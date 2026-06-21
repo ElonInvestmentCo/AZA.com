@@ -266,9 +266,9 @@ const styles = StyleSheet.create({
   },
   btnLoginText: {
     color: "#f8f8f8",
-    fontSize: 12.6,
-    fontFamily: "Manrope_600SemiBold",
-    letterSpacing: 0.2,
+    fontSize: 15,
+    fontFamily: "Manrope_700Bold",
+    letterSpacing: 0.4,
   },
   btnSignUp: {
     height: 38,
@@ -281,8 +281,8 @@ const styles = StyleSheet.create({
   },
   btnSignUpText: {
     color: "#000",
-    fontSize: 12.6,
-    fontFamily: "Manrope_600SemiBold",
-    letterSpacing: 0.2,
+    fontSize: 15,
+    fontFamily: "Manrope_700Bold",
+    letterSpacing: 0.4,
   },
 });
