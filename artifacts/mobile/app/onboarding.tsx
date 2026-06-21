@@ -1,20 +1,17 @@
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Dimensions,
   FlatList,
-  Image,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   ViewToken,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const { width } = Dimensions.get("window");
 
 const eWalletImg = require("@/assets/images/e-wallet.png");
 
@@ -39,11 +36,28 @@ const slides = [
   },
 ];
 
+function clamp(val: number, min: number, max: number) {
+  return Math.min(Math.max(val, min), max);
+}
+
 export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+
+  const isTablet = width >= 768;
+  const contentMaxWidth = Math.min(width, 500);
+
+  // Illustration fills ~50% of screen height on all devices
+  const illustrationSize = clamp(height * 0.44, 200, 380);
+  const hPad = clamp(width * 0.08, 20, 40);
+  const btnWidth = clamp(contentMaxWidth - hPad * 2, 220, 340);
+
+  const titleSize = clamp(isTablet ? width * 0.04 : width * 0.062, 18, 26);
+  const subtitleSize = clamp(width * 0.031, 10.5, 13);
+  const logoSize = clamp(width * 0.054, 17, 23);
 
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -54,61 +68,92 @@ export default function OnboardingScreen() {
   ).current;
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
-      {/* AZA. Header */}
+    <View
+      style={[
+        styles.root,
+        { paddingTop: Platform.OS === "web" ? 0 : insets.top },
+      ]}
+    >
+      {/* ── AZA. header ── */}
       <View style={styles.header}>
-        <Text style={styles.logo}>AZA.</Text>
+        <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
       </View>
 
-      {/* Swipeable slides */}
+      {/* ── Illustration carousel — flex:1 fills middle space ── */}
       <FlatList
         ref={flatListRef}
         data={slides}
         keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
+        bounces={false}
         showsHorizontalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
+        style={styles.flatList}
+        contentContainerStyle={styles.flatListContent}
         renderItem={({ item }) => (
           <View style={[styles.slide, { width }]}>
             <Image
               source={item.image}
-              style={styles.illustration}
-              resizeMode="contain"
+              style={{ width: illustrationSize, height: illustrationSize }}
+              contentFit="contain"
+              transition={180}
+              cachePolicy="memory-disk"
             />
           </View>
         )}
       />
 
-      {/* Bottom section — fixed */}
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + 28 }]}>
-        {/* Page dots */}
+      {/* ── Bottom section — sticks to bottom ── */}
+      <View
+        style={[
+          styles.bottom,
+          {
+            paddingBottom: Math.max(insets.bottom + 16, 24),
+            paddingHorizontal: hPad,
+            alignSelf: "center",
+            width: contentMaxWidth,
+          },
+        ]}
+      >
+        {/* Dots */}
         <View style={styles.dots}>
-          {slides.map((_, i) => {
-            const isActive = i === activeIndex;
-            return (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  isActive ? styles.dotActive : styles.dotInactive,
-                ]}
-              />
-            );
-          })}
+          {slides.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                i === activeIndex ? styles.dotActive : styles.dotInactive,
+              ]}
+            />
+          ))}
         </View>
 
         {/* Text */}
         <View style={styles.textBlock}>
-          <Text style={styles.title}>{slides[activeIndex].title}</Text>
-          <Text style={styles.subtitle}>{slides[activeIndex].subtitle}</Text>
+          <Text
+            style={[
+              styles.title,
+              { fontSize: titleSize, lineHeight: titleSize * 1.22 },
+            ]}
+          >
+            {slides[activeIndex].title}
+          </Text>
+          <Text
+            style={[
+              styles.subtitle,
+              { fontSize: subtitleSize, lineHeight: subtitleSize * 1.5 },
+            ]}
+          >
+            {slides[activeIndex].subtitle}
+          </Text>
         </View>
 
-        {/* Buttons */}
+        {/* Buttons — exact Figma styling preserved */}
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={styles.btnLogin}
+            style={[styles.btnLogin, { width: btnWidth }]}
             onPress={() => router.push("/(auth)/login")}
             activeOpacity={0.85}
           >
@@ -116,7 +161,7 @@ export default function OnboardingScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.btnSignUp}
+            style={[styles.btnSignUp, { width: btnWidth }]}
             onPress={() => router.push("/(auth)/register")}
             activeOpacity={0.85}
           >
@@ -136,27 +181,26 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     paddingTop: 16,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   logo: {
-    fontSize: 22,
     fontFamily: "Manrope_700Bold",
-    letterSpacing: 1,
+    letterSpacing: 1.5,
     color: "#0b0a0a",
   },
+  flatList: {
+    flex: 1,
+  },
+  flatListContent: {
+    alignItems: "center",
+  },
   slide: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 38,
-    paddingTop: 16,
-  },
-  illustration: {
-    width: 334,
-    height: 334,
   },
   bottom: {
-    paddingHorizontal: 32,
-    gap: 20,
+    gap: 16,
     backgroundColor: "#fff",
   },
   dots: {
@@ -164,10 +208,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
+    paddingTop: 4,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 8.39,
+    height: 8.39,
     borderRadius: 1.58,
   },
   dotActive: {
@@ -180,31 +225,27 @@ const styles = StyleSheet.create({
   },
   textBlock: {
     alignItems: "center",
-    gap: 10,
+    gap: 7,
   },
   title: {
-    fontSize: 25.2,
     fontFamily: "Manrope_700Bold",
     color: "#0b0a0a",
     textAlign: "center",
-    letterSpacing: -0.3,
-    lineHeight: 30,
+    letterSpacing: -0.2,
   },
   subtitle: {
-    fontSize: 12.6,
     fontFamily: "Manrope_400Regular",
     color: "#616263",
     textAlign: "center",
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    lineHeight: 18.9,
+    letterSpacing: 0.8,
   },
   buttons: {
-    gap: 8,
     alignItems: "center",
+    gap: 8,
   },
+  // ── Exact Figma button specs — DO NOT change ──
   btnLogin: {
-    width: 263,
     height: 38,
     backgroundColor: "#000",
     borderRadius: 3.15,
@@ -215,13 +256,14 @@ const styles = StyleSheet.create({
     color: "#f8f8f8",
     fontSize: 12.6,
     fontFamily: "Manrope_600SemiBold",
+    letterSpacing: 0.2,
   },
   btnSignUp: {
-    width: 263,
     height: 38,
     borderRadius: 3.15,
     borderWidth: 0.79,
     borderColor: "#000",
+    backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -229,5 +271,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 12.6,
     fontFamily: "Manrope_600SemiBold",
+    letterSpacing: 0.2,
   },
 });
