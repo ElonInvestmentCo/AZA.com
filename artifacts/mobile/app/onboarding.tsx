@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const eWalletImg = require("@/assets/images/e-wallet.png");
+const slide1Img = require("@/assets/images/slide1.png");
+const slide3Img = require("@/assets/images/slide3.png");
 
 // ── Gift Card Illustration ───────────────────────────────────────────────────
 // Pixel-perfect recreation of the Figma slide-2 card element.
@@ -189,7 +190,7 @@ const slides: Slide[] = [
   {
     id: "1",
     type: "image",
-    image: eWalletImg,
+    image: slide1Img,
     title: "Withdraw like a Boss",
     subtitle: "BUY YOUR GIFT CARD ON AZA",
   },
@@ -202,7 +203,7 @@ const slides: Slide[] = [
   {
     id: "3",
     type: "image",
-    image: eWalletImg,
+    image: slide3Img,
     title: "Track Every Transaction",
     subtitle: "FULL HISTORY OF YOUR SALES, ALWAYS IN YOUR POCKET",
   },
