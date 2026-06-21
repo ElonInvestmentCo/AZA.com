@@ -1,7 +1,9 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   FlatList,
   Platform,
   StyleSheet,
@@ -13,216 +15,175 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const slide1Img = require("@/assets/images/slide1.png");
-const slide3Img = require("@/assets/images/slide3.png");
-
-// ── Gift Card Illustration ───────────────────────────────────────────────────
-// Pixel-perfect recreation of the Figma slide-2 card element.
-// Base canvas: 329 × 210. We scale uniformly to fit available width.
-function GiftCardIllustration({ scale }: { scale: number }) {
-  const W = 329 * scale;
-  const H = 210 * scale;
-  const r = (px: number) => Math.round(px * scale);
-
-  // Simple QR-like grid drawn with tiny black squares on white bg
-  const qrCellSize = r(8);
-  const qrPatternSize = r(78);
-  const qrCells: JSX.Element[] = [];
-  // Corner squares + random inner dots to read visually as a QR code
-  const pattern = [
-    [0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],
-    [1,0],[1,6],
-    [2,0],[2,2],[2,3],[2,4],[2,6],
-    [3,0],[3,2],[3,3],[3,4],[3,6],
-    [4,0],[4,2],[4,3],[4,4],[4,6],
-    [5,0],[5,6],
-    [6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],
-    // inner data
-    [2,8],[3,9],[4,8],[5,10],[8,2],[9,3],[8,4],[10,5],
-    [8,8],[8,9],[9,8],[9,10],[10,9],[10,10],
-  ];
-  pattern.forEach(([row, col], idx) => {
-    qrCells.push(
-      <View
-        key={idx}
-        style={{
-          position: "absolute",
-          top: row * qrCellSize,
-          left: col * qrCellSize,
-          width: qrCellSize,
-          height: qrCellSize,
-          backgroundColor: "#000",
-        }}
-      />
-    );
-  });
-
-  return (
-    <View
-      style={{
-        width: W,
-        height: H,
-        backgroundColor: "#000",
-        borderRadius: r(11.32),
-        overflow: "hidden",
-      }}
-    >
-      {/* Top-left labels */}
-      <Text
-        style={{
-          position: "absolute",
-          left: r(17),
-          top: r(11),
-          color: "#fff",
-          fontFamily: "Manrope_700Bold",
-          fontSize: r(13),
-          lineHeight: r(24),
-        }}
-      >
-        Gift card
-      </Text>
-      <Text
-        style={{
-          position: "absolute",
-          left: r(16),
-          top: r(33),
-          color: "#fff",
-          fontFamily: "Manrope_400Regular",
-          fontSize: r(12),
-          lineHeight: r(17),
-          opacity: 0.8,
-        }}
-      >
-        Location
-      </Text>
-
-      {/* Top-right ID */}
-      <Text
-        style={{
-          position: "absolute",
-          right: r(18),
-          top: r(33),
-          color: "#fff",
-          fontFamily: "Manrope_400Regular",
-          fontSize: r(12),
-          lineHeight: r(17),
-          opacity: 0.8,
-        }}
-      >
-        ID: 12345678
-      </Text>
-
-      {/* Divider line */}
-      <View
-        style={{
-          position: "absolute",
-          left: r(16),
-          right: r(16),
-          top: r(58),
-          height: StyleSheet.hairlineWidth,
-          backgroundColor: "rgba(255,255,255,0.25)",
-        }}
-      />
-
-      {/* €XX amount — bottom-left */}
-      <Text
-        style={{
-          position: "absolute",
-          left: r(15),
-          top: r(150),
-          color: "#fff",
-          fontFamily: "Manrope_700Bold",
-          fontSize: r(30),
-          lineHeight: r(32),
-          opacity: 0.9,
-        }}
-      >
-        €XX
-      </Text>
-
-      {/* QR code box */}
-      <View
-        style={{
-          position: "absolute",
-          left: r(214),
-          top: r(90),
-          width: r(90),
-          height: r(90),
-          backgroundColor: "#fff",
-          borderRadius: r(5.66),
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-        }}
-      >
-        <View style={{ width: qrPatternSize, height: qrPatternSize, position: "relative" }}>
-          {qrCells}
-        </View>
-      </View>
-
-      {/* Subtle shine overlay */}
-      <View
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: H * 0.38,
-          backgroundColor: "rgba(255,255,255,0.04)",
-          borderTopLeftRadius: r(11.32),
-          borderTopRightRadius: r(11.32),
-        }}
-      />
-    </View>
-  );
-}
-
-// ── Slide data ───────────────────────────────────────────────────────────────
-type Slide = {
-  id: string;
-  type: "image" | "giftcard";
-  image?: ReturnType<typeof require>;
-  title: string;
-  subtitle: string;
-};
-
-const slides: Slide[] = [
-  {
-    id: "1",
-    type: "image",
-    image: slide1Img,
-    title: "Withdraw like a Boss",
-    subtitle: "BUY YOUR GIFT CARD ON AZA",
-  },
-  {
-    id: "2",
-    type: "giftcard",
-    title: "Sell your gift card",
-    subtitle: "BUY YOUR GIFT CARD ON AZA",
-  },
-  {
-    id: "3",
-    type: "image",
-    image: slide3Img,
-    title: "Track Every Transaction",
-    subtitle: "FULL HISTORY OF YOUR SALES, ALWAYS IN YOUR POCKET",
-  },
-];
+// ── Assets ───────────────────────────────────────────────────────────────────
+const slide1Img    = require("@/assets/images/slide1.png");
+const slide3Img    = require("@/assets/images/slide3.png");
+const giftCardImg  = require("@/assets/images/gift-card.png");
+const manImg       = require("@/assets/images/man-illustration.png");
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
   return Math.min(Math.max(val, min), max);
 }
 
-const HEADER_H = 52;
-const DOTS_H   = 24;
-const TEXT_H   = 68;
-const BTNS_H   = 96;
+// ── Layout constants ─────────────────────────────────────────────────────────
+const HEADER_H = 56;
+const DOTS_H   = 28;
+const TEXT_H   = 72;
+const BTNS_H   = 116; // 2 buttons × 50px + 16px gap
 
-// ── Screen ───────────────────────────────────────────────────────────────────
+// ── Slide definitions ────────────────────────────────────────────────────────
+type SlideItem = {
+  id: string;
+  type: "animated-wallet" | "giftcard" | "image";
+  title: string;
+  subtitle: string;
+  bgColor: string;
+};
+
+const SLIDES: SlideItem[] = [
+  {
+    id: "1",
+    type: "animated-wallet",
+    title: "Withdraw like a Boss",
+    subtitle: "BUY YOUR GIFT CARD ON AZA",
+    bgColor: "#ffffff",
+  },
+  {
+    id: "2",
+    type: "giftcard",
+    title: "Sell your gift card",
+    subtitle: "Buy Your Gift Card On Aza",
+    bgColor: "#ece8f8",
+  },
+  {
+    id: "3",
+    type: "image",
+    title: "Bill payments",
+    subtitle: "We Got Your Bills Sorted",
+    bgColor: "#ffffff",
+  },
+];
+
+// ── Slide 1: Animated wallet illustration ───────────────────────────────────
+function AnimatedWalletSlide({
+  illustrationSize,
+  slideW,
+  slideH,
+  isActive,
+}: {
+  illustrationSize: number;
+  slideW: number;
+  slideH: number;
+  isActive: boolean;
+}) {
+  const manY = useRef(new Animated.Value(-illustrationSize * 1.2)).current;
+
+  useEffect(() => {
+    if (!isActive) return;
+    // Reset then slide in
+    manY.setValue(-illustrationSize * 1.2);
+    Animated.timing(manY, {
+      toValue: 0,
+      duration: 1000,
+      delay: 200,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: Platform.OS !== "web",
+    }).start();
+  }, [isActive, illustrationSize]);
+
+  // Man is sized to ~55% of illustration, positioned left of center
+  // so his outstretched right arm aligns with the PAY button on the phone
+  const manH = illustrationSize * 0.78;
+  const manW = manH * 0.72; // aspect ratio of the man+document illustration
+  // The PAY button is at ~62% from top of illustration, at horizontal center
+  // Man's arm tip is at ~52% from top of man → vertically align:
+  const manTop  = illustrationSize * 0.62 - manH * 0.52;
+  const manLeft = illustrationSize * 0.01; // slightly left of center
+
+  return (
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      {/* Base e-wallet illustration */}
+      <View style={{ width: illustrationSize, height: illustrationSize, position: "relative" }}>
+        <Image
+          source={slide1Img}
+          style={{ width: illustrationSize, height: illustrationSize }}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+        />
+        {/* Animated man overlay */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: manTop,
+            left: manLeft,
+            width: manW,
+            height: manH,
+            transform: [{ translateY: manY }],
+          }}
+        >
+          <Image
+            source={manImg}
+            style={{ width: manW, height: manH }}
+            contentFit="contain"
+            cachePolicy="memory-disk"
+          />
+        </Animated.View>
+      </View>
+    </View>
+  );
+}
+
+// ── Slide 2: Gift card image ─────────────────────────────────────────────────
+function GiftCardSlide({
+  slideW,
+  slideH,
+}: {
+  slideW: number;
+  slideH: number;
+}) {
+  // Card aspect ratio: 329/210 (landscape) → keep width ~88% of slide
+  const cardW = clamp(slideW * 0.88, 240, 380);
+  const cardH = cardW * (210 / 329);
+
+  return (
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Image
+        source={giftCardImg}
+        style={{ width: cardW, height: cardH, borderRadius: 12 }}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+      />
+    </View>
+  );
+}
+
+// ── Slide 3: Image illustration ──────────────────────────────────────────────
+function ImageSlide({
+  illustrationSize,
+  slideW,
+  slideH,
+}: {
+  illustrationSize: number;
+  slideW: number;
+  slideH: number;
+}) {
+  return (
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Image
+        source={slide3Img}
+        style={{ width: illustrationSize, height: illustrationSize }}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+      />
+    </View>
+  );
+}
+
+// ── Main screen ──────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const router  = useRouter();
+  const insets  = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -230,23 +191,18 @@ export default function OnboardingScreen() {
   const topInset    = Platform.OS === "web" ? 0 : insets.top;
   const bottomInset = Platform.OS === "web" ? 0 : insets.bottom;
 
-  const bottomSectionH = DOTS_H + TEXT_H + BTNS_H + 32 + bottomInset;
-  const slideAreaH     = height - topInset - HEADER_H - bottomSectionH;
+  const bottomSectionH = DOTS_H + TEXT_H + BTNS_H + 40 + bottomInset;
+  const slideAreaH     = Math.max(height - topInset - HEADER_H - bottomSectionH, 160);
 
-  const illustrationSize = clamp(Math.min(slideAreaH * 0.88, width * 0.86), 180, 380);
+  const illustrationSize = clamp(Math.min(slideAreaH * 0.92, width * 0.9), 180, 420);
 
-  // Gift card: keep the 329/210 aspect ratio and fit inside the slide area
-  const cardMaxW = clamp(width * 0.88, 240, 340);
-  const cardScale = cardMaxW / 329;
+  const contentMaxW = Math.min(width, 500);
+  const hPad        = clamp(width * 0.06, 16, 28);
+  const btnWidth    = contentMaxW - hPad * 2;
 
-  const isTablet       = width >= 768;
-  const contentMaxWidth = Math.min(width, 500);
-  const hPad           = clamp(width * 0.07, 20, 40);
-  const btnWidth       = clamp(contentMaxWidth - hPad * 2, 220, 340);
-
-  const titleSize    = clamp(isTablet ? width * 0.038 : width * 0.062, 18, 26);
-  const subtitleSize = clamp(width * 0.031, 10.5, 13);
-  const logoSize     = clamp(width * 0.054, 17, 23);
+  const titleSize    = clamp(width * 0.064, 20, 28);
+  const subtitleSize = clamp(width * 0.034, 11, 14);
+  const logoSize     = clamp(width * 0.056, 18, 24);
 
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -256,6 +212,8 @@ export default function OnboardingScreen() {
     }
   ).current;
 
+  const activeSlide = SLIDES[activeIndex];
+
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
 
@@ -264,10 +222,10 @@ export default function OnboardingScreen() {
         <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
       </View>
 
-      {/* ── Illustration carousel ── */}
+      {/* ── Slide carousel ── */}
       <FlatList
         ref={flatListRef}
-        data={slides}
+        data={SLIDES}
         keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
@@ -276,33 +234,35 @@ export default function OnboardingScreen() {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         style={{ height: slideAreaH }}
-        getItemLayout={(_, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              width,
-              height: slideAreaH,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {item.type === "giftcard" ? (
-              <GiftCardIllustration scale={cardScale} />
-            ) : (
-              <Image
-                source={item.image}
-                style={{ width: illustrationSize, height: illustrationSize }}
-                contentFit="contain"
-                transition={180}
-                cachePolicy="memory-disk"
-              />
-            )}
-          </View>
-        )}
+        getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
+        renderItem={({ item, index }) => {
+          const isActive = index === activeIndex;
+          return (
+            <View style={{ width, height: slideAreaH, backgroundColor: item.bgColor }}>
+              {item.type === "animated-wallet" && (
+                <AnimatedWalletSlide
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                  isActive={isActive}
+                />
+              )}
+              {item.type === "giftcard" && (
+                <GiftCardSlide
+                  slideW={width}
+                  slideH={slideAreaH}
+                />
+              )}
+              {item.type === "image" && (
+                <ImageSlide
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                />
+              )}
+            </View>
+          );
+        }}
       />
 
       {/* ── Bottom section ── */}
@@ -310,46 +270,37 @@ export default function OnboardingScreen() {
         style={[
           styles.bottom,
           {
-            paddingBottom: bottomInset + 16,
+            paddingBottom: bottomInset + 20,
             paddingHorizontal: hPad,
             alignSelf: "center",
-            width: contentMaxWidth,
+            width: contentMaxW,
           },
         ]}
       >
         {/* Dots */}
         <View style={[styles.dots, { height: DOTS_H }]}>
-          {slides.map((_, i) => (
+          {SLIDES.map((_, i) => (
             <View
               key={i}
-              style={[
-                styles.dot,
-                i === activeIndex ? styles.dotActive : styles.dotInactive,
-              ]}
+              style={[styles.dot, i === activeIndex ? styles.dotActive : styles.dotInactive]}
             />
           ))}
         </View>
 
         {/* Text */}
-        <View style={[styles.textBlock, { height: TEXT_H }]}>
+        <View style={[styles.textBlock, { minHeight: TEXT_H }]}>
           <Text
-            style={[
-              styles.title,
-              { fontSize: titleSize, lineHeight: titleSize * 1.22 },
-            ]}
+            style={[styles.title, { fontSize: titleSize, lineHeight: titleSize * 1.2 }]}
             numberOfLines={2}
             adjustsFontSizeToFit
           >
-            {slides[activeIndex].title}
+            {activeSlide.title}
           </Text>
           <Text
-            style={[
-              styles.subtitle,
-              { fontSize: subtitleSize, lineHeight: subtitleSize * 1.5 },
-            ]}
+            style={[styles.subtitle, { fontSize: subtitleSize, lineHeight: subtitleSize * 1.5 }]}
             numberOfLines={2}
           >
-            {slides[activeIndex].subtitle}
+            {activeSlide.subtitle}
           </Text>
         </View>
 
@@ -358,7 +309,7 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             style={[styles.btnLogin, { width: btnWidth }]}
             onPress={() => router.push("/(auth)/login")}
-            activeOpacity={0.85}
+            activeOpacity={0.82}
           >
             <Text style={styles.btnLoginText}>Login</Text>
           </TouchableOpacity>
@@ -366,7 +317,7 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             style={[styles.btnSignUp, { width: btnWidth }]}
             onPress={() => router.push("/(auth)/register")}
-            activeOpacity={0.85}
+            activeOpacity={0.82}
           >
             <Text style={styles.btnSignUpText}>Sign Up</Text>
           </TouchableOpacity>
@@ -376,6 +327,7 @@ export default function OnboardingScreen() {
   );
 }
 
+// ── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -384,6 +336,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#fff",
   },
   logo: {
     fontFamily: "Manrope_700Bold",
@@ -391,7 +344,6 @@ const styles = StyleSheet.create({
     color: "#0b0a0a",
   },
   bottom: {
-    gap: 0,
     backgroundColor: "#fff",
   },
   dots: {
@@ -399,16 +351,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
+    marginBottom: 4,
   },
   dot: {
-    width: 8.39,
-    height: 8.39,
-    borderRadius: 1.58,
+    width: 8,
+    height: 8,
+    borderRadius: 2,
   },
   dotActive: {
-    backgroundColor: "#d0d3d8",
-    borderWidth: 1.58,
-    borderColor: "#0b0a0a",
+    backgroundColor: "#0b0a0a",
+    borderWidth: 0,
   },
   dotInactive: {
     backgroundColor: "#d0d3d8",
@@ -416,44 +368,43 @@ const styles = StyleSheet.create({
   textBlock: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 7,
+    gap: 8,
+    paddingVertical: 4,
   },
   title: {
     fontFamily: "Manrope_700Bold",
     color: "#0b0a0a",
     textAlign: "center",
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
   },
   subtitle: {
     fontFamily: "Manrope_400Regular",
     color: "#616263",
     textAlign: "center",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
   },
   buttons: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 8,
+    gap: 12,
+    marginTop: 8,
   },
-  // ── Exact Figma button specs — DO NOT modify ──
   btnLogin: {
-    height: 38,
+    height: 50,
     backgroundColor: "#000",
-    borderRadius: 3.15,
+    borderRadius: 4,
     alignItems: "center",
     justifyContent: "center",
   },
   btnLoginText: {
-    color: "#f8f8f8",
+    color: "#fff",
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
-    letterSpacing: 0.4,
+    letterSpacing: 0.3,
   },
   btnSignUp: {
-    height: 38,
-    borderRadius: 3.15,
-    borderWidth: 0.79,
+    height: 50,
+    borderRadius: 4,
+    borderWidth: 1,
     borderColor: "#000",
     backgroundColor: "transparent",
     alignItems: "center",
@@ -463,6 +414,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
-    letterSpacing: 0.4,
+    letterSpacing: 0.3,
   },
 });
