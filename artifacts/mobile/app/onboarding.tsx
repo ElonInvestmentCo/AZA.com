@@ -77,19 +77,21 @@ function AnimatedWalletSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Man is life-size: taller than the phone illustration so he dominates the scene.
-  // He slides in from above and pauses exactly when his hand aligns with the PAY button.
+  // Man is life-size — taller than the phone illustration.
   const manH = illustrationSize * 1.38;
-  const manW = manH * 0.72; // preserve aspect ratio of the man illustration
+  const manW = manH * 0.72;
 
-  // The PAY button sits at ~62% down the illustration height.
-  // The man's pointing hand tip is at ~50% of his own height.
-  // Solve: manTop + manH * 0.50 = illustrationSize * 0.62
-  const manTop  = illustrationSize * 0.62 - manH * 0.50;
-  const manLeft = -manW * 0.08; // anchor left edge slightly outside the illustration so body stays left
+  // Illustration is centered within the slide.
+  const illusTop  = (slideH - illustrationSize) / 2;
+  const illusLeft = (slideW - illustrationSize) / 2;
 
-  // Slide starts fully above the slide area; toValue=0 is the resting (hand-aligned) position.
-  const startY = -(illustrationSize + Math.abs(manTop) + manH);
+  // PAY button sits at ~62% down the illustration; man's hand tip at ~50% of his height.
+  // Compute absolute positions within the slide so we NEVER need overflow.
+  const manTop  = illusTop  + illustrationSize * 0.62 - manH * 0.50;
+  const manLeft = illusLeft - manW * 0.08; // body left of centre, arm reaches phone
+
+  // Start fully above the visible slide so there's no pop-in on any device.
+  const startY = -(slideH + manH);
   const manY = useRef(new Animated.Value(startY)).current;
 
   useEffect(() => {
@@ -105,34 +107,40 @@ function AnimatedWalletSlide({
   }, [isActive, illustrationSize]);
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      {/* Base e-wallet illustration — overflow visible so the life-size man can extend above/below */}
-      <View style={{ width: illustrationSize, height: illustrationSize, position: "relative", overflow: "visible" }}>
+    // Flat layout — both layers are absolutely positioned children of the slide view.
+    // No overflow hacks needed; the man sits alongside the phone, not inside its View.
+    <View style={{ width: slideW, height: slideH }}>
+      {/* Base e-wallet / phone illustration — centred */}
+      <Image
+        source={slide1Img}
+        style={{
+          position: "absolute",
+          top: illusTop,
+          left: illusLeft,
+          width: illustrationSize,
+          height: illustrationSize,
+        }}
+        contentFit="contain"
+        cachePolicy="memory-disk"
+      />
+      {/* Life-size man — slides in from top, hand lands on PAY button */}
+      <Animated.View
+        style={{
+          position: "absolute",
+          top: manTop,
+          left: manLeft,
+          width: manW,
+          height: manH,
+          transform: [{ translateY: manY }],
+        }}
+      >
         <Image
-          source={slide1Img}
-          style={{ width: illustrationSize, height: illustrationSize }}
+          source={manImg}
+          style={{ width: manW, height: manH }}
           contentFit="contain"
           cachePolicy="memory-disk"
         />
-        {/* Animated man overlay — life-size, slides down from top */}
-        <Animated.View
-          style={{
-            position: "absolute",
-            top: manTop,
-            left: manLeft,
-            width: manW,
-            height: manH,
-            transform: [{ translateY: manY }],
-          }}
-        >
-          <Image
-            source={manImg}
-            style={{ width: manW, height: manH }}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-          />
-        </Animated.View>
-      </View>
+      </Animated.View>
     </View>
   );
 }
