@@ -77,41 +77,44 @@ function AnimatedWalletSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const manY = useRef(new Animated.Value(-illustrationSize * 1.2)).current;
+  // Man is life-size: taller than the phone illustration so he dominates the scene.
+  // He slides in from above and pauses exactly when his hand aligns with the PAY button.
+  const manH = illustrationSize * 1.38;
+  const manW = manH * 0.72; // preserve aspect ratio of the man illustration
+
+  // The PAY button sits at ~62% down the illustration height.
+  // The man's pointing hand tip is at ~50% of his own height.
+  // Solve: manTop + manH * 0.50 = illustrationSize * 0.62
+  const manTop  = illustrationSize * 0.62 - manH * 0.50;
+  const manLeft = -manW * 0.08; // anchor left edge slightly outside the illustration so body stays left
+
+  // Slide starts fully above the slide area; toValue=0 is the resting (hand-aligned) position.
+  const startY = -(illustrationSize + Math.abs(manTop) + manH);
+  const manY = useRef(new Animated.Value(startY)).current;
 
   useEffect(() => {
     if (!isActive) return;
-    // Reset then slide in
-    manY.setValue(-illustrationSize * 1.2);
+    manY.setValue(startY);
     Animated.timing(manY, {
       toValue: 0,
-      duration: 1000,
+      duration: 1100,
       delay: 200,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: Platform.OS !== "web",
     }).start();
   }, [isActive, illustrationSize]);
 
-  // Man is sized to ~55% of illustration, positioned left of center
-  // so his outstretched right arm aligns with the PAY button on the phone
-  const manH = illustrationSize * 0.78;
-  const manW = manH * 0.72; // aspect ratio of the man+document illustration
-  // The PAY button is at ~62% from top of illustration, at horizontal center
-  // Man's arm tip is at ~52% from top of man → vertically align:
-  const manTop  = illustrationSize * 0.62 - manH * 0.52;
-  const manLeft = illustrationSize * 0.01; // slightly left of center
-
   return (
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      {/* Base e-wallet illustration */}
-      <View style={{ width: illustrationSize, height: illustrationSize, position: "relative" }}>
+      {/* Base e-wallet illustration — overflow visible so the life-size man can extend above/below */}
+      <View style={{ width: illustrationSize, height: illustrationSize, position: "relative", overflow: "visible" }}>
         <Image
           source={slide1Img}
           style={{ width: illustrationSize, height: illustrationSize }}
           contentFit="contain"
           cachePolicy="memory-disk"
         />
-        {/* Animated man overlay */}
+        {/* Animated man overlay — life-size, slides down from top */}
         <Animated.View
           style={{
             position: "absolute",
