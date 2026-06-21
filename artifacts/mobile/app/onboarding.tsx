@@ -3,109 +3,124 @@ import React, { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ViewToken,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AZAButton } from "@/components/AZAButton";
-import { useColors } from "@/hooks/useColors";
 
 const { width } = Dimensions.get("window");
+
+const eWalletImg = require("@/assets/images/e-wallet.png");
 
 const slides = [
   {
     id: "1",
+    image: eWalletImg,
     title: "Withdraw like a Boss",
-    subtitle: "Buy your gift card on AZA and cash out instantly.",
-    bg: "#000",
-    textColor: "#fff",
+    subtitle: "buy your gift card on aza",
   },
   {
     id: "2",
+    image: eWalletImg,
     title: "Sell Gift Cards Fast",
-    subtitle: "Trade Amazon, iTunes, Steam and more at the best rates.",
-    bg: "#061941",
-    textColor: "#fff",
+    subtitle: "trade amazon, itunes, steam & more",
   },
   {
     id: "3",
+    image: eWalletImg,
     title: "Track Every Transaction",
-    subtitle: "Full history of your sales and withdrawals, always in your pocket.",
-    bg: "#008a48",
-    textColor: "#fff",
+    subtitle: "full history of your sales, always in your pocket",
   },
 ];
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const colors = useColors();
   const insets = useSafeAreaInsets();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
-  const handleNext = () => {
-    if (currentIndex < slides.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
-      setCurrentIndex((i) => i + 1);
-    } else {
-      router.replace("/(auth)/login");
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index !== null) {
+        setActiveIndex(viewableItems[0].index);
+      }
     }
-  };
-
-  const isLast = currentIndex === slides.length - 1;
+  ).current;
 
   return (
-    <View style={{ flex: 1, backgroundColor: slides[currentIndex].bg }}>
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      {/* AZA. Header */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>AZA.</Text>
+      </View>
+
+      {/* Swipeable slides */}
       <FlatList
         ref={flatListRef}
         data={slides}
+        keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        scrollEnabled={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         renderItem={({ item }) => (
-          <View style={[styles.slide, { width, backgroundColor: item.bg }]}>
-            <View style={styles.illustration}>
-              <Text style={[styles.illustrationText, { color: item.textColor }]}>
-                {item.id === "1" ? "💳" : item.id === "2" ? "🎁" : "📊"}
-              </Text>
-            </View>
-            <Text style={[styles.title, { color: item.textColor }]}>
-              {item.title}
-            </Text>
-            <Text style={[styles.subtitle, { color: item.textColor, opacity: 0.7 }]}>
-              {item.subtitle}
-            </Text>
+          <View style={[styles.slide, { width }]}>
+            <Image
+              source={item.image}
+              style={styles.illustration}
+              resizeMode="contain"
+            />
           </View>
         )}
       />
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + 24 }]}>
+      {/* Bottom section — fixed */}
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + 28 }]}>
+        {/* Page dots */}
         <View style={styles.dots}>
-          {slides.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    i === currentIndex ? "#fff" : "rgba(255,255,255,0.3)",
-                  width: i === currentIndex ? 20 : 8,
-                },
-              ]}
-            />
-          ))}
+          {slides.map((_, i) => {
+            const isActive = i === activeIndex;
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  isActive ? styles.dotActive : styles.dotInactive,
+                ]}
+              />
+            );
+          })}
         </View>
 
-        <View style={styles.actions}>
-          <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
-            <Text style={styles.skipText}>Skip</Text>
+        {/* Text */}
+        <View style={styles.textBlock}>
+          <Text style={styles.title}>{slides[activeIndex].title}</Text>
+          <Text style={styles.subtitle}>{slides[activeIndex].subtitle}</Text>
+        </View>
+
+        {/* Buttons */}
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.btnLogin}
+            onPress={() => router.push("/(auth)/login")}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.btnLoginText}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
-            <Text style={styles.nextText}>{isLast ? "Get Started" : "Next"}</Text>
+
+          <TouchableOpacity
+            style={styles.btnSignUp}
+            onPress={() => router.push("/(auth)/register")}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.btnSignUpText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -114,69 +129,105 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  slide: {
+  root: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    alignItems: "center",
+    paddingTop: 16,
+    paddingBottom: 4,
+  },
+  logo: {
+    fontSize: 22,
+    fontFamily: "Manrope_700Bold",
+    letterSpacing: 1,
+    color: "#0b0a0a",
+  },
+  slide: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 32,
-    paddingTop: 80,
+    paddingHorizontal: 38,
+    paddingTop: 16,
   },
   illustration: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 48,
+    width: 334,
+    height: 334,
   },
-  illustrationText: { fontSize: 80 },
-  title: {
-    fontSize: 28,
-    fontFamily: "Manrope_700Bold",
-    textAlign: "center",
-    marginBottom: 16,
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontFamily: "Manrope_400Regular",
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  footer: {
-    paddingHorizontal: 28,
-    gap: 24,
+  bottom: {
+    paddingHorizontal: 32,
+    gap: 20,
+    backgroundColor: "#fff",
   },
   dots: {
     flexDirection: "row",
-    gap: 6,
     justifyContent: "center",
     alignItems: "center",
+    gap: 8,
   },
   dot: {
+    width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: 1.58,
   },
-  actions: {
-    flexDirection: "row",
+  dotActive: {
+    backgroundColor: "#d0d3d8",
+    borderWidth: 1.58,
+    borderColor: "#0b0a0a",
+  },
+  dotInactive: {
+    backgroundColor: "#d0d3d8",
+  },
+  textBlock: {
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 10,
   },
-  skipText: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: 15,
-    fontFamily: "Manrope_500Medium",
+  title: {
+    fontSize: 25.2,
+    fontFamily: "Manrope_700Bold",
+    color: "#0b0a0a",
+    textAlign: "center",
+    letterSpacing: -0.3,
+    lineHeight: 30,
   },
-  nextBtn: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    borderRadius: 40,
+  subtitle: {
+    fontSize: 12.6,
+    fontFamily: "Manrope_400Regular",
+    color: "#616263",
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    lineHeight: 18.9,
   },
-  nextText: {
+  buttons: {
+    gap: 8,
+    alignItems: "center",
+  },
+  btnLogin: {
+    width: 263,
+    height: 38,
+    backgroundColor: "#000",
+    borderRadius: 3.15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnLoginText: {
+    color: "#f8f8f8",
+    fontSize: 12.6,
+    fontFamily: "Manrope_600SemiBold",
+  },
+  btnSignUp: {
+    width: 263,
+    height: 38,
+    borderRadius: 3.15,
+    borderWidth: 0.79,
+    borderColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnSignUpText: {
     color: "#000",
-    fontSize: 15,
+    fontSize: 12.6,
     fontFamily: "Manrope_600SemiBold",
   },
 });
