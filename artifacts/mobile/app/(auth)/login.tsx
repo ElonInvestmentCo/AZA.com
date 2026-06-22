@@ -369,32 +369,6 @@ export default function LoginScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── Divider — exact CSS spec ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).delay(220).springify()}
-          style={s.dividerRow}
-        >
-          {/* Line 1: 111.66px, border: 1px solid #E8ECF4 */}
-          <View style={s.dividerLine} />
-          {/* Or Login with: Urbanist 600, 14px, #6A707C */}
-          <Text style={s.dividerText}>Or Login with</Text>
-          {/* Line 2: 110.66px, border: 1px solid #E8ECF4 */}
-          <View style={s.dividerLine} />
-        </Animated.View>
-
-        {/* ── Social buttons ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).delay(260).springify()}
-          style={s.socialRow}
-        >
-          <SocialBtn>
-            <Image source={btnGoogleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
-          </SocialBtn>
-          <SocialBtn>
-            <Image source={btnAppleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
-          </SocialBtn>
-        </Animated.View>
-
         {/* ── Footer ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}

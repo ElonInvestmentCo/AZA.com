@@ -302,29 +302,6 @@ export default function RegisterScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── Divider — exact CSS spec ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).delay(220).springify()}
-          style={s.dividerRow}
-        >
-          <View style={s.dividerLine} />
-          <Text style={s.dividerText}>Or Login with</Text>
-          <View style={s.dividerLine} />
-        </Animated.View>
-
-        {/* ── Social buttons — Google + Apple only ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).delay(260).springify()}
-          style={s.socialRow}
-        >
-          <SocialBtn>
-            <Image source={btnGoogleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
-          </SocialBtn>
-          <SocialBtn>
-            <Image source={btnAppleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
-          </SocialBtn>
-        </Animated.View>
-
         {/* ── Footer ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}
