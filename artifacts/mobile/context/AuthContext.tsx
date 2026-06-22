@@ -19,6 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
+  loginWithSocial: (email: string, name: string, provider: string) => Promise<void>;
   logout: () => void;
   updateBalance: (amount: number) => void;
 }
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => false,
   register: async () => false,
+  loginWithSocial: async () => {},
   logout: () => {},
   updateBalance: () => {},
 });
@@ -65,6 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
+  const loginWithSocial = useCallback(
+    async (email: string, name: string, _provider: string) => {
+      const u: User = { name: name || email.split("@")[0], email, balance: 200590 };
+      setUser(u);
+      await AsyncStorage.setItem("aza_user", JSON.stringify(u));
+    },
+    []
+  );
+
   const logout = useCallback(async () => {
     setUser(null);
     await AsyncStorage.removeItem("aza_user");
@@ -88,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        loginWithSocial,
         logout,
         updateBalance,
       }}

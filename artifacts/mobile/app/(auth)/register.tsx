@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -28,8 +29,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 /* ── Assets ─────────────────────────────────────────────────────────────── */
-const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
-const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 const eyeOpenImg   = require("../../assets/images/eye-open.svg");
 const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 
@@ -275,12 +274,13 @@ export default function RegisterScreen() {
   const insets       = useSafeAreaInsets();
   const { register } = useAuth();
 
-  const [username,  setUsername]  = useState("");
-  const [email,     setEmail]     = useState("");
-  const [password,  setPassword]  = useState("");
-  const [confirm,   setConfirm]   = useState("");
-  const [loading,   setLoading]   = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [username,    setUsername]    = useState("");
+  const [email,       setEmail]       = useState("");
+  const [password,    setPassword]    = useState("");
+  const [confirm,     setConfirm]     = useState("");
+  const [loading,     setLoading]     = useState(false);
+  const [submitted,   setSubmitted]   = useState(false);
+  const [socialError, setSocialError] = useState("");
 
   /* touched state — set true on blur OR on first submit attempt */
   const [touchedUsername, setTouchedUsername] = useState(false);
@@ -450,10 +450,17 @@ export default function RegisterScreen() {
         {/* ── Social buttons ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(260).springify()}
-          style={s.socialRow}
+          style={s.socialWrap}
         >
-          <Image source={btnGoogleImg} style={s.socialBtn} contentFit="contain" />
-          <Image source={btnAppleImg}  style={s.socialBtn} contentFit="contain" />
+          <SocialAuthButtons
+            onSuccess={() => router.replace("/(auth)/pin")}
+            onError={msg => { setSocialError(msg); }}
+          />
+          {socialError ? (
+            <Animated.Text entering={FadeIn.duration(200)} style={s.socialError}>
+              {socialError}
+            </Animated.Text>
+          ) : null}
         </Animated.View>
 
         {/* ── Footer ── */}
@@ -541,13 +548,17 @@ const s = StyleSheet.create({
     color: "#6A707C",
   },
 
-  socialRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
+  socialWrap: {
     marginBottom: 24,
+    gap: 10,
   },
-  socialBtn: { width: 105, height: 56 },
+  socialError: {
+    fontSize: 13,
+    fontFamily: "Manrope_400Regular",
+    color: "#FF5B7A",
+    textAlign: "center",
+    marginTop: 4,
+  },
 
   footer: {
     flexDirection: "row",

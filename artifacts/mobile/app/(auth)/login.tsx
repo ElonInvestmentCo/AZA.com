@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
@@ -53,11 +54,8 @@ const C = {
 };
 
 const fingerprintImg = require("@/assets/images/fingerprint.png");
-const btnGoogleImg   = require("@/assets/images/btn-social-google.svg");
-const btnAppleImg    = require("@/assets/images/btn-social-apple.svg");
-
-const eyeOpenImg   = require("../../assets/images/eye-open.svg");
-const eyeClosedImg = require("../../assets/images/eye-closed.svg");
+const eyeOpenImg     = require("../../assets/images/eye-open.svg");
+const eyeClosedImg   = require("../../assets/images/eye-closed.svg");
 
 /* ── Email input ────────────────────────────────────────────────────────── */
 function EmailInput({
@@ -188,10 +186,11 @@ export default function LoginScreen() {
   const insets    = useSafeAreaInsets();
   const { login } = useAuth();
 
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState("");
+  const [email,       setEmail]       = useState("");
+  const [password,    setPassword]    = useState("");
+  const [loading,     setLoading]     = useState(false);
+  const [error,       setError]       = useState("");
+  const [socialError, setSocialError] = useState("");
 
   /* login button scale — lives on its OWN Animated.View (no entering prop) */
   const btnSc    = useSharedValue(1);
@@ -347,10 +346,17 @@ export default function LoginScreen() {
         {/* ── Social buttons ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}
-          style={s.socialRow}
+          style={s.socialWrap}
         >
-          <Image source={btnGoogleImg} style={s.socialBtn} contentFit="contain" />
-          <Image source={btnAppleImg}  style={s.socialBtn} contentFit="contain" />
+          <SocialAuthButtons
+            onSuccess={() => router.replace("/(auth)/pin")}
+            onError={msg => { setSocialError(msg); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); }}
+          />
+          {socialError ? (
+            <Animated.Text entering={FadeIn.duration(200)} style={s.socialError}>
+              {socialError}
+            </Animated.Text>
+          ) : null}
         </Animated.View>
 
         {/* ── Footer ── */}
@@ -461,15 +467,16 @@ const s = StyleSheet.create({
     color: "#6A707C",
   },
 
-  socialRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
+  socialWrap: {
     marginBottom: 24,
+    gap: 10,
   },
-  socialBtn: {
-    width: 105,
-    height: 56,
+  socialError: {
+    fontSize: 13,
+    fontFamily: "Manrope_400Regular",
+    color: "#FF5B7A",
+    textAlign: "center",
+    marginTop: 4,
   },
 
   footer: {
