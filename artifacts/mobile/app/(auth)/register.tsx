@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import Animated, {
@@ -34,7 +33,7 @@ const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 const eyeOpenImg   = require("../../assets/images/eye-open.svg");
 const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 
-/* ── Design tokens (light theme — matches reference screenshot) ───────────── */
+/* ── Design tokens ───────────────────────────────────────────────────────── */
 const C = {
   bg:          "#FFFFFF",
   inputBg:     "#F7F8F9",
@@ -42,14 +41,13 @@ const C = {
   inputFocus:  "#1E232C",
   text:        "#1E232C",
   placeholder: "#8391A1",
-  subtext:     "#6A707C",
   btn:         "#1E232C",
   btnText:     "#FFFFFF",
   error:       "#FF5B7A",
   footerLink:  "#35C2C1",
 };
 
-/* ── Plain input (no left icon — matches reference) ──────────────────────── */
+/* ── Plain input ─────────────────────────────────────────────────────────── */
 function PlainInput({
   placeholder,
   value,
@@ -83,7 +81,7 @@ function PlainInput({
         onBlur={() => setFocused(false)}
       />
       {secure && (
-        <TouchableOpacity
+        <Pressable
           onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={inp.eyeBtn}
@@ -93,7 +91,7 @@ function PlainInput({
             style={{ width: 22, height: 22 }}
             contentFit="contain"
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
     </View>
   );
@@ -122,34 +120,33 @@ const inp = StyleSheet.create({
   eyeBtn: { padding: 2 },
 });
 
-/* ── Social button ────────────────────────────────────────────────────────── */
-function SocialBtn({ children }: { children: React.ReactNode }) {
-  const sc = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+/* ── Animated Pressable link ─────────────────────────────────────────────── */
+function LinkBtn({
+  onPress,
+  style,
+  textStyle,
+  label,
+}: {
+  onPress: () => void;
+  style?: object;
+  textStyle: object;
+  label: string;
+}) {
+  const op = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ opacity: op.value }));
   return (
-    <Animated.View style={[animStyle, { flex: 1 }]}>
+    <Animated.View style={[animStyle, style]}>
       <Pressable
-        style={sb.btn}
-        onPressIn={() => { sc.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
-        onPressOut={() => { sc.value = withSpring(1.0, { damping: 12, stiffness: 300 }); }}
+        onPress={onPress}
+        onPressIn={() => { op.value = withTiming(0.5, { duration: 80 }); }}
+        onPressOut={() => { op.value = withSpring(1, { damping: 14, stiffness: 280 }); }}
+        hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
       >
-        {children}
+        <Text style={textStyle}>{label}</Text>
       </Pressable>
     </Animated.View>
   );
 }
-
-const sb = StyleSheet.create({
-  btn: {
-    height: 60,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: C.inputBorder,
-    backgroundColor: C.bg,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
 
 /* ── Main screen ─────────────────────────────────────────────────────────── */
 export default function RegisterScreen() {
@@ -164,6 +161,7 @@ export default function RegisterScreen() {
   const [loading,   setLoading]   = useState(false);
   const [error,     setError]     = useState("");
 
+  /* register button scale — on its OWN inner Animated.View (no entering prop) */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
@@ -221,13 +219,13 @@ export default function RegisterScreen() {
       >
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
-          <TouchableOpacity
+          <Pressable
             style={s.backBtn}
             onPress={() => router.back()}
-            activeOpacity={0.8}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
-          </TouchableOpacity>
+          </Pressable>
           <Text style={s.wordmark}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
@@ -272,7 +270,6 @@ export default function RegisterScreen() {
             secure
             error={!!error}
           />
-
           {error ? (
             <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
               {error}
@@ -280,27 +277,29 @@ export default function RegisterScreen() {
           ) : null}
         </Animated.View>
 
-        {/* ── Agree and Register button ── */}
+        {/* ── Register button — entering on wrapper, scale on inner view ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
-          style={[btnStyle, s.btnWrap]}
+          style={s.btnWrap}
         >
-          <Pressable
-            style={[s.regBtn, loading && { opacity: 0.75 }]}
-            onPress={handleRegister}
-            onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
-            }}
-            onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={C.btnText} size="small" />
-            ) : (
-              <Text style={s.regBtnText}>Agree and Register</Text>
-            )}
-          </Pressable>
+          <Animated.View style={btnStyle}>
+            <Pressable
+              style={[s.regBtn, loading && { opacity: 0.75 }]}
+              onPress={handleRegister}
+              onPressIn={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
+              }}
+              onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={C.btnText} size="small" />
+              ) : (
+                <Text style={s.regBtnText}>Agree and Register</Text>
+              )}
+            </Pressable>
+          </Animated.View>
         </Animated.View>
 
         {/* ── Or Login with ── */}
@@ -322,15 +321,20 @@ export default function RegisterScreen() {
           <Image source={btnAppleImg}  style={s.socialBtn} contentFit="contain" />
         </Animated.View>
 
-        {/* ── Footer ── */}
+        {/* ── Footer — Sign In navigates FORWARD to login, not back ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}
           style={s.footer}
         >
           <Text style={s.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-            <Text style={s.footerLink}>Sign In</Text>
-          </TouchableOpacity>
+          <LinkBtn
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.replace("/(auth)/login");
+            }}
+            textStyle={s.footerLink}
+            label="Sign In"
+          />
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -340,7 +344,7 @@ export default function RegisterScreen() {
 /* ── Styles ──────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
   root:  { flex: 1, backgroundColor: C.bg },
-  scroll:{ paddingHorizontal: 24, flexGrow: 1 },
+  scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
   topBar: {
     flexDirection: "row",
@@ -398,32 +402,6 @@ const s = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  /* Divider — CSS spec: Line1(111.66px) | text | Line2(110.66px), #E8ECF4, 1px */
-  dividerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#E8ECF4",
-  },
-  dividerText: {
-    fontSize: 14,
-    fontFamily: "Manrope_600SemiBold",
-    color: "#6A707C",
-    marginHorizontal: 12,
-    lineHeight: 17,
-  },
-
-  socialRow: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 40,
-  },
-
-  /* Divider + Social */
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -440,6 +418,7 @@ const s = StyleSheet.create({
     fontFamily: "Manrope_400Regular",
     color: "#6A707C",
   },
+
   socialRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -447,7 +426,7 @@ const s = StyleSheet.create({
     marginBottom: 24,
   },
   socialBtn: {
-    width: 150,
+    width: 105,
     height: 56,
   },
 
