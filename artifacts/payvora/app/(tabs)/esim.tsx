@@ -114,7 +114,7 @@ export default function EsimScreen() {
               <Text style={[styles.activePlanBadge, { color: activePlan.color }]}>● ACTIVE</Text>
               <Text style={[styles.activePlanName, { color: colors.foreground }]}>{activePlan.name} Plan</Text>
             </View>
-            <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+            <TouchableOpacity onPress={() => Haptics.selectionAsync()}>
               <Feather name="settings" size={20} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -163,7 +163,7 @@ export default function EsimScreen() {
             <TouchableOpacity
               key={r.name}
               style={[styles.regionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              onPress={() => Haptics.selectionAsync()}
               activeOpacity={0.7}
             >
               <Feather name="map-pin" size={20} color={colors.primary} />

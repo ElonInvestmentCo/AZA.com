@@ -32,6 +32,7 @@ export default function LoginScreen() {
   async function handleLogin() {
     if (!email.trim() || !password.trim()) {
       setError("Please fill in all fields");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     setError("");
@@ -39,9 +40,11 @@ export default function LoginScreen() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await login(email.trim(), password);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(tabs)");
     } catch {
       setError("Invalid credentials. Please try again.");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsLoading(false);
     }
@@ -99,13 +102,13 @@ export default function LoginScreen() {
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+              <TouchableOpacity onPress={async () => { await Haptics.selectionAsync(); setShowPassword(!showPassword); }} style={styles.eyeBtn}>
                 <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.forgotBtn}>
+          <TouchableOpacity style={styles.forgotBtn} onPress={() => Haptics.selectionAsync()}>
             <Text style={[styles.forgotText, { color: colors.primary }]}>Forgot password?</Text>
           </TouchableOpacity>
 

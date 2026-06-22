@@ -29,6 +29,7 @@ function formatDate(iso: string) {
 function TransactionItem({ tx }: { tx: Transaction }) {
   const colors = useColors();
   const isPositive = tx.amount > 0;
+  const handlePress = () => Haptics.selectionAsync();
 
   const iconMap: Record<string, string> = {
     send: "arrow-up-right",
@@ -52,7 +53,7 @@ function TransactionItem({ tx }: { tx: Transaction }) {
   };
 
   return (
-    <View style={[styles.txItem, { borderBottomColor: colors.border }]}>
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7} style={[styles.txItem, { borderBottomColor: colors.border }]}>
       <View style={[styles.txIcon, { backgroundColor: iconBgMap[tx.type] }]}>
         <Feather name={iconMap[tx.type] as any} size={18} color={iconColorMap[tx.type]} />
       </View>
@@ -70,7 +71,7 @@ function TransactionItem({ tx }: { tx: Transaction }) {
       >
         {isPositive ? "+" : ""}${Math.abs(tx.amount).toFixed(2)}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -143,7 +144,7 @@ export default function HomeScreen() {
           <View style={[styles.cardGlow, { backgroundColor: colors.primary }]} />
           <View style={styles.cardTop}>
             <Text style={[styles.cardLabel, { color: colors.mutedForeground }]}>Total Balance</Text>
-            <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
+            <TouchableOpacity onPress={async () => { await Haptics.selectionAsync(); setBalanceVisible(!balanceVisible); }}>
               <Feather name={balanceVisible ? "eye" : "eye-off"} size={18} color={colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -174,7 +175,7 @@ export default function HomeScreen() {
               key={action.label}
               style={styles.quickAction}
               onPress={async () => {
-                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 if (action.route) router.push(action.route as any);
               }}
               activeOpacity={0.7}

@@ -55,7 +55,7 @@ export default function ProfileScreen() {
         text: "Sign Out",
         style: "destructive",
         onPress: async () => {
-          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
           await logout();
           router.replace("/login");
         },
@@ -72,21 +72,21 @@ export default function ProfileScreen() {
           icon: "user",
           iconColor: "#3B82F6",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
         {
           label: "Payment Methods",
           icon: "credit-card",
           iconColor: "#00D9A0",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
         {
           label: "Verification (KYC)",
           icon: "shield",
           iconColor: "#F59E0B",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
       ],
     },
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
           value: biometrics,
           onToggle: (v) => {
             setBiometrics(v);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Haptics.selectionAsync();
           },
         },
         {
@@ -109,14 +109,14 @@ export default function ProfileScreen() {
           icon: "key",
           iconColor: "#EF4444",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
         {
           label: "Two-Factor Auth",
           icon: "smartphone",
           iconColor: "#3B82F6",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
       ],
     },
@@ -131,7 +131,7 @@ export default function ProfileScreen() {
           value: notifications,
           onToggle: (v) => {
             setNotifications(v);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Haptics.selectionAsync();
           },
         },
         {
@@ -142,7 +142,7 @@ export default function ProfileScreen() {
           value: priceAlerts,
           onToggle: (v) => {
             setPriceAlerts(v);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Haptics.selectionAsync();
           },
         },
         {
@@ -153,7 +153,7 @@ export default function ProfileScreen() {
           value: darkMode,
           onToggle: (v) => {
             setDarkMode(v);
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            Haptics.selectionAsync();
           },
         },
       ],
@@ -166,21 +166,21 @@ export default function ProfileScreen() {
           icon: "help-circle",
           iconColor: "#3B82F6",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
         {
           label: "Terms of Service",
           icon: "file-text",
           iconColor: "#6B7280",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
         {
           label: "Privacy Policy",
           icon: "eye-off",
           iconColor: "#6B7280",
           type: "nav",
-          onPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+          onPress: () => Haptics.selectionAsync(),
         },
       ],
     },
@@ -197,7 +197,7 @@ export default function ProfileScreen() {
         <Text style={[styles.title, { color: colors.foreground }]}>Profile</Text>
         <TouchableOpacity
           style={[styles.headerBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
-          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+          onPress={() => Haptics.selectionAsync()}
         >
           <Feather name="edit-2" size={16} color={colors.foreground} />
         </TouchableOpacity>

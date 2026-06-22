@@ -34,14 +34,17 @@ export default function RegisterScreen() {
   async function handleRegister() {
     if (!name.trim() || !email.trim() || !password.trim()) {
       setError("Please fill in all fields");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     if (password !== confirm) {
       setError("Passwords do not match");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     setError("");
@@ -49,9 +52,11 @@ export default function RegisterScreen() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await register(name.trim(), email.trim(), password);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(tabs)");
     } catch {
       setError("Registration failed. Please try again.");
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +122,7 @@ export default function RegisterScreen() {
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeBtn}>
+              <TouchableOpacity onPress={async () => { await Haptics.selectionAsync(); setShowPassword(!showPassword); }} style={styles.eyeBtn}>
                 <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={colors.mutedForeground} />
               </TouchableOpacity>
             </View>

@@ -42,14 +42,17 @@ export default function SendScreen() {
   async function handleSend() {
     const num = parseFloat(amount);
     if (!recipient.trim()) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Error", "Please enter a recipient");
       return;
     }
     if (!num || num <= 0) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Error", "Please enter a valid amount");
       return;
     }
     if (num > balance) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert("Insufficient funds", "You don't have enough balance");
       return;
     }
@@ -104,7 +107,7 @@ export default function SendScreen() {
                 activeTab === tab && { backgroundColor: colors.primary },
               ]}
               onPress={async () => {
-                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                await Haptics.selectionAsync();
                 setActiveTab(tab);
               }}
             >
@@ -139,7 +142,7 @@ export default function SendScreen() {
                     key={c.id}
                     style={styles.contact}
                     onPress={async () => {
-                      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      await Haptics.selectionAsync();
                       setRecipient(c.name);
                     }}
                     activeOpacity={0.7}
@@ -190,7 +193,7 @@ export default function SendScreen() {
                   <TouchableOpacity
                     key={q}
                     style={[styles.quickAmount, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    onPress={() => { setAmount(q); Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); }}
+                    onPress={() => { setAmount(q); Haptics.selectionAsync(); }}
                   >
                     <Text style={[styles.quickAmountText, { color: colors.foreground }]}>${q}</Text>
                   </TouchableOpacity>
@@ -274,7 +277,7 @@ export default function SendScreen() {
                   <TouchableOpacity
                     key={opt.label}
                     style={[styles.receiveOpt, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+                    onPress={() => Haptics.selectionAsync()}
                   >
                     <Feather name={opt.icon as any} size={20} color={colors.foreground} />
                     <Text style={[styles.receiveOptText, { color: colors.foreground }]}>{opt.label}</Text>

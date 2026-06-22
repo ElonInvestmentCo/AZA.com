@@ -148,7 +148,7 @@ export default function MarketsScreen() {
               { borderColor: colors.border },
             ]}
             onPress={async () => {
-              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              await Haptics.selectionAsync();
               setActiveTab(tab);
             }}
           >
@@ -177,7 +177,7 @@ export default function MarketsScreen() {
               styles.cryptoRow,
               i < filtered.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
             ]}
-            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+            onPress={() => Haptics.selectionAsync()}
             activeOpacity={0.7}
           >
             <View style={styles.cryptoLeft}>
