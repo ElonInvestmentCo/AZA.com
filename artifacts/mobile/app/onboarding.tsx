@@ -17,14 +17,15 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Assets ───────────────────────────────────────────────────────────────────
-const slide1Img   = require("@/assets/images/slide1.png");
-const slide3Img   = require("@/assets/images/slide3.png");
-const giftCardImg = require("@/assets/images/gift-card.png");
-const manImg      = require("@/assets/images/man-illustration.png");
+const slide1Img       = require("@/assets/images/slide1.png");
+const slide3Img       = require("@/assets/images/slide3.png");
+const giftCardImg     = require("@/assets/images/gift-card.png");
+const giftCardVisaImg = require("@/assets/images/gift-card-visa.png");
+const manImg          = require("@/assets/images/man-illustration.png");
 
 // Pre-decode every image the instant this module is imported.
 // By the time the first frame paints, images are already in memory → zero flicker.
-Asset.loadAsync([slide1Img, slide3Img, giftCardImg, manImg]);
+Asset.loadAsync([slide1Img, slide3Img, giftCardImg, giftCardVisaImg, manImg]);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -59,7 +60,7 @@ const SLIDES: SlideItem[] = [
     type: "giftcard",
     title: "Sell your gift card",
     subtitle: "Buy Your Gift Card On Aza",
-    bgColor: "#ece8f8",
+    bgColor: "#FFD6E0",
   },
   {
     id: "3",
@@ -221,14 +222,64 @@ function AnimatedWalletSlide({
 
 // ── Slide 2: Gift card ────────────────────────────────────────────────────────
 function GiftCardSlide({ slideW, slideH }: { slideW: number; slideH: number }) {
-  const cardW = clamp(slideW * 0.88, 240, 380);
-  const cardH = cardW * (210 / 329);
+  // ── Black card (credit-card ratio 1.586 : 1) ─────────────────────────────
+  const blackCardW    = clamp(slideW * 0.76, 220, 340);
+  const blackCardH    = blackCardW / 1.586;
+  const blackCardLeft = (slideW - blackCardW) / 2;
+  // Card sits in the upper-centre, leaving the lower third for the man
+  const blackCardTop  = slideH * 0.08;
+
+  // ── Man illustration — fully visible, standing in front of the card ───────
+  const manH    = clamp(slideH * 0.78, 200, 340);
+  const manW    = manH * 0.72;
+  // Bottom-anchor the man so he stands on the floor of the slide
+  const manTop  = slideH - manH;
+  // Align him so his pointing arm reaches across the card
+  const manLeft = -manW * 0.04;
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+    // Flat absolute layout — no overflow clipping needed
+    <View style={{ width: slideW, height: slideH }}>
+
+      {/* Plain black card container */}
+      <View
+        style={{
+          position: "absolute",
+          top: blackCardTop,
+          left: blackCardLeft,
+          width: blackCardW,
+          height: blackCardH,
+          backgroundColor: "#0F0F0F",
+          borderRadius: 22,
+          overflow: "hidden",
+          // Subtle shadow for depth
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.45,
+          shadowRadius: 24,
+          elevation: 14,
+        }}
+      >
+        {/* Gift card image fills the black card */}
+        <Image
+          source={giftCardVisaImg}
+          style={{ width: blackCardW, height: blackCardH }}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          priority="high"
+        />
+      </View>
+
+      {/* Man illustration — rendered last so it sits in front of the card */}
       <Image
-        source={giftCardImg}
-        style={{ width: cardW, height: cardH, borderRadius: 12 }}
+        source={manImg}
+        style={{
+          position: "absolute",
+          top: manTop,
+          left: manLeft,
+          width: manW,
+          height: manH,
+        }}
         contentFit="contain"
         cachePolicy="memory-disk"
         priority="high"
