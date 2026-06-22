@@ -7,13 +7,18 @@
  * Required env var:
  *   EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID — Web client ID from Google Cloud Console
  *
+ * Redirect URIs to register in Google Cloud Console:
+ *   • https://auth.expo.io/@payvora/payvora  (Expo Go dev)
+ *   • https://www.payvora.org               (web production)
+ *   • payvora://auth/google                 (iOS/Android production)
+ *
  * Google works in Expo Go via the hosted auth proxy.
- * Apple works on iOS native only; button is visible but shows an
- * explanatory alert on Android/web.
+ * Apple works on iOS native only; shows an informative alert on Android/web.
  */
 
 import { AntDesign } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
@@ -120,8 +125,22 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
   const [appleAvail,    setAppleAvail]    = useState(false);
 
   /* ── Google OAuth ─────────────────────────────────────────────────────── */
+  /*
+   * Redirect URI strategy:
+   *   - Native builds: payvora://auth/google  (custom scheme)
+   *   - Web builds:    https://www.payvora.org/auth/google (set via EXPO_PUBLIC_DOMAIN)
+   *   - Expo Go:       expo-auth-session falls back to the auth proxy automatically
+   *
+   * Register ALL of these in Google Cloud Console → Authorized redirect URIs.
+   */
+  const redirectUri = makeRedirectUri({
+    scheme: "payvora",
+    path: "auth/google",
+  });
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri,
   });
 
   /* Check Apple availability on mount (iOS only) */
@@ -149,8 +168,8 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
       fetch("https://www.googleapis.com/userinfo/v2/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then(r => r.json())
-        .then(async info => {
+        .then((r) => r.json())
+        .then(async (info) => {
           const name  = info.name || info.given_name || "Google User";
           const email = info.email || `google_${Date.now()}@googleuser.com`;
           await loginWithSocial(email, name, "google");
@@ -178,7 +197,7 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
     if (!request) {
       Alert.alert(
         "Google Sign-In",
-        "Google sign-in is not configured.\n\nPlease ensure EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is set in Replit Secrets.",
+        "Google sign-in is not configured.\n\nEnsure EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID is set in Replit Secrets.",
       );
       return;
     }

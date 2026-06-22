@@ -106,3 +106,4 @@ packages = ["nano"]
 
 [userenv.shared]
 PORT = "8080"
+EXPO_PUBLIC_DOMAIN = "www.payvora.org"
