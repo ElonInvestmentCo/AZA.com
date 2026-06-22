@@ -1,4 +1,4 @@
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -54,6 +54,9 @@ const C = {
 };
 
 const fingerprintImg = require("@/assets/images/fingerprint.png");
+const btnGoogleImg   = require("@/assets/images/btn-google.png");
+const btnAppleImg    = require("@/assets/images/btn-apple.png");
+const iconEyeImg     = require("@/assets/images/icon-eye.png");
 
 /* ── Password input ─────────────────────────────────────────────────────── */
 function EmailInput({
@@ -130,10 +133,10 @@ function PasswordInput({
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <Ionicons
-          name={showPass ? "eye-outline" : "eye-off-outline"}
-          size={20}
-          color={C.placeholder}
+        <Image
+          source={iconEyeImg}
+          style={{ width: 22, height: 22 }}
+          contentFit="contain"
         />
       </TouchableOpacity>
     </View>
@@ -380,10 +383,10 @@ export default function LoginScreen() {
           style={s.socialRow}
         >
           <SocialBtn>
-            <AntDesign name="google" size={22} color="#EA4335" />
+            <Image source={btnGoogleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
           </SocialBtn>
           <SocialBtn>
-            <AntDesign name="apple1" size={24} color="#000000" />
+            <Image source={btnAppleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
           </SocialBtn>
         </Animated.View>
 
