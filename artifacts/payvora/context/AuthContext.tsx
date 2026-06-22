@@ -42,7 +42,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         AsyncStorage.getItem(STORAGE_KEYS.USER),
         AsyncStorage.getItem(STORAGE_KEYS.ONBOARDING),
       ]);
-      if (storedUser) setUser(JSON.parse(storedUser));
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else if (__DEV__ && typeof window !== "undefined") {
+        const demoUser: User = { id: "demo", name: "Dove Johnson", email: "dove@payvora.app", joinedAt: new Date().toISOString() };
+        setUser(demoUser);
+        setHasSeenOnboarding(true);
+      }
       if (onboarding === "true") setHasSeenOnboarding(true);
     } catch {
     } finally {

@@ -1,15 +1,115 @@
-import { BlurView } from "expo-blur";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 import * as Haptics from "expo-haptics";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
-import { useColors } from "@/hooks/useColors";
+const ACTIVE_PILL = "#E8DEF8";
+const ACTIVE_ICON = "#4A148C";
+const INACTIVE_ICON = "#FFFFFF";
+const NAV_BG = "#000000";
+
+const TAB_ICONS: Record<string, { feather?: string; material?: string; sf?: string }> = {
+  index:   { feather: "home",        sf: "house.fill" },
+  markets: { feather: "trending-up", sf: "chart.bar.fill" },
+  send:    { feather: "send",        sf: "arrow.up.arrow.down.circle.fill" },
+  esim:    { material: "sim-card",   sf: "simcard.fill" },
+  profile: { feather: "user",        sf: "person.fill" },
+};
+
+const TAB_LABELS: Record<string, string> = {
+  index:   "Home",
+  markets: "Markets",
+  send:    "Transfer",
+  esim:    "eSIM",
+  profile: "Profile",
+};
+
+function TabIcon({
+  routeName,
+  isFocused,
+}: {
+  routeName: string;
+  isFocused: boolean;
+}) {
+  const cfg = TAB_ICONS[routeName];
+  const color = isFocused ? ACTIVE_ICON : INACTIVE_ICON;
+  const size = 22;
+
+  if (!cfg) return <Feather name="circle" size={size} color={color} />;
+
+  if (Platform.OS === "ios" && cfg.sf) {
+    return (
+      <SymbolView
+        name={cfg.sf}
+        tintColor={color}
+        size={size}
+      />
+    );
+  }
+  if (cfg.material) {
+    return <MaterialIcons name={cfg.material as any} size={size + 2} color={color} />;
+  }
+  if (cfg.feather) {
+    return <Feather name={cfg.feather as any} size={size} color={color} />;
+  }
+  return <Feather name="circle" size={size} color={color} />;
+}
+
+function BlackPillTabBar({ state, navigation }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, Platform.OS === "web" ? 12 : 8);
+
+  return (
+    <View
+      style={[
+        styles.tabBarOuter,
+        { bottom: bottomPad },
+      ]}
+      pointerEvents="box-none"
+    >
+      <View style={styles.tabBarPill}>
+        {state.routes.map((route, index) => {
+          const isFocused = state.index === index;
+
+          function onPress() {
+            if (!isFocused) {
+              Haptics.selectionAsync();
+              navigation.navigate(route.name);
+            }
+          }
+
+          return (
+            <TouchableOpacity
+              key={route.key}
+              onPress={onPress}
+              style={styles.tabItemOuter}
+              activeOpacity={0.75}
+              accessibilityLabel={TAB_LABELS[route.name] ?? route.name}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isFocused }}
+            >
+              <View style={[styles.tabItemInner, isFocused && styles.tabItemActive]}>
+                <TabIcon routeName={route.name} isFocused={isFocused} />
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
 
 function NativeTabLayout() {
   return (
@@ -39,115 +139,18 @@ function NativeTabLayout() {
 }
 
 function ClassicTabLayout() {
-  const colors = useColors();
-  const colorScheme = useColorScheme();
-  const safeAreaInsets = useSafeAreaInsets();
-  const isDark = colorScheme === "dark";
-  const isIOS = Platform.OS === "ios";
-  const isWeb = Platform.OS === "web";
-
   return (
     <Tabs
-      screenListeners={{
-        tabPress: () => {
-          Haptics.selectionAsync();
-        },
-      }}
+      tabBar={(props) => <BlackPillTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarStyle: {
-          position: "absolute",
-          backgroundColor: isIOS ? "transparent" : colors.background,
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
-          elevation: 0,
-          paddingBottom: isWeb ? 0 : safeAreaInsets.bottom,
-          ...(isWeb ? { height: 84 } : {}),
-        },
-        tabBarBackground: () =>
-          isIOS ? (
-            <BlurView
-              intensity={90}
-              tint="dark"
-              style={StyleSheet.absoluteFill}
-            />
-          ) : isWeb ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { backgroundColor: colors.background },
-              ]}
-            />
-          ) : null,
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontFamily: "Inter_500Medium",
-          marginBottom: 2,
-        },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="house.fill" tintColor={color} size={22} />
-            ) : (
-              <Feather name="home" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="markets"
-        options={{
-          title: "Markets",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="chart.bar.fill" tintColor={color} size={22} />
-            ) : (
-              <Feather name="trending-up" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="send"
-        options={{
-          title: "Transfer",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="arrow.up.arrow.down.circle.fill" tintColor={color} size={24} />
-            ) : (
-              <Feather name="send" size={22} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="esim"
-        options={{
-          title: "eSIM",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="simcard.fill" tintColor={color} size={22} />
-            ) : (
-              <MaterialIcons name="sim-card" size={24} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color }) =>
-            isIOS ? (
-              <SymbolView name="person.fill" tintColor={color} size={22} />
-            ) : (
-              <Feather name="user" size={22} color={color} />
-            ),
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
+      <Tabs.Screen name="markets" options={{ title: "Markets" }} />
+      <Tabs.Screen name="send" options={{ title: "Transfer" }} />
+      <Tabs.Screen name="esim" options={{ title: "eSIM" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
 }
@@ -158,3 +161,44 @@ export default function TabLayout() {
   }
   return <ClassicTabLayout />;
 }
+
+const styles = StyleSheet.create({
+  tabBarOuter: {
+    position: "absolute",
+    left: 21,
+    right: 21,
+    alignItems: "stretch",
+    zIndex: 100,
+  },
+  tabBarPill: {
+    flexDirection: "row",
+    backgroundColor: NAV_BG,
+    borderRadius: 34,
+    height: 53,
+    paddingHorizontal: 8,
+    alignItems: "center",
+    gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
+  },
+  tabItemOuter: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 37,
+  },
+  tabItemInner: {
+    width: "100%",
+    height: 37,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  tabItemActive: {
+    backgroundColor: ACTIVE_PILL,
+  },
+});
