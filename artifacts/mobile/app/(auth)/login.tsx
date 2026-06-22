@@ -302,7 +302,7 @@ export default function LoginScreen() {
         >
           <Image
             source={fingerprintImg}
-            style={{ width: 130, height: 130 }}
+            style={{ width: 90, height: 90 }}
             contentFit="contain"
             cachePolicy="memory-disk"
           />
@@ -367,13 +367,16 @@ export default function LoginScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── Divider ── */}
+        {/* ── Divider — exact CSS spec ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.dividerRow}
         >
+          {/* Line 1: 111.66px, border: 1px solid #E8ECF4 */}
           <View style={s.dividerLine} />
+          {/* Or Login with: Urbanist 600, 14px, #6A707C */}
           <Text style={s.dividerText}>Or Login with</Text>
+          {/* Line 2: 110.66px, border: 1px solid #E8ECF4 */}
           <View style={s.dividerLine} />
         </Animated.View>
 
@@ -500,22 +503,23 @@ const s = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  /* Divider */
+  /* Divider — from CSS spec */
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
     marginBottom: 24,
   },
   dividerLine: {
     flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: C.divider,
+    height: 1,
+    backgroundColor: "#E8ECF4",
   },
   dividerText: {
     fontSize: 14,
-    fontFamily: "Manrope_400Regular",
-    color: C.subtext,
+    fontFamily: "Manrope_600SemiBold",
+    color: "#6A707C",
+    marginHorizontal: 12,
+    lineHeight: 17,
   },
 
   /* Social */
