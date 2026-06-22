@@ -178,8 +178,9 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   skipText: {
-    fontSize: 16,
-    fontFamily: "Inter_500Medium",
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    letterSpacing: 0.1,
   },
   slide: {
     flex: 1,
@@ -205,17 +206,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    fontSize: 40,
+    fontSize: 34,
     fontFamily: "Inter_700Bold",
     textAlign: "center",
-    lineHeight: 48,
-    letterSpacing: -1,
+    lineHeight: 42,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontFamily: "Inter_400Regular",
     textAlign: "center",
-    lineHeight: 26,
+    lineHeight: 24,
+    letterSpacing: 0.1,
+    opacity: 0.75,
   },
   footer: {
     paddingHorizontal: 32,
