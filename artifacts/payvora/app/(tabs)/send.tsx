@@ -40,6 +40,7 @@ export default function SendScreen() {
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
   async function handleSend() {
+    Keyboard.dismiss();
     const num = parseFloat(amount);
     if (!recipient.trim()) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);

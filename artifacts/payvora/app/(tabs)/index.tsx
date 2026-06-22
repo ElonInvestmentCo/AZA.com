@@ -81,7 +81,7 @@ const STATIC_TXS: FullTxRow[] = [
     icon: "triangle",
     name: "Deposit Giftcard",
     date: "February 24, 2022",
-    amount: "+₦200,40.00",
+    amount: "+₦20,040.00",
     isPositive: true,
     type: "Gift Card Deposit",
     status: "completed",
@@ -128,10 +128,10 @@ function txFromWallet(tx: Transaction): FullTxRow {
 }
 
 // ── Sub-components ────────────────────────────────────────────
-function AZALogo() {
+function PayvoraLogo() {
   return (
     <View style={styles.logoRow}>
-      <Text style={styles.logoText}>AZA</Text>
+      <Text style={styles.logoText}>Payvora</Text>
     </View>
   );
 }
@@ -291,6 +291,7 @@ export default function HomeScreen() {
   async function handleAction(label: string) {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (label === "Fund Wallet" || label === "Withdraw") router.push("/(tabs)/send" as any);
+    if (label === "Sell") router.push("/(tabs)/markets" as any);
   }
 
   async function handleQuick(key: string) {
@@ -327,7 +328,7 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        <AZALogo />
+        <PayvoraLogo />
 
         {/* ── Greeting + Balance ── */}
         <View style={styles.greetingRow}>
@@ -418,7 +419,7 @@ export default function HomeScreen() {
           <View style={styles.txHeader}>
             <Text style={styles.txHeading}>Recent Transaction</Text>
             <TouchableOpacity
-              onPress={() => Haptics.selectionAsync()}
+              onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/send" as any); }}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Text style={styles.txSeeAll}>See All</Text>

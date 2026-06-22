@@ -68,11 +68,12 @@ export default function MarketsScreen() {
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  const filtered = ALL_CRYPTO.filter(
+  const searchFiltered = ALL_CRYPTO.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.symbol.toLowerCase().includes(search.toLowerCase())
   );
+  const filtered = activeTab === "watchlist" ? [] : searchFiltered;
 
   const portfolioChange = 3.42;
 
@@ -164,45 +165,57 @@ export default function MarketsScreen() {
         ))}
       </View>
 
-      {/* Crypto List */}
-      <View style={[styles.cryptoList, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <View style={[styles.listHeader, { borderBottomColor: colors.border }]}>
-          <Text style={[styles.listHeaderText, { color: colors.mutedForeground }]}>Asset</Text>
-          <Text style={[styles.listHeaderText, { color: colors.mutedForeground }]}>Price / 24h</Text>
+      {/* Crypto List / Watchlist */}
+      {activeTab === "watchlist" ? (
+        <View style={[styles.emptyWatchlist, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.emptyIcon, { backgroundColor: colors.muted }]}>
+            <Feather name="bookmark" size={26} color={colors.mutedForeground} />
+          </View>
+          <Text style={[styles.emptyTitle, { color: colors.foreground }]}>No watchlist yet</Text>
+          <Text style={[styles.emptySub, { color: colors.mutedForeground }]}>
+            Tap an asset in All Assets to add it to your watchlist
+          </Text>
         </View>
-        {filtered.map((coin, i) => (
-          <TouchableOpacity
-            key={coin.symbol}
-            style={[
-              styles.cryptoRow,
-              i < filtered.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
-            ]}
-            onPress={() => Haptics.selectionAsync()}
-            activeOpacity={0.7}
-          >
-            <View style={styles.cryptoLeft}>
-              <View style={[styles.coinIcon, { backgroundColor: coin.color + "20" }]}>
-                <Text style={{ fontSize: 12, fontFamily: "Inter_700Bold", color: coin.color }}>
-                  {coin.symbol.charAt(0)}
+      ) : (
+        <View style={[styles.cryptoList, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.listHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.listHeaderText, { color: colors.mutedForeground }]}>Asset</Text>
+            <Text style={[styles.listHeaderText, { color: colors.mutedForeground }]}>Price / 24h</Text>
+          </View>
+          {filtered.map((coin, i) => (
+            <TouchableOpacity
+              key={coin.symbol}
+              style={[
+                styles.cryptoRow,
+                i < filtered.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border },
+              ]}
+              onPress={() => Haptics.selectionAsync()}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cryptoLeft}>
+                <View style={[styles.coinIcon, { backgroundColor: coin.color + "20" }]}>
+                  <Text style={{ fontSize: 12, fontFamily: "Inter_700Bold", color: coin.color }}>
+                    {coin.symbol.charAt(0)}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={[styles.coinName, { color: colors.foreground }]}>{coin.symbol}</Text>
+                  <Text style={[styles.coinFullName, { color: colors.mutedForeground }]}>{coin.name}</Text>
+                </View>
+              </View>
+              <MiniSparkline data={coin.sparkline} color={coin.color} up={coin.change24h >= 0} />
+              <View style={styles.cryptoRight}>
+                <Text style={[styles.cryptoPrice, { color: colors.foreground }]}>
+                  ${coin.price < 1 ? coin.price.toFixed(4) : coin.price.toLocaleString("en-US")}
+                </Text>
+                <Text style={[styles.cryptoChange, { color: coin.change24h >= 0 ? colors.positive : colors.negative }]}>
+                  {coin.change24h >= 0 ? "+" : ""}{coin.change24h.toFixed(2)}%
                 </Text>
               </View>
-              <View>
-                <Text style={[styles.coinName, { color: colors.foreground }]}>{coin.symbol}</Text>
-                <Text style={[styles.coinFullName, { color: colors.mutedForeground }]}>{coin.name}</Text>
-              </View>
-            </View>
-            <MiniSparkline data={coin.sparkline} color={coin.color} up={coin.change24h >= 0} />
-            <View style={styles.cryptoRight}>
-              <Text style={[styles.cryptoPrice, { color: colors.foreground }]}>
-                ${coin.price < 1 ? coin.price.toFixed(4) : coin.price.toLocaleString("en-US")}
-              </Text>
-              <Text style={[styles.cryptoChange, { color: coin.change24h >= 0 ? colors.positive : colors.negative }]}>
-                {coin.change24h >= 0 ? "+" : ""}{coin.change24h.toFixed(2)}%
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 }
@@ -257,4 +270,11 @@ const styles = StyleSheet.create({
   cryptoRight: { alignItems: "flex-end", minWidth: 80 },
   cryptoPrice: { fontSize: 14, fontFamily: "Inter_600SemiBold", marginBottom: 1 },
   cryptoChange: { fontSize: 12, fontFamily: "Inter_500Medium" },
+  emptyWatchlist: {
+    marginHorizontal: 24, borderRadius: 20, borderWidth: 1,
+    padding: 40, alignItems: "center", gap: 12,
+  },
+  emptyIcon: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  emptyTitle: { fontSize: 17, fontFamily: "Inter_600SemiBold" },
+  emptySub: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "center", lineHeight: 20 },
 });
