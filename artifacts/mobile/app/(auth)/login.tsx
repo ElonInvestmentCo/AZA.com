@@ -1,4 +1,5 @@
-import { AntDesign, FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
+import Svg, { Path } from "react-native-svg";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -51,6 +52,47 @@ const C = {
   backIcon:     "#1E232C",
   error:        "#FF5B7A",
 };
+
+/* ── Fingerprint SVG (from design vectors) ──────────────────────────────── */
+function FingerprintSVG({ size = 130 }: { size?: number }) {
+  const sw = 3.2;
+  const color = "#000000";
+  const cap = "round" as const;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      {/* Ridge 1 – innermost small arch */}
+      <Path
+        d="M 44 60 C 44 52 56 52 56 60"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+      {/* Ridge 2 */}
+      <Path
+        d="M 37 64 C 35 46 65 46 63 64 C 62 72 57 78 50 80"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+      {/* Ridge 3 */}
+      <Path
+        d="M 29 64 C 26 36 74 36 71 64 C 69 76 61 85 50 88"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+      {/* Ridge 4 */}
+      <Path
+        d="M 21 60 C 17 26 83 26 79 60 C 77 76 65 90 50 94"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+      {/* Ridge 5 */}
+      <Path
+        d="M 13 56 C 8 14 92 14 87 56 C 85 78 70 95 50 99"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+      {/* Ridge 6 – outermost arch */}
+      <Path
+        d="M 6 50 C 0 4 100 4 94 50"
+        stroke={color} strokeWidth={sw} fill="none" strokeLinecap={cap}
+      />
+    </Svg>
+  );
+}
 
 /* ── Password input ─────────────────────────────────────────────────────── */
 function EmailInput({
@@ -294,11 +336,7 @@ export default function LoginScreen() {
           entering={FadeInDown.duration(500).delay(80).springify()}
           style={s.fingerprintWrap}
         >
-          <MaterialCommunityIcons
-            name="fingerprint"
-            size={130}
-            color={C.text}
-          />
+          <FingerprintSVG size={130} />
         </Animated.View>
 
         {/* ── Form ── */}
