@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,64 +13,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
+import { EyeToggleBtn } from "@/components/EyeToggleBtn";
 
 const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
 const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
-
-/* ── Eye toggle button — identical across Login & Register ─────────────── */
-function EyeToggleBtn({
-  show,
-  onToggle,
-  color,
-}: {
-  show: boolean;
-  onToggle: () => void;
-  color: string;
-}) {
-  const scale   = useSharedValue(1);
-  const opacity = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
-
-  const handlePress = () => {
-    Haptics.selectionAsync();
-    opacity.value = withSequence(
-      withTiming(0,   { duration: 70 }),
-      withTiming(1,   { duration: 130 }),
-    );
-    scale.value = withSequence(
-      withSpring(0.68, { damping: 10, stiffness: 420 }),
-      withSpring(1.0,  { damping: 13, stiffness: 300 }),
-    );
-    onToggle();
-  };
-
-  return (
-    <Pressable
-      onPress={handlePress}
-      style={styles.eyeBtn}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-    >
-      <Animated.View style={animStyle}>
-        <Feather name={show ? "eye-off" : "eye"} size={18} color={color} />
-      </Animated.View>
-    </Pressable>
-  );
-}
 
 /* ── Screen ─────────────────────────────────────────────────────────────── */
 export default function LoginScreen() {
@@ -240,7 +189,6 @@ const styles = StyleSheet.create({
   },
   inputIcon: { marginRight: 12 },
   input: { flex: 1, fontSize: 16, fontFamily: "Inter_400Regular" },
-  eyeBtn: { padding: 4 },
   forgotBtn: { alignSelf: "flex-end" },
   forgotText: { fontSize: 14, fontFamily: "Inter_500Medium" },
   errorBox: {
