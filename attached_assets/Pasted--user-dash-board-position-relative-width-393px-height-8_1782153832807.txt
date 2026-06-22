@@ -1,0 +1,2850 @@
+/* user dash board */
+
+position: relative;
+width: 393px;
+height: 852px;
+
+background: #FFFFFF;
+border-radius: 20px;
+
+
+/* recent Transaction */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 12.6px;
+
+position: absolute;
+width: 351px;
+height: 194px;
+left: 21px;
+top: 609px;
+
+
+
+/* Header */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 0px;
+gap: 89px;
+
+width: 351px;
+height: 23px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Recent Transaction */
+
+margin: 0 auto;
+width: 169px;
+height: 23px;
+
+font-family: 'IBM Plex Sans';
+font-style: normal;
+font-weight: 600;
+font-size: 18.902px;
+line-height: 120%;
+/* identical to box height, or 23px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* See All */
+
+margin: 0 auto;
+width: 40px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 600;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+text-align: right;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Transaction List */
+
+width: 351px;
+height: 48.6px;
+
+/* Gray/White */
+background: #FFFFFF;
+border-radius: 3.15033px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 1159 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 12.6px;
+
+position: absolute;
+width: 128.6px;
+height: 36px;
+left: 12.6px;
+top: 6.3px;
+
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* icon */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 25%;
+bottom: 25%;
+
+/* M3/ref/neutral/neutral10
+
+token=md.ref.palette.neutral10
+*/
+background: #1C1B1F;
+
+
+/* Frame 1158 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 92px;
+height: 36px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Deposit Giftcard */
+
+width: 92px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 600;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* February 24,2022 */
+
+width: 87px;
+height: 17px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 11.0261px;
+line-height: 150%;
+/* identical to box height, or 17px */
+
+/* Gray/Gray 3 */
+color: #AAAFB5;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* ₦200,40.00 */
+
+position: absolute;
+width: 143px;
+height: 19px;
+left: 209.35px;
+top: 14.8px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 800;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+text-align: right;
+
+color: #00B03C;
+
+
+
+/* Transaction List */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 6.30065px 12.6013px;
+gap: 66.94px;
+
+width: 351px;
+height: 48.6px;
+
+/* Gray/White */
+background: #FFFFFF;
+border-radius: 3.15033px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Frame 1159 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 12.6px;
+
+width: 127.8px;
+height: 36px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Group 972 */
+
+width: 25.2px;
+height: 25.2px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 884 */
+
+position: absolute;
+width: 25.2px;
+height: 25.2px;
+left: 0px;
+top: 5.4px;
+
+background: #EEFFFE;
+border-radius: 3.15033px;
+
+
+/* Mask Group */
+
+position: absolute;
+width: 25.2px;
+height: 25.2px;
+left: 0px;
+top: 5.4px;
+
+
+
+/* Rectangle 885 */
+
+position: absolute;
+width: 25.2px;
+height: 25.2px;
+left: 0px;
+top: 5.4px;
+
+background: #C4C4C4;
+border-radius: 3.15033px;
+
+
+/* Vector */
+
+position: absolute;
+left: -50.53%;
+right: 72.89%;
+top: -74.7%;
+bottom: -63.76%;
+
+/* Gray/Black */
+background: #0B0A0A;
+
+
+/* Frame 1158 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 90px;
+height: 36px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Withdraws */
+
+width: 65px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 600;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* February 24,2022 */
+
+width: 90px;
+height: 17px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 500;
+font-size: 11.0261px;
+line-height: 150%;
+/* identical to box height, or 17px */
+
+/* Gray/Gray 3 */
+color: #AAAFB5;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* ₦400,000.00 */
+
+width: 146px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 800;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+text-align: right;
+
+color: #FF0000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* navigation-bar
+
+Navigation bars (nav bars) provide access to three to five destinations.
+
+The nav bar is positioned at the bottom of screens for convenient access. Each destination is represented by an icon and optional text label.
+When a navigation bar icon is tapped or focused, the user is taken to the navigation destination associated with that icon. 
+
+Use on mobile or tablet only.
+
+🛠 Additional options 
+Segments - can be edited by selecting individual segments and  selecting states, labels, and badges from the variant properties. 
+
+3 segment Next navigation bar with icon &amp; label 
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px 8px;
+gap: 8px;
+
+width: 351px;
+height: 53px;
+
+background: #000000;
+border-radius: 34px;
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Segment 1
+
+Navigation Bar segment building blocks
+
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 12px 0px 16px;
+gap: 4px;
+
+width: 106.33px;
+height: 60px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* icon-container */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 32px;
+height: 32px;
+
+border-radius: 16px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* state-layer */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 4px 20px;
+gap: 10px;
+
+width: 64px;
+height: 32px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Bounding box */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #D9D9D9;
+
+
+/* home */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 12.5%;
+bottom: 12.5%;
+
+background: #FFFFFF;
+
+
+/* label-text */
+
+display: none;
+width: 104px;
+height: 16px;
+
+/* M3/label/medium */
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+text-align: center;
+letter-spacing: 0.5px;
+
+/* M3/sys/light/on-surface-variant */
+color: #49454F;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Segment 2
+
+Navigation Bar segment building blocks
+
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 12px 0px 16px;
+gap: 4px;
+
+width: 106.33px;
+height: 80px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* icon-container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 64px;
+height: 32px;
+
+/* M3/sys/light/secondary-container
+
+token=md.sys.color.secondary-container
+
+secondary-container / on-secondary-container
+
+Regular text:
+Level AA - ✅ Pass
+Level AAA - ✅ Pass
+
+Large text:
+Level AA - ✅ Pass
+Level AAA - ✅ Pass
+
+Icons:
+Level AA - ✅ Pass
+
+*/
+background: #E8DEF8;
+border-radius: 16px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* state-layer */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 4px 20px;
+
+width: 64px;
+height: 32px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Bounding box */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #D9D9D9;
+
+
+/* add_card */
+
+position: absolute;
+left: 10%;
+right: 0%;
+top: 20%;
+bottom: 10%;
+
+background: #1C1B1F;
+
+
+/* label-text */
+
+width: 106.33px;
+height: 16px;
+
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Segment 3
+
+Navigation Bar segment building blocks
+
+*/
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 12px 0px 16px;
+gap: 4px;
+
+width: 106.33px;
+height: 60px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 1;
+
+
+/* icon-container */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+isolation: isolate;
+
+width: 32px;
+height: 32px;
+
+border-radius: 16px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Badge
+
+Badges are used to indicate a notification, item count, or other information relating to a navigation destination. They are placed on the ending edge of icons, typically within other components.
+*/
+
+position: absolute;
+width: 6px;
+height: 6px;
+left: 22px;
+top: 4px;
+
+background: #FF0000;
+border-radius: 100px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+z-index: 0;
+
+
+/* state-layer */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 4px 20px;
+gap: 10px;
+
+width: 64px;
+height: 32px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+z-index: 1;
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Bounding box */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: #D9D9D9;
+
+
+/* history */
+
+position: absolute;
+left: 15%;
+right: 15%;
+top: 15%;
+bottom: 15%;
+
+background: #FFFFFF;
+
+
+/* label-text */
+
+display: none;
+width: 104px;
+height: 16px;
+
+/* M3/label/medium */
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+text-align: center;
+letter-spacing: 0.5px;
+
+/* M3/sys/light/on-surface-variant */
+color: #49454F;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Banner */
+
+position: absolute;
+width: 388px;
+height: 130px;
+left: 5px;
+top: 486px;
+
+
+
+/* Frame 1150 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 6.3px;
+
+position: absolute;
+width: 804.12px;
+height: 97.66px;
+left: -254.39px;
+top: 0px;
+
+
+
+/* Frame 1149 */
+
+width: 263.84px;
+height: 97.66px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 899 */
+
+position: absolute;
+width: 263.84px;
+height: 97.66px;
+left: 0px;
+top: 0px;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+border-radius: 3.15033px;
+
+
+/* Frame 1149 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.3px;
+
+position: absolute;
+width: 114.2px;
+height: 72.3px;
+left: 12.6px;
+top: 12.6px;
+
+
+
+/* Frame 1148 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 94px;
+height: 38px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* 50% OFF */
+
+width: 66px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 700;
+font-size: 15.7516px;
+line-height: 120%;
+/* identical to box height, or 19px */
+text-align: center;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Black friday deal */
+
+width: 94px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 400;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Get discount for every top up and payment */
+
+width: 114.2px;
+height: 28px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 400;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Group 1124 */
+
+position: absolute;
+width: 91.7px;
+height: 88.77px;
+left: 153.58px;
+top: 8.66px;
+
+
+
+/* Vector 73 */
+
+position: absolute;
+width: 10.61px;
+height: 16.89px;
+left: 194.16px;
+top: 58.72px;
+
+background: #FFE0CF;
+
+
+/* Vector 74 */
+
+position: absolute;
+width: 29.4px;
+height: 15.08px;
+left: 202.41px;
+top: 66.57px;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector 75 */
+
+position: absolute;
+width: 40.56px;
+height: 20.87px;
+left: 202.41px;
+top: 44.89px;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector 76 */
+
+position: absolute;
+width: 35px;
+height: 22.06px;
+left: 165px;
+top: 20.87px;
+
+/* Secondary / Yellow */
+background: #FFF2CF;
+
+
+/* Vector 72 */
+
+position: absolute;
+width: 36.55px;
+height: 18.16px;
+left: 205.32px;
+top: 56.31px;
+
+background: #FFE0CF;
+
+
+/* Vector 71 */
+
+position: absolute;
+width: 19.63px;
+height: 28.8px;
+left: 209.18px;
+top: 20.87px;
+
+background: #FFE0CF;
+
+
+/* Vector */
+
+position: absolute;
+width: 91.7px;
+height: 88.77px;
+left: 153.58px;
+top: 8.66px;
+
+background: #000000;
+
+
+/* Frame 1030 */
+
+width: 263.84px;
+height: 97.66px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Rectangle 899 */
+
+position: absolute;
+width: 263.84px;
+height: 97.66px;
+left: 0px;
+top: 0px;
+
+/* Secondary/Fuscia */
+background: #FCB3C5;
+border-radius: 3.15033px;
+
+
+/* Vector 80 */
+
+position: absolute;
+visibility: hidden;
+width: 44.89px;
+height: 36.44px;
+left: 199.26px;
+top: 45.89px;
+
+background: #D6E1FF;
+
+
+/* Vector 77 */
+
+position: absolute;
+visibility: hidden;
+width: 27.54px;
+height: 29.24px;
+left: 180.77px;
+top: 44.49px;
+
+background: #FFE0CF;
+
+
+/* Vector 78 */
+
+position: absolute;
+visibility: hidden;
+width: 8.95px;
+height: 11.16px;
+left: 233.62px;
+top: 66.03px;
+
+background: #FFE0CF;
+
+
+/* Vector 79 */
+
+position: absolute;
+visibility: hidden;
+width: 16.17px;
+height: 17.53px;
+left: 211.05px;
+top: 29.33px;
+
+background: #FFE0CF;
+
+
+/* Vector 81 */
+
+position: absolute;
+visibility: hidden;
+width: 18.83px;
+height: 16.15px;
+left: 173.73px;
+top: 29.14px;
+
+background: #FFF2CF;
+
+
+/* Vector */
+
+position: absolute;
+visibility: hidden;
+left: 59.7%;
+right: 6.42%;
+top: 12.1%;
+bottom: 0.21%;
+
+background: #000000;
+
+
+/* Frame 1149 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.3px;
+
+position: absolute;
+width: 119px;
+height: 72.3px;
+left: 12.6px;
+top: 12.6px;
+
+
+
+/* Frame 1148 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 119px;
+height: 38px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* 50% OFF */
+
+width: 62px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 15.7516px;
+line-height: 120%;
+/* identical to box height, or 19px */
+text-align: center;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Summer special deal */
+
+width: 119px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Get discount for every transaction this weekend */
+
+width: 114.2px;
+height: 28px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1148 */
+
+width: 263.84px;
+height: 97.66px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Rectangle 899 */
+
+position: absolute;
+width: 263.84px;
+height: 97.66px;
+left: 0px;
+top: 0px;
+
+/* Secondary / Yellow */
+background: #FFF2CF;
+border-radius: 3.15033px;
+
+
+/* Frame 1149 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.3px;
+
+position: absolute;
+width: 114.2px;
+height: 72.3px;
+left: 12.6px;
+top: 12.6px;
+
+
+
+/* Frame 1148 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 94px;
+height: 38px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* 50% OFF */
+
+width: 66px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 700;
+font-size: 15.7516px;
+line-height: 120%;
+/* identical to box height, or 19px */
+text-align: center;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Black friday deal */
+
+width: 94px;
+height: 19px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 400;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Get discount for every top up and payment */
+
+width: 114.2px;
+height: 28px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 400;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Group 1124 */
+
+position: absolute;
+width: 91.7px;
+height: 88.77px;
+left: 153.58px;
+top: 8.66px;
+
+
+
+/* Vector 73 */
+
+position: absolute;
+width: 10.61px;
+height: 16.89px;
+left: 194.16px;
+top: 58.72px;
+
+background: #FFE0CF;
+
+
+/* Vector 74 */
+
+position: absolute;
+width: 29.4px;
+height: 15.08px;
+left: 202.41px;
+top: 66.57px;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector 75 */
+
+position: absolute;
+width: 40.56px;
+height: 20.87px;
+left: 202.41px;
+top: 44.89px;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector 76 */
+
+position: absolute;
+width: 35px;
+height: 22.06px;
+left: 165px;
+top: 20.87px;
+
+/* Secondary / Yellow */
+background: #FFF2CF;
+
+
+/* Vector 72 */
+
+position: absolute;
+width: 36.55px;
+height: 18.16px;
+left: 205.32px;
+top: 56.31px;
+
+background: #FFE0CF;
+
+
+/* Vector 71 */
+
+position: absolute;
+width: 19.63px;
+height: 28.8px;
+left: 209.18px;
+top: 20.87px;
+
+background: #FFE0CF;
+
+
+/* Vector */
+
+position: absolute;
+width: 91.7px;
+height: 88.77px;
+left: 153.58px;
+top: 8.66px;
+
+background: #000000;
+
+
+/* Rectangle 949 */
+
+position: absolute;
+width: 20px;
+height: 12px;
+left: 54.71px;
+top: 337.42px;
+
+background: #FFF2CF;
+transform: rotate(-16.43deg);
+
+
+/* Star 1 */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 59px;
+top: 396px;
+
+background: #BCE2FE;
+
+
+/* Rectangle 950 */
+
+position: absolute;
+width: 11px;
+height: 12px;
+left: 150px;
+top: 399px;
+
+background: #FFF2CF;
+
+
+/* Group 1330 */
+
+position: absolute;
+width: 346px;
+height: 154px;
+left: 26px;
+top: 306px;
+
+
+
+/* Menu */
+
+position: absolute;
+width: 346px;
+height: 154px;
+left: 26px;
+top: 306px;
+
+border-radius: 3.15033px;
+
+
+/* Row 1 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: flex-start;
+padding: 0px;
+gap: 12.6px;
+
+position: absolute;
+width: 320.8px;
+height: 41.15px;
+left: 12.6px;
+top: 28.95px;
+
+
+
+/* Frame 1151 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 41.15px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* icon */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 25%;
+bottom: 25%;
+
+/* M3/ref/neutral/neutral10
+
+token=md.ref.palette.neutral10
+*/
+background: #1C1B1F;
+
+
+/* Gift Card */
+
+width: 38px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1152 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 38.15px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Group 1318 */
+
+width: 21px;
+height: 21px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Ellipse 32 */
+
+position: absolute;
+left: 37.98%;
+right: 39.8%;
+top: 8.12%;
+bottom: 58.85%;
+
+/* Secondary/Blue */
+background: #BCE2FE;
+
+
+/* Water Drop / 24 / Outline */
+
+position: absolute;
+width: 21px;
+height: 21px;
+left: 17.85px;
+top: 0px;
+
+
+
+/* filter */
+
+position: absolute;
+left: -4.21%;
+right: 4.22%;
+top: 0.28%;
+bottom: -0.27%;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 12.5%;
+bottom: 12.5%;
+
+background: #020202;
+
+
+/* Settings */
+
+width: 36px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1153 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 55.92px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Thunder / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Polygon 1 */
+
+position: absolute;
+left: 3.47%;
+right: 9.03%;
+top: -4.17%;
+bottom: 16.67%;
+
+/* Secondary / Yellow */
+background: #FFF2CF;
+transform: rotate(-90deg);
+
+
+/* Vector */
+
+position: absolute;
+left: 16.73%;
+right: 16.87%;
+top: 8.33%;
+bottom: 8.32%;
+
+/* Gray/Black */
+background: #0B0A0A;
+
+
+/* Electricity */
+
+width: 43px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1154 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Group 1316 */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Tv / 24 / Outline */
+
+position: absolute;
+width: 18.9px;
+height: 18.9px;
+left: 18.9px;
+top: 0px;
+
+
+
+/* Rectangle 940 */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 33.33%;
+bottom: 20.83%;
+
+/* Secondary/Fuscia */
+background: #FCB3C5;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.32%;
+bottom: 8.33%;
+
+background: #000000;
+
+
+/* Cable TV */
+
+width: 39px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Row 2 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: flex-start;
+padding: 0px;
+gap: 12.6px;
+
+position: absolute;
+width: 320.8px;
+height: 36.05px;
+left: 12.6px;
+top: 89px;
+
+
+
+/* Frame 1151 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* bar-chart */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+background: #0C0C0C;
+
+
+/* Rates */
+
+width: 25px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1152 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* list */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 25%;
+bottom: 25%;
+
+background: #0B0A0A;
+
+
+/* Transaction */
+
+width: 51px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1153 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 55.92px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* money / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 941 */
+
+position: absolute;
+left: 15.97%;
+right: 13.19%;
+top: 20.83%;
+bottom: 8.34%;
+
+/* Secondary/Blue */
+background: #BCE2FE;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 12.49%;
+bottom: 12.51%;
+
+background: #000000;
+
+
+/* Bet Funding */
+
+width: 51px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Frame 1154 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.15px;
+
+margin: 0 auto;
+width: 56.71px;
+height: 36.05px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* grid / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 941 */
+
+position: absolute;
+left: 16.67%;
+right: 12.5%;
+top: 20.83%;
+bottom: 8.34%;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.34%;
+bottom: 8.33%;
+
+background: #000000;
+
+
+/* More */
+
+width: 23px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Main Action */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 12.6013px 11.8137px;
+gap: 7.88px;
+
+position: absolute;
+width: 351px;
+height: 61px;
+left: 21px;
+top: 196px;
+
+background: #000000;
+border-radius: 5px;
+
+
+/* Frame 1025 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 7.09px;
+
+width: 327.37px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Top Up */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.94px;
+
+width: 104.4px;
+height: 36.84px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Group 1024 */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Ellipse 17 */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 40.95%;
+right: 40.95%;
+top: 0%;
+bottom: 48.69%;
+
+/* Gray/White */
+border: 1.57516px solid #FFFFFF;
+
+
+/* Plus / 24 / Outline */
+
+position: absolute;
+width: 12.6px;
+height: 12.6px;
+left: 45.9px;
+top: 3.15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Fund Wallet */
+
+width: 50px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Send */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* pointer / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 8.31%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Sell */
+
+width: 16px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Scan */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 1;
+
+
+/* money withdrawal / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 8.33%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Withdraw */
+
+width: 40px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Greeting */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+width: 329px;
+height: 44px;
+left: 22px;
+top: 118px;
+
+
+
+/* 3D Avatars / 16
+
+A young adult holding a standing grab handle on a light blue backdrop. They have dark skin, dark eyes, are wearing a yellow shirt with blue headphones and a pink head scarf that comes to a knot at the top.
+*/
+
+width: 46px;
+height: 44px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Avatars / 3d_avatar_16 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(3d_avatar_16);
+
+
+/* Top */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 1.58px;
+
+width: 126px;
+height: 39.58px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Hi, Dove */
+
+width: 59px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 15.7516px;
+line-height: 120%;
+/* identical to box height, or 19px */
+
+/* Base/Gray 1 */
+color: #1C1C1C;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Your available balance */
+
+width: 126px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* ₦200,590.00 */
+
+width: 157px;
+height: 23px;
+
+font-family: 'IBM Plex Sans';
+font-style: normal;
+font-weight: 600;
+font-size: 18.902px;
+line-height: 120%;
+/* identical to box height, or 23px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Black - Status bar */
+
+position: absolute;
+width: 388px;
+height: 46px;
+left: 0px;
+top: 8px;
+
+
+
+/* Group */
+
+position: absolute;
+width: 52.5px;
+height: 8.93px;
+left: 324.55px;
+top: 13.65px;
+
+
+
+/* Battery */
+
+position: absolute;
+width: 19.16px;
+height: 8.93px;
+right: 10.95px;
+top: 13.65px;
+
+
+
+/* Border */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 17.33px;
+height: 8.93px;
+right: 12.78px;
+top: 13.65px;
+
+mix-blend-mode: normal;
+opacity: 0.35;
+border: 0.787582px solid rgba(18, 18, 8, 0.6);
+border-radius: 2.10022px;
+
+
+/* Cap */
+
+position: absolute;
+width: 1.05px;
+height: 3.15px;
+right: 10.95px;
+top: 16.54px;
+
+background: rgba(18, 18, 8, 0.6);
+mix-blend-mode: normal;
+opacity: 0.4;
+
+
+/* Capacity */
+
+position: absolute;
+width: 14.18px;
+height: 5.78px;
+right: 14.36px;
+top: 15.22px;
+
+background: #0B0B0B;
+border-radius: 1.05011px;
+
+
+/* Wifi */
+
+position: absolute;
+width: 12.08px;
+height: 8.66px;
+right: 34.05px;
+top: 13.65px;
+
+background: #0B0B0B;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 12.08px;
+height: 3.75px;
+right: 34.05px;
+top: 13.65px;
+
+background: #000000;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 7.87px;
+height: 2.87px;
+right: 36.15px;
+top: 16.65px;
+
+background: #000000;
+
+
+/* Wifi-path */
+
+position: absolute;
+width: 3.66px;
+height: 2.67px;
+right: 38.26px;
+top: 19.65px;
+
+background: #000000;
+
+
+/* Cellular Connection */
+
+position: absolute;
+width: 13.39px;
+height: 8.4px;
+right: 50.06px;
+top: 13.91px;
+
+background: #0B0B0B;
+
+
+/* Cellular-Connection-path */
+
+position: absolute;
+width: 2.36px;
+height: 3.15px;
+right: 61.09px;
+top: 19.16px;
+
+background: #000000;
+
+
+/* Cellular-Connection-path */
+
+position: absolute;
+width: 2.36px;
+height: 4.73px;
+right: 57.41px;
+top: 17.59px;
+
+background: #000000;
+
+
+/* Cellular-Connection-path */
+
+position: absolute;
+width: 2.36px;
+height: 6.56px;
+right: 53.74px;
+top: 15.75px;
+
+background: #000000;
+
+
+/* Cellular-Connection-path */
+
+position: absolute;
+width: 2.36px;
+height: 8.4px;
+right: 50.06px;
+top: 13.91px;
+
+background: #000000;
+
+
+/* Time */
+
+position: absolute;
+width: 42.53px;
+height: 16.54px;
+left: 16.54px;
+top: 9.45px;
+
+
+
+/* Time */
+
+position: absolute;
+height: 13px;
+left: 0px;
+right: -0.47px;
+top: calc(50% - 13px/2 - 0.07px);
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 600;
+font-size: 11.0261px;
+line-height: 13px;
+/* identical to box height, or 114% */
+text-align: center;
+letter-spacing: -0.220523px;
+
+color: #0B0B0B;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 88.3%;
+right: 5.6%;
+top: 12.44%;
+bottom: 84.74%;
+
+background: #0D0D0D;
+
+
+/* aza */
+
+position: absolute;
+width: 58px;
+height: 23px;
+left: 168px;
+top: 54px;
+
+font-family: 'NIKEA';
+font-style: normal;
+font-weight: 400;
+font-size: 18.902px;
+line-height: 120%;
+/* identical to box height, or 23px */
+text-align: center;
+
+color: #000000;
+
