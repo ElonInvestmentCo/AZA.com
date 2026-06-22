@@ -24,6 +24,10 @@ args = "AZA Mobile"
 task = "workflow.run"
 args = "Payvora Mobile"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "API Server"
+
 [[workflows.workflow]]
 name = "AZA Mobile"
 author = "agent"
@@ -46,8 +50,20 @@ args = "pnpm --filter @workspace/payvora run dev"
 [workflows.workflow.metadata]
 outputType = "console"
 
+[[workflows.workflow]]
+name = "API Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run dev"
+waitForPort = 8080
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [agent]
-stack = "PNPM_WORKSPACE"
+stack = "BEST_EFFORT_FALLBACK"
 expertMode = true
 
 [postMerge]
@@ -85,3 +101,8 @@ externalPort = 3003
 [nix]
 channel = "stable-25_05"
 packages = ["nano"]
+
+[userenv]
+
+[userenv.shared]
+PORT = "8080"
