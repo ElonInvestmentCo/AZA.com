@@ -58,7 +58,7 @@ export default function SplashIndex() {
     if (isLoading) return;
     const timer = setTimeout(() => {
       if (isAuthenticated) {
-        router.replace("/(app)/dashboard");
+        router.replace("/(tabs)/");
       } else {
         router.replace("/onboarding");
       }
