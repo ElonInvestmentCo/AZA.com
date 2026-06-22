@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -40,7 +41,7 @@ function DenomBtn({
             borderColor:     selected ? colors.primary : colors.border,
           },
         ]}
-        onPress={onPress}
+        onPress={() => { Haptics.selectionAsync(); onPress(); }}
         onPressIn={() => { scale.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
         onPressOut={() => { scale.value = withSpring(1.0,  { damping: 12, stiffness: 300 }); }}
       >

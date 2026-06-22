@@ -92,7 +92,7 @@ export default function PinScreen() {
   const [pin,  setPin]  = useState("");
 
   const handleKey = (k: string) => {
-    if (k === "⌫") { setPin(p => p.slice(0, -1)); return; }
+    if (k === "⌫") { Haptics.selectionAsync(); setPin(p => p.slice(0, -1)); return; }
     if (k === "" || pin.length >= PIN_LENGTH) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const next = pin + k;
