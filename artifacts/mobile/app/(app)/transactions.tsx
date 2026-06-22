@@ -1,59 +1,142 @@
-import { Feather } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   FlatList,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import Animated, {
-  FadeInRight,
+  FadeInDown,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
-import { useColors } from "@/hooks/useColors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type Filter = "all" | "sold" | "withdraw";
+const C = {
+  bg:        "#FFFFFF",
+  text:      "#151521",
+  subtext:   "rgba(26,29,37,0.5)",
+  border:    "rgba(21,21,33,0.2)",
+  amount:    "#000000",
+};
 
-const ALL_TX = [
-  { id: "1", title: "Amazon Gift Card",  date: "Apr 28", amount: "+₦200,040", positive: true,  type: "sold",     code: "3289HF-4378" },
-  { id: "2", title: "MTN Data Service",  date: "Apr 25", amount: "-₦15,000",  positive: false, type: "withdraw", code: "—"          },
-  { id: "3", title: "iTunes Gift Card",  date: "Apr 22", amount: "+₦89,500",  positive: true,  type: "sold",     code: "ITC-8821"   },
-  { id: "4", title: "Steam Gift Card",   date: "Apr 20", amount: "+₦45,200",  positive: true,  type: "sold",     code: "STM-4491"   },
-  { id: "5", title: "Wallet Withdraw",   date: "Apr 18", amount: "-₦30,000",  positive: false, type: "withdraw", code: "—"          },
-  { id: "6", title: "Google Play Card",  date: "Apr 15", amount: "+₦35,000",  positive: true,  type: "sold",     code: "GPL-9934"   },
-  { id: "7", title: "Vanilla Visa Card", date: "Apr 12", amount: "+₦152,000", positive: true,  type: "sold",     code: "VVC-7721"   },
+type TxType = "transferred" | "refund" | "transaction";
+type IconKind = "visa" | "bank" | "paypal" | "receipt" | "stripe" | "cash";
+
+interface Tx {
+  id:     string;
+  type:   TxType;
+  date:   string;
+  amount: string;
+  icon:   IconKind;
+}
+
+const TRANSACTIONS: Tx[] = [
+  { id: "1", type: "transferred", date: "Aug 19, 2023", amount: "$123.00",  icon: "visa"    },
+  { id: "2", type: "transferred", date: "Jul 20, 2023",  amount: "$12.00",  icon: "bank"    },
+  { id: "3", type: "refund",      date: "May 08, 2023",  amount: "$234.00", icon: "paypal"  },
+  { id: "4", type: "refund",      date: "Feb 29, 2023",  amount: "$15.00",  icon: "receipt" },
+  { id: "5", type: "transaction", date: "Jan 25, 2023",  amount: "-$92.00", icon: "stripe"  },
+  { id: "6", type: "transaction", date: "Jan 16, 2023",  amount: "-$20.00", icon: "cash"    },
 ];
 
+const TYPE_LABEL: Record<TxType, string> = {
+  transferred: "Transferred",
+  refund:      "Refund",
+  transaction: "Transaction",
+};
+
+function TxIcon({ kind }: { kind: IconKind }) {
+  if (kind === "visa") {
+    return (
+      <View style={[ico.circle, { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "rgba(0,0,0,0.1)" }]}>
+        <FontAwesome5 name="cc-visa" size={20} color="#263B80" />
+      </View>
+    );
+  }
+  if (kind === "bank") {
+    return (
+      <View style={[ico.circle, { backgroundColor: "#118EEB" }]}>
+        <MaterialCommunityIcons name="bank-transfer" size={22} color="#FFFFFF" />
+      </View>
+    );
+  }
+  if (kind === "paypal") {
+    return (
+      <View style={[ico.circle, { backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "rgba(0,0,0,0.1)" }]}>
+        <FontAwesome5 name="paypal" size={18} color="#003087" />
+      </View>
+    );
+  }
+  if (kind === "receipt") {
+    return (
+      <View style={[ico.circle, { backgroundColor: "#FE5722" }]}>
+        <Ionicons name="receipt-outline" size={18} color="#FFFFFF" />
+      </View>
+    );
+  }
+  if (kind === "stripe") {
+    return (
+      <View style={[ico.circle, { backgroundColor: "#000000" }]}>
+        <FontAwesome5 name="stripe-s" size={18} color="#FFFFFF" />
+      </View>
+    );
+  }
+  return (
+    <View style={[ico.circle, { backgroundColor: "#00DA5A" }]}>
+      <MaterialCommunityIcons name="cash" size={20} color="#FFFFFF" />
+    </View>
+  );
+}
+
+const ico = StyleSheet.create({
+  circle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
+
+type Filter = "all" | TxType;
+
 const FILTERS: { key: Filter; label: string }[] = [
-  { key: "all",      label: "All"         },
-  { key: "sold",     label: "Sold"        },
-  { key: "withdraw", label: "Withdrawals" },
+  { key: "all",         label: "All"         },
+  { key: "transferred", label: "Transferred" },
+  { key: "refund",      label: "Refund"      },
+  { key: "transaction", label: "Transaction" },
 ];
 
 function FilterPill({
-  label, active, onPress,
-}: { label: string; active: boolean; onPress: () => void }) {
-  const colors = useColors();
-  const scale  = useSharedValue(1);
-  const style  = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const sc = useSharedValue(1);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   return (
     <Animated.View style={style}>
       <Pressable
-        style={[
-          s.filterBtn,
-          { backgroundColor: active ? colors.primary : colors.card, borderColor: colors.border },
-        ]}
+        style={[fp.btn, active ? fp.active : fp.inactive]}
         onPress={onPress}
-        onPressIn={() => { scale.value = withSpring(0.94, { damping: 12, stiffness: 300 }); }}
-        onPressOut={() => { scale.value = withSpring(1.0,  { damping: 12, stiffness: 300 }); }}
+        onPressIn={() => { sc.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
+        onPressOut={() => { sc.value = withSpring(1.0, { damping: 12, stiffness: 300 }); }}
       >
-        <Text style={[s.filterText, { color: active ? colors.primaryForeground : colors.mutedForeground }]}>
+        <Text style={[fp.label, { color: active ? "#FFFFFF" : "rgba(21,21,33,0.5)" }]}>
           {label}
         </Text>
       </Pressable>
@@ -61,18 +144,56 @@ function FilterPill({
   );
 }
 
-export default function TransactionsScreen() {
-  const router   = useRouter();
-  const colors   = useColors();
-  const [filter, setFilter] = useState<Filter>("all");
+const fp = StyleSheet.create({
+  btn:     { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 20 },
+  active:  { backgroundColor: "#151521" },
+  inactive:{ backgroundColor: "#F5F5F5" },
+  label:   { fontSize: 13, fontFamily: "Manrope_500Medium" },
+});
 
-  const data = ALL_TX.filter((t) => filter === "all" || t.type === filter);
+function TxRow({ item, index }: { item: Tx; index: number }) {
+  const sc = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+  return (
+    <Animated.View entering={FadeInDown.duration(300).delay(index * 60).springify()}>
+      <Animated.View style={pressStyle}>
+        <Pressable
+          style={s.card}
+          onPressIn={() => { sc.value = withSpring(0.97, { damping: 14, stiffness: 300 }); }}
+          onPressOut={() => { sc.value = withSpring(1.0, { damping: 14, stiffness: 300 }); }}
+        >
+          <View style={s.cardLeft}>
+            <TxIcon kind={item.icon} />
+            <View style={s.infoBlock}>
+              <Text style={s.typeLabel}>{TYPE_LABEL[item.type]}</Text>
+              <Text style={s.dateText}>{item.date}</Text>
+            </View>
+          </View>
+          <Text style={s.amount}>{item.amount}</Text>
+        </Pressable>
+      </Animated.View>
+    </Animated.View>
+  );
+}
+
+export default function TransactionsScreen() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [filter, setFilter] = useState<Filter>("all");
+  const data = TRANSACTIONS.filter((t) => filter === "all" || t.type === filter);
+  const topPad = Platform.OS === "web" ? 67 : insets.top;
 
   return (
-    <View style={[s.root, { backgroundColor: colors.background }]}>
-      <ScreenHeader title="Transaction History" />
+    <View style={[s.root, { paddingTop: topPad }]}>
+      <View style={s.header}>
+        <Pressable style={s.backBtn} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={20} color={C.text} />
+        </Pressable>
+        <Text style={s.headerTitle}>Transactions</Text>
+        <View style={{ width: 36 }} />
+      </View>
 
-      <View style={s.filters}>
+      <View style={s.filterRow}>
         {FILTERS.map((f) => (
           <FilterPill
             key={f.key}
@@ -86,53 +207,86 @@ export default function TransactionsScreen() {
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={s.list}
+        contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 32 }]}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInRight.duration(320).springify().delay(index * 40)}>
-            <Pressable
-              style={[s.row, { borderBottomColor: colors.border }]}
-              onPress={() => router.push("/(app)/card-status")}
-            >
-              <View
-                style={[
-                  s.txIcon,
-                  { backgroundColor: item.positive ? colors.successLight : colors.destructiveDim },
-                ]}
-              >
-                <Feather
-                  name={item.positive ? "arrow-down-left" : "arrow-up-right"}
-                  size={15}
-                  color={item.positive ? colors.success : colors.destructive}
-                />
-              </View>
-              <View style={s.mid}>
-                <Text style={[s.title, { color: colors.text }]}>{item.title}</Text>
-                <Text style={[s.code,  { color: colors.mutedForeground }]}>{item.code}</Text>
-                <Text style={[s.date,  { color: colors.mutedForeground }]}>{item.date}</Text>
-              </View>
-              <Text style={[s.amount, { color: item.positive ? colors.success : colors.destructive }]}>
-                {item.amount}
-              </Text>
-            </Pressable>
-          </Animated.View>
-        )}
+        renderItem={({ item, index }) => <TxRow item={item} index={index} />}
       />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root:      { flex: 1 },
-  filters:   { flexDirection: "row", paddingHorizontal: 16, paddingVertical: 14, gap: 8 },
-  filterBtn: { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 20, borderWidth: 1 },
-  filterText:{ fontSize: 13, fontFamily: "Manrope_600SemiBold" },
-  list:      { paddingHorizontal: 20, paddingBottom: 32 },
-  row:       { flexDirection: "row", alignItems: "center", paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, gap: 12 },
-  txIcon:    { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  mid:       { flex: 1 },
-  title:     { fontSize: 14, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
-  code:      { fontSize: 12, fontFamily: "Manrope_400Regular",  marginBottom: 1 },
-  date:      { fontSize: 11, fontFamily: "Manrope_400Regular"  },
-  amount:    { fontSize: 14, fontFamily: "Manrope_700Bold"     },
+  root: {
+    flex: 1,
+    backgroundColor: C.bg,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 16,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(21,21,33,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: "Manrope_700Bold",
+    color: C.text,
+  },
+  filterRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 20,
+    gap: 8,
+    marginBottom: 20,
+  },
+  list: {
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  card: {
+    height: 70,
+    borderRadius: 32,
+    borderWidth: 0.5,
+    borderColor: C.border,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  cardLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  infoBlock: {
+    gap: 4,
+  },
+  typeLabel: {
+    fontSize: 12,
+    fontFamily: "Manrope_400Regular",
+    color: C.subtext,
+  },
+  dateText: {
+    fontSize: 15,
+    fontFamily: "Manrope_500Medium",
+    color: C.text,
+  },
+  amount: {
+    fontSize: 15,
+    fontFamily: "Manrope_500Medium",
+    color: C.amount,
+    textAlign: "right",
+  },
 });
