@@ -1,0 +1,173 @@
+CODE BOXES SCRIPTS:
+
+/* Enter OTP (Input) */
+
+position: absolute;
+width: 330px;
+height: 60px;
+left: 33px;
+top: 346px;
+
+/* blank */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 293.87px;
+top: 346px;
+
+background: #F7F8F9;
+/* Border */
+border: 1px solid #E8ECF4;
+border-radius: 8px;
+
+/* 3 */
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 206.91px;
+top: 346px;
+
+/* blank */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 206.91px;
+top: 346px;
+
+/* White /
+background: #FFFFFF;
+/ Primary */
+border: 1px solid #35C2C1;
+border-radius: 8px;
+
+/* 0 */
+
+position: absolute;
+width: 11.85px;
+height: 26px;
+left: 235.55px;
+top: 363px;
+
+font-family: 'Urbanist';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 26px;
+
+/* Dark */
+color: #1E232C;
+
+/* 5 */
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 33px;
+top: 346px;
+
+/* Rectangle 2 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 33px;
+top: 346px;
+
+/* White /
+background: #FFFFFF;
+/ Primary */
+border: 1.2px solid #35C2C1;
+border-radius: 8px;
+
+/* 5 */
+
+position: absolute;
+width: 12.84px;
+height: 26px;
+left: 61.64px;
+top: 363px;
+
+font-family: 'Urbanist';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 26px;
+
+/* Dark */
+color: #1E232C;
+
+/* 1 */
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 120.17px;
+top: 346px;
+
+/* Rectangle 3 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 69.13px;
+height: 60px;
+left: 120.17px;
+top: 346px;
+
+/* White /
+background: #FFFFFF;
+/ Primary */
+border: 1.2px solid #35C2C1;
+border-radius: 8px;
+
+/* 1 */
+
+position: absolute;
+width: 7.9px;
+height: 26px;
+left: 150.78px;
+top: 363px;
+
+font-family: 'Urbanist';
+font-style: normal;
+font-weight: 700;
+font-size: 22px;
+line-height: 26px;
+
+/* Dark */
+color: #1E232C;
+
+RESEND SCRIPT:
+
+/* Resend */
+
+position: absolute;
+width: 50px;
+height: 21px;
+left: 173px;
+top: 815px;
+
+font-family: 'Urbanist';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 140%;
+/* identical to box height, or 21px */
+text-align: center;
+letter-spacing: 0.01em;
+
+/* Primary */
+color: #35C2C1;
+
+
+
+THEN LASTLY, add a card flip animation where tapping the black gift card flips it over to reveal the card details (CVV, expiry) on the back.
