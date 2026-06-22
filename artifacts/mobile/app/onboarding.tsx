@@ -327,8 +327,16 @@ function GiftCardSlide({
       >
         <Image
           source={giftCardVisaImg}
-          style={{ width: blackCardW, height: blackCardH }}
-          contentFit="cover"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: blackCardW,
+            height: blackCardH,
+          }}
+          contentFit="fill"
           cachePolicy="memory-disk"
           priority="high"
         />
