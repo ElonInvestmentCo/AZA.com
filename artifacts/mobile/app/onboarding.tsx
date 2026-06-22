@@ -17,6 +17,7 @@ import Animated, {
   Easing,
   FadeInUp,
   runOnJS,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -425,20 +426,23 @@ function GiftCardSlide({
   );
 }
 
-// ── Slide 3: Illustration — fade + spring in ──────────────────────────────────
+// ── Slide 3: Illustration — fade + spring in + parallax ───────────────────────
 function ImageSlide({
   illustrationSize,
   slideW,
   slideH,
   isActive,
+  parallaxFactor,
 }: {
   illustrationSize: number;
   slideW: number;
   slideH: number;
   isActive: boolean;
+  parallaxFactor: number;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
+  const px = useSharedValue(parallaxFactor * slideW * 0.13);
 
   useEffect(() => {
     if (!isActive) {
@@ -446,23 +450,28 @@ function ImageSlide({
       cancelAnimation(sc);
       op.value = 0;
       sc.value = 0.88;
-      return;
+    } else {
+      op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
+      sc.value = withSpring(1, { damping: 18, stiffness: 140 });
     }
-    op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    sc.value = withSpring(1, { damping: 18, stiffness: 140 });
   }, [isActive]);
+
+  useEffect(() => {
+    const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13;
+    px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 });
+  }, [parallaxFactor]);
 
   const animStyle = useAnimatedStyle(() => ({
     opacity: op.value,
-    transform: [{ scale: sc.value }],
+    transform: [{ scale: sc.value }, { translateX: px.value }],
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
         <Image
           source={slide3Img}
-          style={{ width: slideW, height: slideH }}
+          style={{ width: slideW * 1.3, height: slideH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -472,20 +481,23 @@ function ImageSlide({
   );
 }
 
-// ── Slide N: Static image (unmodified) — fade + spring in ─────────────────────
+// ── Slide N: Static image — fade + spring in + parallax depth ─────────────────
 function ImageSlideStatic({
   source,
   slideW,
   slideH,
   isActive,
+  parallaxFactor,
 }: {
   source: number;
   slideW: number;
   slideH: number;
   isActive: boolean;
+  parallaxFactor: number;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
+  const px = useSharedValue(parallaxFactor * slideW * 0.13);
 
   useEffect(() => {
     if (!isActive) {
@@ -493,23 +505,29 @@ function ImageSlideStatic({
       cancelAnimation(sc);
       op.value = 0;
       sc.value = 0.88;
-      return;
+    } else {
+      op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
+      sc.value = withSpring(1, { damping: 18, stiffness: 140 });
     }
-    op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    sc.value = withSpring(1, { damping: 18, stiffness: 140 });
   }, [isActive]);
 
+  useEffect(() => {
+    const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13;
+    px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 });
+  }, [parallaxFactor]);
+
+  /* Combined transform — single Animated.View avoids the "overwritten transform" warning */
   const animStyle = useAnimatedStyle(() => ({
     opacity: op.value,
-    transform: [{ scale: sc.value }],
+    transform: [{ scale: sc.value }, { translateX: px.value }],
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
         <Image
           source={source}
-          style={{ width: slideW, height: slideH }}
+          style={{ width: slideW * 1.3, height: slideH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -557,7 +575,7 @@ export default function OnboardingScreen() {
         <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
       </View>
 
-      {/* Slide carousel */}
+      {/* Slide carousel — scroll drives the parallax depth on image slides */}
       <FlatList
         ref={flatListRef}
         data={SLIDES}
@@ -591,6 +609,7 @@ export default function OnboardingScreen() {
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
+                  parallaxFactor={index - activeIndex}
                 />
               )}
               {item.type === "chatgpt-portfolio" && (
@@ -599,6 +618,7 @@ export default function OnboardingScreen() {
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
+                  parallaxFactor={index - activeIndex}
                 />
               )}
               {item.type === "chatgpt-card" && (
@@ -607,6 +627,7 @@ export default function OnboardingScreen() {
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
+                  parallaxFactor={index - activeIndex}
                 />
               )}
               {item.type === "chatgpt-esim" && (
@@ -615,6 +636,7 @@ export default function OnboardingScreen() {
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
+                  parallaxFactor={index - activeIndex}
                 />
               )}
             </View>

@@ -39,59 +39,127 @@ const C = {
   inputBg:     "#F7F8F9",
   inputBorder: "#E8ECF4",
   inputFocus:  "#1E232C",
+  inputValid:  "#00C48C",
+  inputError:  "#FF5B7A",
   text:        "#1E232C",
   placeholder: "#8391A1",
   btn:         "#1E232C",
   btnText:     "#FFFFFF",
   error:       "#FF5B7A",
   footerLink:  "#35C2C1",
+  hint:        "#8391A1",
 };
 
-/* ── Plain input ─────────────────────────────────────────────────────────── */
-function PlainInput({
+/* ── Validation rules ────────────────────────────────────────────────────── */
+const validateUsername = (v: string): string => {
+  if (!v.trim()) return "Username is required";
+  if (v.trim().length < 3) return "At least 3 characters required";
+  if (!/^[a-zA-Z0-9_]+$/.test(v.trim())) return "Only letters, numbers & underscores";
+  return "";
+};
+const validateEmail = (v: string): string => {
+  if (!v.trim()) return "Email is required";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return "Enter a valid email address";
+  return "";
+};
+const validatePassword = (v: string): string => {
+  if (!v) return "Password is required";
+  if (v.length < 6) return "Minimum 6 characters";
+  if (!/[A-Z]/.test(v)) return "Include at least one uppercase letter";
+  if (!/[0-9]/.test(v)) return "Include at least one number";
+  return "";
+};
+const validateConfirm = (v: string, pw: string): string => {
+  if (!v) return "Please confirm your password";
+  if (v !== pw) return "Passwords don't match";
+  return "";
+};
+
+/* ── Validated input ─────────────────────────────────────────────────────── */
+function ValidatedInput({
   placeholder,
   value,
   onChangeText,
   keyboardType,
   secure,
   error,
+  touched,
+  onBlur,
 }: {
   placeholder: string;
   value: string;
   onChangeText: (t: string) => void;
   keyboardType?: any;
   secure?: boolean;
-  error?: boolean;
+  error?: string;
+  touched?: boolean;
+  onBlur?: () => void;
 }) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
 
+  const isError = touched && !!error;
+  const isValid = touched && !error && value.length > 0;
+
+  const borderColor = isError
+    ? C.inputError
+    : isValid
+    ? C.inputValid
+    : focused
+    ? C.inputFocus
+    : C.inputBorder;
+
   return (
-    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
-      <TextInput
-        style={inp.field}
-        placeholder={placeholder}
-        placeholderTextColor={C.placeholder}
-        value={value}
-        onChangeText={onChangeText}
-        keyboardType={keyboardType}
-        autoCapitalize="none"
-        secureTextEntry={secure && !showPass}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-      />
-      {secure && (
-        <Pressable
-          onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={inp.eyeBtn}
+    <View>
+      <View
+        style={[
+          inp.wrap,
+          { borderColor },
+          isValid && inp.validShadow,
+        ]}
+      >
+        <TextInput
+          style={inp.field}
+          placeholder={placeholder}
+          placeholderTextColor={C.placeholder}
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType}
+          autoCapitalize="none"
+          secureTextEntry={secure && !showPass}
+          onFocus={() => setFocused(true)}
+          onBlur={() => { setFocused(false); onBlur?.(); }}
+        />
+        {/* Valid checkmark */}
+        {isValid && !secure && (
+          <Animated.View entering={FadeIn.duration(180)}>
+            <Ionicons name="checkmark-circle" size={20} color={C.inputValid} />
+          </Animated.View>
+        )}
+        {/* Password toggle */}
+        {secure && (
+          <Pressable
+            onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={inp.eyeBtn}
+          >
+            <Image
+              source={showPass ? eyeOpenImg : eyeClosedImg}
+              style={{ width: 22, height: 22 }}
+              contentFit="contain"
+            />
+          </Pressable>
+        )}
+      </View>
+      {/* Per-field error message */}
+      {isError && (
+        <Animated.View
+          entering={FadeIn.duration(180)}
+          style={inp.errorRow}
         >
-          <Image
-            source={showPass ? eyeOpenImg : eyeClosedImg}
-            style={{ width: 22, height: 22 }}
-            contentFit="contain"
-          />
-        </Pressable>
+          <Ionicons name="alert-circle-outline" size={13} color={C.inputError} />
+          <Text style={inp.errorMsg}>{error}</Text>
+        </Animated.View>
       )}
     </View>
   );
@@ -102,14 +170,19 @@ const inp = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: C.inputBg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: C.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 18,
     height: 58,
   },
-  focused: { borderColor: C.inputFocus },
-  errored: { borderColor: C.error },
+  validShadow: {
+    shadowColor: "#00C48C",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 2,
+  },
   field: {
     flex: 1,
     fontSize: 15,
@@ -117,7 +190,20 @@ const inp = StyleSheet.create({
     color: C.text,
     height: "100%",
   },
-  eyeBtn: { padding: 2 },
+  eyeBtn:   { padding: 2 },
+  errorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 5,
+    paddingLeft: 4,
+  },
+  errorMsg: {
+    fontSize: 12,
+    fontFamily: "Manrope_400Regular",
+    color: C.inputError,
+    flex: 1,
+  },
 });
 
 /* ── Animated Pressable link ─────────────────────────────────────────────── */
@@ -148,6 +234,41 @@ function LinkBtn({
   );
 }
 
+/* ── Password strength indicator ─────────────────────────────────────────── */
+function PasswordStrength({ value }: { value: string }) {
+  if (!value) return null;
+  const hasLen  = value.length >= 6;
+  const hasUpper = /[A-Z]/.test(value);
+  const hasNum  = /[0-9]/.test(value);
+  const score   = [hasLen, hasUpper, hasNum].filter(Boolean).length;
+  const colors  = ["#FF5B7A", "#F59E0B", "#00C48C"];
+  const labels  = ["Weak", "Fair", "Strong"];
+  const color   = colors[score - 1] ?? "#E8ECF4";
+  const label   = labels[score - 1] ?? "";
+
+  return (
+    <Animated.View entering={FadeIn.duration(220)} style={ps.wrap}>
+      <View style={ps.bars}>
+        {[0, 1, 2].map((i) => (
+          <View
+            key={i}
+            style={[ps.bar, { backgroundColor: i < score ? color : "#E8ECF4" }]}
+          />
+        ))}
+      </View>
+      {!!label && (
+        <Text style={[ps.label, { color }]}>{label}</Text>
+      )}
+    </Animated.View>
+  );
+}
+const ps = StyleSheet.create({
+  wrap:  { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6, paddingLeft: 2 },
+  bars:  { flexDirection: "row", gap: 4, flex: 1 },
+  bar:   { flex: 1, height: 3, borderRadius: 2 },
+  label: { fontSize: 11, fontFamily: "Manrope_600SemiBold" },
+});
+
 /* ── Main screen ─────────────────────────────────────────────────────────── */
 export default function RegisterScreen() {
   const router       = useRouter();
@@ -159,12 +280,26 @@ export default function RegisterScreen() {
   const [password,  setPassword]  = useState("");
   const [confirm,   setConfirm]   = useState("");
   const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  /* register button scale — on its OWN inner Animated.View (no entering prop) */
+  /* touched state — set true on blur OR on first submit attempt */
+  const [touchedUsername, setTouchedUsername] = useState(false);
+  const [touchedEmail,    setTouchedEmail]    = useState(false);
+  const [touchedPassword, setTouchedPassword] = useState(false);
+  const [touchedConfirm,  setTouchedConfirm]  = useState(false);
+
+  /* Computed errors */
+  const errUsername = validateUsername(username);
+  const errEmail    = validateEmail(email);
+  const errPassword = validatePassword(password);
+  const errConfirm  = validateConfirm(confirm, password);
+  const hasErrors   = !!(errUsername || errEmail || errPassword || errConfirm);
+
+  /* register button scale */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
+  /* form shake */
   const shakeX     = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
@@ -179,25 +314,19 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    if (!username || !email || !password || !confirm) {
-      setError("Please fill in all fields.");
+    /* Mark all fields as touched so errors appear */
+    setTouchedUsername(true);
+    setTouchedEmail(true);
+    setTouchedPassword(true);
+    setTouchedConfirm(true);
+    setSubmitted(true);
+
+    if (hasErrors) {
       triggerShake();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
-    }
-    if (password !== confirm) {
-      setError("Passwords do not match.");
-      triggerShake();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      triggerShake();
       return;
     }
     setLoading(true);
-    setError("");
     await register(username, email, password);
     setLoading(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -243,41 +372,47 @@ export default function RegisterScreen() {
           entering={FadeInUp.duration(420).delay(120).springify()}
           style={[s.form, shakeStyle]}
         >
-          <PlainInput
+          <ValidatedInput
             placeholder="Username"
             value={username}
-            onChangeText={t => { setUsername(t); setError(""); }}
-            error={!!error}
+            onChangeText={t => { setUsername(t); }}
+            error={errUsername}
+            touched={touchedUsername}
+            onBlur={() => setTouchedUsername(true)}
           />
-          <PlainInput
+          <ValidatedInput
             placeholder="Email"
             value={email}
-            onChangeText={t => { setEmail(t); setError(""); }}
+            onChangeText={t => { setEmail(t); }}
             keyboardType="email-address"
-            error={!!error}
+            error={errEmail}
+            touched={touchedEmail}
+            onBlur={() => setTouchedEmail(true)}
           />
-          <PlainInput
-            placeholder="Password"
-            value={password}
-            onChangeText={t => { setPassword(t); setError(""); }}
-            secure
-            error={!!error}
-          />
-          <PlainInput
+          <View>
+            <ValidatedInput
+              placeholder="Password"
+              value={password}
+              onChangeText={t => { setPassword(t); }}
+              secure
+              error={errPassword}
+              touched={touchedPassword}
+              onBlur={() => setTouchedPassword(true)}
+            />
+            {touchedPassword && <PasswordStrength value={password} />}
+          </View>
+          <ValidatedInput
             placeholder="Confirm password"
             value={confirm}
-            onChangeText={t => { setConfirm(t); setError(""); }}
+            onChangeText={t => { setConfirm(t); }}
             secure
-            error={!!error}
+            error={errConfirm}
+            touched={touchedConfirm}
+            onBlur={() => setTouchedConfirm(true)}
           />
-          {error ? (
-            <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
-              {error}
-            </Animated.Text>
-          ) : null}
         </Animated.View>
 
-        {/* ── Register button — entering on wrapper, scale on inner view ── */}
+        {/* ── Register button ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
           style={s.btnWrap}
@@ -302,7 +437,7 @@ export default function RegisterScreen() {
           </Animated.View>
         </Animated.View>
 
-        {/* ── Or Login with ── */}
+        {/* ── Divider ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.dividerRow}
@@ -321,17 +456,14 @@ export default function RegisterScreen() {
           <Image source={btnAppleImg}  style={s.socialBtn} contentFit="contain" />
         </Animated.View>
 
-        {/* ── Footer — Sign In navigates FORWARD to login, not back ── */}
+        {/* ── Footer ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}
           style={s.footer}
         >
           <Text style={s.footerText}>Already have an account? </Text>
           <LinkBtn
-            onPress={() => {
-              Haptics.selectionAsync();
-              router.replace("/(auth)/login");
-            }}
+            onPress={() => { Haptics.selectionAsync(); router.replace("/(auth)/login"); }}
             textStyle={s.footerLink}
             label="Sign In"
           />
@@ -374,13 +506,7 @@ const s = StyleSheet.create({
     letterSpacing: -0.3,
   },
 
-  form:      { gap: 16, marginBottom: 28 },
-  errorText: {
-    fontSize: 13,
-    fontFamily: "Manrope_400Regular",
-    color: C.error,
-    textAlign: "center",
-  },
+  form:    { gap: 14, marginBottom: 28 },
 
   btnWrap: { marginBottom: 32 },
   regBtn: {
@@ -407,11 +533,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#E8ECF4",
-  },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "#E8ECF4" },
   dividerText: {
     marginHorizontal: 12,
     fontSize: 14,
@@ -425,10 +547,7 @@ const s = StyleSheet.create({
     gap: 16,
     marginBottom: 24,
   },
-  socialBtn: {
-    width: 105,
-    height: 56,
-  },
+  socialBtn: { width: 105, height: 56 },
 
   footer: {
     flexDirection: "row",
