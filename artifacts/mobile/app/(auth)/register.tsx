@@ -29,8 +29,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 /* ── Assets ─────────────────────────────────────────────────────────────── */
-const btnGoogleImg = require("@/assets/images/btn-social-google.png");
-const btnAppleImg  = require("@/assets/images/btn-social-apple.png");
+const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
+const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 const eyeOpenImg   = require("../../assets/images/eye-open.svg");
 const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 

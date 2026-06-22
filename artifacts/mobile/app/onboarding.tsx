@@ -292,6 +292,41 @@ function AnimatedWalletSlide({
   );
 }
 
+// ── QR code placeholder (decorative) ──────────────────────────────────────────
+function QRPlaceholder({ size }: { size: number }) {
+  const cell = size / 10;
+  const pattern = [
+    [1,1,1,1,1,1,1,0,1,0],
+    [1,0,0,0,0,0,1,0,0,1],
+    [1,0,1,1,1,0,1,0,1,0],
+    [1,0,1,1,1,0,1,1,1,1],
+    [1,0,1,1,1,0,1,0,0,0],
+    [1,0,0,0,0,0,1,0,1,1],
+    [1,1,1,1,1,1,1,0,1,0],
+    [0,1,0,0,1,0,0,0,0,1],
+    [1,0,1,1,0,1,1,1,0,1],
+    [0,1,0,1,0,0,1,0,1,1],
+  ];
+  return (
+    <View style={{ width: size, height: size, backgroundColor: "#fff", padding: cell * 0.4 }}>
+      {pattern.map((row, r) => (
+        <View key={r} style={{ flexDirection: "row" }}>
+          {row.map((filled, c) => (
+            <View
+              key={c}
+              style={{
+                width: cell,
+                height: cell,
+                backgroundColor: filled ? "#000" : "#fff",
+              }}
+            />
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 // ── Slide 2: Gift card — fade + spring in ─────────────────────────────────────
 function GiftCardSlide({
   slideW,
@@ -302,10 +337,13 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const blackCardW    = clamp(slideW * 0.96, 300, 460);
+  const blackCardW    = clamp(slideW * 0.88, 280, 420);
   const blackCardH    = blackCardW / 1.586;
   const blackCardLeft = (slideW - blackCardW) / 2;
   const blackCardTop  = (slideH - blackCardH) / 2;
+
+  const qrSize = blackCardH * 0.50;
+  const pad    = blackCardW * 0.06;
 
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
@@ -337,33 +375,51 @@ function GiftCardSlide({
             left: blackCardLeft,
             width: blackCardW,
             height: blackCardH,
-            backgroundColor: "#0F0F0F",
+            backgroundColor: "#0A0A0A",
             borderRadius: 22,
             overflow: "hidden",
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.30,
-            shadowRadius: 24,
-            elevation: 14,
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.45,
+            shadowRadius: 28,
+            elevation: 16,
+            padding: pad,
           },
           cardStyle,
         ]}
       >
-        <Image
-          source={giftCardVisaImg}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: blackCardW,
-            height: blackCardH,
-          }}
-          contentFit="fill"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+        {/* Top row: title + ID */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <View>
+            <Text style={{ color: "#fff", fontSize: blackCardW * 0.048, fontFamily: "Manrope_700Bold", letterSpacing: -0.3 }}>
+              Visa Gift Card
+            </Text>
+            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular", marginTop: 3 }}>
+              {"United States 🇺🇸"}
+            </Text>
+          </View>
+          <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular" }}>
+            {"ID: 12345678"}
+          </Text>
+        </View>
+
+        {/* Bottom row: amount + QR */}
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", flex: 1, marginTop: 8 }}>
+          <Text style={{ color: "#fff", fontSize: blackCardW * 0.13, fontFamily: "Manrope_700Bold", letterSpacing: -1 }}>
+            $100
+          </Text>
+          <View style={{
+            borderRadius: 6,
+            overflow: "hidden",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.18,
+            shadowRadius: 6,
+            elevation: 4,
+          }}>
+            <QRPlaceholder size={qrSize} />
+          </View>
+        </View>
       </Animated.View>
     </View>
   );

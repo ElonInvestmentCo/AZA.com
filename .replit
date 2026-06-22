@@ -11,6 +11,41 @@ env = { "CI" = "true" }
 [workflows]
 runButton = "Project"
 
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "AZA Mobile"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Payvora Mobile"
+
+[[workflows.workflow]]
+name = "AZA Mobile"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/mobile run dev"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Payvora Mobile"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/payvora run dev"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
@@ -38,6 +73,10 @@ externalPort = 3001
 [[ports]]
 localPort = 19000
 externalPort = 3002
+
+[[ports]]
+localPort = 19001
+externalPort = 4200
 
 [[ports]]
 localPort = 19665

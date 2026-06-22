@@ -1,4 +1,5 @@
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -16,6 +17,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
+
+const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
+const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 
 export default function RegisterScreen() {
   const colors = useColors();
@@ -163,6 +167,21 @@ export default function RegisterScreen() {
               <Text style={[styles.submitBtnText, { color: colors.primaryForeground }]}>Create Account</Text>
             )}
           </TouchableOpacity>
+
+          <View style={styles.divider}>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.mutedForeground }]}>or</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+          </View>
+
+          <View style={styles.socialRow}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
+              <Image source={btnGoogleImg} style={styles.socialBtn} contentFit="contain" />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
+              <Image source={btnAppleImg} style={styles.socialBtn} contentFit="contain" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.footer}>
@@ -204,6 +223,22 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   submitBtnText: { fontSize: 17, fontFamily: "Inter_600SemiBold" },
+  divider: { flexDirection: "row", alignItems: "center", gap: 12 },
+  dividerLine: { flex: 1, height: 1 },
+  dividerText: { fontSize: 14, fontFamily: "Inter_400Regular" },
+  socialRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+  },
+  socialBtnWrap: {
+    flex: 1,
+    alignItems: "center",
+  },
+  socialBtn: {
+    width: 105,
+    height: 56,
+  },
   footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: "auto", paddingTop: 32 },
   footerText: { fontSize: 15, fontFamily: "Inter_400Regular" },
   footerLink: { fontSize: 15, fontFamily: "Inter_600SemiBold" },

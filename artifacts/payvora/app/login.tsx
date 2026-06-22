@@ -1,4 +1,5 @@
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -16,6 +17,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
+
+const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
+const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 
 export default function LoginScreen() {
   const colors = useColors();
@@ -138,18 +142,14 @@ export default function LoginScreen() {
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
-          <TouchableOpacity
-            style={[styles.biometricBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={async () => {
-              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              await login("demo@payvora.app", "demo");
-              router.replace("/(tabs)");
-            }}
-            activeOpacity={0.85}
-          >
-            <Feather name="shield" size={20} color={colors.primary} />
-            <Text style={[styles.biometricText, { color: colors.foreground }]}>Continue with Biometrics</Text>
-          </TouchableOpacity>
+          <View style={styles.socialRow}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
+              <Image source={btnGoogleImg} style={styles.socialBtn} contentFit="contain" />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
+              <Image source={btnAppleImg} style={styles.socialBtn} contentFit="contain" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.footer}>
@@ -200,11 +200,19 @@ const styles = StyleSheet.create({
   divider: { flexDirection: "row", alignItems: "center", gap: 12 },
   dividerLine: { flex: 1, height: 1 },
   dividerText: { fontSize: 14, fontFamily: "Inter_400Regular" },
-  biometricBtn: {
-    height: 56, borderRadius: 16, borderWidth: 1,
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+  socialRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
   },
-  biometricText: { fontSize: 16, fontFamily: "Inter_500Medium" },
+  socialBtnWrap: {
+    flex: 1,
+    alignItems: "center",
+  },
+  socialBtn: {
+    width: 105,
+    height: 56,
+  },
   footer: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: "auto", paddingTop: 32 },
   footerText: { fontSize: 15, fontFamily: "Inter_400Regular" },
   footerLink: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
