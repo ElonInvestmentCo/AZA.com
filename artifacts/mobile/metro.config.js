@@ -1,3 +1,23 @@
 const { getDefaultConfig } = require("expo/metro-config");
+const path = require("path");
+const fs = require("fs");
 
-module.exports = getDefaultConfig(__dirname);
+const config = getDefaultConfig(__dirname);
+
+// Fix for pnpm + Metro: Metro's FallbackWatcher crashes when it tries to watch
+// node_modules subdirectories inside pnpm packages that don't exist.
+// We override the watcher to silently ignore ENOENT errors.
+const originalWatch = fs.watch;
+fs.watch = function (filename, options, listener) {
+  try {
+    return originalWatch(filename, options, listener);
+  } catch (e) {
+    if (e.code === "ENOENT") {
+      // Return a no-op watcher
+      return { close: () => {} };
+    }
+    throw e;
+  }
+};
+
+module.exports = config;
