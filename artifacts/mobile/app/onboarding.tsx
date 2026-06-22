@@ -302,7 +302,7 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const blackCardW    = clamp(slideW * 0.82, 240, 360);
+  const blackCardW    = clamp(slideW * 0.90, 280, 420);
   const blackCardH    = blackCardW / 1.586;
   const blackCardLeft = (slideW - blackCardW) / 2;
   const blackCardTop  = (slideH - blackCardH) / 2;
@@ -478,7 +478,7 @@ export default function OnboardingScreen() {
 
   const bottomSectionH   = DOTS_H + TEXT_H + BTNS_H + 40 + bottomInset;
   const slideAreaH       = Math.max(height - topInset - HEADER_H - bottomSectionH, 160);
-  const illustrationSize = clamp(Math.min(slideAreaH * 0.92, width * 0.9), 180, 420);
+  const illustrationSize = clamp(Math.min(slideAreaH * 0.96, width * 0.92), 220, 500);
   const contentMaxW      = Math.min(width, 500);
   const hPad             = clamp(width * 0.06, 16, 28);
   const btnWidth         = contentMaxW - hPad * 2;
