@@ -1,12 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AZAButton } from "@/components/AZAButton";
 import { AZAInput } from "@/components/AZAInput";
@@ -18,19 +13,13 @@ export default function NewPasswordScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [confirm,  setConfirm]  = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState("");
 
   const handleSubmit = () => {
-    if (!password || !confirm) {
-      setError("Please fill in all fields.");
-      return;
-    }
-    if (password !== confirm) {
-      setError("Passwords do not match.");
-      return;
-    }
+    if (!password || !confirm) { setError("Please fill in all fields."); return; }
+    if (password !== confirm)  { setError("Passwords do not match.");    return; }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -44,9 +33,12 @@ export default function NewPasswordScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScreenHeader title="New Password" />
-      <View style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
-        <Text style={[styles.sub, { color: colors.mutedForeground }]}>
-          Create a strong new password for your account.
+      <Animated.View
+        entering={FadeInUp.duration(420).springify().delay(80)}
+        style={[s.content, { paddingBottom: insets.bottom + 24 }]}
+      >
+        <Text style={[s.sub, { color: colors.mutedForeground }]}>
+          Create a strong new password. Use a mix of letters, numbers and symbols.
         </Text>
         <AZAInput
           label="New Password"
@@ -66,12 +58,12 @@ export default function NewPasswordScreen() {
           error={error}
         />
         <AZAButton title="Set New Password" onPress={handleSubmit} loading={loading} />
-      </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  content: { flex: 1, paddingHorizontal: 28, paddingTop: 32, gap: 20 },
-  sub: { fontSize: 15, fontFamily: "Manrope_400Regular", lineHeight: 22 },
+const s = StyleSheet.create({
+  content: { flex: 1, paddingHorizontal: 24, paddingTop: 32, gap: 20 },
+  sub: { fontSize: 15, fontFamily: "Manrope_400Regular", lineHeight: 24 },
 });

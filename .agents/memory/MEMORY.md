@@ -1,0 +1,1 @@
+- [Dark fintech design system](dark-fintech-design.md) — all screens use dark palette (#0A0A0F bg, #00D9A0 accent); colors.light keys are dark values for compat.

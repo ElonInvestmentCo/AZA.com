@@ -4,35 +4,62 @@ import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { AZAButton } from "@/components/AZAButton";
 import { AZAInput } from "@/components/AZAInput";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useColors } from "@/hooks/useColors";
 
-const DENOMINATIONS = ["$25", "$50", "$100", "$200", "$500"];
+const DENOMS = ["$25", "$50", "$100", "$200", "$500"];
+
+function DenomBtn({
+  label, selected, onPress,
+}: { label: string; selected: boolean; onPress: () => void }) {
+  const colors = useColors();
+  const scale  = useSharedValue(1);
+  const style  = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+  return (
+    <Animated.View style={style}>
+      <Pressable
+        style={[
+          s.denomBtn,
+          {
+            backgroundColor: selected ? colors.primary : colors.card,
+            borderColor:     selected ? colors.primary : colors.border,
+          },
+        ]}
+        onPress={onPress}
+        onPressIn={() => { scale.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
+        onPressOut={() => { scale.value = withSpring(1.0,  { damping: 12, stiffness: 300 }); }}
+      >
+        <Text style={[s.denomText, { color: selected ? colors.primaryForeground : colors.text }]}>
+          {label}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
 
 export default function SellGiftCardScreen() {
-  const router = useRouter();
-  const colors = useColors();
+  const router  = useRouter();
+  const colors  = useColors();
   const { card } = useLocalSearchParams<{ card: string }>();
-  const [denom, setDenom] = useState("");
-  const [code, setCode] = useState("");
-  const [selectedDenom, setSelectedDenom] = useState<string | null>(null);
+  const [code,  setCode]  = useState("");
+  const [denom, setDenom] = useState<string | null>(null);
 
-  const handleContinue = () => {
-    if (!code) return;
-    router.push("/(app)/confirm-transaction");
-  };
-
-  const nairaValue = selectedDenom
-    ? parseInt(selectedDenom.replace("$", "")) * 780
-    : 0;
+  const naira = denom ? parseInt(denom.replace("$", "")) * 780 : 0;
 
   return (
     <KeyboardAvoidingView
@@ -41,82 +68,57 @@ export default function SellGiftCardScreen() {
     >
       <ScreenHeader title={`Sell ${card ?? "Gift Card"}`} />
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.label, { color: colors.subtitle }]}>Select Denomination</Text>
-        <View style={styles.denomRow}>
-          {DENOMINATIONS.map((d) => (
-            <TouchableOpacity
-              key={d}
-              style={[
-                styles.denomBtn,
-                {
-                  backgroundColor: selectedDenom === d ? colors.primary : colors.card,
-                  borderColor: selectedDenom === d ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={() => setSelectedDenom(d)}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={[
-                  styles.denomText,
-                  { color: selectedDenom === d ? "#fff" : colors.text },
-                ]}
-              >
-                {d}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <AZAInput
-          label="Gift Card Code"
-          placeholder="Enter the card code"
-          value={code}
-          onChangeText={setCode}
-          icon="credit-card"
-          autoCapitalize="characters"
-        />
-
-        {selectedDenom && (
-          <View style={[styles.estimateBox, { backgroundColor: colors.successLight }]}>
-            <Feather name="info" size={14} color={colors.success} />
-            <Text style={[styles.estimateText, { color: colors.success }]}>
-              You'll receive approximately ₦{nairaValue.toLocaleString("en-NG")}
-            </Text>
+        <Animated.View entering={FadeInUp.duration(380).springify().delay(60)}>
+          <Text style={[s.label, { color: colors.mutedForeground }]}>Select Denomination</Text>
+          <View style={s.denomRow}>
+            {DENOMS.map((d) => (
+              <DenomBtn key={d} label={d} selected={denom === d} onPress={() => setDenom(d)} />
+            ))}
           </View>
-        )}
+        </Animated.View>
 
-        <AZAButton
-          title="Continue"
-          onPress={handleContinue}
-          disabled={!code || !selectedDenom}
-        />
+        <Animated.View entering={FadeInUp.duration(380).springify().delay(100)}>
+          <AZAInput
+            label="Gift Card Code"
+            placeholder="Enter card code"
+            value={code}
+            onChangeText={setCode}
+            icon="credit-card"
+            autoCapitalize="characters"
+          />
+        </Animated.View>
+
+        {denom ? (
+          <Animated.View
+            entering={FadeInUp.duration(320).springify()}
+            style={[s.estimateBox, { backgroundColor: colors.accentDim, borderColor: "rgba(0,217,160,0.2)" }]}
+          >
+            <Feather name="trending-up" size={15} color={colors.accent} />
+            <Text style={[s.estimateText, { color: colors.accent }]}>
+              You'll receive approximately{" "}
+              <Text style={{ fontFamily: "Manrope_700Bold" }}>
+                ₦{naira.toLocaleString("en-NG")}
+              </Text>
+            </Text>
+          </Animated.View>
+        ) : null}
+
+        <AZAButton title="Continue" onPress={() => router.push("/(app)/confirm-transaction")} disabled={!code || !denom} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 20, gap: 20, paddingBottom: 40 },
-  label: { fontSize: 13, fontFamily: "Manrope_500Medium" },
-  denomRow: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  denomBtn: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  denomText: { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
-  estimateBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    padding: 12,
-    borderRadius: 8,
-  },
-  estimateText: { fontSize: 13, fontFamily: "Manrope_500Medium", flex: 1 },
+const s = StyleSheet.create({
+  content:      { paddingHorizontal: 20, paddingTop: 24, gap: 20, paddingBottom: 40 },
+  label:        { fontSize: 13, fontFamily: "Manrope_600SemiBold", marginBottom: 10 },
+  denomRow:     { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  denomBtn:     { paddingHorizontal: 20, paddingVertical: 11, borderRadius: 12, borderWidth: 1.5 },
+  denomText:    { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+  estimateBox:  { flexDirection: "row", alignItems: "center", gap: 10, padding: 14, borderRadius: 14, borderWidth: 1 },
+  estimateText: { fontSize: 13, fontFamily: "Manrope_400Regular", flex: 1 },
 });

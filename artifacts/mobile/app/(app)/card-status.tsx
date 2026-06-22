@@ -2,15 +2,22 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { AZAButton } from "@/components/AZAButton";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { useColors } from "@/hooks/useColors";
 
 const STEPS = [
-  { label: "Card Received", done: true, time: "10:42 AM" },
-  { label: "Under Review", done: true, time: "10:43 AM" },
-  { label: "Verified", done: true, time: "10:45 AM" },
-  { label: "Payment Sent", done: false, time: "Pending" },
+  { label: "Card Received", done: true,  time: "10:42 AM" },
+  { label: "Under Review",  done: true,  time: "10:43 AM" },
+  { label: "Verified",      done: true,  time: "10:45 AM" },
+  { label: "Payment Sent",  done: false, time: "Pending"  },
+];
+
+const DETAILS = [
+  { label: "Amount",     value: "$100 USD" },
+  { label: "Rate",       value: "₦780 / $1" },
+  { label: "You Receive",value: "₦78,000",  accent: true },
 ];
 
 export default function CardStatusScreen() {
@@ -18,118 +25,133 @@ export default function CardStatusScreen() {
   const colors = useColors();
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
+    <View style={[s.root, { backgroundColor: colors.background }]}>
       <ScreenHeader title="Card Status" />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.cardName, { color: colors.text }]}>Amazon Gift Card</Text>
-          <Text style={[styles.cardCode, { color: colors.mutedForeground }]}>3289HF-4378</Text>
-          <View style={[styles.badge, { backgroundColor: "#FFF3CD" }]}>
-            <Text style={[styles.badgeText, { color: "#856404" }]}>Processing</Text>
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+
+        {/* Card info */}
+        <Animated.View
+          entering={FadeInDown.duration(380).springify().delay(40)}
+          style={[s.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <View>
+            <Text style={[s.cardName, { color: colors.text }]}>Amazon Gift Card</Text>
+            <Text style={[s.cardCode, { color: colors.mutedForeground }]}>REF: 3289HF-4378</Text>
           </View>
-        </View>
+          <View style={[s.badge, { backgroundColor: colors.warningLight }]}>
+            <View style={[s.badgeDot, { backgroundColor: colors.warning }]} />
+            <Text style={[s.badgeText, { color: colors.warning }]}>Processing</Text>
+          </View>
+        </Animated.View>
 
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Transaction Progress</Text>
-
-        <View style={styles.steps}>
-          {STEPS.map((step, i) => (
-            <View key={step.label} style={styles.stepRow}>
-              <View style={styles.stepLeft}>
-                <View
-                  style={[
-                    styles.stepCircle,
-                    {
-                      backgroundColor: step.done ? colors.success : colors.border,
-                    },
-                  ]}
-                >
-                  {step.done ? (
-                    <Feather name="check" size={12} color="#fff" />
-                  ) : (
-                    <View style={[styles.stepInner, { backgroundColor: "#fff" }]} />
-                  )}
-                </View>
-                {i < STEPS.length - 1 ? (
+        {/* Progress stepper */}
+        <Animated.View entering={FadeInUp.duration(380).springify().delay(80)}>
+          <Text style={[s.sectionTitle, { color: colors.text }]}>Transaction Progress</Text>
+          <View style={[s.stepperCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {STEPS.map((step, i) => (
+              <View key={step.label} style={s.stepRow}>
+                <View style={s.stepLeft}>
                   <View
                     style={[
-                      styles.stepLine,
-                      { backgroundColor: STEPS[i + 1].done ? colors.success : colors.border },
+                      s.stepCircle,
+                      {
+                        backgroundColor: step.done ? colors.accent : colors.card,
+                        borderColor:     step.done ? colors.accent : colors.border,
+                      },
                     ]}
-                  />
-                ) : null}
+                  >
+                    {step.done
+                      ? <Feather name="check" size={11} color={colors.primaryForeground} />
+                      : <View style={[s.stepInner, { backgroundColor: colors.border }]} />
+                    }
+                  </View>
+                  {i < STEPS.length - 1 && (
+                    <View
+                      style={[
+                        s.stepLine,
+                        { backgroundColor: STEPS[i + 1].done ? colors.accent : colors.border },
+                      ]}
+                    />
+                  )}
+                </View>
+                <View style={s.stepBody}>
+                  <Text style={[s.stepLabel, { color: step.done ? colors.text : colors.mutedForeground }]}>
+                    {step.label}
+                  </Text>
+                  <Text style={[s.stepTime, { color: colors.mutedForeground }]}>{step.time}</Text>
+                </View>
               </View>
-              <View style={styles.stepContent}>
-                <Text style={[styles.stepLabel, { color: step.done ? colors.text : colors.mutedForeground }]}>
-                  {step.label}
-                </Text>
-                <Text style={[styles.stepTime, { color: colors.mutedForeground }]}>{step.time}</Text>
-              </View>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Detail box */}
+        <Animated.View
+          entering={FadeInUp.duration(380).springify().delay(140)}
+          style={[s.detailBox, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          {DETAILS.map((d, i) => (
+            <View
+              key={d.label}
+              style={[
+                s.detailRow,
+                { borderBottomColor: colors.border },
+                i === DETAILS.length - 1 && { borderBottomWidth: 0 },
+              ]}
+            >
+              <Text style={[s.detailLabel, { color: colors.mutedForeground }]}>{d.label}</Text>
+              <Text
+                style={[
+                  s.detailValue,
+                  { color: d.accent ? colors.accent : colors.text },
+                  d.accent && { fontFamily: "Manrope_700Bold", fontSize: 16 },
+                ]}
+              >
+                {d.value}
+              </Text>
             </View>
           ))}
-        </View>
+        </Animated.View>
 
-        <View style={[styles.detailBox, { backgroundColor: "#061941" }]}>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Amount</Text>
-            <Text style={styles.detailValue}>$100 USD</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Rate</Text>
-            <Text style={styles.detailValue}>₦780/$</Text>
-          </View>
-          <View style={[styles.detailRow, { borderBottomWidth: 0 }]}>
-            <Text style={styles.detailLabel}>You Receive</Text>
-            <Text style={[styles.detailValue, { color: "#4ade80", fontFamily: "Manrope_700Bold" }]}>₦78,000</Text>
-          </View>
-        </View>
-
-        <AZAButton
-          title="Back to Dashboard"
-          onPress={() => router.replace("/(app)/dashboard")}
-        />
+        <AZAButton title="Back to Dashboard" onPress={() => router.replace("/(app)/dashboard")} />
       </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1 },
+const s = StyleSheet.create({
+  root:    { flex: 1 },
   content: { paddingHorizontal: 20, paddingTop: 20, gap: 20, paddingBottom: 40 },
-  card: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
-    gap: 6,
-    alignItems: "flex-start",
+
+  infoCard: {
+    borderRadius: 18, borderWidth: 1, padding: 18,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
   },
-  cardName: { fontSize: 18, fontFamily: "Manrope_700Bold" },
-  cardCode: { fontSize: 13, fontFamily: "Manrope_400Regular" },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginTop: 4 },
-  badgeText: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
-  sectionTitle: { fontSize: 16, fontFamily: "Manrope_700Bold" },
-  steps: { gap: 0 },
-  stepRow: { flexDirection: "row", gap: 16 },
+  cardName: { fontSize: 17, fontFamily: "Manrope_700Bold", marginBottom: 4 },
+  cardCode: { fontSize: 12, fontFamily: "Manrope_400Regular" },
+  badge:    { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
+  badgeDot: { width: 6, height: 6, borderRadius: 3 },
+  badgeText:{ fontSize: 12, fontFamily: "Manrope_600SemiBold" },
+
+  sectionTitle: { fontSize: 15, fontFamily: "Manrope_700Bold", marginBottom: 12 },
+  stepperCard:  { borderRadius: 18, borderWidth: 1, padding: 20 },
+  stepRow:  { flexDirection: "row", gap: 16 },
   stepLeft: { alignItems: "center", width: 24 },
   stepCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 24, height: 24, borderRadius: 12,
+    alignItems: "center", justifyContent: "center", borderWidth: 1.5,
   },
   stepInner: { width: 8, height: 8, borderRadius: 4 },
-  stepLine: { width: 2, flex: 1, minHeight: 32 },
-  stepContent: { flex: 1, paddingBottom: 24 },
+  stepLine:  { width: 2, flex: 1, minHeight: 28, marginVertical: 2 },
+  stepBody:  { flex: 1, paddingBottom: 22 },
   stepLabel: { fontSize: 14, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
-  stepTime: { fontSize: 12, fontFamily: "Manrope_400Regular" },
-  detailBox: { borderRadius: 16, padding: 20, gap: 0 },
+  stepTime:  { fontSize: 12, fontFamily: "Manrope_400Regular" },
+
+  detailBox: { borderRadius: 18, borderWidth: 1, padding: 18 },
   detailRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(255,255,255,0.1)",
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingVertical: 13, borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  detailLabel: { color: "rgba(255,255,255,0.6)", fontSize: 14, fontFamily: "Manrope_400Regular" },
-  detailValue: { color: "#fff", fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+  detailLabel: { fontSize: 13, fontFamily: "Manrope_400Regular" },
+  detailValue: { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
 });

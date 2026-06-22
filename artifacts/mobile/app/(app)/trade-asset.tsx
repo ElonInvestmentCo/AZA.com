@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -8,22 +9,18 @@ import {
   Text,
   View,
 } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { AZAButton } from "@/components/AZAButton";
 import { AZAInput } from "@/components/AZAInput";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useColors } from "@/hooks/useColors";
 
 export default function TradeAssetScreen() {
-  const router = useRouter();
-  const colors = useColors();
+  const router  = useRouter();
+  const colors  = useColors();
   const { card } = useLocalSearchParams<{ card: string }>();
   const [amount, setAmount] = useState("");
   const [wallet, setWallet] = useState("");
-
-  const handleContinue = () => {
-    if (!amount || !wallet) return;
-    router.push("/(app)/confirm-transaction");
-  };
 
   return (
     <KeyboardAvoidingView
@@ -32,35 +29,49 @@ export default function TradeAssetScreen() {
     >
       <ScreenHeader title={`Trade ${card ?? "Asset"}`} />
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.rateCard, { backgroundColor: "#061941" }]}>
-          <Text style={styles.rateName}>{card ?? "Gift Card"}</Text>
-          <Text style={styles.rateValue}>₦780 / $1</Text>
-          <Text style={styles.rateSub}>Current trading rate</Text>
-        </View>
+        {/* Rate card */}
+        <Animated.View
+          entering={FadeInUp.duration(380).springify().delay(60)}
+          style={[s.rateCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <View style={[s.rateIconBg, { backgroundColor: colors.accentDim }]}>
+            <Feather name="trending-up" size={18} color={colors.accent} />
+          </View>
+          <Text style={[s.rateName, { color: colors.mutedForeground }]}>
+            {card ?? "Gift Card"}
+          </Text>
+          <Text style={[s.rateValue, { color: colors.accent }]}>₦780 / $1</Text>
+          <Text style={[s.rateSub,   { color: colors.mutedForeground }]}>Current trading rate</Text>
+        </Animated.View>
 
-        <AZAInput
-          label="Amount (USD)"
-          placeholder="Enter amount in USD"
-          value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
-          icon="dollar-sign"
-        />
-        <AZAInput
-          label="Wallet / Account Number"
-          placeholder="Enter your wallet or account"
-          value={wallet}
-          onChangeText={setWallet}
-          icon="credit-card"
-        />
+        <Animated.View entering={FadeInUp.duration(380).springify().delay(100)}>
+          <AZAInput
+            label="Amount (USD)"
+            placeholder="Enter amount in USD"
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+            icon="dollar-sign"
+          />
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.duration(380).springify().delay(140)}>
+          <AZAInput
+            label="Wallet / Account Number"
+            placeholder="Enter your wallet or account"
+            value={wallet}
+            onChangeText={setWallet}
+            icon="credit-card"
+          />
+        </Animated.View>
 
         <AZAButton
           title="Proceed to Trade"
-          onPress={handleContinue}
+          onPress={() => router.push("/(app)/confirm-transaction")}
           disabled={!amount || !wallet}
         />
       </ScrollView>
@@ -68,15 +79,11 @@ export default function TradeAssetScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: { paddingHorizontal: 20, paddingTop: 20, gap: 20, paddingBottom: 40 },
-  rateCard: {
-    borderRadius: 16,
-    padding: 20,
-    gap: 4,
-    marginBottom: 4,
-  },
-  rateName: { color: "#fff", fontSize: 15, fontFamily: "Manrope_600SemiBold", opacity: 0.7 },
-  rateValue: { color: "#fff", fontSize: 28, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
-  rateSub: { color: "rgba(255,255,255,0.5)", fontSize: 12, fontFamily: "Manrope_400Regular" },
+const s = StyleSheet.create({
+  content:   { paddingHorizontal: 20, paddingTop: 24, gap: 20, paddingBottom: 40 },
+  rateCard:  { borderRadius: 18, padding: 20, gap: 6, borderWidth: 1 },
+  rateIconBg:{ width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center", marginBottom: 8 },
+  rateName:  { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
+  rateValue: { fontSize: 30, fontFamily: "Manrope_700Bold", letterSpacing: -0.8 },
+  rateSub:   { fontSize: 12, fontFamily: "Manrope_400Regular" },
 });
