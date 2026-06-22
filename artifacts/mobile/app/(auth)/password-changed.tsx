@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -6,10 +7,10 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import Animated, {
+  FadeIn,
   FadeInDown,
   FadeInUp,
   useAnimatedStyle,
@@ -21,14 +22,13 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const successmarkImg = require("../../assets/images/successmark.svg");
-const backBtnImg     = require("../../assets/images/back-btn.svg");
-const lkdImg         = require("../../assets/images/lkd.png");
 
 const C = {
   bg:        "#FFFFFF",
   dark:      "#1E232C",
   gray:      "#8391A1",
   white:     "#FFFFFF",
+  btnBorder: "#E8ECF4",
 };
 
 export default function PasswordChangedScreen() {
@@ -55,27 +55,25 @@ export default function PasswordChangedScreen() {
   }));
 
   return (
-    <View style={[s.root, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }]}>
+    <View style={[s.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 }]}>
 
-      {/* ── AZA. logo (lkd.png — unmodified) ── */}
-      <Animated.View entering={FadeInUp.duration(380).springify()} style={s.header}>
-        <Image source={lkdImg} style={s.lkd} contentFit="contain" />
-      </Animated.View>
-
-      {/* ── Back button (back-btn.svg — unmodified) ── */}
-      <Animated.View entering={FadeInUp.duration(380).delay(40).springify()} style={s.backRow}>
-        <TouchableOpacity
+      {/* ── Top bar ── */}
+      <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
+        <Pressable
+          style={s.backBtn}
           onPress={() => router.replace("/(auth)/login")}
-          activeOpacity={0.78}
+          hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
         >
-          <Image source={backBtnImg} style={s.backBtnImg} contentFit="contain" />
-        </TouchableOpacity>
+          <Ionicons name="chevron-back" size={22} color={C.dark} />
+        </Pressable>
+        <Text style={s.wordmark}>AZA.</Text>
+        <View style={{ width: 44 }} />
       </Animated.View>
 
       {/* ── Centre content ── */}
       <View style={s.center}>
 
-        {/* Successmark SVG — unmodified, springs in */}
+        {/* Successmark SVG — springs in */}
         <Animated.View style={[s.iconWrap, iconStyle]}>
           <Image
             source={successmarkImg}
@@ -124,18 +122,37 @@ const s = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: C.bg,
-    paddingHorizontal: 28,
+    paddingHorizontal: 24,
   },
 
-  /* AZA. logo */
-  header: { alignItems: "center", marginBottom: 28 },
-  lkd:    { width: 87, height: 19 },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.btnBorder,
+    backgroundColor: C.white,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  wordmark: {
+    fontSize: 32,
+    fontFamily: "Manrope_700Bold",
+    color: C.dark,
+    letterSpacing: -0.5,
+  },
 
-  /* Back button */
-  backRow:   { marginBottom: 0 },
-  backBtnImg: { width: 41, height: 41 },
-
-  /* Centre */
   center: {
     flex: 1,
     alignItems: "center",
@@ -149,14 +166,14 @@ const s = StyleSheet.create({
   textBlock: { alignItems: "center", gap: 10 },
   heading: {
     fontSize: 26,
-    fontFamily: "Urbanist_700Bold",
+    fontFamily: "Manrope_700Bold",
     color: C.dark,
     textAlign: "center",
     lineHeight: 31,
   },
   subText: {
     fontSize: 15,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.gray,
     textAlign: "center",
     lineHeight: 22,
@@ -164,16 +181,21 @@ const s = StyleSheet.create({
 
   btnWrap: { width: "100%", marginTop: 4 },
   loginBtn: {
-    height: 56,
+    height: 60,
     backgroundColor: C.dark,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   loginBtnText: {
-    fontSize: 15,
-    fontFamily: "Urbanist_600SemiBold",
+    fontSize: 16,
+    fontFamily: "Manrope_700Bold",
     color: C.white,
-    textAlign: "center",
+    letterSpacing: 0.2,
   },
 });

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -93,7 +94,7 @@ const inp = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.dark,
     height: "100%",
   },
@@ -139,25 +140,22 @@ export default function NewPasswordScreen() {
       <ScrollView
         contentContainerStyle={[
           s.scroll,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 },
+          { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* ── AZA. header ── */}
-        <Animated.View entering={FadeInUp.duration(380).springify()} style={s.header}>
-          <Text style={s.brand}>AZA.</Text>
-        </Animated.View>
-
-        {/* ── Back button ── */}
-        <Animated.View entering={FadeInUp.duration(380).delay(40).springify()} style={s.backRow}>
-          <TouchableOpacity
+        {/* ── Top bar ── */}
+        <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
+          <Pressable
             style={s.backBtn}
             onPress={() => router.back()}
-            activeOpacity={0.78}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
-            <Text style={s.backArrow}>‹</Text>
-          </TouchableOpacity>
+            <Ionicons name="chevron-back" size={22} color={C.dark} />
+          </Pressable>
+          <Text style={s.wordmark}>AZA.</Text>
+          <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Title ── */}
@@ -216,38 +214,40 @@ export default function NewPasswordScreen() {
 
 const s = StyleSheet.create({
   root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { paddingHorizontal: 28, flexGrow: 1 },
+  scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
-  header: { alignItems: "center", marginBottom: 32 },
-  brand: {
-    fontSize: 28,
-    fontFamily: "Urbanist_700Bold",
-    color: C.dark,
-    letterSpacing: 0.5,
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
   },
-
-  backRow: { marginBottom: 32 },
   backBtn: {
-    width: 41,
-    height: 41,
+    width: 44,
+    height: 44,
     borderRadius: 12,
-    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: C.btnBorder,
+    backgroundColor: C.white,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  backArrow: {
-    fontSize: 26,
+  wordmark: {
+    fontSize: 32,
+    fontFamily: "Manrope_700Bold",
     color: C.dark,
-    lineHeight: 30,
-    marginTop: -2,
+    letterSpacing: -0.5,
   },
 
   titleBlock: { marginBottom: 32 },
   heading: {
     fontSize: 30,
-    fontFamily: "Urbanist_700Bold",
+    fontFamily: "Manrope_700Bold",
     color: C.dark,
     letterSpacing: -0.3,
     lineHeight: 39,
@@ -255,7 +255,7 @@ const s = StyleSheet.create({
   },
   subText: {
     fontSize: 16,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.gray,
     lineHeight: 24,
   },
@@ -263,22 +263,27 @@ const s = StyleSheet.create({
   formBlock: { gap: 16, marginBottom: 24 },
   errorText: {
     fontSize: 13,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.error,
   },
 
   btnWrap: {},
   resetBtn: {
-    height: 56,
+    height: 60,
     backgroundColor: C.dark,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   resetBtnText: {
-    fontSize: 15,
-    fontFamily: "Urbanist_600SemiBold",
+    fontSize: 16,
+    fontFamily: "Manrope_700Bold",
     color: C.white,
-    textAlign: "center",
+    letterSpacing: 0.2,
   },
 });

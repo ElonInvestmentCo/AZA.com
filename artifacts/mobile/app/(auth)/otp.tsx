@@ -255,6 +255,8 @@ export default function OtpScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
           </TouchableOpacity>
+          <Text style={s.wordmark}>AZA.</Text>
+          <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Heading — "OTP Verification" from image ── */}
@@ -365,13 +367,23 @@ const s = StyleSheet.create({
   root:  { flex: 1, backgroundColor: C.bg },
   inner: { flex: 1, paddingHorizontal: 24 },
 
-  topBar: { marginBottom: 32 },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
+  },
   backBtn: {
     width: 44, height: 44, borderRadius: 12,
     borderWidth: 1, borderColor: C.inputBorder,
     backgroundColor: C.bg,
     alignItems: "center", justifyContent: "center",
-    alignSelf: "flex-start",
+  },
+  wordmark: {
+    fontSize: 32,
+    fontFamily: "Manrope_700Bold",
+    color: C.text,
+    letterSpacing: -0.5,
   },
 
   headBlock:  { marginBottom: 40 },

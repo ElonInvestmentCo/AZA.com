@@ -134,7 +134,7 @@ export default function PinScreen() {
 const s = StyleSheet.create({
   root:    { flex: 1, backgroundColor: C.bg, alignItems: "center", paddingHorizontal: 28 },
   header:  { alignItems: "center", marginBottom: 48 },
-  logo:    { fontSize: 28, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: 1.5, marginBottom: 32 },
+  logo:    { fontSize: 32, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, marginBottom: 32 },
   heading: { fontSize: 26, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, marginBottom: 8 },
   sub:     { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.subtext, textAlign: "center" },
   dots:    { flexDirection: "row", gap: 20, marginBottom: 52 },

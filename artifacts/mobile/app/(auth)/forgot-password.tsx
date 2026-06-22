@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,7 +15,7 @@ import {
   View,
 } from "react-native";
 import Animated, {
-  FadeInDown,
+  FadeIn,
   FadeInUp,
   useAnimatedStyle,
   useSharedValue,
@@ -34,7 +35,6 @@ const C = {
   btnBorder:   "#E8ECF4",
 };
 
-/* ── Email input ────────────────────────────────────────────────────────── */
 function EmailInput({
   value,
   onChangeText,
@@ -44,12 +44,7 @@ function EmailInput({
 }) {
   const [focused, setFocused] = useState(false);
   return (
-    <View
-      style={[
-        inp.row,
-        focused && inp.focused,
-      ]}
-    >
+    <View style={[inp.row, focused && inp.focused]}>
       <TextInput
         style={inp.input}
         placeholder="Enter your email"
@@ -76,18 +71,15 @@ const inp = StyleSheet.create({
     paddingHorizontal: 18,
     justifyContent: "center",
   },
-  focused: {
-    borderColor: C.inputFocus,
-  },
+  focused: { borderColor: C.inputFocus },
   input: {
     fontSize: 15,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.dark,
     height: "100%",
   },
 });
 
-/* ── Main screen ──────────────────────────────────────────────────────── */
 export default function ForgotPasswordScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
@@ -125,25 +117,22 @@ export default function ForgotPasswordScreen() {
       <ScrollView
         contentContainerStyle={[
           s.scroll,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 },
+          { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* ── AZA. header ── */}
-        <Animated.View entering={FadeInDown.duration(380).springify()} style={s.header}>
-          <Text style={s.brand}>AZA.</Text>
-        </Animated.View>
-
-        {/* ── Back button ── */}
-        <Animated.View entering={FadeInDown.duration(380).delay(40).springify()} style={s.backRow}>
-          <TouchableOpacity
+        {/* ── Top bar ── */}
+        <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
+          <Pressable
             style={s.backBtn}
             onPress={() => router.back()}
-            activeOpacity={0.78}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
-            <Text style={s.backArrow}>‹</Text>
-          </TouchableOpacity>
+            <Ionicons name="chevron-back" size={22} color={C.dark} />
+          </Pressable>
+          <Text style={s.wordmark}>AZA.</Text>
+          <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Title ── */}
@@ -204,38 +193,40 @@ export default function ForgotPasswordScreen() {
 
 const s = StyleSheet.create({
   root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { paddingHorizontal: 28, flexGrow: 1 },
+  scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
-  header: { alignItems: "center", marginBottom: 32 },
-  brand:  {
-    fontSize: 28,
-    fontFamily: "Urbanist_700Bold",
-    color: C.dark,
-    letterSpacing: 0.5,
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
   },
-
-  backRow: { marginBottom: 32 },
   backBtn: {
-    width: 41,
-    height: 41,
+    width: 44,
+    height: 44,
     borderRadius: 12,
-    backgroundColor: C.white,
     borderWidth: 1,
     borderColor: C.btnBorder,
+    backgroundColor: C.white,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  backArrow: {
-    fontSize: 26,
+  wordmark: {
+    fontSize: 32,
+    fontFamily: "Manrope_700Bold",
     color: C.dark,
-    lineHeight: 30,
-    marginTop: -2,
+    letterSpacing: -0.5,
   },
 
   titleBlock: { marginBottom: 36 },
   heading: {
     fontSize: 30,
-    fontFamily: "Urbanist_700Bold",
+    fontFamily: "Manrope_700Bold",
     color: C.dark,
     letterSpacing: -0.3,
     marginBottom: 12,
@@ -243,7 +234,7 @@ const s = StyleSheet.create({
   },
   subText: {
     fontSize: 16,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.gray,
     lineHeight: 24,
   },
@@ -252,23 +243,28 @@ const s = StyleSheet.create({
   errorText: {
     marginTop: 8,
     fontSize: 13,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: "#E74C3C",
   },
 
   btnWrap: { marginBottom: 28 },
   sendBtn: {
-    height: 56,
+    height: 60,
     backgroundColor: C.dark,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   sendBtnText: {
-    fontSize: 15,
-    fontFamily: "Urbanist_600SemiBold",
+    fontSize: 16,
+    fontFamily: "Manrope_700Bold",
     color: C.white,
-    letterSpacing: 0.1,
+    letterSpacing: 0.2,
   },
 
   footer: {
@@ -280,18 +276,14 @@ const s = StyleSheet.create({
   },
   footerText: {
     fontSize: 15,
-    fontFamily: "Urbanist_500Medium",
+    fontFamily: "Manrope_400Regular",
     color: C.dark,
-    letterSpacing: 0.01 * 15,
     lineHeight: 21,
   },
   footerLink: {
     fontSize: 15,
-    fontFamily: "Urbanist_700Bold",
+    fontFamily: "Manrope_700Bold",
     color: C.primary,
-    letterSpacing: 0.01 * 15,
     lineHeight: 21,
   },
-
-  sentWrap: { flex: 1, alignItems: "center", justifyContent: "center", gap: 20, paddingHorizontal: 4 },
 });
