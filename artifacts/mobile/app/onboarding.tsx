@@ -33,8 +33,11 @@ const slide3Img       = require("@/assets/images/slide3.png");
 const giftCardImg     = require("@/assets/images/gift-card.png");
 const giftCardVisaImg = require("@/assets/images/gift-card-visa.png");
 const manImg          = require("@/assets/images/man-illustration.png");
+const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
+const onboardCard      = require("@/assets/images/onboard-card.png");
+const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide3Img, giftCardImg, giftCardVisaImg, manImg]);
+Asset.loadAsync([slide1Img, slide3Img, giftCardImg, giftCardVisaImg, manImg, onboardPortfolio, onboardCard, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -50,7 +53,7 @@ const BTNS_H   = 116;
 // ── Slide definitions ─────────────────────────────────────────────────────────
 type SlideItem = {
   id: string;
-  type: "animated-wallet" | "giftcard" | "image";
+  type: "animated-wallet" | "giftcard" | "image" | "chatgpt-portfolio" | "chatgpt-card" | "chatgpt-esim";
   title: string;
   subtitle: string;
   bgColor: string;
@@ -76,6 +79,27 @@ const SLIDES: SlideItem[] = [
     type: "image",
     title: "Bill payments",
     subtitle: "Pay your bills seamlessly in one place",
+    bgColor: "#ffffff",
+  },
+  {
+    id: "4",
+    type: "chatgpt-portfolio",
+    title: "Track Your Portfolio",
+    subtitle: "Monitor your crypto assets in real time.",
+    bgColor: "#ffffff",
+  },
+  {
+    id: "5",
+    type: "chatgpt-card",
+    title: "Virtual Card",
+    subtitle: "Pay anywhere with your PAYVORA virtual card.",
+    bgColor: "#ffffff",
+  },
+  {
+    id: "6",
+    type: "chatgpt-esim",
+    title: "Global eSIM",
+    subtitle: "Stay connected wherever you go.",
     bgColor: "#ffffff",
   },
 ];
@@ -392,6 +416,55 @@ function ImageSlide({
   );
 }
 
+// ── Slide N: Static image (unmodified) — fade + spring in ─────────────────────
+function ImageSlideStatic({
+  source,
+  illustrationSize,
+  slideW,
+  slideH,
+  isActive,
+}: {
+  source: number;
+  illustrationSize: number;
+  slideW: number;
+  slideH: number;
+  isActive: boolean;
+}) {
+  const op = useSharedValue(0);
+  const sc = useSharedValue(0.88);
+
+  useEffect(() => {
+    if (!isActive) {
+      cancelAnimation(op);
+      cancelAnimation(sc);
+      op.value = 0;
+      sc.value = 0.88;
+      return;
+    }
+    op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
+    sc.value = withSpring(1, { damping: 18, stiffness: 140 });
+  }, [isActive]);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: op.value,
+    transform: [{ scale: sc.value }],
+  }));
+
+  return (
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={animStyle}>
+        <Image
+          source={source}
+          style={{ width: illustrationSize, height: illustrationSize }}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          priority="high"
+        />
+      </Animated.View>
+    </View>
+  );
+}
+
 // ── Main screen ───────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
   const router  = useRouter();
@@ -460,6 +533,33 @@ export default function OnboardingScreen() {
               )}
               {item.type === "image" && (
                 <ImageSlide
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                  isActive={isActive}
+                />
+              )}
+              {item.type === "chatgpt-portfolio" && (
+                <ImageSlideStatic
+                  source={onboardPortfolio}
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                  isActive={isActive}
+                />
+              )}
+              {item.type === "chatgpt-card" && (
+                <ImageSlideStatic
+                  source={onboardCard}
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                  isActive={isActive}
+                />
+              )}
+              {item.type === "chatgpt-esim" && (
+                <ImageSlideStatic
+                  source={onboardEsim}
                   illustrationSize={illustrationSize}
                   slideW={width}
                   slideH={slideAreaH}
