@@ -131,7 +131,7 @@ function PasswordInput({
         onBlur={() => setFocused(false)}
       />
       <TouchableOpacity
-        onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
+        onPress={() => setShowPass(v => !v)}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
@@ -258,7 +258,6 @@ export default function LoginScreen() {
     const ok = await login(email, password);
     setLoading(false);
     if (ok) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(auth)/pin");
     } else {
       setError("Invalid credentials. Please try again.");
@@ -337,7 +336,7 @@ export default function LoginScreen() {
           ) : null}
 
           <TouchableOpacity
-            onPress={() => { Haptics.selectionAsync(); router.push("/(auth)/forgot-password"); }}
+            onPress={() => router.push("/(auth)/forgot-password")}
             style={s.forgotWrap}
             activeOpacity={0.7}
           >
@@ -354,7 +353,7 @@ export default function LoginScreen() {
             style={[s.loginBtn, loading && { opacity: 0.75 }]}
             onPress={handleLogin}
             onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
             }}
             onPressOut={() => {

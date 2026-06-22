@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -26,12 +25,10 @@ export default function ConfirmTransactionScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     setLoading(true);
     setTimeout(() => {
       updateBalance(78000);
       setLoading(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(app)/submitted");
     }, 1500);
   };

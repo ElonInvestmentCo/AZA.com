@@ -84,7 +84,7 @@ function PlainInput({
       />
       {secure && (
         <TouchableOpacity
-          onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
+          onPress={() => setShowPass(v => !v)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={inp.eyeBtn}
         >
@@ -202,7 +202,6 @@ export default function RegisterScreen() {
     setError("");
     await register(username, email, password);
     setLoading(false);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.replace("/(auth)/pin");
   };
 
@@ -289,7 +288,7 @@ export default function RegisterScreen() {
             style={[s.regBtn, loading && { opacity: 0.75 }]}
             onPress={handleRegister}
             onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
             }}
             onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}

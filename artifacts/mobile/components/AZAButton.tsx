@@ -41,11 +41,7 @@ export function AZAButton({
   };
 
   const handlePress = () => {
-    if (variant === "primary" || variant === "danger") {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress();
   };
 

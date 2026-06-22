@@ -226,7 +226,7 @@ export default function DashboardScreen() {
                 <Text style={[s.brandLabel, { color: colors.accent }]}>PAYVORA</Text>
               </View>
               <TouchableOpacity
-                onPress={() => { Haptics.selectionAsync(); setShowBalance(v => !v); }}
+                onPress={() => setShowBalance(v => !v)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Feather
@@ -299,10 +299,10 @@ export default function DashboardScreen() {
           entering={FadeInUp.duration(400).springify().delay(140)}
           style={s.qRow}
         >
-          <QAction icon="arrow-up"   label="Top Up"    onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)} />
-          <QAction icon="send"       label="Send"       onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)} />
+          <QAction icon="arrow-up"   label="Top Up"    onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)} />
+          <QAction icon="send"       label="Send"       onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)} />
           <QAction icon="gift"       label="Gift Cards" onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/(app)/gift-cards"); }} />
-          <QAction icon="refresh-cw" label="Withdraw"  onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)} />
+          <QAction icon="refresh-cw" label="Withdraw"  onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)} />
         </Animated.View>
 
         {/* ── Sell promo banner ─────────────────────────────────────────── */}
@@ -382,7 +382,7 @@ export default function DashboardScreen() {
                     { borderBottomColor: colors.border },
                     i === TRANSACTIONS.length - 1 && { borderBottomWidth: 0 },
                   ]}
-                  onPress={() => { Haptics.selectionAsync(); router.push("/(app)/card-status"); }}
+                  onPress={() => router.push("/(app)/card-status")}
                   activeOpacity={0.72}
                 >
                   <View
