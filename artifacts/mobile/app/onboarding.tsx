@@ -1,3 +1,4 @@
+import { Asset } from "expo-asset";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -16,10 +17,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Assets ───────────────────────────────────────────────────────────────────
-const slide1Img    = require("@/assets/images/slide1.png");
-const slide3Img    = require("@/assets/images/slide3.png");
-const giftCardImg  = require("@/assets/images/gift-card.png");
-const manImg       = require("@/assets/images/man-illustration.png");
+const slide1Img   = require("@/assets/images/slide1.png");
+const slide3Img   = require("@/assets/images/slide3.png");
+const giftCardImg = require("@/assets/images/gift-card.png");
+const manImg      = require("@/assets/images/man-illustration.png");
+
+// Pre-decode every image the instant this module is imported.
+// By the time the first frame paints, images are already in memory → zero flicker.
+Asset.loadAsync([slide1Img, slide3Img, giftCardImg, manImg]);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -30,7 +35,7 @@ function clamp(val: number, min: number, max: number) {
 const HEADER_H = 56;
 const DOTS_H   = 28;
 const TEXT_H   = 72;
-const BTNS_H   = 116; // 2 buttons × 50px + 16px gap
+const BTNS_H   = 116;
 
 // ── Slide definitions ────────────────────────────────────────────────────────
 type SlideItem = {
@@ -65,7 +70,7 @@ const SLIDES: SlideItem[] = [
   },
 ];
 
-// ── Slide 1: Animated wallet illustration ───────────────────────────────────
+// ── Slide 1: Animated wallet + man + PAY-button glow ─────────────────────────
 function AnimatedWalletSlide({
   illustrationSize,
   slideW,
@@ -77,40 +82,91 @@ function AnimatedWalletSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Man is life-size — taller than the phone illustration.
+  // ── Man sizing ──────────────────────────────────────────────────────────────
   const manH = illustrationSize * 1.38;
   const manW = manH * 0.72;
 
-  // Illustration is centered within the slide.
+  // Illustration centered in slide
   const illusTop  = (slideH - illustrationSize) / 2;
   const illusLeft = (slideW - illustrationSize) / 2;
 
-  // PAY button sits at ~62% down the illustration; man's hand tip at ~50% of his height.
-  // Compute absolute positions within the slide so we NEVER need overflow.
+  // Man: hand tip at 50% of his height aligns with PAY button at 62% of illustration
   const manTop  = illusTop  + illustrationSize * 0.62 - manH * 0.50;
-  const manLeft = illusLeft - manW * 0.08; // body left of centre, arm reaches phone
+  const manLeft = illusLeft - manW * 0.08;
 
-  // Start fully above the visible slide so there's no pop-in on any device.
+  // ── Man slide-in animation ──────────────────────────────────────────────────
   const startY = -(slideH + manH);
-  const manY = useRef(new Animated.Value(startY)).current;
+  const manY   = useRef(new Animated.Value(startY)).current;
+
+  // ── PAY-button glow animation ───────────────────────────────────────────────
+  // PAY button sits at ~62% down and ~61% across the illustration
+  const glowSize = illustrationSize * 0.20;
+  const glowTop  = illusTop  + illustrationSize * 0.62 - glowSize / 2;
+  const glowLeft = illusLeft + illustrationSize * 0.61 - glowSize / 2;
+
+  const glowOpacity = useRef(new Animated.Value(0)).current;
+  const glowScale   = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    if (!isActive) return;
+    if (!isActive) {
+      // Reset both animations when slide is no longer active
+      manY.setValue(startY);
+      glowOpacity.setValue(0);
+      glowScale.setValue(1);
+      return;
+    }
+
     manY.setValue(startY);
+    glowOpacity.setValue(0);
+    glowScale.setValue(1);
+
     Animated.timing(manY, {
       toValue: 0,
       duration: 1100,
       delay: 200,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: Platform.OS !== "web",
-    }).start();
+    }).start(() => {
+      // Fire 3 pulse ripples the instant the hand lands
+      Animated.loop(
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(glowOpacity, {
+              toValue: 0.75,
+              duration: 120,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: Platform.OS !== "web",
+            }),
+            Animated.timing(glowScale, {
+              toValue: 1.0,
+              duration: 120,
+              useNativeDriver: Platform.OS !== "web",
+            }),
+          ]),
+          Animated.parallel([
+            Animated.timing(glowOpacity, {
+              toValue: 0,
+              duration: 550,
+              easing: Easing.in(Easing.quad),
+              useNativeDriver: Platform.OS !== "web",
+            }),
+            Animated.timing(glowScale, {
+              toValue: 2.0,
+              duration: 550,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: Platform.OS !== "web",
+            }),
+          ]),
+          Animated.delay(120),
+        ]),
+        { iterations: 3 }
+      ).start();
+    });
   }, [isActive, illustrationSize]);
 
   return (
-    // Flat layout — both layers are absolutely positioned children of the slide view.
-    // No overflow hacks needed; the man sits alongside the phone, not inside its View.
     <View style={{ width: slideW, height: slideH }}>
-      {/* Base e-wallet / phone illustration — centred */}
+      {/* Phone / e-wallet illustration */}
       <Image
         source={slide1Img}
         style={{
@@ -122,8 +178,25 @@ function AnimatedWalletSlide({
         }}
         contentFit="contain"
         cachePolicy="memory-disk"
+        priority="high"
       />
-      {/* Life-size man — slides in from top, hand lands on PAY button */}
+
+      {/* PAY-button glow ripple — renders behind the man */}
+      <Animated.View
+        style={{
+          position: "absolute",
+          top: glowTop,
+          left: glowLeft,
+          width: glowSize,
+          height: glowSize,
+          borderRadius: glowSize / 2,
+          backgroundColor: "#FFD700",
+          opacity: glowOpacity,
+          transform: [{ scale: glowScale }],
+        }}
+      />
+
+      {/* Life-size man — slides in from top */}
       <Animated.View
         style={{
           position: "absolute",
@@ -139,21 +212,15 @@ function AnimatedWalletSlide({
           style={{ width: manW, height: manH }}
           contentFit="contain"
           cachePolicy="memory-disk"
+          priority="high"
         />
       </Animated.View>
     </View>
   );
 }
 
-// ── Slide 2: Gift card image ─────────────────────────────────────────────────
-function GiftCardSlide({
-  slideW,
-  slideH,
-}: {
-  slideW: number;
-  slideH: number;
-}) {
-  // Card aspect ratio: 329/210 (landscape) → keep width ~88% of slide
+// ── Slide 2: Gift card ────────────────────────────────────────────────────────
+function GiftCardSlide({ slideW, slideH }: { slideW: number; slideH: number }) {
   const cardW = clamp(slideW * 0.88, 240, 380);
   const cardH = cardW * (210 / 329);
 
@@ -164,12 +231,13 @@ function GiftCardSlide({
         style={{ width: cardW, height: cardH, borderRadius: 12 }}
         contentFit="contain"
         cachePolicy="memory-disk"
+        priority="high"
       />
     </View>
   );
 }
 
-// ── Slide 3: Image illustration ──────────────────────────────────────────────
+// ── Slide 3: Image illustration ───────────────────────────────────────────────
 function ImageSlide({
   illustrationSize,
   slideW,
@@ -186,12 +254,13 @@ function ImageSlide({
         style={{ width: illustrationSize, height: illustrationSize }}
         contentFit="contain"
         cachePolicy="memory-disk"
+        priority="high"
       />
     </View>
   );
 }
 
-// ── Main screen ──────────────────────────────────────────────────────────────
+// ── Main screen ───────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
@@ -204,13 +273,11 @@ export default function OnboardingScreen() {
 
   const bottomSectionH = DOTS_H + TEXT_H + BTNS_H + 40 + bottomInset;
   const slideAreaH     = Math.max(height - topInset - HEADER_H - bottomSectionH, 160);
-
   const illustrationSize = clamp(Math.min(slideAreaH * 0.92, width * 0.9), 180, 420);
 
-  const contentMaxW = Math.min(width, 500);
-  const hPad        = clamp(width * 0.06, 16, 28);
-  const btnWidth    = contentMaxW - hPad * 2;
-
+  const contentMaxW  = Math.min(width, 500);
+  const hPad         = clamp(width * 0.06, 16, 28);
+  const btnWidth     = contentMaxW - hPad * 2;
   const titleSize    = clamp(width * 0.064, 20, 28);
   const subtitleSize = clamp(width * 0.034, 11, 14);
   const logoSize     = clamp(width * 0.056, 18, 24);
@@ -228,12 +295,12 @@ export default function OnboardingScreen() {
   return (
     <View style={[styles.root, { paddingTop: topInset }]}>
 
-      {/* ── AZA. header ── */}
+      {/* AZA. header */}
       <View style={[styles.header, { height: HEADER_H }]}>
         <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
       </View>
 
-      {/* ── Slide carousel ── */}
+      {/* Slide carousel */}
       <FlatList
         ref={flatListRef}
         data={SLIDES}
@@ -259,10 +326,7 @@ export default function OnboardingScreen() {
                 />
               )}
               {item.type === "giftcard" && (
-                <GiftCardSlide
-                  slideW={width}
-                  slideH={slideAreaH}
-                />
+                <GiftCardSlide slideW={width} slideH={slideAreaH} />
               )}
               {item.type === "image" && (
                 <ImageSlide
@@ -276,7 +340,7 @@ export default function OnboardingScreen() {
         }}
       />
 
-      {/* ── Bottom section ── */}
+      {/* Bottom section */}
       <View
         style={[
           styles.bottom,
@@ -338,7 +402,7 @@ export default function OnboardingScreen() {
   );
 }
 
-// ── Styles ───────────────────────────────────────────────────────────────────
+// ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   root: {
     flex: 1,
