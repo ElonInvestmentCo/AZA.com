@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { SvgXml } from "react-native-svg";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -56,7 +57,30 @@ const C = {
 const fingerprintImg = require("@/assets/images/fingerprint.png");
 const btnGoogleImg   = require("@/assets/images/btn-google.png");
 const btnAppleImg    = require("@/assets/images/btn-apple.png");
-const iconEyeImg     = require("@/assets/images/icon-eye.png");
+
+/* ── Eye SVG icons (unmodified from provided URLs) ───────────────────────── */
+const EYE_OPEN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <path d="M0 0h72v72H0z" fill="none" />
+  <ellipse cx="35.75" cy="36.428" fill="#fff" rx="34.81" ry="20.428" />
+  <ellipse cx="35.75" cy="36.428" fill="#fff" rx="34.81" ry="20.428" />
+  <circle cx="36" cy="35.958" r="15.484" fill="#a57939" />
+  <ellipse cx="35.75" cy="36.428" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" rx="34.81" ry="20.428" />
+  <circle cx="36" cy="35.958" r="8.442" />
+  <circle cx="36" cy="35.958" r="8.442" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" />
+  <circle cx="36" cy="35.958" r="15.484" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" />
+</svg>`;
+
+const EYE_CLOSED_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <path d="M0 0h72v72H0z" fill="none" />
+  <ellipse cx="35.98" cy="39.971" fill="#fff" rx="19.297" ry="11.01" />
+  <circle cx="36.144" cy="39.651" r="8.896" fill="#a57939" />
+  <ellipse cx="36" cy="39.921" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" rx="20" ry="11.737" />
+  <circle cx="36.144" cy="39.651" r="4.85" />
+  <circle cx="36.144" cy="39.651" r="4.85" fill="none" />
+  <circle cx="36.144" cy="39.651" r="8.896" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+  <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m43.135 24.35l1.983-4.037l2.026 2.152l2.491-5.072m-25.319-1.134l2.333 3.845l-2.904.549l2.93 4.83m9.805-2.801l-.19-4.494l-2.721 1.154l-.238-5.646" />
+  <path fill="none" stroke="#d22f27" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m43.135 24.35l1.983-4.037l2.026 2.152l2.491-5.072m-25.319-1.134l2.333 3.845l-2.904.549l2.93 4.82m9.805-2.801l-.19-4.494l-2.721 1.154l-.238-5.646" />
+</svg>`;
 
 /* ── Password input ─────────────────────────────────────────────────────── */
 function EmailInput({
@@ -133,10 +157,10 @@ function PasswordInput({
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <Image
-          source={iconEyeImg}
-          style={{ width: 22, height: 22 }}
-          contentFit="contain"
+        <SvgXml
+          xml={showPass ? EYE_OPEN_SVG : EYE_CLOSED_SVG}
+          width={22}
+          height={22}
         />
       </TouchableOpacity>
     </View>

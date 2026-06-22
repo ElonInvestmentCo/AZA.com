@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -25,69 +25,96 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { SvgXml } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-const logoIcon = require("@/assets/images/logo-icon.png");
+/* ── Assets ─────────────────────────────────────────────────────────────── */
+const btnGoogleImg = require("@/assets/images/btn-google.png");
+const btnAppleImg  = require("@/assets/images/btn-apple.png");
 
-/* ─── Design tokens ─────────────────────────────────────────────────────────── */
+/* ── Eye SVG icons (unmodified from provided URLs) ───────────────────────── */
+const EYE_OPEN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <path d="M0 0h72v72H0z" fill="none" />
+  <ellipse cx="35.75" cy="36.428" fill="#fff" rx="34.81" ry="20.428" />
+  <ellipse cx="35.75" cy="36.428" fill="#fff" rx="34.81" ry="20.428" />
+  <circle cx="36" cy="35.958" r="15.484" fill="#a57939" />
+  <ellipse cx="35.75" cy="36.428" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" rx="34.81" ry="20.428" />
+  <circle cx="36" cy="35.958" r="8.442" />
+  <circle cx="36" cy="35.958" r="8.442" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" />
+  <circle cx="36" cy="35.958" r="15.484" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" />
+</svg>`;
+
+const EYE_CLOSED_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+  <path d="M0 0h72v72H0z" fill="none" />
+  <ellipse cx="35.98" cy="39.971" fill="#fff" rx="19.297" ry="11.01" />
+  <circle cx="36.144" cy="39.651" r="8.896" fill="#a57939" />
+  <ellipse cx="36" cy="39.921" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" rx="20" ry="11.737" />
+  <circle cx="36.144" cy="39.651" r="4.85" />
+  <circle cx="36.144" cy="39.651" r="4.85" fill="none" />
+  <circle cx="36.144" cy="39.651" r="8.896" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+  <path fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m43.135 24.35l1.983-4.037l2.026 2.152l2.491-5.072m-25.319-1.134l2.333 3.845l-2.904.549l2.93 4.83m9.805-2.801l-.19-4.494l-2.721 1.154l-.238-5.646" />
+  <path fill="none" stroke="#d22f27" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m43.135 24.35l1.983-4.037l2.026 2.152l2.491-5.072m-25.319-1.134l2.333 3.845l-2.904.549l2.93 4.82m9.805-2.801l-.19-4.494l-2.721 1.154l-.238-5.646" />
+</svg>`;
+
+/* ── Design tokens (light theme — matches reference screenshot) ───────────── */
 const C = {
-  bg:          "#0A0A0F",
-  surface:     "#14141F",
-  inputBg:     "#1C1C2A",
-  inputBorder: "#2A2A3D",
-  inputFocus:  "#00D9A0",
-  text:        "#FFFFFF",
-  subtext:     "#8F8FA3",
-  placeholder: "#55556A",
-  accent:      "#00D9A0",
-  accentDim:   "rgba(0,217,160,0.10)",
-  accentGlow:  "rgba(0,217,160,0.05)",
-  btnText:     "#0A0A0F",
+  bg:          "#FFFFFF",
+  inputBg:     "#F7F8F9",
+  inputBorder: "#E8ECF4",
+  inputFocus:  "#1E232C",
+  text:        "#1E232C",
+  placeholder: "#8391A1",
+  subtext:     "#6A707C",
+  btn:         "#1E232C",
+  btnText:     "#FFFFFF",
   error:       "#FF5B7A",
-  errorDim:    "rgba(255,91,122,0.10)",
-  warn:        "#F59E0B",
+  footerLink:  "#35C2C1",
 };
 
-/* ─── Animated input field ──────────────────────────────────────────────────── */
-function FinInput({
-  placeholder, value, onChangeText, keyboardType,
-  autoCapitalize, secureToggle, icon, error,
+/* ── Plain input (no left icon — matches reference) ──────────────────────── */
+function PlainInput({
+  placeholder,
+  value,
+  onChangeText,
+  keyboardType,
+  secure,
+  error,
 }: {
-  placeholder: string; value: string; onChangeText: (t: string) => void;
-  keyboardType?: any; autoCapitalize?: any; secureToggle?: boolean;
-  icon: keyof typeof Feather.glyphMap; error?: boolean;
+  placeholder: string;
+  value: string;
+  onChangeText: (t: string) => void;
+  keyboardType?: any;
+  secure?: boolean;
+  error?: boolean;
 }) {
-  const [focused, setFocused] = useState(false);
-  const [showPw,  setShowPw]  = useState(false);
+  const [focused,  setFocused]  = useState(false);
+  const [showPass, setShowPass] = useState(false);
 
   return (
-    <View style={[fi.row, focused && fi.focused, error && fi.errored]}>
-      <Feather
-        name={icon} size={17}
-        color={focused ? C.inputFocus : error ? C.error : C.placeholder}
-        style={{ marginRight: 12 }}
-      />
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
-        style={fi.input}
+        style={inp.field}
         placeholder={placeholder}
         placeholderTextColor={C.placeholder}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
-        autoCapitalize={autoCapitalize ?? "none"}
-        secureTextEntry={secureToggle && !showPw}
+        autoCapitalize="none"
+        secureTextEntry={secure && !showPass}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      {secureToggle && (
+      {secure && (
         <TouchableOpacity
-          onPress={() => setShowPw(v => !v)}
+          onPress={() => setShowPass(v => !v)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={inp.eyeBtn}
         >
-          <Feather
-            name={showPw ? "eye-off" : "eye"} size={17}
-            color={focused ? C.inputFocus : C.placeholder}
+          <SvgXml
+            xml={showPass ? EYE_OPEN_SVG : EYE_CLOSED_SVG}
+            width={22}
+            height={22}
           />
         </TouchableOpacity>
       )}
@@ -95,94 +122,96 @@ function FinInput({
   );
 }
 
-const fi = StyleSheet.create({
-  row: {
-    flexDirection: "row", alignItems: "center",
-    backgroundColor: C.inputBg, borderWidth: 1.5,
-    borderColor: C.inputBorder, borderRadius: 16,
-    paddingHorizontal: 16, height: 58,
+const inp = StyleSheet.create({
+  wrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: C.inputBg,
+    borderWidth: 1,
+    borderColor: C.inputBorder,
+    borderRadius: 14,
+    paddingHorizontal: 18,
+    height: 58,
   },
-  focused: { borderColor: C.inputFocus, backgroundColor: "rgba(0,217,160,0.05)" },
-  errored: { borderColor: C.error,      backgroundColor: C.errorDim },
-  input:   { flex: 1, fontSize: 15, fontFamily: "Manrope_400Regular", color: C.text, height: "100%" },
+  focused: { borderColor: C.inputFocus },
+  errored: { borderColor: C.error },
+  field: {
+    flex: 1,
+    fontSize: 15,
+    fontFamily: "Manrope_400Regular",
+    color: C.text,
+    height: "100%",
+  },
+  eyeBtn: { padding: 2 },
 });
 
-/* ─── Password strength meter ───────────────────────────────────────────────── */
-function StrengthMeter({ password }: { password: string }) {
-  if (!password) return null;
-  const hasUpper  = /[A-Z]/.test(password);
-  const hasNum    = /\d/.test(password);
-  const hasSpecial = /[^A-Za-z0-9]/.test(password);
-  const score =
-    (password.length >= 6 ? 1 : 0) +
-    (password.length >= 10 ? 1 : 0) +
-    (hasUpper ? 1 : 0) +
-    (hasNum ? 1 : 0) +
-    (hasSpecial ? 1 : 0);
-
-  const level  = score <= 1 ? 0 : score <= 3 ? 1 : 2;
-  const colors = [C.error, C.warn, C.accent];
-  const labels = ["Weak", "Fair", "Strong"];
-  const fill   = [1, 2, 3];
-
+/* ── Social button ────────────────────────────────────────────────────────── */
+function SocialBtn({ children }: { children: React.ReactNode }) {
+  const sc = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   return (
-    <Animated.View entering={FadeIn.duration(300)} style={sm.wrap}>
-      <View style={sm.bars}>
-        {[0, 1, 2].map(i => (
-          <View
-            key={i}
-            style={[
-              sm.bar,
-              { backgroundColor: i <= level ? colors[level] : C.inputBorder },
-            ]}
-          />
-        ))}
-      </View>
-      <Text style={[sm.label, { color: colors[level] }]}>{labels[level]}</Text>
+    <Animated.View style={[animStyle, { flex: 1 }]}>
+      <Pressable
+        style={sb.btn}
+        onPressIn={() => { sc.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
+        onPressOut={() => { sc.value = withSpring(1.0, { damping: 12, stiffness: 300 }); }}
+      >
+        {children}
+      </Pressable>
     </Animated.View>
   );
 }
 
-const sm = StyleSheet.create({
-  wrap:  { flexDirection: "row", alignItems: "center", gap: 10 },
-  bars:  { flexDirection: "row", gap: 5, flex: 1 },
-  bar:   { flex: 1, height: 3, borderRadius: 4 },
-  label: { fontSize: 11, fontFamily: "Manrope_600SemiBold", width: 44, textAlign: "right" },
+const sb = StyleSheet.create({
+  btn: {
+    height: 60,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.inputBorder,
+    backgroundColor: C.bg,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
-/* ─── Main screen ───────────────────────────────────────────────────────────── */
+/* ── Main screen ─────────────────────────────────────────────────────────── */
 export default function RegisterScreen() {
-  const router          = useRouter();
-  const insets          = useSafeAreaInsets();
-  const { register }    = useAuth();
+  const router       = useRouter();
+  const insets       = useSafeAreaInsets();
+  const { register } = useAuth();
 
-  const [name,     setName]     = useState("");
-  const [email,    setEmail]    = useState("");
-  const [password, setPassword] = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState("");
+  const [username,  setUsername]  = useState("");
+  const [email,     setEmail]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [confirm,   setConfirm]   = useState("");
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
 
-  /* Button spring */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
-  /* Error shake */
   const shakeX     = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
   const triggerShake = () => {
     shakeX.value = withSequence(
-      withTiming(-10, { duration: 55 }),
-      withTiming(10,  { duration: 55 }),
-      withTiming(-7,  { duration: 55 }),
-      withTiming(7,   { duration: 55 }),
-      withTiming(0,   { duration: 55 }),
+      withTiming(-8, { duration: 55 }),
+      withTiming(8,  { duration: 55 }),
+      withTiming(-5, { duration: 55 }),
+      withTiming(5,  { duration: 55 }),
+      withTiming(0,  { duration: 55 }),
     );
   };
 
   const handleRegister = async () => {
-    if (!name || !email || !password) {
+    if (!username || !email || !password || !confirm) {
       setError("Please fill in all fields.");
+      triggerShake();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+    if (password !== confirm) {
+      setError("Passwords do not match.");
       triggerShake();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
@@ -194,7 +223,7 @@ export default function RegisterScreen() {
     }
     setLoading(true);
     setError("");
-    await register(name, email, password);
+    await register(username, email, password);
     setLoading(false);
     router.replace("/(auth)/pin");
   };
@@ -204,116 +233,124 @@ export default function RegisterScreen() {
       style={s.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {/* Ambient glow */}
-      <Animated.View entering={FadeIn.duration(700)} style={s.glow} pointerEvents="none" />
-
       <ScrollView
         contentContainerStyle={[
           s.scroll,
-          { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 36 },
+          { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 32 },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-
         {/* ── Top bar ── */}
-        <Animated.View entering={FadeInDown.duration(450).springify()} style={s.topBar}>
+        <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <TouchableOpacity
             style={s.backBtn}
             onPress={() => router.back()}
-            activeOpacity={0.78}
+            activeOpacity={0.8}
           >
-            <Feather name="chevron-left" size={20} color={C.text} />
+            <Ionicons name="chevron-back" size={22} color={C.text} />
           </TouchableOpacity>
-          <View style={s.logoWrap}>
-            <Image source={logoIcon} style={s.logoImg} contentFit="contain" priority="high" />
-            <View style={s.logoGlow} />
-          </View>
+          <Text style={s.wordmark}>AZA.</Text>
+          <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Heading ── */}
-        <Animated.View entering={FadeInUp.duration(430).springify().delay(80)} style={s.headBlock}>
-          <View style={s.stepPill}>
-            <Text style={s.stepText}>Step 1 of 2</Text>
-          </View>
-          <Text style={s.heading}>Create Account</Text>
-          <Text style={s.headSub}>
-            Join thousands of users trading gift cards with instant payouts
-          </Text>
+        <Animated.View
+          entering={FadeInDown.duration(450).delay(60).springify()}
+          style={s.headBlock}
+        >
+          <Text style={s.heading}>{"Welcome!\nFill your Details Here..."}</Text>
         </Animated.View>
 
         {/* ── Form ── */}
         <Animated.View
-          entering={FadeInUp.duration(410).springify().delay(140)}
+          entering={FadeInUp.duration(420).delay(120).springify()}
           style={[s.form, shakeStyle]}
         >
-          <FinInput
-            icon="user"
-            placeholder="Full name"
-            value={name}
-            onChangeText={t => { setName(t); setError(""); }}
-            autoCapitalize="words"
+          <PlainInput
+            placeholder="Username"
+            value={username}
+            onChangeText={t => { setUsername(t); setError(""); }}
             error={!!error}
           />
-          <FinInput
-            icon="mail"
-            placeholder="Email address"
+          <PlainInput
+            placeholder="Email"
             value={email}
             onChangeText={t => { setEmail(t); setError(""); }}
             keyboardType="email-address"
             error={!!error}
           />
-          <View style={{ gap: 8 }}>
-            <FinInput
-              icon="lock"
-              placeholder="Create a password"
-              value={password}
-              onChangeText={t => { setPassword(t); setError(""); }}
-              secureToggle
-              error={!!error}
-            />
-            <StrengthMeter password={password} />
-          </View>
+          <PlainInput
+            placeholder="Password"
+            value={password}
+            onChangeText={t => { setPassword(t); setError(""); }}
+            secure
+            error={!!error}
+          />
+          <PlainInput
+            placeholder="Confirm password"
+            value={confirm}
+            onChangeText={t => { setConfirm(t); setError(""); }}
+            secure
+            error={!!error}
+          />
 
           {error ? (
-            <Animated.View entering={FadeIn.duration(250)} style={s.errorBox}>
-              <Feather name="alert-circle" size={13} color={C.error} />
-              <Text style={s.errorText}>{error}</Text>
-            </Animated.View>
+            <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
+              {error}
+            </Animated.Text>
           ) : null}
         </Animated.View>
 
-        {/* ── CTA button ── */}
+        {/* ── Agree and Register button ── */}
         <Animated.View
-          entering={FadeInUp.duration(400).springify().delay(220)}
-          style={btnStyle}
+          entering={FadeInUp.duration(400).delay(180).springify()}
+          style={[btnStyle, s.btnWrap]}
         >
           <Pressable
-            style={[s.createBtn, loading && { opacity: 0.72 }]}
+            style={[s.regBtn, loading && { opacity: 0.75 }]}
             onPress={handleRegister}
             onPressIn={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              btnSc.value = withSpring(0.96, { damping: 13, stiffness: 320 });
+              btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
             }}
-            onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 320 }); }}
+            onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color={C.btnText} size="small" />
             ) : (
-              <View style={s.createBtnInner}>
-                <Text style={s.createBtnText}>Create Account</Text>
-                <View style={s.createArrow}>
-                  <Feather name="arrow-right" size={15} color={C.accent} />
-                </View>
-              </View>
+              <Text style={s.regBtnText}>Agree and Register</Text>
             )}
           </Pressable>
         </Animated.View>
 
+        {/* ── Divider — exact CSS spec ── */}
+        <Animated.View
+          entering={FadeInUp.duration(380).delay(220).springify()}
+          style={s.dividerRow}
+        >
+          <View style={s.dividerLine} />
+          <Text style={s.dividerText}>Or Login with</Text>
+          <View style={s.dividerLine} />
+        </Animated.View>
+
+        {/* ── Social buttons — Google + Apple only ── */}
+        <Animated.View
+          entering={FadeInUp.duration(380).delay(260).springify()}
+          style={s.socialRow}
+        >
+          <SocialBtn>
+            <Image source={btnGoogleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
+          </SocialBtn>
+          <SocialBtn>
+            <Image source={btnAppleImg} style={{ width: 44, height: 44 }} contentFit="contain" />
+          </SocialBtn>
+        </Animated.View>
+
         {/* ── Footer ── */}
         <Animated.View
-          entering={FadeInUp.duration(380).springify().delay(280)}
+          entering={FadeInUp.duration(380).delay(300).springify()}
           style={s.footer}
         >
           <Text style={s.footerText}>Already have an account? </Text>
@@ -321,88 +358,110 @@ export default function RegisterScreen() {
             <Text style={s.footerLink}>Sign In</Text>
           </TouchableOpacity>
         </Animated.View>
-
-        {/* ── Terms note ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).springify().delay(320)}
-          style={s.terms}
-        >
-          <Text style={s.termsText}>
-            By continuing you agree to our{" "}
-            <Text style={s.termsLink}>Terms of Service</Text>
-            {" "}and{" "}
-            <Text style={s.termsLink}>Privacy Policy</Text>
-          </Text>
-        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-/* ─── Styles ────────────────────────────────────────────────────────────────── */
+/* ── Styles ──────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { paddingHorizontal: 24, flexGrow: 1 },
+  root:  { flex: 1, backgroundColor: C.bg },
+  scroll:{ paddingHorizontal: 24, flexGrow: 1 },
 
-  glow: {
-    position: "absolute", top: -60, right: -60,
-    width: 240, height: 240, borderRadius: 120,
-    backgroundColor: C.accentGlow,
-    pointerEvents: "none",
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 32,
   },
-
-  /* Top bar */
-  topBar:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 36 },
   backBtn: {
-    width: 44, height: 44, borderRadius: 14,
-    backgroundColor: C.surface, alignItems: "center", justifyContent: "center",
+    width: 44, height: 44, borderRadius: 12,
     borderWidth: 1, borderColor: C.inputBorder,
-  },
-  logoWrap: { position: "relative" },
-  logoImg:  { width: 44, height: 44, borderRadius: 14 },
-  logoGlow: {
-    position: "absolute", inset: -6, borderRadius: 20,
-    backgroundColor: C.accentDim, zIndex: -1,
-  },
-
-  /* Heading */
-  headBlock: { marginBottom: 32 },
-  stepPill:  {
-    alignSelf: "flex-start",
-    paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
-    backgroundColor: C.accentDim, marginBottom: 14,
-  },
-  stepText:  { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.accent, letterSpacing: 0.3 },
-  heading:   { fontSize: 28, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.6, marginBottom: 8 },
-  headSub:   { fontSize: 15, fontFamily: "Manrope_400Regular", color: C.subtext, lineHeight: 22 },
-
-  /* Form */
-  form:     { gap: 14, marginBottom: 24 },
-  errorBox: { flexDirection: "row", alignItems: "center", gap: 7, padding: 12, borderRadius: 12, backgroundColor: C.errorDim },
-  errorText:{ fontSize: 13, fontFamily: "Manrope_400Regular", color: C.error, flex: 1 },
-
-  /* CTA */
-  createBtn: {
-    height: 58, backgroundColor: C.accent, borderRadius: 16,
-    alignItems: "center", justifyContent: "center", marginBottom: 28,
-    shadowColor: C.accent, shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.32, shadowRadius: 20, elevation: 10,
-  },
-  createBtnInner: { flexDirection: "row", alignItems: "center", gap: 10 },
-  createBtnText:  { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.btnText, letterSpacing: 0.3 },
-  createArrow:    {
-    width: 28, height: 28, borderRadius: 8,
-    backgroundColor: "rgba(10,10,15,0.15)",
+    backgroundColor: C.bg,
     alignItems: "center", justifyContent: "center",
   },
+  wordmark: {
+    fontSize: 32,
+    fontFamily: "Manrope_700Bold",
+    color: C.text,
+    letterSpacing: -0.5,
+  },
 
-  /* Footer */
-  footer:     { flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 20 },
-  footerText: { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.subtext },
-  footerLink: { fontSize: 14, fontFamily: "Manrope_700Bold", color: C.accent },
+  headBlock: { marginBottom: 32 },
+  heading: {
+    fontSize: 26,
+    fontFamily: "Manrope_700Bold",
+    color: C.text,
+    lineHeight: 36,
+    letterSpacing: -0.3,
+  },
 
-  /* Terms */
-  terms:     { paddingHorizontal: 8, marginTop: "auto" },
-  termsText: { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.placeholder, textAlign: "center", lineHeight: 17 },
-  termsLink: { color: C.subtext, fontFamily: "Manrope_600SemiBold" },
+  form:      { gap: 16, marginBottom: 28 },
+  errorText: {
+    fontSize: 13,
+    fontFamily: "Manrope_400Regular",
+    color: C.error,
+    textAlign: "center",
+  },
+
+  btnWrap: { marginBottom: 32 },
+  regBtn: {
+    height: 60,
+    backgroundColor: C.btn,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  regBtnText: {
+    fontSize: 16,
+    fontFamily: "Manrope_700Bold",
+    color: C.btnText,
+    letterSpacing: 0.2,
+  },
+
+  /* Divider — CSS spec: Line1(111.66px) | text | Line2(110.66px), #E8ECF4, 1px */
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E8ECF4",
+  },
+  dividerText: {
+    fontSize: 14,
+    fontFamily: "Manrope_600SemiBold",
+    color: "#6A707C",
+    marginHorizontal: 12,
+    lineHeight: 17,
+  },
+
+  socialRow: {
+    flexDirection: "row",
+    gap: 16,
+    marginBottom: 40,
+  },
+
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  footerText: {
+    fontSize: 15,
+    fontFamily: "Manrope_400Regular",
+    color: C.text,
+  },
+  footerLink: {
+    fontSize: 15,
+    fontFamily: "Manrope_700Bold",
+    color: C.footerLink,
+  },
 });
