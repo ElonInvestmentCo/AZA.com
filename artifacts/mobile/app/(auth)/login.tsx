@@ -13,7 +13,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import Animated, {
@@ -29,7 +28,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-/* ── Design tokens (light theme matching reference) ─────────────────────── */
+/* ── Design tokens ─────────────────────────────────────────────────────── */
 const C = {
   bg:           "#FFFFFF",
   inputBg:      "#F7F8F9",
@@ -60,7 +59,7 @@ const btnAppleImg    = require("@/assets/images/btn-social-apple.svg");
 const eyeOpenImg   = require("../../assets/images/eye-open.svg");
 const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 
-/* ── Password input ─────────────────────────────────────────────────────── */
+/* ── Email input ────────────────────────────────────────────────────────── */
 function EmailInput({
   placeholder,
   value,
@@ -75,15 +74,8 @@ function EmailInput({
   error?: boolean;
 }) {
   const [focused, setFocused] = useState(false);
-
   return (
-    <View
-      style={[
-        inp.wrap,
-        focused && inp.focused,
-        error && inp.errored,
-      ]}
-    >
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
         style={inp.field}
         placeholder={placeholder}
@@ -99,6 +91,7 @@ function EmailInput({
   );
 }
 
+/* ── Password input ─────────────────────────────────────────────────────── */
 function PasswordInput({
   value,
   onChangeText,
@@ -110,15 +103,8 @@ function PasswordInput({
 }) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
-
   return (
-    <View
-      style={[
-        inp.wrap,
-        focused && inp.focused,
-        error && inp.errored,
-      ]}
-    >
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
         style={inp.field}
         placeholder="Enter your password"
@@ -130,7 +116,7 @@ function PasswordInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      <TouchableOpacity
+      <Pressable
         onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
@@ -140,7 +126,7 @@ function PasswordInput({
           style={{ width: 22, height: 22 }}
           contentFit="contain"
         />
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -156,12 +142,8 @@ const inp = StyleSheet.create({
     paddingHorizontal: 18,
     height: 58,
   },
-  focused: {
-    borderColor: C.inputFocus,
-  },
-  errored: {
-    borderColor: C.error,
-  },
+  focused: { borderColor: C.inputFocus },
+  errored: { borderColor: C.error },
   field: {
     flex: 1,
     fontSize: 15,
@@ -169,51 +151,36 @@ const inp = StyleSheet.create({
     color: C.text,
     height: "100%",
   },
-  eyeBtn: {
-    padding: 2,
-  },
+  eyeBtn: { padding: 2 },
 });
 
-/* ── Social button ──────────────────────────────────────────────────────── */
-function SocialBtn({ children }: { children: React.ReactNode }) {
-  const sc = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: sc.value }],
-  }));
-
+/* ── Animated Pressable link ────────────────────────────────────────────── */
+function LinkBtn({
+  onPress,
+  style,
+  textStyle,
+  label,
+}: {
+  onPress: () => void;
+  style?: object;
+  textStyle: object;
+  label: string;
+}) {
+  const op = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ opacity: op.value }));
   return (
-    <Animated.View style={[animStyle, { flex: 1 }]}>
+    <Animated.View style={[animStyle, style]}>
       <Pressable
-        style={sb.btn}
-        onPressIn={() => {
-          sc.value = withSpring(0.93, { damping: 12, stiffness: 300 });
-        }}
-        onPressOut={() => {
-          sc.value = withSpring(1.0, { damping: 12, stiffness: 300 });
-        }}
+        onPress={onPress}
+        onPressIn={() => { op.value = withTiming(0.5, { duration: 80 }); }}
+        onPressOut={() => { op.value = withSpring(1, { damping: 14, stiffness: 280 }); }}
+        hitSlop={{ top: 10, bottom: 10, left: 8, right: 8 }}
       >
-        {children}
+        <Text style={textStyle}>{label}</Text>
       </Pressable>
     </Animated.View>
   );
 }
-
-const sb = StyleSheet.create({
-  btn: {
-    height: 60,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: C.socialBorder,
-    backgroundColor: C.socialBg,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-});
 
 /* ── Main screen ────────────────────────────────────────────────────────── */
 export default function LoginScreen() {
@@ -226,11 +193,13 @@ export default function LoginScreen() {
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState("");
 
+  /* login button scale — lives on its OWN Animated.View (no entering prop) */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({
     transform: [{ scale: btnSc.value }],
   }));
 
+  /* form shake on bad login */
   const shakeX     = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeX.value }],
@@ -282,19 +251,16 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Top bar: Logo + Back ── */}
+        {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
-          <TouchableOpacity
+          <Pressable
             style={s.backBtn}
             onPress={() => router.back()}
-            activeOpacity={0.8}
+            hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
             <Ionicons name="chevron-back" size={22} color={C.backIcon} />
-          </TouchableOpacity>
-
+          </Pressable>
           <Text style={s.wordmark}>AZA.</Text>
-
-          {/* spacer to center the logo */}
           <View style={{ width: 44 }} />
         </Animated.View>
 
@@ -323,51 +289,49 @@ export default function LoginScreen() {
             keyboardType="email-address"
             error={!!error}
           />
-
           <PasswordInput
             value={password}
             onChangeText={t => { setPassword(t); setError(""); }}
             error={!!error}
           />
-
           {error ? (
             <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
               {error}
             </Animated.Text>
           ) : null}
-
-          <TouchableOpacity
+          <LinkBtn
             onPress={() => { Haptics.selectionAsync(); router.push("/(auth)/forgot-password"); }}
             style={s.forgotWrap}
-            activeOpacity={0.7}
-          >
-            <Text style={s.forgotText}>Forgot Password?</Text>
-          </TouchableOpacity>
+            textStyle={s.forgotText}
+            label="Forgot Password?"
+          />
         </Animated.View>
 
-        {/* ── Login button ── */}
+        {/* ── Login button — entering on a wrapper, scale on an inner view ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
-          style={[btnStyle, s.btnWrap]}
+          style={s.btnWrap}
         >
-          <Pressable
-            style={[s.loginBtn, loading && { opacity: 0.75 }]}
-            onPress={handleLogin}
-            onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
-            }}
-            onPressOut={() => {
-              btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
-            }}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={C.loginBtnText} size="small" />
-            ) : (
-              <Text style={s.loginBtnText}>Login</Text>
-            )}
-          </Pressable>
+          <Animated.View style={btnStyle}>
+            <Pressable
+              style={[s.loginBtn, loading && { opacity: 0.75 }]}
+              onPress={handleLogin}
+              onPressIn={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
+              }}
+              onPressOut={() => {
+                btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
+              }}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color={C.loginBtnText} size="small" />
+              ) : (
+                <Text style={s.loginBtnText}>Login</Text>
+              )}
+            </Pressable>
+          </Animated.View>
         </Animated.View>
 
         {/* ── Or Login with ── */}
@@ -395,12 +359,11 @@ export default function LoginScreen() {
           style={s.footer}
         >
           <Text style={s.footerText}>Don't have an account? </Text>
-          <TouchableOpacity
+          <LinkBtn
             onPress={() => router.push("/(auth)/register")}
-            activeOpacity={0.7}
-          >
-            <Text style={s.footerLink}>Register Now</Text>
-          </TouchableOpacity>
+            textStyle={s.footerLink}
+            label="Register Now"
+          />
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -409,16 +372,9 @@ export default function LoginScreen() {
 
 /* ── Styles ─────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: C.bg,
-  },
-  scroll: {
-    paddingHorizontal: 24,
-    flexGrow: 1,
-  },
+  root:   { flex: 1, backgroundColor: C.bg },
+  scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
-  /* Top bar */
   topBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -447,7 +403,6 @@ const s = StyleSheet.create({
     letterSpacing: -0.5,
   },
 
-  /* Fingerprint */
   fingerprintWrap: {
     alignItems: "center",
     justifyContent: "center",
@@ -455,31 +410,21 @@ const s = StyleSheet.create({
     marginTop: 8,
   },
 
-  /* Form */
-  form: {
-    gap: 16,
-    marginBottom: 28,
-  },
+  form:      { gap: 16, marginBottom: 28 },
   errorText: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
     color: C.error,
     textAlign: "center",
   },
-  forgotWrap: {
-    alignSelf: "flex-end",
-    marginTop: 2,
-  },
+  forgotWrap: { alignSelf: "flex-end", marginTop: 2 },
   forgotText: {
     fontSize: 14,
     fontFamily: "Manrope_600SemiBold",
     color: C.forgotText,
   },
 
-  /* Login button */
-  btnWrap: {
-    marginBottom: 32,
-  },
+  btnWrap: { marginBottom: 32 },
   loginBtn: {
     height: 60,
     backgroundColor: C.loginBtn,
@@ -499,33 +444,6 @@ const s = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  /* Divider — from CSS spec */
-  dividerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#E8ECF4",
-  },
-  dividerText: {
-    fontSize: 14,
-    fontFamily: "Manrope_600SemiBold",
-    color: "#6A707C",
-    marginHorizontal: 12,
-    lineHeight: 17,
-  },
-
-  /* Social */
-  socialRow: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 40,
-  },
-
-  /* Divider + Social */
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -542,6 +460,7 @@ const s = StyleSheet.create({
     fontFamily: "Manrope_400Regular",
     color: "#6A707C",
   },
+
   socialRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -549,11 +468,10 @@ const s = StyleSheet.create({
     marginBottom: 24,
   },
   socialBtn: {
-    width: 150,
+    width: 105,
     height: 56,
   },
 
-  /* Footer */
   footer: {
     flexDirection: "row",
     justifyContent: "center",
