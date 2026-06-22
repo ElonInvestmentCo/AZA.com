@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -327,21 +328,31 @@ export default function OtpScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── "Didn't receive the code? Resend" — CSS spec ── */}
+        {/* ── "Didn't received code? Resend" ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.resendRow}
         >
-          <Text style={s.resendLabel}>Didn't received code? </Text>
+          <Image
+            source={require("../../assets/images/didnt-received-code.png")}
+            style={s.resendLabelImg}
+            resizeMode="contain"
+          />
           <TouchableOpacity
             onPress={handleResend}
             activeOpacity={countdown > 0 ? 1 : 0.7}
             disabled={countdown > 0}
+            style={countdown > 0 && { opacity: 0.45 }}
           >
-            {/* CSS spec: Urbanist 700, 15px, #35C2C1 → Manrope_700Bold */}
-            <Text style={[s.resendLink, countdown > 0 && { opacity: 0.45 }]}>
-              {countdown > 0 ? `Resend (${countdown}s)` : "Resend"}
-            </Text>
+            {countdown > 0 ? (
+              <Text style={s.resendCountdown}>{`(${countdown}s)`}</Text>
+            ) : (
+              <Image
+                source={require("../../assets/images/resend.png")}
+                style={s.resendImg}
+                resizeMode="contain"
+              />
+            )}
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -420,26 +431,24 @@ const s = StyleSheet.create({
     letterSpacing: 0.2,
   },
 
-  /* CSS spec: Resend — 15px, 700, #35C2C1 */
   resendRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: 4,
   },
-  resendLabel: {
-    /* CSS spec: font-weight 500, 15px, line-height 140%, letter-spacing 0.01em, color #1E232C */
-    fontSize: 15,
-    fontFamily: "Manrope_500Medium",
-    color: "#1E232C",
-    lineHeight: 21,
-    letterSpacing: 0.01 * 15,
+  resendLabelImg: {
+    height: 21,
+    width: 146,
   },
-  resendLink: {
-    /* CSS spec: font-weight 700, 15px, line-height 140%, letter-spacing 0.01em, color #35C2C1 */
+  resendImg: {
+    height: 21,
+    width: 50,
+  },
+  resendCountdown: {
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
     color: "#35C2C1",
     lineHeight: 21,
-    letterSpacing: 0.01 * 15,
   },
 });
