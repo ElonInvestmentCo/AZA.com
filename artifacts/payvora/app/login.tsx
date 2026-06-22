@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +14,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
@@ -21,17 +29,62 @@ import { useAuth } from "@/context/AuthContext";
 const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
 const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
 
+/* ── Eye toggle button — identical across Login & Register ─────────────── */
+function EyeToggleBtn({
+  show,
+  onToggle,
+  color,
+}: {
+  show: boolean;
+  onToggle: () => void;
+  color: string;
+}) {
+  const scale   = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  const handlePress = () => {
+    Haptics.selectionAsync();
+    opacity.value = withSequence(
+      withTiming(0,   { duration: 70 }),
+      withTiming(1,   { duration: 130 }),
+    );
+    scale.value = withSequence(
+      withSpring(0.68, { damping: 10, stiffness: 420 }),
+      withSpring(1.0,  { damping: 13, stiffness: 300 }),
+    );
+    onToggle();
+  };
+
+  return (
+    <Pressable
+      onPress={handlePress}
+      style={styles.eyeBtn}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <Animated.View style={animStyle}>
+        <Feather name={show ? "eye-off" : "eye"} size={18} color={color} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+/* ── Screen ─────────────────────────────────────────────────────────────── */
 export default function LoginScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email,        setEmail]        = useState("");
+  const [password,     setPassword]     = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [isLoading,    setIsLoading]    = useState(false);
+  const [error,        setError]        = useState("");
 
   async function handleLogin() {
     if (!email.trim() || !password.trim()) {
@@ -76,6 +129,7 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.form}>
+          {/* Email */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: colors.mutedForeground }]}>Email</Text>
             <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -93,6 +147,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
+          {/* Password */}
           <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: colors.mutedForeground }]}>Password</Text>
             <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -106,9 +161,11 @@ export default function LoginScreen() {
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
               />
-              <TouchableOpacity onPress={async () => { await Haptics.selectionAsync(); setShowPassword(!showPassword); }} style={styles.eyeBtn}>
-                <Feather name={showPassword ? "eye-off" : "eye"} size={18} color={colors.mutedForeground} />
-              </TouchableOpacity>
+              <EyeToggleBtn
+                show={showPassword}
+                onToggle={() => setShowPassword(v => !v)}
+                color={colors.mutedForeground}
+              />
             </View>
           </View>
 
@@ -136,7 +193,7 @@ export default function LoginScreen() {
             )}
           </TouchableOpacity>
 
-          <View style={[styles.divider]}>
+          <View style={styles.divider}>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
             <Text style={[styles.dividerText, { color: colors.mutedForeground }]}>or</Text>
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
