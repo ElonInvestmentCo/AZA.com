@@ -14,7 +14,6 @@ import {
   View,
 } from "react-native";
 import Animated, {
-  FadeIn,
   FadeInDown,
   FadeInUp,
   useAnimatedStyle,
@@ -96,7 +95,6 @@ export default function ForgotPasswordScreen() {
   const [email,   setEmail]   = useState("");
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
-  const [sent,    setSent]    = useState(false);
 
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
@@ -115,26 +113,9 @@ export default function ForgotPasswordScreen() {
     setError("");
     setTimeout(() => {
       setLoading(false);
-      setSent(true);
+      router.push("/(auth)/new-password");
     }, 1400);
   };
-
-  if (sent) {
-    return (
-      <View style={[s.root, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 32 }]}>
-        <Animated.View entering={FadeIn.duration(400)} style={s.sentWrap}>
-          <Text style={s.heading}>Check your inbox!</Text>
-          <Text style={s.subText}>
-            We sent a code to{" "}
-            <Text style={{ color: C.primary, fontFamily: "Urbanist_700Bold" }}>{email}</Text>
-          </Text>
-          <TouchableOpacity style={s.sendBtn} onPress={() => router.back()} activeOpacity={0.85}>
-            <Text style={s.sendBtnText}>Back to Login</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </View>
-    );
-  }
 
   return (
     <KeyboardAvoidingView

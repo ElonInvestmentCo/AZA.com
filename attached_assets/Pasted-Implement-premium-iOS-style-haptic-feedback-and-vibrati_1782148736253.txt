@@ -1,0 +1,65 @@
+Implement premium iOS-style haptic feedback and vibration across the entire Payvora app like a top-tier trading, banking, and fintech application.
+
+Use native-quality haptics (Expo Haptics) and make feedback feel subtle, fast, and trustworthy.
+
+IMPORTANT:
+Do NOT add vibration everywhere.
+Only use haptics where it improves user confidence.
+
+Implement in these areas:
+
+TRADING / HIGH VALUE ACTIONS:
+- Buy button press → medium haptic
+- Sell button press → medium haptic
+- Trade review actions → selection haptic
+- Final trade confirmation → strong impact + success haptic
+- Transaction completed → success notification haptic
+- Transaction failed → error haptic
+
+PAYMENTS / TRANSFERS:
+- Send money button → medium haptic
+- Recipient selection → selection haptic
+- Transfer confirmation → strong haptic
+- Successful transfer screen → success haptic
+- Failed transfer state → error haptic
+
+WALLET:
+- Wallet balance refresh → light haptic
+- Balance visibility toggle → selection haptic
+- Add funds → medium haptic
+- Withdraw funds → medium haptic
+- Wallet card interactions → light haptic
+- Transaction history selection → selection haptic
+
+AUTH:
+- Login button → medium haptic
+- Successful login → success haptic
+- Login error → error haptic
+- Signup button → medium haptic
+- Forgot password → selection haptic
+- Password visibility toggle → selection haptic
+- PIN keypad:
+  - Each digit → light crisp haptic
+  - Delete → softer selection haptic
+  - Completed PIN → success haptic
+
+NAVIGATION:
+- Bottom tab switching → selection haptic
+- Opening important screens → light haptic
+- Closing modals → light haptic
+- Menu selections → selection haptic
+
+UI COMPONENTS:
+- Primary buttons → press scale animation + medium haptic
+- Cards → subtle light haptic
+- Toggles/switches → selection haptic
+- Dropdown selections → selection haptic
+
+UX RULES:
+- Follow iOS Human Interface style
+- Make haptics quick and responsive
+- Avoid excessive vibration
+- Use stronger feedback only for important financial confirmations
+- Keep existing colors, UI, animations, and layouts unchanged
+
+The final experience should feel like a premium trading platform similar to major financial apps.

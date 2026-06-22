@@ -34,5 +34,10 @@ externalPort = 3000
 localPort = 18116
 externalPort = 3001
 
+[[ports]]
+localPort = 19000
+externalPort = 3002
+
 [nix]
 channel = "stable-25_05"
+packages = ["nano"]
