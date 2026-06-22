@@ -1,5 +1,4 @@
 import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -18,9 +17,7 @@ import { Feather } from "@expo/vector-icons";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/context/AuthContext";
 import { EyeToggleBtn } from "@/components/EyeToggleBtn";
-
-const btnGoogleImg = require("@/assets/images/btn-social-google.svg");
-const btnAppleImg  = require("@/assets/images/btn-social-apple.svg");
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 /* ── Screen ─────────────────────────────────────────────────────────────── */
 export default function LoginScreen() {
@@ -148,14 +145,10 @@ export default function LoginScreen() {
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
-          <View style={styles.socialRow}>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
-              <Image source={btnGoogleImg} style={styles.socialBtn} contentFit="contain" />
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => Haptics.selectionAsync()} style={styles.socialBtnWrap}>
-              <Image source={btnAppleImg} style={styles.socialBtn} contentFit="contain" />
-            </TouchableOpacity>
-          </View>
+          <SocialAuthButtons
+            onSuccess={() => router.replace("/(tabs)")}
+            onError={(msg) => setError(msg)}
+          />
         </View>
 
         <View style={styles.footer}>

@@ -16,6 +16,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  loginWithSocial: (email: string, name: string, provider: string) => Promise<void>;
   logout: () => Promise<void>;
   completeOnboarding: () => Promise<void>;
 }
@@ -78,6 +79,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(newUser);
   }
 
+  async function loginWithSocial(email: string, name: string, _provider: string) {
+    const newUser: User = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      name: name || email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      email,
+      joinedAt: new Date().toISOString(),
+    };
+    await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
+    setUser(newUser);
+  }
+
   async function logout() {
     await AsyncStorage.removeItem(STORAGE_KEYS.USER);
     setUser(null);
@@ -96,6 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
+        loginWithSocial,
         logout,
         completeOnboarding,
       }}
