@@ -475,7 +475,7 @@ const pc = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.08)",
     top: -60, right: -50,
   },
-  pct:   { fontSize: 22, fontFamily: "Manrope_800ExtraBold", letterSpacing: -0.5 },
+  pct:   { fontSize: 22, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
   title: { fontSize: 14, fontFamily: "Manrope_700Bold" },
   desc:  { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 18, marginTop: 4 },
 });
