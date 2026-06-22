@@ -302,7 +302,7 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const blackCardW    = clamp(slideW * 0.90, 280, 420);
+  const blackCardW    = clamp(slideW * 0.96, 300, 460);
   const blackCardH    = blackCardW / 1.586;
   const blackCardLeft = (slideW - blackCardW) / 2;
   const blackCardTop  = (slideH - blackCardH) / 2;
@@ -403,10 +403,10 @@ function ImageSlide({
 
   return (
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={slide3Img}
-          style={{ width: illustrationSize, height: illustrationSize }}
+          style={{ width: slideW, height: slideH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -419,13 +419,11 @@ function ImageSlide({
 // ── Slide N: Static image (unmodified) — fade + spring in ─────────────────────
 function ImageSlideStatic({
   source,
-  illustrationSize,
   slideW,
   slideH,
   isActive,
 }: {
   source: number;
-  illustrationSize: number;
   slideW: number;
   slideH: number;
   isActive: boolean;
@@ -452,10 +450,10 @@ function ImageSlideStatic({
 
   return (
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={source}
-          style={{ width: illustrationSize, height: illustrationSize }}
+          style={{ width: slideW, height: slideH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -478,7 +476,7 @@ export default function OnboardingScreen() {
 
   const bottomSectionH   = DOTS_H + TEXT_H + BTNS_H + 40 + bottomInset;
   const slideAreaH       = Math.max(height - topInset - HEADER_H - bottomSectionH, 160);
-  const illustrationSize = clamp(Math.min(slideAreaH * 0.96, width * 0.92), 220, 500);
+  const illustrationSize = clamp(Math.min(slideAreaH * 1.0, width * 0.98), 240, 700);
   const contentMaxW      = Math.min(width, 500);
   const hPad             = clamp(width * 0.06, 16, 28);
   const btnWidth         = contentMaxW - hPad * 2;
@@ -542,7 +540,6 @@ export default function OnboardingScreen() {
               {item.type === "chatgpt-portfolio" && (
                 <ImageSlideStatic
                   source={onboardPortfolio}
-                  illustrationSize={illustrationSize}
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
@@ -551,7 +548,6 @@ export default function OnboardingScreen() {
               {item.type === "chatgpt-card" && (
                 <ImageSlideStatic
                   source={onboardCard}
-                  illustrationSize={illustrationSize}
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
@@ -560,7 +556,6 @@ export default function OnboardingScreen() {
               {item.type === "chatgpt-esim" && (
                 <ImageSlideStatic
                   source={onboardEsim}
-                  illustrationSize={illustrationSize}
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
