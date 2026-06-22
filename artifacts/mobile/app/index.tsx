@@ -40,13 +40,13 @@ export default function SplashIndex() {
           Animated.timing(glowAnim, {
             toValue: 1,
             duration: 1400,
-            easing: Easing.inOut(Easing.sine),
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: Platform.OS !== "web",
           }),
           Animated.timing(glowAnim, {
             toValue: 0,
             duration: 1400,
-            easing: Easing.inOut(Easing.sine),
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: Platform.OS !== "web",
           }),
         ])
