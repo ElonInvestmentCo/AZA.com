@@ -54,8 +54,8 @@ const C = {
 };
 
 const fingerprintImg = require("@/assets/images/fingerprint.png");
-const btnGoogleImg   = require("@/assets/images/btn-google.png");
-const btnAppleImg    = require("@/assets/images/btn-apple.png");
+const btnGoogleImg   = require("@/assets/images/btn-social-google.png");
+const btnAppleImg    = require("@/assets/images/btn-social-apple.png");
 
 const eyeOpenImg   = require("../../assets/images/eye-open.svg");
 const eyeClosedImg = require("../../assets/images/eye-closed.svg");
@@ -369,9 +369,28 @@ export default function LoginScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── Footer ── */}
+        {/* ── Or Login with ── */}
+        <Animated.View
+          entering={FadeInUp.duration(380).delay(260).springify()}
+          style={s.dividerRow}
+        >
+          <View style={s.dividerLine} />
+          <Text style={s.dividerText}>Or Login with</Text>
+          <View style={s.dividerLine} />
+        </Animated.View>
+
+        {/* ── Social buttons ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(300).springify()}
+          style={s.socialRow}
+        >
+          <Image source={btnGoogleImg} style={s.socialBtn} contentFit="contain" />
+          <Image source={btnAppleImg}  style={s.socialBtn} contentFit="contain" />
+        </Animated.View>
+
+        {/* ── Footer ── */}
+        <Animated.View
+          entering={FadeInUp.duration(380).delay(340).springify()}
           style={s.footer}
         >
           <Text style={s.footerText}>Don't have an account? </Text>
@@ -503,6 +522,34 @@ const s = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
     marginBottom: 40,
+  },
+
+  /* Divider + Social */
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E8ECF4",
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    fontSize: 14,
+    fontFamily: "Manrope_400Regular",
+    color: "#6A707C",
+  },
+  socialRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+    marginBottom: 24,
+  },
+  socialBtn: {
+    width: 150,
+    height: 56,
   },
 
   /* Footer */
