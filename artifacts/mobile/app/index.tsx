@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
   },
   logo: {
-    width: "80%",
-    height: 160,
+    width: "95%",
+    aspectRatio: 2,
   },
 });
