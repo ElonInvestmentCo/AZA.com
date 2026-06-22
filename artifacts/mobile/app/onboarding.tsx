@@ -52,21 +52,21 @@ const SLIDES: SlideItem[] = [
     id: "1",
     type: "animated-wallet",
     title: "Withdraw like a Boss",
-    subtitle: "BUY YOUR GIFT CARD ON AZA",
+    subtitle: "Fast, secure withdrawals made simple.",
     bgColor: "#ffffff",
   },
   {
     id: "2",
     type: "giftcard",
     title: "Sell your gift card",
-    subtitle: "Buy Your Gift Card On Aza",
-    bgColor: "#FFD6E0",
+    subtitle: "Sell smarter. Get paid faster.",
+    bgColor: "#EDE7F6",
   },
   {
     id: "3",
     type: "image",
     title: "Bill payments",
-    subtitle: "We Got Your Bills Sorted",
+    subtitle: "Pay your bills seamlessly in one place",
     bgColor: "#ffffff",
   },
 ];
@@ -222,26 +222,15 @@ function AnimatedWalletSlide({
 
 // ── Slide 2: Gift card ────────────────────────────────────────────────────────
 function GiftCardSlide({ slideW, slideH }: { slideW: number; slideH: number }) {
-  // ── Black card (credit-card ratio 1.586 : 1) ─────────────────────────────
-  const blackCardW    = clamp(slideW * 0.76, 220, 340);
+  // ── Black card (credit-card ratio 1.586 : 1) — centred in slide ─────────
+  const blackCardW    = clamp(slideW * 0.82, 240, 360);
   const blackCardH    = blackCardW / 1.586;
   const blackCardLeft = (slideW - blackCardW) / 2;
-  // Card sits in the upper-centre, leaving the lower third for the man
-  const blackCardTop  = slideH * 0.08;
-
-  // ── Man illustration — fully visible, standing in front of the card ───────
-  const manH    = clamp(slideH * 0.78, 200, 340);
-  const manW    = manH * 0.72;
-  // Bottom-anchor the man so he stands on the floor of the slide
-  const manTop  = slideH - manH;
-  // Align him so his pointing arm reaches across the card
-  const manLeft = -manW * 0.04;
+  const blackCardTop  = (slideH - blackCardH) / 2;
 
   return (
-    // Flat absolute layout — no overflow clipping needed
     <View style={{ width: slideW, height: slideH }}>
-
-      {/* Plain black card container */}
+      {/* Plain black card container with the gift card image inside */}
       <View
         style={{
           position: "absolute",
@@ -252,15 +241,13 @@ function GiftCardSlide({ slideW, slideH }: { slideW: number; slideH: number }) {
           backgroundColor: "#0F0F0F",
           borderRadius: 22,
           overflow: "hidden",
-          // Subtle shadow for depth
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.45,
+          shadowOpacity: 0.30,
           shadowRadius: 24,
           elevation: 14,
         }}
       >
-        {/* Gift card image fills the black card */}
         <Image
           source={giftCardVisaImg}
           style={{ width: blackCardW, height: blackCardH }}
@@ -269,21 +256,6 @@ function GiftCardSlide({ slideW, slideH }: { slideW: number; slideH: number }) {
           priority="high"
         />
       </View>
-
-      {/* Man illustration — rendered last so it sits in front of the card */}
-      <Image
-        source={manImg}
-        style={{
-          position: "absolute",
-          top: manTop,
-          left: manLeft,
-          width: manW,
-          height: manH,
-        }}
-        contentFit="contain"
-        cachePolicy="memory-disk"
-        priority="high"
-      />
     </View>
   );
 }
@@ -330,7 +302,7 @@ export default function OnboardingScreen() {
   const hPad         = clamp(width * 0.06, 16, 28);
   const btnWidth     = contentMaxW - hPad * 2;
   const titleSize    = clamp(width * 0.064, 20, 28);
-  const subtitleSize = clamp(width * 0.034, 11, 14);
+  const subtitleSize = 16;
   const logoSize     = clamp(width * 0.056, 18, 24);
 
   const onViewableItemsChanged = useRef(
