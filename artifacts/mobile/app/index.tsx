@@ -1,12 +1,13 @@
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import { useColors } from "@/hooks/useColors";
+import { StyleSheet, View } from "react-native";
 import { useAuth } from "@/context/AuthContext";
+
+const payvoraImg = require("@/assets/images/splash-payvora.png");
 
 export default function SplashIndex() {
   const router = useRouter();
-  const colors = useColors();
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
@@ -22,8 +23,13 @@ export default function SplashIndex() {
   }, [isLoading, isAuthenticated]);
 
   return (
-    <View style={[styles.container, { backgroundColor: "#000" }]}>
-      <Text style={styles.logo}>aza</Text>
+    <View style={styles.container}>
+      <Image
+        source={payvoraImg}
+        style={styles.logo}
+        contentFit="contain"
+        priority="high"
+      />
     </View>
   );
 }
@@ -33,11 +39,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#000",
   },
   logo: {
-    color: "#fff",
-    fontSize: 48,
-    fontFamily: "Manrope_700Bold",
-    letterSpacing: -2,
+    width: "80%",
+    height: 160,
   },
 });
