@@ -2,8 +2,10 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  Dimensions,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -27,552 +29,476 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
 
-/* ─── Service tile data ──────────────────────────────────────────────────────── */
+const { width: SW } = Dimensions.get("window");
+const PROMO_W = SW - 80;
+const ITEM_W  = (SW - 40) / 4;
+
+/* ─── Static data ──────────────────────────────────────────────────────────── */
 
 const SERVICES = [
-  {
-    id: "sell",
-    icon: "tag" as const,
-    title: "Sell Gift Cards",
-    subtitle: "Amazon, iTunes, Steam & more",
-    color: "#00D9A0",
-    gradient: ["#00D9A020", "#00D9A008"] as [string, string],
-    route: "/(app)/gift-cards" as const,
-    badge: "Best Rate",
-  },
-  {
-    id: "buy",
-    icon: "shopping-bag" as const,
-    title: "Buy Gift Cards",
-    subtitle: "Shop at 200+ brands globally",
-    color: "#8B5CF6",
-    gradient: ["#8B5CF620", "#8B5CF608"] as [string, string],
-    route: "/(app)/gift-cards" as const,
-    badge: null,
-  },
-  {
-    id: "bill",
-    icon: "zap" as const,
-    title: "Bill Payments",
-    subtitle: "Airtime, data, electricity",
-    color: "#F59E0B",
-    gradient: ["#F59E0B20", "#F59E0B08"] as [string, string],
-    route: "/(app)/gift-cards" as const,
-    badge: null,
-  },
-  {
-    id: "esim",
-    icon: "wifi" as const,
-    title: "eSIM Plans",
-    subtitle: "Global connectivity in 200+ countries",
-    color: "#3B82F6",
-    gradient: ["#3B82F620", "#3B82F608"] as [string, string],
-    route: "/(app)/gift-cards" as const,
-    badge: "New",
-  },
-  {
-    id: "card",
-    icon: "credit-card" as const,
-    title: "Virtual Card",
-    subtitle: "Pay anywhere with Payvora Dollars",
-    color: "#EC4899",
-    gradient: ["#EC489920", "#EC489908"] as [string, string],
-    route: "/(app)/dashboard" as const,
-    badge: null,
-  },
-  {
-    id: "trade",
-    icon: "refresh-cw" as const,
-    title: "Trade Assets",
-    subtitle: "Currency & crypto exchange",
-    color: "#06B6D4",
-    gradient: ["#06B6D420", "#06B6D408"] as [string, string],
-    route: "/(app)/trade-asset" as const,
-    badge: null,
-  },
+  { id: "gift",     icon: "tag"          as const, label: "Gift Card",   color: "#00D9A0", route: "/(app)/gift-cards" as const },
+  { id: "settings", icon: "sliders"      as const, label: "Settings",    color: "#8B8FA3", route: null },
+  { id: "elec",     icon: "zap"          as const, label: "Electricity", color: "#F59E0B", route: null },
+  { id: "cable",    icon: "tv"           as const, label: "Cable TV",    color: "#EF4444", route: null },
+  { id: "rates",    icon: "bar-chart-2"  as const, label: "Rates",       color: "#3B82F6", route: null },
+  { id: "txn",      icon: "list"         as const, label: "Transaction", color: "#8B5CF6", route: "/(app)/transactions" as const },
+  { id: "bet",      icon: "grid"         as const, label: "Bet Funding", color: "#F97316", route: null },
+  { id: "more",     icon: "more-horizontal" as const, label: "More",     color: "#06B6D4", route: null },
 ] as const;
 
 const PROMOS = [
   {
     id: "p1",
-    title: "Sell Gift Cards at Top Rates",
-    sub: "Instant payout to your wallet",
-    icon: "gift" as const,
-    colors: ["#00D9A0", "#00A878"] as [string, string],
+    pct: "50% OFF",
+    title: "Summer special deal",
+    desc: "Get discount for every transaction this weekend",
+    colors: ["#FF6B9D", "#D63384"] as [string, string],
+    textColor: "#FFFFFF",
   },
   {
     id: "p2",
-    title: "Get a Virtual Dollar Card",
-    sub: "Shop globally with Payvora Dollars",
-    icon: "credit-card" as const,
-    colors: ["#3B82F6", "#2563EB"] as [string, string],
+    pct: "50% OFF",
+    title: "Black friday deal",
+    desc: "Get discount for every sign up and payment",
+    colors: ["#FFD93D", "#F59E0B"] as [string, string],
+    textColor: "#1C1B1F",
   },
   {
     id: "p3",
-    title: "eSIM — Stay Connected Abroad",
-    sub: "No physical SIM, all digital",
-    icon: "wifi" as const,
-    colors: ["#8B5CF6", "#7C3AED"] as [string, string],
+    pct: "Top Rates",
+    title: "Sell Gift Cards",
+    desc: "Amazon, iTunes, Steam — paid to wallet instantly",
+    colors: ["#00D9A0", "#00956C"] as [string, string],
+    textColor: "#FFFFFF",
   },
 ];
 
-/* ─── Service card ───────────────────────────────────────────────────────────── */
+const TRANSACTIONS = [
+  { id: "t1", icon: "arrow-down-circle" as const, title: "Deposit Giftcard", date: "February 24, 2022", amount: "₦200,40.00",    positive: true },
+  { id: "t2", icon: "arrow-up-circle"   as const, title: "Withdraws",        date: "February 24, 2022", amount: "₦400,000.00",   positive: false },
+  { id: "t3", icon: "tag"              as const, title: "Amazon Gift Card",  date: "April 28, 2024",    amount: "+₦200,040",      positive: true },
+];
 
-function ServiceCard({
-  item,
-  onPress,
-}: {
-  item: (typeof SERVICES)[number];
-  onPress: () => void;
-}) {
+/* ─── Sub-components ────────────────────────────────────────────────────────── */
+
+function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
   const colors = useColors();
   const sc = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
 
   return (
-    <Animated.View style={[anim, svc.wrap]}>
+    <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
       <Pressable
         onPress={onPress}
-        onPressIn={() => { sc.value = withSpring(0.94, { damping: 13 }); }}
-        onPressOut={() => { sc.value = withSpring(1, { damping: 13 }); }}
-        style={[svc.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        onPressIn={() => { sc.value = withSpring(0.88, { damping: 12 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 12 }); }}
+        style={sv.wrap}
       >
-        <LinearGradient
-          colors={item.gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
-
-        {/* Icon */}
-        <View style={[svc.iconWrap, { backgroundColor: item.color + "22" }]}>
+        <View style={[sv.iconBox, { backgroundColor: item.color + "20" }]}>
           <Feather name={item.icon} size={22} color={item.color} />
         </View>
-
-        {/* Badge */}
-        {item.badge && (
-          <View style={[svc.badge, { backgroundColor: item.color + "25" }]}>
-            <Text style={[svc.badgeText, { color: item.color }]}>{item.badge}</Text>
-          </View>
-        )}
-
-        <Text style={[svc.title, { color: colors.text }]} numberOfLines={1}>
-          {item.title}
+        <Text style={[sv.label, { color: colors.mutedForeground }]} numberOfLines={1}>
+          {item.label}
         </Text>
-        <Text style={[svc.sub, { color: colors.mutedForeground }]} numberOfLines={2}>
-          {item.subtitle}
-        </Text>
-
-        {/* Arrow */}
-        <View style={[svc.arrow, { backgroundColor: item.color + "18" }]}>
-          <Feather name="arrow-right" size={12} color={item.color} />
-        </View>
       </Pressable>
     </Animated.View>
   );
 }
 
-/* ─── Promo banner ───────────────────────────────────────────────────────────── */
-
-function PromoBanner({ item, onPress }: { item: (typeof PROMOS)[number]; onPress: () => void }) {
+function PromoCard({ item, onPress }: { item: typeof PROMOS[number]; onPress: () => void }) {
   const sc = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
 
   return (
-    <Animated.View style={[anim, pb.wrap]}>
+    <Animated.View style={[anim, { width: PROMO_W, marginRight: 12 }]}>
       <Pressable
         onPress={onPress}
         onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
-        onPressOut={() => { sc.value = withSpring(1, { damping: 14 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
       >
-        <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={pb.card}>
-          {/* Decorative circle */}
-          <View style={pb.orb} />
-          <View style={[pb.iconBox, { backgroundColor: "rgba(255,255,255,0.18)" }]}>
-            <Feather name={item.icon} size={20} color="#FFFFFF" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={pb.title}>{item.title}</Text>
-            <Text style={pb.sub}>{item.sub}</Text>
-          </View>
-          <View style={[pb.arrow, { backgroundColor: "rgba(255,255,255,0.2)" }]}>
-            <Feather name="chevron-right" size={16} color="#FFFFFF" />
-          </View>
+        <LinearGradient colors={item.colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={pc.card}>
+          <View style={pc.orb} />
+          <Text style={[pc.pct,   { color: item.textColor }]}>{item.pct}</Text>
+          <Text style={[pc.title, { color: item.textColor }]}>{item.title}</Text>
+          <Text style={[pc.desc,  { color: item.textColor + "CC" }]}>{item.desc}</Text>
         </LinearGradient>
       </Pressable>
     </Animated.View>
   );
 }
 
-/* ─── Balance mini pill ──────────────────────────────────────────────────────── */
-
-function BalancePill({ balance }: { balance: number }) {
+function TxRow({ item, onPress }: { item: typeof TRANSACTIONS[number]; onPress: () => void }) {
   const colors = useColors();
-  const fmt = (n: number) => "₦" + n.toLocaleString("en-NG");
-
   return (
-    <TouchableOpacity
-      style={[bp.pill, { backgroundColor: colors.accentDim, borderColor: "rgba(0,217,160,0.2)" }]}
-      activeOpacity={0.8}
-    >
-      <View style={[bp.dot, { backgroundColor: "#00D9A0" }]} />
-      <Text style={[bp.label, { color: colors.mutedForeground }]}>Balance</Text>
-      <Text style={[bp.amount, { color: "#00D9A0" }]}>{fmt(balance)}</Text>
+    <TouchableOpacity style={[tx.row, { borderBottomColor: colors.border }]} onPress={onPress} activeOpacity={0.75}>
+      <View style={[tx.iconWrap, { backgroundColor: (item.positive ? colors.success : colors.destructive) + "18" }]}>
+        <Feather name={item.icon} size={18} color={item.positive ? colors.success : colors.destructive} />
+      </View>
+      <View style={tx.info}>
+        <Text style={[tx.title, { color: colors.text }]}>{item.title}</Text>
+        <Text style={[tx.date,  { color: colors.mutedForeground }]}>{item.date}</Text>
+      </View>
+      <Text style={[tx.amount, { color: item.positive ? colors.success : colors.destructive }]}>
+        {item.amount}
+      </Text>
     </TouchableOpacity>
   );
 }
 
-/* ─── Main screen ────────────────────────────────────────────────────────────── */
+/* ─── Main screen ───────────────────────────────────────────────────────────── */
 
 export default function HomeScreen() {
-  const router = useRouter();
-  const colors = useColors();
-  const insets = useSafeAreaInsets();
+  const router   = useRouter();
+  const colors   = useColors();
+  const insets   = useSafeAreaInsets();
   const { user } = useAuth();
 
-  const topPad = Platform.OS === "web" ? 48 : insets.top;
+  const [balanceVisible, setBalanceVisible] = useState(true);
   const firstName = (user?.name ?? "User").split(" ")[0];
+  const balance   = user?.balance ?? 200590;
+  const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  /* Pulse animation for live indicator */
+  /* Subtle pulse on balance when it loads */
   const pulse = useSharedValue(1);
   useEffect(() => {
     pulse.value = withRepeat(
       withSequence(
-        withTiming(1.3, { duration: 900, easing: Easing.inOut(Easing.sin) }),
-        withTiming(1, { duration: 900, easing: Easing.inOut(Easing.sin) }),
+        withTiming(1.04, { duration: 1200, easing: Easing.inOut(Easing.sin) }),
+        withTiming(1,    { duration: 1200, easing: Easing.inOut(Easing.sin) }),
       ),
-      -1,
+      3,
       true,
     );
   }, []);
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
+  const topPad = Platform.OS === "web" ? 48 : insets.top;
+
+  const press = (fn: () => void) => () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    fn();
+  };
+
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
 
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      {/* ── Top header ─────────────────────────────────────────────────────── */}
       <Animated.View
-        entering={FadeInDown.duration(380).springify()}
-        style={[s.header, { paddingTop: topPad + 12 }]}
+        entering={FadeInDown.duration(350).springify()}
+        style={[s.header, { paddingTop: topPad + 10 }]}
       >
-        <View>
-          <View style={s.liveRow}>
-            <Animated.View style={[s.liveDot, { backgroundColor: "#00D9A0" }, pulseStyle]} />
-            <Text style={[s.liveText, { color: colors.mutedForeground }]}>AZA Platform</Text>
-          </View>
-          <Text style={[s.welcome, { color: colors.text }]}>
-            Hi, {firstName} 👋
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[s.dashBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
-          onPress={() => router.push("/(app)/dashboard")}
-          activeOpacity={0.78}
-        >
-          <Feather name="grid" size={17} color={colors.mutedForeground} />
+        {/* Notification bell left */}
+        <TouchableOpacity style={[s.hdrBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Feather name="bell" size={18} color={colors.mutedForeground} />
         </TouchableOpacity>
-      </Animated.View>
 
-      {/* Balance pill */}
-      <Animated.View
-        entering={FadeInDown.duration(340).springify().delay(60)}
-        style={s.balPillWrap}
-      >
-        <BalancePill balance={user?.balance ?? 0} />
+        {/* AZA wordmark center */}
+        <Image
+          source={require("@/assets/images/lkd.png")}
+          style={s.logo}
+          resizeMode="contain"
+        />
+
+        {/* Profile right */}
+        <TouchableOpacity style={[s.hdrBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          onPress={press(() => router.push("/(app)/dashboard"))}>
+          <Feather name="user" size={18} color={colors.mutedForeground} />
+        </TouchableOpacity>
       </Animated.View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 100 }]}
       >
+        {/* ── User + balance card ─────────────────────────────────────────── */}
+        <Animated.View
+          entering={FadeInDown.duration(380).springify().delay(60)}
+          style={[s.balCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          {/* Left: avatar + greeting */}
+          <View style={s.userLeft}>
+            <Image
+              source={require("@/assets/images/man-illustration.png")}
+              style={s.avatar}
+              resizeMode="cover"
+            />
+            <View>
+              <Text style={[s.greeting, { color: colors.text }]}>Hi, {firstName}</Text>
+              <Text style={[s.balLabel, { color: colors.mutedForeground }]}>Your available balance</Text>
+            </View>
+          </View>
 
-        {/* ── Promo banners ─────────────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(400).springify().delay(40)}>
+          {/* Right: eye toggle + amount */}
+          <View style={s.userRight}>
+            <TouchableOpacity
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setBalanceVisible(v => !v); }}
+              style={s.eyeBtn}
+            >
+              <Feather name={balanceVisible ? "eye" : "eye-off"} size={18} color={colors.mutedForeground} />
+            </TouchableOpacity>
+            <Animated.Text style={[s.balAmount, { color: colors.text }, pulseStyle]}>
+              {balanceVisible ? formatted : "₦•••,•••.••"}
+            </Animated.Text>
+          </View>
+        </Animated.View>
+
+        {/* ── Quick actions ────────────────────────────────────────────────── */}
+        <Animated.View
+          entering={FadeInDown.duration(360).springify().delay(100)}
+          style={s.actionsWrap}
+        >
+          <View style={[s.actionsBar, { backgroundColor: "#0D0D14", borderColor: colors.border }]}>
+            {[
+              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
+              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/gift-cards")) },
+              { icon: "arrow-up"   as const, label: "Withdraw",    onPress: press(() => router.push("/(app)/dashboard")) },
+            ].map((action, i) => (
+              <React.Fragment key={action.label}>
+                {i > 0 && <View style={[s.actionDivider, { backgroundColor: colors.border }]} />}
+                <TouchableOpacity style={s.actionBtn} onPress={action.onPress} activeOpacity={0.72}>
+                  <View style={[s.actionIconWrap, { borderColor: colors.border }]}>
+                    <Feather name={action.icon} size={20} color="#FFFFFF" />
+                  </View>
+                  <Text style={s.actionLabel}>{action.label}</Text>
+                </TouchableOpacity>
+              </React.Fragment>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* ── Services grid ────────────────────────────────────────────────── */}
+        <Animated.View
+          entering={FadeInUp.duration(360).springify().delay(130)}
+          style={s.servicesGrid}
+        >
+          {SERVICES.map((item, i) => (
+            <Animated.View
+              key={item.id}
+              entering={FadeInUp.duration(300).springify().delay(130 + i * 30)}
+            >
+              <ServiceItem
+                item={item}
+                onPress={press(() => {
+                  if (item.route) router.push(item.route as any);
+                })}
+              />
+            </Animated.View>
+          ))}
+        </Animated.View>
+
+        {/* ── Promo banners ────────────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.duration(340).springify().delay(200)}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={s.promoScroll}
-            snapToInterval={SCREEN_PROMO_W + 12}
+            snapToInterval={PROMO_W + 12}
             decelerationRate="fast"
           >
             {PROMOS.map(p => (
-              <PromoBanner
+              <PromoCard
                 key={p.id}
                 item={p}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/(app)/gift-cards");
-                }}
+                onPress={press(() => router.push("/(app)/gift-cards"))}
               />
             ))}
           </ScrollView>
         </Animated.View>
 
-        {/* ── Services header ───────────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInUp.duration(360).springify().delay(80)}
-          style={s.secRow}
-        >
-          <View>
-            <Text style={[s.secTitle, { color: colors.text }]}>Services</Text>
-            <Text style={[s.secSub, { color: colors.mutedForeground }]}>
-              What would you like to do?
-            </Text>
+        {/* ── Recent Transactions ──────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.duration(340).springify().delay(240)}>
+          {/* Section header */}
+          <View style={s.secHdr}>
+            <Text style={[s.secTitle, { color: colors.text }]}>Recent Transaction</Text>
+            <TouchableOpacity onPress={press(() => router.push("/(app)/transactions"))}>
+              <Text style={[s.seeAll, { color: colors.primary }]}>See All</Text>
+            </TouchableOpacity>
           </View>
-        </Animated.View>
 
-        {/* ── Service grid ──────────────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).springify().delay(120)}
-          style={s.grid}
-        >
-          {SERVICES.map((item, i) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInUp.duration(320).springify().delay(120 + i * 40)}
-              style={s.gridCell}
-            >
-              <ServiceCard
-                item={item}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push(item.route as any);
-                }}
-              />
-            </Animated.View>
-          ))}
-        </Animated.View>
-
-        {/* ── Quick access section ──────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInUp.duration(360).springify().delay(260)}
-          style={s.secRow}
-        >
-          <Text style={[s.secTitle, { color: colors.text }]}>Quick Access</Text>
-        </Animated.View>
-
-        <Animated.View
-          entering={FadeInUp.duration(380).springify().delay(290)}
-          style={s.quickList}
-        >
-          {[
-            { icon: "trending-up" as const, label: "View Dashboard",     sub: "Balance, transactions & virtual card", route: "/(app)/dashboard" as const, color: "#00D9A0" },
-            { icon: "layers" as const,      label: "Trade Assets",        sub: "Exchange currency & crypto",           route: "/(app)/trade-asset" as const, color: "#3B82F6" },
-            { icon: "check-circle" as const,label: "Transactions",        sub: "Full transaction history",             route: "/(app)/transactions" as const, color: "#8B5CF6" },
-          ].map((item, i) => (
-            <Animated.View
-              key={item.label}
-              entering={FadeInUp.duration(300).springify().delay(290 + i * 50)}
-            >
-              <TouchableOpacity
-                style={[s.quickRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push(item.route as any); }}
-                activeOpacity={0.82}
+          {/* Transaction list */}
+          <View style={[s.txList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            {TRANSACTIONS.map((item, i) => (
+              <Animated.View
+                key={item.id}
+                entering={FadeInUp.duration(280).springify().delay(240 + i * 40)}
               >
-                <View style={[s.quickIcon, { backgroundColor: item.color + "18" }]}>
-                  <Feather name={item.icon} size={18} color={item.color} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[s.quickLabel, { color: colors.text }]}>{item.label}</Text>
-                  <Text style={[s.quickSub, { color: colors.mutedForeground }]}>{item.sub}</Text>
-                </View>
-                <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
-        </Animated.View>
-
-        {/* ── Footer tagline ────────────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInUp.duration(340).springify().delay(360)}
-          style={s.footer}
-        >
-          <View style={[s.footerLine, { backgroundColor: colors.border }]} />
-          <Text style={[s.footerText, { color: colors.mutedForeground }]}>
-            PAYVORA · FINTECH REIMAGINED
-          </Text>
-          <View style={[s.footerLine, { backgroundColor: colors.border }]} />
+                <TxRow
+                  item={item}
+                  onPress={press(() => router.push("/(app)/transactions"))}
+                />
+              </Animated.View>
+            ))}
+          </View>
         </Animated.View>
       </ScrollView>
     </View>
   );
 }
 
-const SCREEN_PROMO_W = 290;
-
 /* ─── Styles ─────────────────────────────────────────────────────────────────── */
 
 const s = StyleSheet.create({
-  root: { flex: 1 },
+  root:   { flex: 1 },
+  scroll: { paddingTop: 8, gap: 20 },
 
+  /* Header */
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    paddingHorizontal: 24,
-    paddingBottom: 12,
+    flexDirection:     "row",
+    alignItems:        "center",
+    justifyContent:    "space-between",
+    paddingHorizontal: 20,
+    paddingBottom:     12,
   },
-  liveRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
-  liveDot: { width: 7, height: 7, borderRadius: 4 },
-  liveText: { fontSize: 11, fontFamily: "Manrope_400Regular", letterSpacing: 0.5 },
-  welcome: { fontSize: 24, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
-  dashBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
-    alignItems: "center",
+  hdrBtn: {
+    width: 40, height: 40,
+    borderRadius:       12,
+    borderWidth:        1,
+    alignItems:         "center",
+    justifyContent:     "center",
+  },
+  logo: { width: 80, height: 28 },
+
+  /* Balance card */
+  balCard: {
+    marginHorizontal: 20,
+    borderRadius:     20,
+    borderWidth:      1,
+    padding:          20,
+    flexDirection:    "row",
+    alignItems:       "center",
+    justifyContent:   "space-between",
+    shadowColor:      "#000",
+    shadowOffset:     { width: 0, height: 4 },
+    shadowOpacity:    0.12,
+    shadowRadius:     12,
+    elevation:        4,
+  },
+  userLeft:  { flexDirection: "row", alignItems: "center", gap: 12 },
+  avatar:    { width: 52, height: 52, borderRadius: 26 },
+  greeting:  { fontSize: 16, fontFamily: "Manrope_700Bold", marginBottom: 2 },
+  balLabel:  { fontSize: 12, fontFamily: "Manrope_400Regular" },
+  userRight: { alignItems: "flex-end", gap: 4 },
+  eyeBtn:    { padding: 4 },
+  balAmount: { fontSize: 20, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
+
+  /* Quick actions */
+  actionsWrap: { paddingHorizontal: 20 },
+  actionsBar: {
+    borderRadius:   18,
+    borderWidth:    1,
+    flexDirection:  "row",
+    alignItems:     "center",
+    paddingVertical: 18,
+    shadowColor:    "#000",
+    shadowOffset:   { width: 0, height: 4 },
+    shadowOpacity:  0.25,
+    shadowRadius:   12,
+    elevation:      5,
+  },
+  actionBtn: {
+    flex:            1,
+    alignItems:      "center",
+    justifyContent:  "center",
+    gap:             8,
+  },
+  actionIconWrap: {
+    width:          46,
+    height:         46,
+    borderRadius:   23,
+    borderWidth:    1,
+    alignItems:     "center",
     justifyContent: "center",
-    borderWidth: 1,
+  },
+  actionLabel: {
+    fontSize:    11,
+    fontFamily:  "Manrope_600SemiBold",
+    color:       "#FFFFFF",
+    letterSpacing: 0.2,
+  },
+  actionDivider: { width: 1, height: 50, opacity: 0.3 },
+
+  /* Services */
+  servicesGrid: {
+    flexDirection:     "row",
+    flexWrap:          "wrap",
+    paddingHorizontal: 10,
+    rowGap:            20,
   },
 
-  balPillWrap: { paddingHorizontal: 24, marginBottom: 6 },
+  /* Promos */
+  promoScroll: { paddingHorizontal: 20 },
 
-  scroll: { paddingTop: 16, gap: 20 },
-
-  promoScroll: { paddingHorizontal: 20, gap: 12 },
-
-  secRow: { paddingHorizontal: 20, flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
+  /* Transactions */
+  secHdr: {
+    flexDirection:     "row",
+    justifyContent:    "space-between",
+    alignItems:        "center",
+    paddingHorizontal: 20,
+    marginBottom:      10,
+  },
   secTitle: { fontSize: 18, fontFamily: "Manrope_700Bold" },
-  secSub: { fontSize: 12, fontFamily: "Manrope_400Regular", marginTop: 2 },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    paddingHorizontal: 14,
-    gap: 10,
-  },
-  gridCell: { width: "47.5%" },
-
-  quickList: { paddingHorizontal: 20, gap: 10 },
-  quickRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    padding: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-  },
-  quickIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  quickLabel: { fontSize: 14, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
-  quickSub: { fontSize: 12, fontFamily: "Manrope_400Regular" },
-
-  footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 24,
-  },
-  footerLine: { flex: 1, height: 1 },
-  footerText: { fontSize: 10, fontFamily: "Manrope_400Regular", letterSpacing: 2 },
-});
-
-/* service card */
-const svc = StyleSheet.create({
-  wrap: {},
-  card: {
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
-    gap: 8,
-    overflow: "hidden",
-    minHeight: 160,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  iconWrap: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 20,
-  },
-  badgeText: { fontSize: 9, fontFamily: "Manrope_700Bold", letterSpacing: 0.5 },
-  title: { fontSize: 14, fontFamily: "Manrope_700Bold", lineHeight: 18 },
-  sub: { fontSize: 11, fontFamily: "Manrope_400Regular", lineHeight: 15 },
-  arrow: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-end",
-    marginTop: "auto" as any,
+  seeAll:   { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+  txList: {
+    marginHorizontal: 20,
+    borderRadius:     20,
+    borderWidth:      1,
+    overflow:         "hidden",
   },
 });
 
-/* promo banner */
-const pb = StyleSheet.create({
-  wrap: { width: SCREEN_PROMO_W },
+/* service item */
+const sv = StyleSheet.create({
+  wrap:    { alignItems: "center", gap: 8, paddingVertical: 4 },
+  iconBox: { width: 54, height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center" },
+});
+
+/* promo card */
+const pc = StyleSheet.create({
   card: {
-    width: SCREEN_PROMO_W,
-    borderRadius: 20,
-    padding: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    elevation: 6,
+    borderRadius:   20,
+    padding:        20,
+    paddingBottom:  22,
+    overflow:       "hidden",
+    gap:            4,
+    shadowColor:    "#000",
+    shadowOffset:   { width: 0, height: 6 },
+    shadowOpacity:  0.2,
+    shadowRadius:   16,
+    elevation:      6,
   },
   orb: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: "rgba(255,255,255,0.07)",
-    top: -60,
-    right: -40,
+    position:     "absolute",
+    width:        180,
+    height:       180,
+    borderRadius: 90,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    top: -60, right: -50,
   },
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", marginBottom: 3 },
-  sub: { fontSize: 11, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.75)" },
-  arrow: {
-    width: 34,
-    height: 34,
-    borderRadius: 11,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  pct:   { fontSize: 22, fontFamily: "Manrope_800ExtraBold", letterSpacing: -0.5 },
+  title: { fontSize: 14, fontFamily: "Manrope_700Bold" },
+  desc:  { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 18, marginTop: 4 },
 });
 
-/* balance pill */
-const bp = StyleSheet.create({
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
-    borderWidth: 1,
+/* transaction row */
+const tx = StyleSheet.create({
+  row: {
+    flexDirection:  "row",
+    alignItems:     "center",
+    gap:            14,
+    paddingHorizontal: 16,
+    paddingVertical:   16,
+    borderBottomWidth: 1,
   },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  label: { fontSize: 12, fontFamily: "Manrope_400Regular" },
+  iconWrap: {
+    width:          44,
+    height:         44,
+    borderRadius:   14,
+    alignItems:     "center",
+    justifyContent: "center",
+  },
+  info:   { flex: 1 },
+  title:  { fontSize: 14, fontFamily: "Manrope_600SemiBold", marginBottom: 3 },
+  date:   { fontSize: 12, fontFamily: "Manrope_400Regular" },
   amount: { fontSize: 14, fontFamily: "Manrope_700Bold" },
 });
