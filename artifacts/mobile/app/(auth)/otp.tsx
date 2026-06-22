@@ -332,7 +332,7 @@ export default function OtpScreen() {
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.resendRow}
         >
-          <Text style={s.resendLabel}>Didn't receive the code? </Text>
+          <Text style={s.resendLabel}>Didn't received code? </Text>
           <TouchableOpacity
             onPress={handleResend}
             activeOpacity={countdown > 0 ? 1 : 0.7}
@@ -427,15 +427,19 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   resendLabel: {
+    /* CSS spec: font-weight 500, 15px, line-height 140%, letter-spacing 0.01em, color #1E232C */
     fontSize: 15,
-    fontFamily: "Manrope_400Regular",
-    color: C.text,
+    fontFamily: "Manrope_500Medium",
+    color: "#1E232C",
+    lineHeight: 21,
+    letterSpacing: 0.01 * 15,
   },
   resendLink: {
-    /* CSS spec: font-weight 700, 15px, line-height 140%, color #35C2C1 */
+    /* CSS spec: font-weight 700, 15px, line-height 140%, letter-spacing 0.01em, color #35C2C1 */
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
     color: "#35C2C1",
+    lineHeight: 21,
     letterSpacing: 0.01 * 15,
   },
 });
