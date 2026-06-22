@@ -64,7 +64,7 @@ function PasswordInput({
         onBlur={() => setFocused(false)}
       />
       <TouchableOpacity
-        onPress={() => setShowPass(v => !v)}
+        onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
@@ -126,6 +126,7 @@ export default function NewPasswordScreen() {
     setError("");
     setTimeout(() => {
       setLoading(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(auth)/password-changed");
     }, 1200);
   };

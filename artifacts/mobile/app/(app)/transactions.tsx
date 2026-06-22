@@ -3,6 +3,7 @@ import {
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -132,7 +133,7 @@ function FilterPill({
     <Animated.View style={style}>
       <Pressable
         style={[fp.btn, active ? fp.active : fp.inactive]}
-        onPress={onPress}
+        onPress={() => { Haptics.selectionAsync(); onPress(); }}
         onPressIn={() => { sc.value = withSpring(0.93, { damping: 12, stiffness: 300 }); }}
         onPressOut={() => { sc.value = withSpring(1.0, { damping: 12, stiffness: 300 }); }}
       >
@@ -159,6 +160,7 @@ function TxRow({ item, index }: { item: Tx; index: number }) {
       <Animated.View style={pressStyle}>
         <Pressable
           style={s.card}
+          onPress={() => Haptics.selectionAsync()}
           onPressIn={() => { sc.value = withSpring(0.97, { damping: 14, stiffness: 300 }); }}
           onPressOut={() => { sc.value = withSpring(1.0, { damping: 14, stiffness: 300 }); }}
         >
@@ -186,7 +188,7 @@ export default function TransactionsScreen() {
   return (
     <View style={[s.root, { paddingTop: topPad }]}>
       <View style={s.header}>
-        <Pressable style={s.backBtn} onPress={() => router.back()}>
+        <Pressable style={s.backBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}>
           <Ionicons name="chevron-back" size={20} color={C.text} />
         </Pressable>
         <Text style={s.headerTitle}>Transactions</Text>
