@@ -12,7 +12,8 @@
   "dependencies": {
     "expo-apple-authentication": "~8.0.8",
     "expo-auth-session": "~7.0.11",
-    "expo-crypto": "~15.0.9"
+    "expo-crypto": "~15.0.9",
+    "expo-updates": "~29.0.18"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
