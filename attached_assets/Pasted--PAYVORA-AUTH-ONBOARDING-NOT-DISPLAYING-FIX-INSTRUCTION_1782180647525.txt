@@ -1,0 +1,127 @@
+🚨 PAYVORA – AUTH & ONBOARDING NOT DISPLAYING FIX INSTRUCTION
+(EXPO REACT NATIVE)
+
+──────────────────────────────────────────────
+🎯 ISSUE
+──────────────────────────────────────────────
+
+Authentication and onboarding screens are NOT showing on app launch.
+
+App is likely:
+- skipping Auth flow
+- rendering Main App (Home) directly
+- or returning null / blank during auth state check
+
+──────────────────────────────────────────────
+🧠 GOAL
+──────────────────────────────────────────────
+
+Fix app startup flow so that:
+
+1. On app launch → show ONBOARDING (if first time user)
+2. Then → show LOGIN / SIGNUP screens
+3. ONLY after authentication → show MAIN APP (Home / Tabs)
+
+No blank screens at any time.
+
+──────────────────────────────────────────────
+📍 REQUIRED FLOW ARCHITECTURE
+──────────────────────────────────────────────
+
+APP START
+   ↓
+Check auth state / onboarding status
+   ↓
+IF first time user:
+   → OnboardingScreen
+
+ELSE IF not authenticated:
+   → AuthStack (Login / Signup)
+
+ELSE:
+   → MainApp (Tabs / Home / SendMoney)
+
+──────────────────────────────────────────────
+⚠️ CRITICAL PROBLEM TO FIX
+──────────────────────────────────────────────
+
+Currently likely issues:
+- Auth state not initializing properly
+- Navigation condition is incorrect or inverted
+- Missing loading state handling
+- App directly renders MainApp before auth resolves
+
+──────────────────────────────────────────────
+🧱 REQUIRED FIXES
+──────────────────────────────────────────────
+
+1. Ensure AUTH STATE IS WAITED FOR
+
+- Add proper loading state (isLoading / initializingAuth)
+- DO NOT render anything until auth check completes
+
+TEMP FIX RULE:
+- If loading → show Splash / Loading screen
+- NEVER return null
+
+──────────────────────────────────────────────
+2. FIX ROOT NAVIGATION LOGIC
+
+App must follow strict conditional rendering:
+
+IF (loading):
+   return LoadingScreen
+
+ELSE IF (not onboarded):
+   return OnboardingStack
+
+ELSE IF (not logged in):
+   return AuthStack
+
+ELSE:
+   return MainAppTabs
+
+──────────────────────────────────────────────
+3. VERIFY NAVIGATION REGISTRATION
+
+Ensure these exist and are properly registered:
+- OnboardingScreen
+- LoginScreen
+- SignupScreen
+- HomeScreen
+- SendMoneyScreen
+
+──────────────────────────────────────────────
+4. PROTECT AGAINST BLANK SCREEN BUG
+
+CRITICAL RULE:
+- NEVER return null in root navigator
+- ALWAYS return a valid screen
+
+──────────────────────────────────────────────
+5. DO NOT BREAK EXISTING UI OR THEME
+
+❌ DO NOT change:
+- UI design
+- colors
+- layout
+- animations
+- fintech styling
+- Home → SendMoney gesture system
+
+✔ ONLY FIX:
+- navigation logic
+- auth flow conditions
+- screen rendering order
+
+──────────────────────────────────────────────
+🏁 EXPECTED RESULT
+──────────────────────────────────────────────
+
+On app launch:
+
+✔ Onboarding shows correctly (if first time)
+✔ Auth screens show correctly (if logged out)
+✔ Home shows ONLY after login
+✔ No blank screens ever
+✔ Smooth transition between all states
