@@ -4,7 +4,6 @@ import React, { useRef, useState } from "react";
 import {
   Animated as RNAnimated,
   Dimensions,
-  Image,
   Modal,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -27,6 +26,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withTiming,
   interpolate,
   Extrapolation,
   runOnJS,
@@ -317,14 +317,14 @@ function TransactionDetailSheet({
         <View style={sheetStyles.divider} />
 
         <View style={sheetStyles.detailsBlock}>
-          <DetailRow label="Type"       value={tx.type}      />
+          <DetailRow label="Type"        value={tx.type}      />
           <DetailRow label="Date & Time" value={tx.timestamp} />
-          <DetailRow label="Currency"   value={tx.currency}  />
+          <DetailRow label="Currency"    value={tx.currency}  />
           <View style={sheetStyles.statusRow}>
             <Text style={sheetStyles.detailLabel}>Status</Text>
             <StatusPill status={tx.status} />
           </View>
-          <DetailRow label="Reference"  value={tx.reference} mono />
+          <DetailRow label="Reference"   value={tx.reference} mono />
           {tx.note ? <DetailRow label="Note" value={tx.note} /> : null}
         </View>
 
@@ -340,29 +340,11 @@ function TransactionDetailSheet({
   );
 }
 
-// ── Drag hint label ───────────────────────────────────────────
-function DragHint({ dragY }: { dragY: Animated.SharedValue<number> }) {
-  const style = useAnimatedStyle(() => ({
-    opacity: interpolate(dragY.value, [0, 40, 80], [0, 0.6, 1], Extrapolation.CLAMP),
-    transform: [{ translateY: interpolate(dragY.value, [0, 80], [6, 0], Extrapolation.CLAMP) }],
-  }));
-  return (
-    <Animated.View style={[hintStyles.wrap, style]} pointerEvents="none">
-      <Feather name="chevrons-down" size={14} color={TEXT_LIGHT} />
-      <Text style={hintStyles.label}>Drag to Send Money</Text>
-    </Animated.View>
-  );
-}
-
-const hintStyles = StyleSheet.create({
-  wrap: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, marginTop: 10, marginBottom: 2 },
-  label: { fontFamily: "Inter_500Medium", fontSize: 11, color: TEXT_LIGHT },
-});
-
-// ── Main screen ───────────────────────────────────────────────
-const DRAG_THRESHOLD   = 120;
+// ── Gesture constants ─────────────────────────────────────────
+const DRAG_THRESHOLD    = 120;
 const VELOCITY_THRESHOLD = 800;
 
+// ── Main screen ───────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -375,7 +357,7 @@ export default function HomeScreen() {
   const sheetY          = useRef(new RNAnimated.Value(SHEET_HEIGHT)).current;
   const backdropOpacity = useRef(new RNAnimated.Value(0)).current;
 
-  // ── Gesture shared values ──
+  // Three shared values only — all needed in worklet context
   const dragY        = useSharedValue(0);
   const isNavigating = useSharedValue(false);
   const scrollY      = useSharedValue(0);
@@ -388,53 +370,61 @@ export default function HomeScreen() {
       ? transactions.slice(0, 2).map(txFromWallet)
       : STATIC_TXS;
 
-  // ── Navigation callback (runs on JS thread) ──
-  function doNavigate() {
+  // Runs on JS thread after threshold is crossed
+  function commitNavigate() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Navigate first — tab switch is instant, home screen is hidden immediately
     router.push("/(tabs)/send" as any);
-    setTimeout(() => {
-      dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
-      isNavigating.value = false;
-    }, 450);
+    // Reset without animation since the screen is no longer visible
+    dragY.value = 0;
+    isNavigating.value = false;
   }
 
-  // ── Screen animated style (whole screen follows drag) ──
+  // Whole-screen animated style — driven by dragY
   const screenAnimStyle = useAnimatedStyle(() => ({
     transform: [
       { translateY: dragY.value },
-      { scale: interpolate(dragY.value, [0, 220], [1, 0.95], Extrapolation.CLAMP) },
+      { scale: interpolate(dragY.value, [0, 200], [1, 0.95], Extrapolation.CLAMP) },
     ],
-    opacity: interpolate(dragY.value, [0, 220], [1, 0.85], Extrapolation.CLAMP),
+    opacity: interpolate(dragY.value, [0, 200], [1, 0.88], Extrapolation.CLAMP),
   }));
 
-  // ── Pan gesture – attached only to Recent Transactions container ──
+  // Pan gesture — attached only to the Recent Transactions container
   const panGesture = Gesture.Pan()
-    .activeOffsetY(10)
+    // Activate only on downward movement; fail on upward (lets scroll handle it)
+    .activeOffsetY(12)
     .failOffsetY(-5)
     .onUpdate((e) => {
       "worklet";
-      if (isNavigating.value) return;
-      if (scrollY.value > 8) return;
+      // Do nothing if already navigating or user has scrolled down
+      if (isNavigating.value || scrollY.value > 8) return;
       if (e.translationY > 0) {
-        // Rubber-band: resistance increases as you drag further
-        const raw = e.translationY;
-        dragY.value = raw / (1 + raw / 400);
+        // Soft rubber-band: resistance increases naturally with distance
+        dragY.value = e.translationY / (1 + e.translationY / 350);
       }
     })
     .onEnd((e) => {
       "worklet";
       if (isNavigating.value) return;
-      if (scrollY.value > 8) {
-        dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
-        return;
-      }
-      if (dragY.value > DRAG_THRESHOLD || e.velocityY > VELOCITY_THRESHOLD) {
+      const shouldNavigate =
+        (dragY.value > DRAG_THRESHOLD || e.velocityY > VELOCITY_THRESHOLD) &&
+        scrollY.value <= 8;
+      if (shouldNavigate) {
         isNavigating.value = true;
-        dragY.value = withSpring(700, { damping: 22, stiffness: 120 }, () => {
-          runOnJS(doNavigate)();
+        // Brief spring-out (150ms), then switch tabs on JS thread
+        dragY.value = withTiming(180, { duration: 150 }, () => {
+          runOnJS(commitNavigate)();
         });
       } else {
-        dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
+        // Always snap cleanly back
+        dragY.value = withSpring(0, { damping: 20, stiffness: 220, mass: 0.8 });
+      }
+    })
+    .onFinalize(() => {
+      "worklet";
+      // Safety net: if gesture is cancelled/interrupted, snap back
+      if (!isNavigating.value && dragY.value !== 0) {
+        dragY.value = withSpring(0, { damping: 20, stiffness: 220, mass: 0.8 });
       }
     });
 
@@ -489,7 +479,9 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={(e) => { scrollY.value = e.nativeEvent.contentOffset.y; }}
+        onScroll={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+          scrollY.value = e.nativeEvent.contentOffset.y;
+        }}
       >
         {/* ── Top Bar ── */}
         <View style={styles.topBar}>
@@ -583,7 +575,7 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
-        {/* ── Recent Transactions – gesture attached here ── */}
+        {/* ── Recent Transactions — gesture ONLY on this container ── */}
         <GestureDetector gesture={panGesture}>
           <View style={styles.txSection}>
             <View style={styles.txHeader}>
@@ -620,9 +612,6 @@ export default function HomeScreen() {
                 </View>
               </TouchableOpacity>
             ))}
-
-            {/* Subtle drag hint that appears as you pull */}
-            <DragHint dragY={dragY} />
           </View>
         </GestureDetector>
       </ScrollView>
