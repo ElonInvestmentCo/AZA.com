@@ -227,7 +227,7 @@ export default function LoginScreen() {
     setLoading(false);
     if (ok) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace("/(auth)/pin");
+      router.replace("/(auth)/otp");
     } else {
       setError("Invalid credentials. Please try again.");
       triggerShake();
@@ -348,7 +348,7 @@ export default function LoginScreen() {
           style={s.socialWrap}
         >
           <SocialAuthButtons
-            onSuccess={() => router.replace("/(auth)/pin")}
+            onSuccess={() => router.replace("/(auth)/otp")}
             onError={msg => { setSocialError(msg); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); }}
           />
           {socialError ? (

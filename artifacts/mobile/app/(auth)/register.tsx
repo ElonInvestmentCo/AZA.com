@@ -330,7 +330,7 @@ export default function RegisterScreen() {
     await register(username, email, password);
     setLoading(false);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.replace("/(auth)/pin");
+    router.replace("/(auth)/otp");
   };
 
   return (
@@ -452,7 +452,7 @@ export default function RegisterScreen() {
           style={s.socialWrap}
         >
           <SocialAuthButtons
-            onSuccess={() => router.replace("/(auth)/pin")}
+            onSuccess={() => router.replace("/(auth)/otp")}
             onError={msg => { setSocialError(msg); }}
           />
           {socialError ? (
