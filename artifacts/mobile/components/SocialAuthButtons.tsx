@@ -228,7 +228,7 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
       <View style={[ss.half, { width: btnW }]}>
         <AppleSignIn onSuccess={onSuccess} onError={onError} />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

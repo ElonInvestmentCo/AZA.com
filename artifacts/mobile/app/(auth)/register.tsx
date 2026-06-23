@@ -368,48 +368,47 @@ export default function RegisterScreen() {
         </Animated.View>
 
         {/* ── Form ── */}
-        <Animated.View
-          entering={FadeInUp.duration(420).delay(120).springify()}
-          style={[s.form, shakeStyle]}
-        >
-          <ValidatedInput
-            placeholder="Username"
-            value={username}
-            onChangeText={t => { setUsername(t); }}
-            error={errUsername}
-            touched={touchedUsername}
-            onBlur={() => setTouchedUsername(true)}
-          />
-          <ValidatedInput
-            placeholder="Email"
-            value={email}
-            onChangeText={t => { setEmail(t); }}
-            keyboardType="email-address"
-            error={errEmail}
-            touched={touchedEmail}
-            onBlur={() => setTouchedEmail(true)}
-          />
-          <View>
+        <Animated.View entering={FadeInUp.duration(420).delay(120).springify()}>
+          <Animated.View style={[s.form, shakeStyle]}>
             <ValidatedInput
-              placeholder="Password"
-              value={password}
-              onChangeText={t => { setPassword(t); }}
-              secure
-              error={errPassword}
-              touched={touchedPassword}
-              onBlur={() => setTouchedPassword(true)}
+              placeholder="Username"
+              value={username}
+              onChangeText={t => { setUsername(t); }}
+              error={errUsername}
+              touched={touchedUsername}
+              onBlur={() => setTouchedUsername(true)}
             />
-            {touchedPassword && <PasswordStrength value={password} />}
-          </View>
-          <ValidatedInput
-            placeholder="Confirm password"
-            value={confirm}
-            onChangeText={t => { setConfirm(t); }}
-            secure
-            error={errConfirm}
-            touched={touchedConfirm}
-            onBlur={() => setTouchedConfirm(true)}
-          />
+            <ValidatedInput
+              placeholder="Email"
+              value={email}
+              onChangeText={t => { setEmail(t); }}
+              keyboardType="email-address"
+              error={errEmail}
+              touched={touchedEmail}
+              onBlur={() => setTouchedEmail(true)}
+            />
+            <View>
+              <ValidatedInput
+                placeholder="Password"
+                value={password}
+                onChangeText={t => { setPassword(t); }}
+                secure
+                error={errPassword}
+                touched={touchedPassword}
+                onBlur={() => setTouchedPassword(true)}
+              />
+              {touchedPassword && <PasswordStrength value={password} />}
+            </View>
+            <ValidatedInput
+              placeholder="Confirm password"
+              value={confirm}
+              onChangeText={t => { setConfirm(t); }}
+              secure
+              error={errConfirm}
+              touched={touchedConfirm}
+              onBlur={() => setTouchedConfirm(true)}
+            />
+          </Animated.View>
         </Animated.View>
 
         {/* ── Register button ── */}

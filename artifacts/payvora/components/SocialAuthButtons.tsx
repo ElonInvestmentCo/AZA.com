@@ -292,7 +292,7 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
           </>
         )}
       </SocialBtn>
-    </Animated.View>
+    </View>
   );
 }
 

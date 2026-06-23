@@ -277,33 +277,32 @@ export default function LoginScreen() {
         </Animated.View>
 
         {/* ── Form ── */}
-        <Animated.View
-          entering={FadeInUp.duration(420).delay(120).springify()}
-          style={[s.form, shakeStyle]}
-        >
-          <EmailInput
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={t => { setEmail(t); setError(""); }}
-            keyboardType="email-address"
-            error={!!error}
-          />
-          <PasswordInput
-            value={password}
-            onChangeText={t => { setPassword(t); setError(""); }}
-            error={!!error}
-          />
-          {error ? (
-            <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
-              {error}
-            </Animated.Text>
-          ) : null}
-          <LinkBtn
-            onPress={() => { Haptics.selectionAsync(); router.push("/(auth)/forgot-password"); }}
-            style={s.forgotWrap}
-            textStyle={s.forgotText}
-            label="Forgot Password?"
-          />
+        <Animated.View entering={FadeInUp.duration(420).delay(120).springify()}>
+          <Animated.View style={[s.form, shakeStyle]}>
+            <EmailInput
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={t => { setEmail(t); setError(""); }}
+              keyboardType="email-address"
+              error={!!error}
+            />
+            <PasswordInput
+              value={password}
+              onChangeText={t => { setPassword(t); setError(""); }}
+              error={!!error}
+            />
+            {error ? (
+              <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
+                {error}
+              </Animated.Text>
+            ) : null}
+            <LinkBtn
+              onPress={() => { Haptics.selectionAsync(); router.push("/(auth)/forgot-password"); }}
+              style={s.forgotWrap}
+              textStyle={s.forgotText}
+              label="Forgot Password?"
+            />
+          </Animated.View>
         </Animated.View>
 
         {/* ── Login button — entering on a wrapper, scale on an inner view ── */}
