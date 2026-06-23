@@ -3,7 +3,11 @@ import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Animated,
+  Dimensions,
+  Image,
   Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Platform,
   ScrollView,
   StatusBar,
@@ -19,6 +23,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/context/AuthContext";
 import { useWallet, Transaction } from "@/context/WalletContext";
 
+const { width: SCREEN_W } = Dimensions.get("window");
+const CARD_W = SCREEN_W - 48;
+
 // ── Palette ──────────────────────────────────────────────────
 const WHITE = "#FFFFFF";
 const BLACK = "#000000";
@@ -31,7 +38,6 @@ const PROMO_PINK = "#FCB3C5";
 const PROMO_YELLOW = "#FFF2CF";
 const PROMO_BLUE = "#D6E1FF";
 
-// Sheet dark palette
 const SHEET_BG = "#0E0E1A";
 const SHEET_CARD = "#181825";
 const SHEET_BORDER = "rgba(255,255,255,0.07)";
@@ -40,7 +46,35 @@ const SHEET_VALUE = "#FFFFFF";
 const ACCENT_GREEN = "#00D9A0";
 const ACCENT_RED = "#F87171";
 
-// ── Static data ───────────────────────────────────────────────
+// ── Virtual cards ─────────────────────────────────────────────
+const VIRTUAL_CARDS = [
+  {
+    id: "1",
+    gradient: ["#1a1a2e", "#16213e"] as [string, string],
+    accent: "#BCE2FE",
+    label: "PAYVORA",
+    number: "•••• •••• •••• 4287",
+    scheme: "VISA",
+  },
+  {
+    id: "2",
+    gradient: ["#0d1b2a", "#1b263b"] as [string, string],
+    accent: "#D6E1FF",
+    label: "PAYVORA",
+    number: "•••• •••• •••• 8154",
+    scheme: "MASTERCARD",
+  },
+  {
+    id: "3",
+    gradient: ["#1e1b4b", "#312e81"] as [string, string],
+    accent: "#FFF2CF",
+    label: "PAYVORA",
+    number: "•••• •••• •••• 6039",
+    scheme: "VERVE",
+  },
+];
+
+// ── Quick Actions ─────────────────────────────────────────────
 const QUICK_ACTIONS = [
   { label: "Gift Card",    icon: "gift",        key: "gift"        },
   { label: "Settings",    icon: "sliders",     key: "settings"    },
@@ -78,7 +112,7 @@ interface FullTxRow {
 const STATIC_TXS: FullTxRow[] = [
   {
     id: "s1",
-    icon: "triangle",
+    icon: "gift",
     name: "Deposit Giftcard",
     date: "February 24, 2022",
     amount: "+₦20,040.00",
@@ -112,7 +146,7 @@ function txFromWallet(tx: Transaction): FullTxRow {
   const naira = Math.abs(tx.amount * 1550);
   return {
     id: tx.id,
-    icon: tx.amount > 0 ? "triangle" : "arrow-down",
+    icon: tx.amount > 0 ? "arrow-down-circle" : "arrow-up-circle",
     name: tx.title,
     date: new Date(tx.timestamp).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
     amount: (tx.amount > 0 ? "+" : "-") + "₦" + naira.toLocaleString("en-NG", { minimumFractionDigits: 2 }),
@@ -127,25 +161,83 @@ function txFromWallet(tx: Transaction): FullTxRow {
   };
 }
 
-// ── Sub-components ────────────────────────────────────────────
-function PayvoraLogo() {
-  return (
-    <View style={styles.logoRow}>
-      <Text style={styles.logoText}>Payvora</Text>
-    </View>
-  );
-}
+// ── Card Carousel ─────────────────────────────────────────────
+function CardCarousel({ balanceVisible, balance }: { balanceVisible: boolean; balance: number }) {
+  const [activeIdx, setActiveIdx] = useState(0);
 
-function Avatar({ initial }: { initial: string }) {
+  function onScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    const idx = Math.round(e.nativeEvent.contentOffset.x / CARD_W);
+    setActiveIdx(idx);
+  }
+
+  const displayBalance = balanceVisible
+    ? `₦${(balance * 1550).toLocaleString("en-NG", { minimumFractionDigits: 2 })}`
+    : "••••••••";
+
   return (
-    <LinearGradient
-      colors={["#BCE2FE", "#D8B4FE"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.avatarCircle}
-    >
-      <Text style={styles.avatarInitial}>{initial}</Text>
-    </LinearGradient>
+    <View style={carouselStyles.wrapper}>
+      <ScrollView
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_W + 16}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+        onMomentumScrollEnd={onScroll}
+      >
+        {VIRTUAL_CARDS.map((card, i) => (
+          <LinearGradient
+            key={card.id}
+            colors={card.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[carouselStyles.card, { width: CARD_W }]}
+          >
+            {/* Decorative circle */}
+            <View style={[carouselStyles.decorCircle, { borderColor: card.accent + "30" }]} />
+            <View style={[carouselStyles.decorCircle2, { borderColor: card.accent + "20" }]} />
+
+            {/* Top row */}
+            <View style={carouselStyles.cardTop}>
+              <Text style={carouselStyles.cardLabel}>{card.label}</Text>
+              <View style={[carouselStyles.schemeBadge, { borderColor: card.accent + "40" }]}>
+                <Text style={[carouselStyles.schemeText, { color: card.accent }]}>{card.scheme}</Text>
+              </View>
+            </View>
+
+            {/* Balance */}
+            <View style={carouselStyles.cardBalanceRow}>
+              <Text style={carouselStyles.cardBalLabel}>Available Balance</Text>
+              {i === 0 && (
+                <Text style={[carouselStyles.cardBalance, { color: card.accent }]}>{displayBalance}</Text>
+              )}
+            </View>
+
+            {/* Card number */}
+            <Text style={[carouselStyles.cardNumber, { color: card.accent + "CC" }]}>{card.number}</Text>
+
+            {/* Chip decoration */}
+            <View style={[carouselStyles.chip, { borderColor: card.accent + "40" }]}>
+              <View style={[carouselStyles.chipInner, { backgroundColor: card.accent + "30" }]} />
+            </View>
+          </LinearGradient>
+        ))}
+      </ScrollView>
+
+      {/* Dots */}
+      <View style={carouselStyles.dots}>
+        {VIRTUAL_CARDS.map((_, i) => (
+          <View
+            key={i}
+            style={[
+              carouselStyles.dot,
+              { backgroundColor: i === activeIdx ? TEXT_DARK : TEXT_LIGHT, width: i === activeIdx ? 20 : 6 },
+            ]}
+          />
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -193,19 +285,15 @@ function TransactionDetailSheet({
 
   return (
     <Modal transparent animationType="none" visible statusBarTranslucent onRequestClose={onClose}>
-      {/* Backdrop */}
       <Animated.View style={[sheetStyles.backdrop, { opacity: backdropOpacity }]}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
       </Animated.View>
 
-      {/* Sheet */}
       <Animated.View style={[sheetStyles.sheet, { transform: [{ translateY: sheetY }] }]}>
-        {/* Drag handle */}
         <View style={sheetStyles.handle} />
 
-        {/* Header row */}
         <View style={sheetStyles.sheetHeader}>
           <Text style={sheetStyles.sheetTitle}>Transaction Details</Text>
           <TouchableOpacity onPress={onClose} style={sheetStyles.closeBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -213,7 +301,6 @@ function TransactionDetailSheet({
           </TouchableOpacity>
         </View>
 
-        {/* Amount hero */}
         <View style={sheetStyles.amountHero}>
           <View style={[sheetStyles.txTypeChip, { backgroundColor: amountColor + "18" }]}>
             <Feather name={tx.isPositive ? "arrow-down-left" : "arrow-up-right"} size={15} color={amountColor} />
@@ -224,10 +311,8 @@ function TransactionDetailSheet({
           </View>
         </View>
 
-        {/* Divider */}
         <View style={sheetStyles.divider} />
 
-        {/* Detail rows */}
         <View style={sheetStyles.detailsBlock}>
           <DetailRow label="Type"       value={tx.type}      />
           <DetailRow label="Date & Time" value={tx.timestamp} />
@@ -240,7 +325,6 @@ function TransactionDetailSheet({
           {tx.note ? <DetailRow label="Note" value={tx.note} /> : null}
         </View>
 
-        {/* CTA */}
         <TouchableOpacity
           style={sheetStyles.ctaBtn}
           onPress={() => { Haptics.selectionAsync(); onClose(); }}
@@ -262,23 +346,18 @@ export default function HomeScreen() {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [selectedTx, setSelectedTx] = useState<FullTxRow | null>(null);
 
-  const scaleAnim     = useRef(new Animated.Value(1)).current;
-  const sheetY        = useRef(new Animated.Value(SHEET_HEIGHT)).current;
+  const scaleAnim       = useRef(new Animated.Value(1)).current;
+  const sheetY          = useRef(new Animated.Value(SHEET_HEIGHT)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
   const firstName = user?.name?.split(" ")[0] ?? "Dove";
   const initial   = firstName.charAt(0).toUpperCase();
-
-  const displayBalance = balanceVisible
-    ? `₦${(balance * 1550).toLocaleString("en-NG", { minimumFractionDigits: 2 })}`
-    : "••••••••";
 
   const rows: FullTxRow[] =
     transactions.length > 0
       ? transactions.slice(0, 2).map(txFromWallet)
       : STATIC_TXS;
 
-  // ── Handlers ──────────────────────────────────────────────
   function handleEyeToggle() {
     Haptics.selectionAsync();
     Animated.sequence([
@@ -290,12 +369,14 @@ export default function HomeScreen() {
 
   async function handleAction(label: string) {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (label === "Fund Wallet" || label === "Withdraw") router.push("/(tabs)/send" as any);
-    if (label === "Sell") router.push("/(tabs)/markets" as any);
+    if (label === "Fund Wallet") router.push("/fund-wallet" as any);
+    if (label === "Sell")        router.push("/sell-gift-card" as any);
+    if (label === "Withdraw")    router.push("/(tabs)/send" as any);
   }
 
   async function handleQuick(key: string) {
     await Haptics.selectionAsync();
+    if (key === "gift")        router.push("/gift-card" as any);
     if (key === "transaction") router.push("/(tabs)/send" as any);
     if (key === "settings")    router.push("/(tabs)/profile" as any);
   }
@@ -328,36 +409,39 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
-        <PayvoraLogo />
-
-        {/* ── Greeting + Balance ── */}
-        <View style={styles.greetingRow}>
+        {/* ── Top Bar ── */}
+        <View style={styles.topBar}>
           <View style={styles.greetingLeft}>
-            <Avatar initial={initial} />
-            <View style={styles.greetingTexts}>
-              <Text style={styles.greetingName}>Hi, {firstName}</Text>
-              <Text style={styles.greetingSub}>Your available balance</Text>
+            <LinearGradient
+              colors={["#BCE2FE", "#D8B4FE"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.avatarCircle}
+            >
+              <Text style={styles.avatarInitial}>{initial}</Text>
+            </LinearGradient>
+            <View>
+              <Text style={styles.greetingName}>Hi, {firstName} 👋</Text>
+              <Text style={styles.greetingSub}>Welcome back</Text>
             </View>
           </View>
-          <View style={styles.balanceRight}>
-            <TouchableOpacity
-              onPress={handleEyeToggle}
-              style={styles.eyeBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Feather name={balanceVisible ? "eye-off" : "eye"} size={20} color={TEXT_GRAY} />
-            </TouchableOpacity>
-            <Animated.Text style={[styles.balanceAmount, { transform: [{ scale: scaleAnim }] }]}>
-              {displayBalance}
-            </Animated.Text>
-          </View>
+          <TouchableOpacity
+            onPress={handleEyeToggle}
+            style={styles.eyeBtn}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Feather name={balanceVisible ? "eye" : "eye-off"} size={22} color={TEXT_GRAY} />
+          </TouchableOpacity>
         </View>
+
+        {/* ── Card Carousel ── */}
+        <CardCarousel balanceVisible={balanceVisible} balance={balance} />
 
         {/* ── Action Bar ── */}
         <View style={styles.actionBar}>
           {[
             { label: "Fund Wallet", icon: "plus-circle" as const },
-            { label: "Sell",        icon: "send"         as const },
+            { label: "Sell",        icon: "tag"          as const },
             { label: "Withdraw",    icon: "download"     as const },
           ].map((action, i) => (
             <TouchableOpacity
@@ -367,7 +451,7 @@ export default function HomeScreen() {
               activeOpacity={0.6}
             >
               <View style={styles.actionIconWrap}>
-                <Feather name={action.icon} size={22} color={WHITE} />
+                <Feather name={action.icon} size={20} color={WHITE} />
               </View>
               <Text style={styles.actionLabel}>{action.label}</Text>
             </TouchableOpacity>
@@ -375,6 +459,9 @@ export default function HomeScreen() {
         </View>
 
         {/* ── Quick Actions Grid ── */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+        </View>
         <View style={styles.quickGrid}>
           {QUICK_ACTIONS.map((item) => (
             <TouchableOpacity
@@ -384,7 +471,7 @@ export default function HomeScreen() {
               activeOpacity={0.65}
             >
               <View style={styles.quickIconWrap}>
-                <Feather name={item.icon as any} size={22} color={TEXT_DARK} />
+                <Feather name={item.icon as any} size={20} color={TEXT_DARK} />
               </View>
               <Text style={styles.quickLabel}>{item.label}</Text>
             </TouchableOpacity>
@@ -397,7 +484,7 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.promoScroll}
           decelerationRate="fast"
-          snapToInterval={276}
+          snapToInterval={270}
           snapToAlignment="start"
         >
           {PROMO_CARDS.map((card) => (
@@ -414,7 +501,7 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
-        {/* ── Recent Transaction ── */}
+        {/* ── Recent Transactions ── */}
         <View style={styles.txSection}>
           <View style={styles.txHeader}>
             <Text style={styles.txHeading}>Recent Transaction</Text>
@@ -434,8 +521,8 @@ export default function HomeScreen() {
               activeOpacity={0.68}
             >
               <View style={styles.txLeft}>
-                <View style={styles.txIconWrap}>
-                  <Feather name={row.icon as any} size={14} color={TEXT_DARK} />
+                <View style={[styles.txIconWrap, { backgroundColor: row.isPositive ? "#E8F8EE" : "#FEF2F2" }]}>
+                  <Feather name={row.icon as any} size={15} color={row.isPositive ? GREEN : RED} />
                 </View>
                 <View style={styles.txInfo}>
                   <Text style={styles.txName}>{row.name}</Text>
@@ -453,7 +540,6 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {/* ── Transaction Detail Bottom Sheet ── */}
       <TransactionDetailSheet
         tx={selectedTx}
         sheetY={sheetY}
@@ -464,162 +550,169 @@ export default function HomeScreen() {
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────
+// ── Carousel Styles ───────────────────────────────────────────
+const carouselStyles = StyleSheet.create({
+  wrapper: { marginBottom: 24 },
+  card: {
+    height: 180,
+    borderRadius: 20,
+    padding: 24,
+    overflow: "hidden",
+    position: "relative",
+    justifyContent: "space-between",
+  },
+  decorCircle: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 1,
+    top: -60,
+    right: -60,
+  },
+  decorCircle2: {
+    position: "absolute",
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 1,
+    bottom: -40,
+    left: -30,
+  },
+  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  cardLabel: { fontFamily: "Inter_700Bold", fontSize: 16, color: WHITE, letterSpacing: 3 },
+  schemeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  schemeText: { fontFamily: "Inter_600SemiBold", fontSize: 10, letterSpacing: 1 },
+  cardBalanceRow: { gap: 4 },
+  cardBalLabel: { fontFamily: "Inter_400Regular", fontSize: 11, color: "rgba(255,255,255,0.5)", letterSpacing: 0.3 },
+  cardBalance: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.5 },
+  cardNumber: { fontFamily: "Inter_500Medium", fontSize: 14, letterSpacing: 3 },
+  chip: {
+    position: "absolute",
+    width: 36,
+    height: 28,
+    borderRadius: 5,
+    borderWidth: 1,
+    bottom: 24,
+    left: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chipInner: { width: 24, height: 18, borderRadius: 3 },
+  dots: { flexDirection: "row", justifyContent: "center", gap: 6, marginTop: 14 },
+  dot: { height: 6, borderRadius: 3, backgroundColor: TEXT_LIGHT },
+});
+
+// ── Screen Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: WHITE },
   scroll: { flex: 1, backgroundColor: WHITE },
 
-  logoRow: { alignItems: "center", paddingVertical: 14 },
-  logoText: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: 4, color: TEXT_DARK },
-
-  greetingRow: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    paddingHorizontal: 24, marginBottom: 20,
-  },
-  greetingLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
-  avatarCircle: { width: 52, height: 52, borderRadius: 26, alignItems: "center", justifyContent: "center" },
-  avatarInitial: { fontFamily: "Inter_700Bold", fontSize: 20, color: WHITE, lineHeight: 24 },
-  greetingTexts: { gap: 2 },
-  greetingName: { fontFamily: "Inter_700Bold", fontSize: 16, color: TEXT_DARK, lineHeight: 22 },
-  greetingSub: { fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_GRAY, lineHeight: 18 },
-  balanceRight: { alignItems: "flex-end", gap: 4 },
-  eyeBtn: { padding: 2 },
-  balanceAmount: { fontFamily: "Inter_700Bold", fontSize: 18, color: TEXT_DARK, letterSpacing: -0.3 },
-
-  actionBar: {
-    marginHorizontal: 21, backgroundColor: BLACK, borderRadius: 14,
-    flexDirection: "row", marginBottom: 28, overflow: "hidden",
-  },
-  actionItem: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 14, gap: 6 },
-  actionBorder: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: "rgba(255,255,255,0.15)" },
-  actionIconWrap: { width: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center" },
-  actionLabel: { fontFamily: "Inter_500Medium", fontSize: 11.5, color: WHITE, textAlign: "center", letterSpacing: 0.1 },
-
-  quickGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 21, marginBottom: 24, rowGap: 20 },
-  quickItem: { width: "25%", alignItems: "center", gap: 8 },
-  quickIconWrap: { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#F7F7F8" },
-  quickLabel: { fontFamily: "Inter_500Medium", fontSize: 10.5, color: TEXT_GRAY, textAlign: "center", lineHeight: 14 },
-
-  promoScroll: { paddingLeft: 21, paddingRight: 9, gap: 12, marginBottom: 28 },
-  promoCard: { width: 263, borderRadius: 10, padding: 18, justifyContent: "flex-end", minHeight: 100, gap: 4 },
-  promoPct: { fontFamily: "Inter_700Bold", fontSize: 20, color: TEXT_DARK, lineHeight: 26 },
-  promoTitle: { fontFamily: "Inter_600SemiBold", fontSize: 13.5, color: TEXT_DARK, lineHeight: 18 },
-  promoDesc: { fontFamily: "Inter_400Regular", fontSize: 11, color: TEXT_GRAY, lineHeight: 16 },
-
-  txSection: { paddingHorizontal: 21, gap: 12 },
-  txHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  txHeading: { fontFamily: "Inter_600SemiBold", fontSize: 18, color: TEXT_DARK, lineHeight: 23 },
-  txSeeAll: { fontFamily: "Inter_600SemiBold", fontSize: 12.5, color: BLACK, textAlign: "right" },
-  txRow: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingVertical: 12, minHeight: 52, backgroundColor: WHITE, borderRadius: 4,
-  },
-  txLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
-  txIconWrap: { width: 28, height: 28, borderRadius: 6, backgroundColor: "#F0F0F2", alignItems: "center", justifyContent: "center" },
-  txInfo: { gap: 2, flex: 1 },
-  txName: { fontFamily: "Inter_600SemiBold", fontSize: 12.5, color: TEXT_GRAY, lineHeight: 19 },
-  txDate: { fontFamily: "Inter_500Medium", fontSize: 11, color: TEXT_LIGHT, lineHeight: 17 },
-  txRight: { flexDirection: "row", alignItems: "center", gap: 4 },
-  txAmount: { fontFamily: "Inter_700Bold", fontSize: 12.5, lineHeight: 19, textAlign: "right" },
-});
-
-// ── Sheet styles (dark system) ────────────────────────────────
-const sheetStyles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.68)",
-  },
-  sheet: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: SHEET_HEIGHT,
-    backgroundColor: SHEET_BG,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    paddingTop: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 24,
-  },
-  handle: {
-    alignSelf: "center",
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "rgba(255,255,255,0.18)",
-    marginBottom: 16,
-  },
-  sheetHeader: {
+  topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    paddingHorizontal: 24,
+    paddingBottom: 20,
   },
-  sheetTitle: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: SHEET_VALUE },
-  closeBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  greetingLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  avatarCircle: { width: 46, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
+  avatarInitial: { fontFamily: "Inter_700Bold", fontSize: 18, color: WHITE },
+  greetingName: { fontFamily: "Inter_700Bold", fontSize: 15, color: TEXT_DARK, lineHeight: 22 },
+  greetingSub: { fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_GRAY, lineHeight: 18 },
+  eyeBtn: { padding: 4 },
 
-  amountHero: {
+  actionBar: {
+    marginHorizontal: 24,
+    backgroundColor: BLACK,
+    borderRadius: 16,
     flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    backgroundColor: SHEET_CARD,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: SHEET_BORDER,
+    marginBottom: 28,
+    overflow: "hidden",
   },
-  txTypeChip: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
+  actionItem: { flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 16, gap: 7 },
+  actionBorder: { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: "rgba(255,255,255,0.15)" },
+  actionIconWrap: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(255,255,255,0.1)", alignItems: "center", justifyContent: "center" },
+  actionLabel: { fontFamily: "Inter_500Medium", fontSize: 11, color: WHITE, textAlign: "center" },
+
+  sectionHeader: { paddingHorizontal: 24, marginBottom: 14 },
+  sectionTitle: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: TEXT_DARK },
+
+  quickGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 16, marginBottom: 28, rowGap: 20 },
+  quickItem: { width: "25%", alignItems: "center", gap: 8 },
+  quickIconWrap: {
+    width: 46, height: 46, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: "#F5F5F7",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
+  quickLabel: { fontFamily: "Inter_500Medium", fontSize: 10, color: TEXT_GRAY, textAlign: "center", lineHeight: 14 },
+
+  promoScroll: { paddingLeft: 24, paddingRight: 8, gap: 12, marginBottom: 28 },
+  promoCard: { width: 260, borderRadius: 10, padding: 18, minHeight: 100, gap: 4, justifyContent: "flex-end" },
+  promoPct: { fontFamily: "Inter_700Bold", fontSize: 20, color: TEXT_DARK },
+  promoTitle: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEXT_DARK },
+  promoDesc: { fontFamily: "Inter_400Regular", fontSize: 10.5, color: TEXT_GRAY, lineHeight: 16 },
+
+  txSection: { paddingHorizontal: 24, gap: 4 },
+  txHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
+  txHeading: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: TEXT_DARK },
+  txSeeAll: { fontFamily: "Inter_600SemiBold", fontSize: 12, color: BLACK },
+  txRow: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingVertical: 13, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: "#F0F0F2",
+  },
+  txLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+  txIconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  txInfo: { gap: 3, flex: 1 },
+  txName: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEXT_GRAY },
+  txDate: { fontFamily: "Inter_400Regular", fontSize: 11, color: TEXT_LIGHT },
+  txRight: { flexDirection: "row", alignItems: "center", gap: 4 },
+  txAmount: { fontFamily: "Inter_700Bold", fontSize: 13, textAlign: "right" },
+});
+
+// ── Sheet Styles ──────────────────────────────────────────────
+const sheetStyles = StyleSheet.create({
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.68)" },
+  sheet: {
+    position: "absolute",
+    bottom: 0, left: 0, right: 0,
+    height: SHEET_HEIGHT,
+    backgroundColor: SHEET_BG,
+    borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    paddingHorizontal: 24, paddingBottom: 32, paddingTop: 12,
+  },
+  handle: { alignSelf: "center", width: 40, height: 4, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.18)", marginBottom: 16 },
+  sheetHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
+  sheetTitle: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: SHEET_VALUE },
+  closeBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: "rgba(255,255,255,0.08)", alignItems: "center", justifyContent: "center" },
+  amountHero: {
+    flexDirection: "row", alignItems: "center", gap: 14,
+    backgroundColor: SHEET_CARD, borderRadius: 14, padding: 16, marginBottom: 16,
+    borderWidth: 1, borderColor: SHEET_BORDER,
+  },
+  txTypeChip: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   amountBlock: { flex: 1 },
   heroAmount: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.5 },
-  heroName: { fontFamily: "Inter_400Regular", fontSize: 13, color: SHEET_LABEL, marginTop: 2 },
-
-  divider: { height: StyleSheet.hairlineWidth, backgroundColor: SHEET_BORDER, marginBottom: 14 },
-
-  detailsBlock: { gap: 14 },
+  heroName: { fontFamily: "Inter_500Medium", fontSize: 13, color: SHEET_LABEL, marginTop: 2 },
+  divider: { height: 1, backgroundColor: SHEET_BORDER, marginBottom: 16 },
+  detailsBlock: { gap: 12, flex: 1 },
   detailRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  detailLabel: { fontFamily: "Inter_400Regular", fontSize: 13, color: SHEET_LABEL },
+  detailValue: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: SHEET_VALUE, maxWidth: "60%", textAlign: "right" },
+  mono: { fontFamily: "Inter_400Regular", fontSize: 11, letterSpacing: 0.5 },
   statusRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  detailLabel: { fontFamily: "Inter_400Regular", fontSize: 13, color: SHEET_LABEL, flex: 1 },
-  detailValue: { fontFamily: "Inter_500Medium", fontSize: 13, color: SHEET_VALUE, textAlign: "right", flex: 2 },
-  mono: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 0.5, color: "rgba(255,255,255,0.7)" },
-
-  statusPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
+  statusPill: { flexDirection: "row", alignItems: "center", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
-
-  ctaBtn: {
-    position: "absolute",
-    bottom: 32,
-    left: 24,
-    right: 24,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
-  },
-  ctaText: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: SHEET_VALUE },
+  ctaBtn: { height: 50, backgroundColor: "#1E1E2C", borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 8 },
+  ctaText: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: WHITE },
 });

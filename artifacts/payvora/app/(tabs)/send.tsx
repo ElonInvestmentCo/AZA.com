@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -14,32 +15,41 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { useColors } from "@/hooks/useColors";
 import { useWallet } from "@/context/WalletContext";
 
+const WHITE      = "#FFFFFF";
+const TEXT_DARK  = "#0B0A0A";
+const TEXT_GRAY  = "#595F67";
+const TEXT_LIGHT = "#AAAFB5";
+const INPUT_BG   = "#F0F0F0";
+const BORDER     = "#EDF1F3";
+const BLACK      = "#000000";
+const GREEN      = "#00B03C";
+
 const RECENT_CONTACTS = [
-  { id: "1", name: "Alex K.", initial: "A", color: "#3B82F6" },
+  { id: "1", name: "Alex K.",  initial: "A", color: "#3B82F6" },
   { id: "2", name: "Sarah M.", initial: "S", color: "#8B5CF6" },
   { id: "3", name: "James T.", initial: "J", color: "#F59E0B" },
-  { id: "4", name: "Emma R.", initial: "E", color: "#EF4444" },
+  { id: "4", name: "Emma R.",  initial: "E", color: "#EF4444" },
   { id: "5", name: "Lucas B.", initial: "L", color: "#00D9A0" },
 ];
 
 const WALLET_ADDRESS = "0x7f3a...9b2c";
+const QUICK_AMOUNTS  = ["10", "25", "50", "100", "250", "500"];
 
 export default function SendScreen() {
-  const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { balance, addTransaction } = useWallet();
-  const [activeTab, setActiveTab] = useState<"send" | "receive">("send");
-  const [recipient, setRecipient] = useState("");
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-  const [copied, setCopied] = useState(false);
+  const { balance, transactions, addTransaction } = useWallet();
+
+  const [activeTab,  setActiveTab]  = useState<"withdraw" | "receive" | "history">("withdraw");
+  const [recipient,  setRecipient]  = useState("");
+  const [amount,     setAmount]     = useState("");
+  const [note,       setNote]       = useState("");
+  const [copied,     setCopied]     = useState(false);
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
 
-  async function handleSend() {
+  async function handleWithdraw() {
     Keyboard.dismiss();
     const num = parseFloat(amount);
     if (!recipient.trim()) {
@@ -61,7 +71,7 @@ export default function SendScreen() {
     addTransaction({
       type: "send",
       title: `Sent to ${recipient}`,
-      subtitle: note || "Transfer",
+      subtitle: note || "Withdrawal",
       amount: -num,
       currency: "USD",
       status: "completed",
@@ -70,7 +80,7 @@ export default function SendScreen() {
     setRecipient("");
     setAmount("");
     setNote("");
-    Alert.alert("Sent!", `$${num.toFixed(2)} sent successfully`);
+    Alert.alert("Sent!", `$${num.toFixed(2)} withdrawn successfully`);
   }
 
   function handleCopy() {
@@ -79,213 +89,248 @@ export default function SendScreen() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const QUICK_AMOUNTS = ["10", "25", "50", "100", "250", "500"];
+  const TABS = [
+    { key: "withdraw", label: "Withdraw" },
+    { key: "receive",  label: "Receive"  },
+    { key: "history",  label: "History"  },
+  ] as const;
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={styles.screen}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+      <StatusBar barStyle="dark-content" backgroundColor={WHITE} />
+
       <ScrollView
-        contentContainerStyle={{ paddingTop: topPad, paddingBottom: (Platform.OS === "web" ? 34 : 0) + 100 }}
+        contentContainerStyle={{ paddingTop: topPad, paddingBottom: 110 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.foreground }]}>
-            {activeTab === "send" ? "Send Money" : "Receive"}
+          <Text style={styles.title}>
+            {activeTab === "withdraw" ? "Withdraw" : activeTab === "receive" ? "Receive" : "History"}
           </Text>
+          <View style={[styles.balancePill]}>
+            <Feather name="credit-card" size={12} color={GREEN} />
+            <Text style={styles.balancePillText}>
+              ${balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            </Text>
+          </View>
         </View>
 
         {/* Tab Toggle */}
-        <View style={[styles.tabContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          {(["send", "receive"] as const).map((tab) => (
+        <View style={styles.tabBar}>
+          {TABS.map((tab) => (
             <TouchableOpacity
-              key={tab}
-              style={[
-                styles.tabBtn,
-                activeTab === tab && { backgroundColor: colors.primary },
-              ]}
-              onPress={async () => {
-                await Haptics.selectionAsync();
-                setActiveTab(tab);
-              }}
+              key={tab.key}
+              style={[styles.tabBtn, activeTab === tab.key && styles.tabBtnActive]}
+              onPress={async () => { await Haptics.selectionAsync(); setActiveTab(tab.key); }}
+              activeOpacity={0.7}
             >
-              <Text
-                style={[
-                  styles.tabBtnText,
-                  { color: activeTab === tab ? colors.primaryForeground : colors.mutedForeground },
-                ]}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              <Text style={[styles.tabBtnText, activeTab === tab.key && styles.tabBtnTextActive]}>
+                {tab.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {activeTab === "send" ? (
+        {/* ── Withdraw Tab ── */}
+        {activeTab === "withdraw" && (
           <View style={styles.content}>
-            {/* Balance Chip */}
-            <View style={[styles.balanceChip, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "30" }]}>
-              <Feather name="credit-card" size={14} color={colors.primary} />
-              <Text style={[styles.balanceChipText, { color: colors.primary }]}>
-                Available: ${balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </Text>
-            </View>
-
             {/* Recent Contacts */}
-            <View style={styles.section}>
-              <Text style={[styles.sectionLabel, { color: colors.mutedForeground }]}>Recent</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.contactsScroll}>
-                {RECENT_CONTACTS.map((c) => (
-                  <TouchableOpacity
-                    key={c.id}
-                    style={styles.contact}
-                    onPress={async () => {
-                      await Haptics.selectionAsync();
-                      setRecipient(c.name);
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[styles.contactAvatar, { backgroundColor: c.color + "25" }]}>
-                      <Text style={{ color: c.color, fontSize: 16, fontFamily: "Inter_700Bold" }}>{c.initial}</Text>
-                    </View>
-                    <Text style={[styles.contactName, { color: colors.mutedForeground }]}>{c.name.split(" ")[0]}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+            <Text style={styles.sectionLabel}>Recent</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.contactsScroll}
+              style={{ marginBottom: 24 }}
+            >
+              {RECENT_CONTACTS.map((c) => (
+                <TouchableOpacity
+                  key={c.id}
+                  style={styles.contactItem}
+                  onPress={async () => { await Haptics.selectionAsync(); setRecipient(c.name); }}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.contactAvatar, { backgroundColor: c.color + "25" }]}>
+                    <Text style={{ color: c.color, fontSize: 18, fontFamily: "Inter_700Bold" }}>{c.initial}</Text>
+                  </View>
+                  <Text style={styles.contactName}>{c.name.split(" ")[0]}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {/* Recipient */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Recipient</Text>
+              <View style={styles.inputWrap}>
+                <Feather name="user" size={16} color={TEXT_LIGHT} />
+                <TextInput
+                  style={styles.input}
+                  value={recipient}
+                  onChangeText={setRecipient}
+                  placeholder="Name, email or address"
+                  placeholderTextColor={TEXT_LIGHT}
+                />
+              </View>
             </View>
 
-            {/* Form */}
-            <View style={styles.form}>
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.mutedForeground }]}>Recipient</Text>
-                <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <Feather name="user" size={18} color={colors.mutedForeground} style={styles.inputIcon} />
-                  <TextInput
-                    style={[styles.input, { color: colors.foreground }]}
-                    value={recipient}
-                    onChangeText={setRecipient}
-                    placeholder="Name, email or address"
-                    placeholderTextColor={colors.mutedForeground}
-                  />
-                </View>
+            {/* Amount */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Amount (USD)</Text>
+              <View style={styles.inputWrap}>
+                <Text style={styles.currencySign}>$</Text>
+                <TextInput
+                  style={[styles.input, styles.amtInputText]}
+                  value={amount}
+                  onChangeText={setAmount}
+                  placeholder="0.00"
+                  placeholderTextColor={TEXT_LIGHT}
+                  keyboardType="decimal-pad"
+                />
               </View>
+            </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.mutedForeground }]}>Amount (USD)</Text>
-                <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <Text style={{ color: colors.mutedForeground, fontSize: 18, marginRight: 8, fontFamily: "Inter_600SemiBold" }}>$</Text>
-                  <TextInput
-                    style={[styles.input, { color: colors.foreground, fontSize: 24, fontFamily: "Inter_700Bold" }]}
-                    value={amount}
-                    onChangeText={setAmount}
-                    placeholder="0.00"
-                    placeholderTextColor={colors.mutedForeground}
-                    keyboardType="decimal-pad"
-                  />
-                </View>
+            {/* Quick amounts */}
+            <View style={styles.quickRow}>
+              {QUICK_AMOUNTS.map((q) => (
+                <TouchableOpacity
+                  key={q}
+                  style={[styles.quickChip, amount === q && styles.quickChipActive]}
+                  onPress={() => { setAmount(q); Haptics.selectionAsync(); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.quickChipText, amount === q && styles.quickChipTextActive]}>${q}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Note */}
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Note (optional)</Text>
+              <View style={styles.inputWrap}>
+                <Feather name="message-circle" size={16} color={TEXT_LIGHT} />
+                <TextInput
+                  style={styles.input}
+                  value={note}
+                  onChangeText={setNote}
+                  placeholder="What's it for?"
+                  placeholderTextColor={TEXT_LIGHT}
+                />
               </View>
+            </View>
 
-              {/* Quick Amounts */}
-              <View style={styles.quickAmounts}>
-                {QUICK_AMOUNTS.map((q) => (
-                  <TouchableOpacity
-                    key={q}
-                    style={[styles.quickAmount, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    onPress={() => { setAmount(q); Haptics.selectionAsync(); }}
-                  >
-                    <Text style={[styles.quickAmountText, { color: colors.foreground }]}>${q}</Text>
-                  </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn} onPress={handleWithdraw} activeOpacity={0.85}>
+              <Feather name="send" size={18} color={WHITE} />
+              <Text style={styles.actionBtnText}>Withdraw Now</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* ── Receive Tab ── */}
+        {activeTab === "receive" && (
+          <View style={styles.content}>
+            <View style={styles.qrCard}>
+              {/* QR pattern */}
+              <View style={styles.qrBox}>
+                {Array.from({ length: 5 }, (_, row) => (
+                  <View key={row} style={{ flex: 1, flexDirection: "row", gap: 4 }}>
+                    {Array.from({ length: 5 }, (_, col) => (
+                      <View
+                        key={col}
+                        style={[
+                          { flex: 1, borderRadius: 3 },
+                          {
+                            backgroundColor:
+                              (row === 0 && col < 3) || (col === 0 && row < 3) ||
+                              (row === 4 && col > 1) || (col === 4 && row > 1) ||
+                              (row === 2 && col === 2)
+                                ? BLACK
+                                : "transparent",
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
                 ))}
               </View>
+              <Text style={styles.qrTitle}>Scan to Pay</Text>
+              <Text style={styles.qrSub}>or share your address below</Text>
+            </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={[styles.label, { color: colors.mutedForeground }]}>Note (optional)</Text>
-                <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <Feather name="message-circle" size={18} color={colors.mutedForeground} style={styles.inputIcon} />
-                  <TextInput
-                    style={[styles.input, { color: colors.foreground }]}
-                    value={note}
-                    onChangeText={setNote}
-                    placeholder="What's it for?"
-                    placeholderTextColor={colors.mutedForeground}
-                  />
-                </View>
-              </View>
-
+            <View style={styles.addressCard}>
+              <Text style={styles.addressLabel}>Your Wallet Address</Text>
+              <Text style={styles.address}>{WALLET_ADDRESS}</Text>
               <TouchableOpacity
-                style={[styles.sendBtn, { backgroundColor: colors.primary }]}
-                onPress={handleSend}
+                style={[styles.copyBtn, copied && styles.copyBtnActive]}
+                onPress={handleCopy}
                 activeOpacity={0.85}
               >
-                <Feather name="send" size={18} color={colors.primaryForeground} />
-                <Text style={[styles.sendBtnText, { color: colors.primaryForeground }]}>Send Now</Text>
+                <Feather name={copied ? "check" : "copy"} size={15} color={copied ? WHITE : BLACK} />
+                <Text style={[styles.copyBtnText, copied && styles.copyBtnTextActive]}>
+                  {copied ? "Copied!" : "Copy Address"}
+                </Text>
               </TouchableOpacity>
             </View>
-          </View>
-        ) : (
-          <View style={styles.content}>
-            {/* QR Code Placeholder */}
-            <View style={styles.qrSection}>
-              <View style={[styles.qrContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <View style={[styles.qrCode, { borderColor: colors.primary }]}>
-                  {/* QR pattern simulation */}
-                  {Array.from({ length: 5 }, (_, row) => (
-                    <View key={row} style={styles.qrRow}>
-                      {Array.from({ length: 5 }, (_, col) => (
-                        <View
-                          key={col}
-                          style={[
-                            styles.qrCell,
-                            {
-                              backgroundColor:
-                                (row === 0 && col < 3) || (col === 0 && row < 3) || (row === 4 && col > 1) || (col === 4 && row > 1) || (row === 2 && col === 2)
-                                  ? colors.primary
-                                  : "transparent",
-                            },
-                          ]}
-                        />
-                      ))}
-                    </View>
-                  ))}
-                </View>
-                <Text style={[styles.qrLabel, { color: colors.foreground }]}>Scan to Pay</Text>
-                <Text style={[styles.qrSubLabel, { color: colors.mutedForeground }]}>or share your address below</Text>
-              </View>
 
-              <View style={[styles.addressBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Text style={[styles.addressLabel, { color: colors.mutedForeground }]}>Your Wallet Address</Text>
-                <Text style={[styles.address, { color: colors.foreground }]}>{WALLET_ADDRESS}</Text>
+            <View style={styles.shareRow}>
+              {[{ icon: "share-2", label: "Share Link" }, { icon: "download", label: "Save QR" }].map((opt) => (
                 <TouchableOpacity
-                  style={[styles.copyBtn, { backgroundColor: copied ? colors.primary : colors.primary + "20", borderColor: colors.primary + "40" }]}
-                  onPress={handleCopy}
-                  activeOpacity={0.85}
+                  key={opt.label}
+                  style={styles.shareBtn}
+                  onPress={() => Haptics.selectionAsync()}
+                  activeOpacity={0.7}
                 >
-                  <Feather name={copied ? "check" : "copy"} size={16} color={copied ? colors.primaryForeground : colors.primary} />
-                  <Text style={[styles.copyBtnText, { color: copied ? colors.primaryForeground : colors.primary }]}>
-                    {copied ? "Copied!" : "Copy Address"}
-                  </Text>
+                  <Feather name={opt.icon as any} size={18} color={TEXT_DARK} />
+                  <Text style={styles.shareBtnText}>{opt.label}</Text>
                 </TouchableOpacity>
-              </View>
-
-              <View style={styles.receiveOptions}>
-                {[
-                  { icon: "share-2", label: "Share Link" },
-                  { icon: "download", label: "Save QR" },
-                ].map((opt) => (
-                  <TouchableOpacity
-                    key={opt.label}
-                    style={[styles.receiveOpt, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    onPress={() => Haptics.selectionAsync()}
-                  >
-                    <Feather name={opt.icon as any} size={20} color={colors.foreground} />
-                    <Text style={[styles.receiveOptText, { color: colors.foreground }]}>{opt.label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              ))}
             </View>
+          </View>
+        )}
+
+        {/* ── History Tab ── */}
+        {activeTab === "history" && (
+          <View style={styles.content}>
+            {transactions.length === 0 ? (
+              <View style={styles.emptyHistory}>
+                <Feather name="clock" size={36} color={TEXT_LIGHT} />
+                <Text style={styles.emptyTitle}>No transactions yet</Text>
+              </View>
+            ) : (
+              <View style={styles.historyList}>
+                {transactions.map((tx, i) => {
+                  const isPos = tx.amount > 0;
+                  const naira = Math.abs(tx.amount * 1550);
+                  return (
+                    <View
+                      key={tx.id}
+                      style={[styles.historyRow, i < transactions.length - 1 && styles.historyRowBorder]}
+                    >
+                      <View style={[styles.historyIcon, { backgroundColor: isPos ? "#E8F8EE" : "#FEF2F2" }]}>
+                        <Feather
+                          name={isPos ? "arrow-down-circle" : "arrow-up-circle"}
+                          size={16}
+                          color={isPos ? GREEN : "#EF4444"}
+                        />
+                      </View>
+                      <View style={styles.historyInfo}>
+                        <Text style={styles.historyTitle}>{tx.title}</Text>
+                        <Text style={styles.historySub}>
+                          {new Date(tx.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          {" · "}{tx.subtitle}
+                        </Text>
+                      </View>
+                      <Text style={[styles.historyAmt, { color: isPos ? GREEN : "#EF4444" }]}>
+                        {isPos ? "+" : "-"}₦{naira.toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
         )}
       </ScrollView>
@@ -294,70 +339,102 @@ export default function SendScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingHorizontal: 24, paddingBottom: 20 },
-  title: { fontSize: 28, fontFamily: "Inter_700Bold", letterSpacing: -0.5 },
-  tabContainer: {
-    flexDirection: "row", marginHorizontal: 24, borderRadius: 14, borderWidth: 1,
-    padding: 4, marginBottom: 24,
+  screen: { flex: 1, backgroundColor: WHITE },
+
+  header: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 24, paddingBottom: 18,
+  },
+  title: { fontFamily: "Inter_700Bold", fontSize: 26, color: TEXT_DARK, letterSpacing: -0.5 },
+  balancePill: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    backgroundColor: GREEN + "15", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6,
+  },
+  balancePillText: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: GREEN },
+
+  tabBar: {
+    flexDirection: "row", marginHorizontal: 24, backgroundColor: INPUT_BG,
+    borderRadius: 14, padding: 4, marginBottom: 24,
   },
   tabBtn: { flex: 1, paddingVertical: 10, borderRadius: 11, alignItems: "center" },
-  tabBtnText: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
-  content: { paddingHorizontal: 24 },
-  balanceChip: {
-    flexDirection: "row", alignItems: "center", gap: 6,
-    alignSelf: "flex-start", borderRadius: 10, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 6, marginBottom: 20,
-  },
-  balanceChipText: { fontSize: 13, fontFamily: "Inter_500Medium" },
-  section: { marginBottom: 24 },
-  sectionLabel: { fontSize: 13, fontFamily: "Inter_500Medium", marginBottom: 12 },
-  contactsScroll: { marginHorizontal: -4 },
-  contact: { alignItems: "center", gap: 6, marginHorizontal: 6 },
+  tabBtnActive: { backgroundColor: BLACK },
+  tabBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: TEXT_GRAY },
+  tabBtnTextActive: { color: WHITE },
+
+  content: { paddingHorizontal: 24, gap: 16 },
+
+  sectionLabel: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEXT_DARK },
+  contactsScroll: { gap: 14, paddingRight: 8 },
+  contactItem: { alignItems: "center", gap: 7 },
   contactAvatar: { width: 52, height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  contactName: { fontSize: 11, fontFamily: "Inter_500Medium" },
-  form: { gap: 16 },
-  inputGroup: { gap: 8 },
-  label: { fontSize: 13, fontFamily: "Inter_500Medium", letterSpacing: 0.3 },
-  inputWrapper: {
-    flexDirection: "row", alignItems: "center",
-    borderRadius: 14, borderWidth: 1, paddingHorizontal: 16, minHeight: 56,
+  contactName: { fontFamily: "Inter_500Medium", fontSize: 11, color: TEXT_GRAY },
+
+  field: { gap: 8 },
+  fieldLabel: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEXT_DARK },
+  inputWrap: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: INPUT_BG, borderRadius: 14, paddingHorizontal: 16, minHeight: 52,
   },
-  inputIcon: { marginRight: 12 },
-  input: { flex: 1, fontSize: 16, fontFamily: "Inter_400Regular", paddingVertical: 12 },
-  quickAmounts: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  quickAmount: {
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1,
+  input: { flex: 1, fontFamily: "Inter_400Regular", fontSize: 15, color: TEXT_DARK, paddingVertical: 14 },
+  currencySign: { fontFamily: "Inter_600SemiBold", fontSize: 18, color: TEXT_GRAY },
+  amtInputText: { fontSize: 22, fontFamily: "Inter_700Bold" },
+
+  quickRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  quickChip: {
+    paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10,
+    backgroundColor: INPUT_BG, borderWidth: 1.5, borderColor: "transparent",
   },
-  quickAmountText: { fontSize: 14, fontFamily: "Inter_500Medium" },
-  sendBtn: {
-    height: 56, borderRadius: 16, flexDirection: "row",
-    alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8,
+  quickChipActive: { backgroundColor: "#E8F8EE", borderColor: GREEN },
+  quickChipText: { fontFamily: "Inter_500Medium", fontSize: 13, color: TEXT_GRAY },
+  quickChipTextActive: { fontFamily: "Inter_600SemiBold", color: GREEN },
+
+  actionBtn: {
+    backgroundColor: BLACK, borderRadius: 14, height: 54,
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+    marginTop: 8,
   },
-  sendBtnText: { fontSize: 17, fontFamily: "Inter_600SemiBold" },
-  qrSection: { alignItems: "center", gap: 20 },
-  qrContainer: {
-    width: "100%", borderRadius: 24, borderWidth: 1, padding: 32,
-    alignItems: "center", gap: 12,
+  actionBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: WHITE },
+
+  qrCard: {
+    backgroundColor: INPUT_BG, borderRadius: 24, padding: 32,
+    alignItems: "center", gap: 10,
   },
-  qrCode: { width: 160, height: 160, borderRadius: 16, borderWidth: 2, padding: 16, gap: 4 },
-  qrRow: { flex: 1, flexDirection: "row", gap: 4 },
-  qrCell: { flex: 1, borderRadius: 3 },
-  qrLabel: { fontSize: 18, fontFamily: "Inter_700Bold", marginTop: 8 },
-  qrSubLabel: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  addressBox: {
-    width: "100%", borderRadius: 20, borderWidth: 1, padding: 20, gap: 8,
+  qrBox: { width: 150, height: 150, borderRadius: 12, gap: 4, padding: 12, backgroundColor: WHITE },
+  qrTitle: { fontFamily: "Inter_700Bold", fontSize: 17, color: TEXT_DARK, marginTop: 6 },
+  qrSub: { fontFamily: "Inter_400Regular", fontSize: 12, color: TEXT_LIGHT },
+
+  addressCard: {
+    backgroundColor: INPUT_BG, borderRadius: 16, padding: 20, gap: 8,
   },
-  addressLabel: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  address: { fontSize: 18, fontFamily: "Inter_600SemiBold", letterSpacing: 1 },
+  addressLabel: { fontFamily: "Inter_500Medium", fontSize: 12, color: TEXT_LIGHT },
+  address: { fontFamily: "Inter_600SemiBold", fontSize: 17, color: TEXT_DARK, letterSpacing: 0.5 },
   copyBtn: {
     flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start",
-    borderRadius: 10, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 8, marginTop: 4,
+    borderRadius: 10, borderWidth: 1.5, borderColor: BLACK,
+    paddingHorizontal: 14, paddingVertical: 8,
   },
-  copyBtnText: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
-  receiveOptions: { flexDirection: "row", gap: 12, width: "100%" },
-  receiveOpt: {
+  copyBtnActive: { backgroundColor: BLACK },
+  copyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: BLACK },
+  copyBtnTextActive: { color: WHITE },
+
+  shareRow: { flexDirection: "row", gap: 12 },
+  shareBtn: {
     flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center",
-    gap: 8, borderRadius: 14, borderWidth: 1, paddingVertical: 14,
+    gap: 8, backgroundColor: INPUT_BG, borderRadius: 14, paddingVertical: 14,
   },
-  receiveOptText: { fontSize: 14, fontFamily: "Inter_500Medium" },
+  shareBtnText: { fontFamily: "Inter_500Medium", fontSize: 14, color: TEXT_DARK },
+
+  emptyHistory: { alignItems: "center", paddingTop: 60, gap: 12 },
+  emptyTitle: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: TEXT_LIGHT },
+
+  historyList: {
+    borderRadius: 20, borderWidth: 1, borderColor: BORDER, overflow: "hidden", backgroundColor: WHITE,
+  },
+  historyRow: { flexDirection: "row", alignItems: "center", padding: 16, gap: 12 },
+  historyRowBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: BORDER },
+  historyIcon: { width: 40, height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  historyInfo: { flex: 1 },
+  historyTitle: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: TEXT_DARK, marginBottom: 2 },
+  historySub: { fontFamily: "Inter_400Regular", fontSize: 11, color: TEXT_LIGHT },
+  historyAmt: { fontFamily: "Inter_700Bold", fontSize: 13 },
 });
