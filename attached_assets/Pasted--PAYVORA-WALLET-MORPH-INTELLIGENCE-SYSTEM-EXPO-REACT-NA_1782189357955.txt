@@ -1,0 +1,155 @@
+🚀 PAYVORA – WALLET MORPH INTELLIGENCE SYSTEM (EXPO REACT NATIVE)
+
+────────────────────────────────────
+🎯 CORE OBJECTIVE
+────────────────────────────────────
+
+Implement a premium gesture-driven “Wallet Intelligence Morph System” on the Home screen.
+
+This is NOT navigation.
+This is NOT a new screen.
+This is a continuous animated transformation of the HOME UI.
+
+The system must feel like Apple-level interaction design (Wallet / iOS Control Center level).
+
+────────────────────────────────────
+🟢 PRIMARY GESTURE RULE
+────────────────────────────────────
+
+Gesture MUST be attached ONLY to:
+
+👉 Balance Card (Home screen)
+
+NOT:
+❌ entire screen
+❌ transactions section
+❌ buttons (Fund Wallet / Sell / Withdraw)
+
+────────────────────────────────────
+🧭 GESTURE BEHAVIOR
+────────────────────────────────────
+
+✔ When user DRAGS DOWN on Balance Card:
+
+- Home screen follows finger (translateY in real time)
+- No blur effect
+- No screen switch
+- No modal or navigation
+
+────────────────────────────────────
+🟢 WALLET INTELLIGENCE REVEAL (BEHIND HOME)
+
+As user drags down, a hidden layer emerges from TOP:
+
+This layer contains:
+
+1. Spending Breakdown (Donut-style animated ring)
+2. Weekly inflow/outflow (minimal motion bars, NOT chart-heavy UI)
+3. Wallet growth indicator (ECG-style pulse line)
+4. Cashback earned (floating counter cards)
+
+IMPORTANT:
+- These elements must follow drag progress (0% → hidden, 100% → fully visible)
+- No sudden appearance
+- No fade-in popups
+
+────────────────────────────────────
+🟢 FULL DRAG COMPLETION STATE
+
+When drag threshold is reached:
+
+✔ HOME SCREEN:
+- Smoothly slides DOWN off screen (physics-based)
+- NOT blur
+- NOT fade
+- Pure translateY spring motion
+
+✔ WALLET INTELLIGENCE:
+- Locks into full view
+- Becomes primary focus
+
+────────────────────────────────────
+🔄 DRAG UP BEHAVIOR (REVERSE MOTION)
+
+If user drags upward:
+
+- Wallet Intelligence follows finger back upward
+- Home screen returns smoothly from bottom
+- Everything remains synced to gesture position
+
+────────────────────────────────────
+📱 DYNAMIC ISLAND (iOS ONLY)
+
+During gesture interaction:
+
+✔ Idle state:
+- Shows balance only (e.g. “₦200,590”)
+
+✔ During drag:
+- Shows “Wallet Intelligence Mode”
+- Live balance updates animation
+- Small activity pulse indicator
+
+✔ Fully expanded:
+- Shows balance + status (Active / Stable / Growing)
+
+────────────────────────────────────
+🧠 TECH REQUIREMENTS
+
+Use ONLY:
+
+- react-native-gesture-handler (GestureDetector)
+- react-native-reanimated v3
+- useSharedValue
+- useAnimatedStyle
+- interpolate
+- withSpring / withTiming
+
+────────────────────────────────────
+🧱 REQUIRED STRUCTURE
+
+Gesture must control BOTH layers:
+
+<GestureDetector>
+  <Animated.View (HOME translateY wrapper)>
+
+      <BalanceCard />   ← gesture anchor
+
+      <Animated.View (INTELLIGENCE LAYER)>
+          Spending breakdown donut
+          Weekly inflow/outflow bars
+          Wallet growth pulse line
+          Cashback earned cards
+      </Animated.View>
+
+  </Animated.View>
+</GestureDetector>
+
+────────────────────────────────────
+⚠️ STRICT CONSTRAINTS
+
+DO NOT:
+❌ create new navigation routes
+❌ modify auth system
+❌ change UI design system
+❌ introduce blur effects
+❌ detach animation from gesture progress
+❌ use static transitions or popups
+
+ONLY:
+✔ gesture-driven transforms
+✔ animation logic
+✔ UI reveal via motion
+
+────────────────────────────────────
+🏁 FINAL RESULT
+
+Home screen becomes a SINGLE living surface:
+
+- Balance Card is the interaction trigger
+- Drag down morphs Home into Wallet Intelligence Mode
+- Everything follows finger movement in real time
+- Smooth, premium fintech motion system
+- iOS-level interaction quality (Apple Wallet feel)
+
+This must feel like a REAL financial OS layer, not an app screen.
