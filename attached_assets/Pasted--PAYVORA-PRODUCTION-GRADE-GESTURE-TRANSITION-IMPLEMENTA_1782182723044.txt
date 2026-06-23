@@ -1,0 +1,168 @@
+🚀 PAYVORA – PRODUCTION-GRADE GESTURE TRANSITION IMPLEMENTATION
+(EXPO REACT NATIVE – FINTECH APP)
+
+──────────────────────────────────────────────
+🎯 FEATURE GOAL
+──────────────────────────────────────────────
+
+Implement a premium fintech UX interaction in PAYVORA:
+
+Users can DRAG DOWN the Home screen (Last Transactions section)
+to fluidly transition into the SendMoney screen.
+
+This must feel like a high-end fintech app (Stripe / Cash App level):
+smooth, stable, no flicker, no blank screens.
+
+──────────────────────────────────────────────
+🧭 CORE UX FLOW
+──────────────────────────────────────────────
+
+HOME (Dashboard)
+   ↓ user drags down Last Transactions container
+   ↓ animated transition begins
+SEND MONEY screen is revealed underneath
+   ↓ threshold reached
+HOME is dismissed → NAVIGATE to SendMoney
+
+If gesture is released early:
+→ HOME snaps back to original position
+
+──────────────────────────────────────────────
+📍 STRICT IMPLEMENTATION SCOPE
+──────────────────────────────────────────────
+
+ONLY modify:
+
+✔ /app/(tabs)/Home.tsx
+✔ /app/SendMoney.tsx (ensure it is ready for navigation)
+
+DO NOT MODIFY:
+❌ App.tsx
+❌ Navigation root or auth flow
+❌ Any unrelated screens
+❌ Global theme / styling system
+❌ UI design or component layout outside gesture needs
+
+──────────────────────────────────────────────
+🎯 GESTURE ATTACHMENT RULE (CRITICAL)
+──────────────────────────────────────────────
+
+Gesture MUST be attached ONLY to:
+
+👉 LastTransactionsContainer inside Home screen
+
+NOT:
+- entire Home screen wrapper
+- App root
+- navigation container
+- individual transaction items
+
+──────────────────────────────────────────────
+🧠 TECH STACK (MANDATORY)
+──────────────────────────────────────────────
+
+- react-native-gesture-handler (GestureDetector only)
+- react-native-reanimated v3
+- Native Stack Navigation (existing)
+- NO PanResponder (forbidden)
+
+──────────────────────────────────────────────
+🎮 GESTURE BEHAVIOR SPEC
+──────────────────────────────────────────────
+
+On drag down:
+
+1. Track vertical translation (translateY)
+2. Home content follows finger in real time
+3. Apply smooth interpolation:
+   - translateY: 0 → drag distance
+   - scale: 1 → 0.95
+   - opacity: 1 → 0.85
+4. Add subtle rubber-band resistance at edges
+5. Keep SendMoney screen mounted underneath Home
+
+──────────────────────────────────────────────
+🎯 TRANSITION LOGIC
+──────────────────────────────────────────────
+
+IF:
+- drag distance > 120px OR swipe velocity threshold exceeded
+
+THEN:
+- animate Home screen off-screen (translateY down with spring)
+- trigger navigation.navigate("SendMoney")
+- ensure transition is continuous (no flicker, no blank screen)
+
+ELSE:
+- snap Home screen back using withSpring animation
+
+──────────────────────────────────────────────
+🧩 ANIMATION ENGINE RULES
+──────────────────────────────────────────────
+
+Must use:
+- useSharedValue
+- useAnimatedStyle
+- interpolate + Extrapolation.CLAMP
+- withSpring / withTiming
+- GestureDetector (Reanimated Gesture API)
+
+Performance:
+- Must maintain 60fps
+- No layout thrashing
+- No unnecessary re-renders
+
+──────────────────────────────────────────────
+🛡️ UI / DESIGN LOCK (ABSOLUTE RULE)
+──────────────────────────────────────────────
+
+DO NOT CHANGE ANY EXISTING UI DESIGN.
+
+❌ Forbidden:
+- Changing colors
+- Changing theme
+- Modifying typography
+- Altering spacing or layout
+- Restyling buttons or cards
+- “UI improvements” or redesigns
+
+✔ Allowed:
+- Animation transforms only
+- Gesture handling only
+- Transition logic only
+
+THE VISUAL DESIGN MUST REMAIN IDENTICAL.
+
+──────────────────────────────────────────────
+🧱 SCOPE CONTROL (STRICT)
+──────────────────────────────────────────────
+
+- Do NOT restructure project
+- Do NOT rename files
+- Do NOT move components
+- Do NOT modify authentication flow
+- Do NOT modify navigation architecture unless required for SendMoney link
+- Do NOT duplicate screens or routes
+
+ONLY implement gesture + transition behavior.
+
+──────────────────────────────────────────────
+🧯 SAFETY REQUIREMENTS (CRITICAL)
+──────────────────────────────────────────────
+
+- NEVER allow blank screen states
+- ALWAYS render fallback UI during gesture transition
+- Prevent double navigation triggers
+- Prevent gesture conflicts with scroll views
+- Ensure stable mount/unmount behavior
+
+──────────────────────────────────────────────
+🏁 FINAL OUTCOME
+──────────────────────────────────────────────
+
+PAYVORA MUST FEEL LIKE A PREMIUM FINTECH APP:
+
+“Home → drag down Last Transactions → smooth native transition → SendMoney”
+
+No glitches. No redesign. No navigation breakage.
+Only a polished gesture-based UX upgrade.

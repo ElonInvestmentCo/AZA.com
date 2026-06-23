@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
+  Animated as RNAnimated,
   Dimensions,
   Image,
   Modal,
@@ -22,6 +22,15 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@/context/AuthContext";
 import { useWallet, Transaction } from "@/context/WalletContext";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  interpolate,
+  Extrapolation,
+  runOnJS,
+} from "react-native-reanimated";
 
 const { width: SCREEN_W } = Dimensions.get("window");
 const CARD_W = SCREEN_W - 48;
@@ -194,11 +203,9 @@ function CardCarousel({ balanceVisible, balance }: { balanceVisible: boolean; ba
             end={{ x: 1, y: 1 }}
             style={[carouselStyles.card, { width: CARD_W }]}
           >
-            {/* Decorative circle */}
             <View style={[carouselStyles.decorCircle, { borderColor: card.accent + "30" }]} />
             <View style={[carouselStyles.decorCircle2, { borderColor: card.accent + "20" }]} />
 
-            {/* Top row */}
             <View style={carouselStyles.cardTop}>
               <Text style={carouselStyles.cardLabel}>{card.label}</Text>
               <View style={[carouselStyles.schemeBadge, { borderColor: card.accent + "40" }]}>
@@ -206,7 +213,6 @@ function CardCarousel({ balanceVisible, balance }: { balanceVisible: boolean; ba
               </View>
             </View>
 
-            {/* Balance */}
             <View style={carouselStyles.cardBalanceRow}>
               <Text style={carouselStyles.cardBalLabel}>Available Balance</Text>
               {i === 0 && (
@@ -214,10 +220,8 @@ function CardCarousel({ balanceVisible, balance }: { balanceVisible: boolean; ba
               )}
             </View>
 
-            {/* Card number */}
             <Text style={[carouselStyles.cardNumber, { color: card.accent + "CC" }]}>{card.number}</Text>
 
-            {/* Chip decoration */}
             <View style={[carouselStyles.chip, { borderColor: card.accent + "40" }]}>
               <View style={[carouselStyles.chipInner, { backgroundColor: card.accent + "30" }]} />
             </View>
@@ -225,7 +229,6 @@ function CardCarousel({ balanceVisible, balance }: { balanceVisible: boolean; ba
         ))}
       </ScrollView>
 
-      {/* Dots */}
       <View style={carouselStyles.dots}>
         {VIRTUAL_CARDS.map((_, i) => (
           <View
@@ -276,8 +279,8 @@ function TransactionDetailSheet({
   onClose,
 }: {
   tx: FullTxRow | null;
-  sheetY: Animated.Value;
-  backdropOpacity: Animated.Value;
+  sheetY: RNAnimated.Value;
+  backdropOpacity: RNAnimated.Value;
   onClose: () => void;
 }) {
   if (!tx) return null;
@@ -285,13 +288,13 @@ function TransactionDetailSheet({
 
   return (
     <Modal transparent animationType="none" visible statusBarTranslucent onRequestClose={onClose}>
-      <Animated.View style={[sheetStyles.backdrop, { opacity: backdropOpacity }]}>
+      <RNAnimated.View style={[sheetStyles.backdrop, { opacity: backdropOpacity }]}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={StyleSheet.absoluteFill} />
         </TouchableWithoutFeedback>
-      </Animated.View>
+      </RNAnimated.View>
 
-      <Animated.View style={[sheetStyles.sheet, { transform: [{ translateY: sheetY }] }]}>
+      <RNAnimated.View style={[sheetStyles.sheet, { transform: [{ translateY: sheetY }] }]}>
         <View style={sheetStyles.handle} />
 
         <View style={sheetStyles.sheetHeader}>
@@ -332,12 +335,34 @@ function TransactionDetailSheet({
         >
           <Text style={sheetStyles.ctaText}>Done</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </RNAnimated.View>
     </Modal>
   );
 }
 
+// ── Drag hint label ───────────────────────────────────────────
+function DragHint({ dragY }: { dragY: Animated.SharedValue<number> }) {
+  const style = useAnimatedStyle(() => ({
+    opacity: interpolate(dragY.value, [0, 40, 80], [0, 0.6, 1], Extrapolation.CLAMP),
+    transform: [{ translateY: interpolate(dragY.value, [0, 80], [6, 0], Extrapolation.CLAMP) }],
+  }));
+  return (
+    <Animated.View style={[hintStyles.wrap, style]} pointerEvents="none">
+      <Feather name="chevrons-down" size={14} color={TEXT_LIGHT} />
+      <Text style={hintStyles.label}>Drag to Send Money</Text>
+    </Animated.View>
+  );
+}
+
+const hintStyles = StyleSheet.create({
+  wrap: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 5, marginTop: 10, marginBottom: 2 },
+  label: { fontFamily: "Inter_500Medium", fontSize: 11, color: TEXT_LIGHT },
+});
+
 // ── Main screen ───────────────────────────────────────────────
+const DRAG_THRESHOLD   = 120;
+const VELOCITY_THRESHOLD = 800;
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -346,9 +371,14 @@ export default function HomeScreen() {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [selectedTx, setSelectedTx] = useState<FullTxRow | null>(null);
 
-  const scaleAnim       = useRef(new Animated.Value(1)).current;
-  const sheetY          = useRef(new Animated.Value(SHEET_HEIGHT)).current;
-  const backdropOpacity = useRef(new Animated.Value(0)).current;
+  const scaleAnim       = useRef(new RNAnimated.Value(1)).current;
+  const sheetY          = useRef(new RNAnimated.Value(SHEET_HEIGHT)).current;
+  const backdropOpacity = useRef(new RNAnimated.Value(0)).current;
+
+  // ── Gesture shared values ──
+  const dragY        = useSharedValue(0);
+  const isNavigating = useSharedValue(false);
+  const scrollY      = useSharedValue(0);
 
   const firstName = user?.name?.split(" ")[0] ?? "Dove";
   const initial   = firstName.charAt(0).toUpperCase();
@@ -358,11 +388,61 @@ export default function HomeScreen() {
       ? transactions.slice(0, 2).map(txFromWallet)
       : STATIC_TXS;
 
+  // ── Navigation callback (runs on JS thread) ──
+  function doNavigate() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push("/(tabs)/send" as any);
+    setTimeout(() => {
+      dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
+      isNavigating.value = false;
+    }, 450);
+  }
+
+  // ── Screen animated style (whole screen follows drag) ──
+  const screenAnimStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: dragY.value },
+      { scale: interpolate(dragY.value, [0, 220], [1, 0.95], Extrapolation.CLAMP) },
+    ],
+    opacity: interpolate(dragY.value, [0, 220], [1, 0.85], Extrapolation.CLAMP),
+  }));
+
+  // ── Pan gesture – attached only to Recent Transactions container ──
+  const panGesture = Gesture.Pan()
+    .activeOffsetY(10)
+    .failOffsetY(-5)
+    .onUpdate((e) => {
+      "worklet";
+      if (isNavigating.value) return;
+      if (scrollY.value > 8) return;
+      if (e.translationY > 0) {
+        // Rubber-band: resistance increases as you drag further
+        const raw = e.translationY;
+        dragY.value = raw / (1 + raw / 400);
+      }
+    })
+    .onEnd((e) => {
+      "worklet";
+      if (isNavigating.value) return;
+      if (scrollY.value > 8) {
+        dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
+        return;
+      }
+      if (dragY.value > DRAG_THRESHOLD || e.velocityY > VELOCITY_THRESHOLD) {
+        isNavigating.value = true;
+        dragY.value = withSpring(700, { damping: 22, stiffness: 120 }, () => {
+          runOnJS(doNavigate)();
+        });
+      } else {
+        dragY.value = withSpring(0, { damping: 20, stiffness: 200 });
+      }
+    });
+
   function handleEyeToggle() {
     Haptics.selectionAsync();
-    Animated.sequence([
-      Animated.timing(scaleAnim, { toValue: 0.91, duration: 75, useNativeDriver: true }),
-      Animated.timing(scaleAnim, { toValue: 1,    duration: 75, useNativeDriver: true }),
+    RNAnimated.sequence([
+      RNAnimated.timing(scaleAnim, { toValue: 0.91, duration: 75, useNativeDriver: true }),
+      RNAnimated.timing(scaleAnim, { toValue: 1,    duration: 75, useNativeDriver: true }),
     ]).start();
     setBalanceVisible((v) => !v);
   }
@@ -384,30 +464,32 @@ export default function HomeScreen() {
   function openSheet(tx: FullTxRow) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedTx(tx);
-    Animated.parallel([
-      Animated.spring(sheetY, { toValue: 0, tension: 68, friction: 11, useNativeDriver: true }),
-      Animated.timing(backdropOpacity, { toValue: 1, duration: 240, useNativeDriver: true }),
+    RNAnimated.parallel([
+      RNAnimated.spring(sheetY, { toValue: 0, tension: 68, friction: 11, useNativeDriver: true }),
+      RNAnimated.timing(backdropOpacity, { toValue: 1, duration: 240, useNativeDriver: true }),
     ]).start();
   }
 
   function closeSheet() {
     Haptics.selectionAsync();
-    Animated.parallel([
-      Animated.timing(sheetY, { toValue: SHEET_HEIGHT, duration: 260, useNativeDriver: true }),
-      Animated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+    RNAnimated.parallel([
+      RNAnimated.timing(sheetY, { toValue: SHEET_HEIGHT, duration: 260, useNativeDriver: true }),
+      RNAnimated.timing(backdropOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
     ]).start(() => setSelectedTx(null));
   }
 
   const topPad = Platform.OS === "web" ? 20 : insets.top;
 
   return (
-    <View style={styles.screen}>
+    <Animated.View style={[styles.screen, screenAnimStyle]}>
       <StatusBar barStyle="dark-content" backgroundColor={WHITE} />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={(e) => { scrollY.value = e.nativeEvent.contentOffset.y; }}
       >
         {/* ── Top Bar ── */}
         <View style={styles.topBar}>
@@ -501,43 +583,48 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
-        {/* ── Recent Transactions ── */}
-        <View style={styles.txSection}>
-          <View style={styles.txHeader}>
-            <Text style={styles.txHeading}>Recent Transaction</Text>
-            <TouchableOpacity
-              onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/send" as any); }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            >
-              <Text style={styles.txSeeAll}>See All</Text>
-            </TouchableOpacity>
-          </View>
+        {/* ── Recent Transactions – gesture attached here ── */}
+        <GestureDetector gesture={panGesture}>
+          <View style={styles.txSection}>
+            <View style={styles.txHeader}>
+              <Text style={styles.txHeading}>Recent Transaction</Text>
+              <TouchableOpacity
+                onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/send" as any); }}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.txSeeAll}>See All</Text>
+              </TouchableOpacity>
+            </View>
 
-          {rows.map((row) => (
-            <TouchableOpacity
-              key={row.id}
-              style={styles.txRow}
-              onPress={() => openSheet(row)}
-              activeOpacity={0.68}
-            >
-              <View style={styles.txLeft}>
-                <View style={[styles.txIconWrap, { backgroundColor: row.isPositive ? "#E8F8EE" : "#FEF2F2" }]}>
-                  <Feather name={row.icon as any} size={15} color={row.isPositive ? GREEN : RED} />
+            {rows.map((row) => (
+              <TouchableOpacity
+                key={row.id}
+                style={styles.txRow}
+                onPress={() => openSheet(row)}
+                activeOpacity={0.68}
+              >
+                <View style={styles.txLeft}>
+                  <View style={[styles.txIconWrap, { backgroundColor: row.isPositive ? "#E8F8EE" : "#FEF2F2" }]}>
+                    <Feather name={row.icon as any} size={15} color={row.isPositive ? GREEN : RED} />
+                  </View>
+                  <View style={styles.txInfo}>
+                    <Text style={styles.txName}>{row.name}</Text>
+                    <Text style={styles.txDate}>{row.date}</Text>
+                  </View>
                 </View>
-                <View style={styles.txInfo}>
-                  <Text style={styles.txName}>{row.name}</Text>
-                  <Text style={styles.txDate}>{row.date}</Text>
+                <View style={styles.txRight}>
+                  <Text style={[styles.txAmount, { color: row.isPositive ? GREEN : RED }]}>
+                    {row.amount}
+                  </Text>
+                  <Feather name="chevron-right" size={14} color={TEXT_LIGHT} />
                 </View>
-              </View>
-              <View style={styles.txRight}>
-                <Text style={[styles.txAmount, { color: row.isPositive ? GREEN : RED }]}>
-                  {row.amount}
-                </Text>
-                <Feather name="chevron-right" size={14} color={TEXT_LIGHT} />
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </TouchableOpacity>
+            ))}
+
+            {/* Subtle drag hint that appears as you pull */}
+            <DragHint dragY={dragY} />
+          </View>
+        </GestureDetector>
       </ScrollView>
 
       <TransactionDetailSheet
@@ -546,7 +633,7 @@ export default function HomeScreen() {
         backdropOpacity={backdropOpacity}
         onClose={closeSheet}
       />
-    </View>
+    </Animated.View>
   );
 }
 
