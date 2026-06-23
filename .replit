@@ -18,37 +18,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Mobile"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Payvora Mobile"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "API Server"
-
-[[workflows.workflow]]
-name = "AZA Mobile"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev"
-
-[[workflows.workflow]]
-name = "Payvora Mobile"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "console"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/payvora run dev"
 
 [[workflows.workflow]]
 name = "API Server"
