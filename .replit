@@ -37,7 +37,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev"
+args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev -- --port 19002"
 
 [[workflows.workflow]]
 name = "Payvora Mobile"
