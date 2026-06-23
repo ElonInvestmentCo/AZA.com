@@ -1,0 +1,115 @@
+CONTINUE FROM PREVIOUS AGENT WORK (CREDITS EXHAUSTED)
+
+You are continuing a Payvora (Expo React Native fintech app) codebase fix. The previous agent already identified issues and started fixes but ran out of credits mid-execution.
+
+DO NOT RESTART WORK OR REDESIGN ANYTHING — continue directly from where it stopped.
+
+────────────────────────────────────
+🎯 PRIMARY GOAL
+────────────────────────────────────
+Fix all runtime warnings and navigation issues while preserving:
+- Existing UI design (STRICTLY NO redesign)
+- Existing navigation structure
+- Existing authentication flow
+- Existing fintech styling system
+
+App must run cleanly in Expo Go.
+
+────────────────────────────────────
+🔴 1. ICON WARNINGS FIX
+────────────────────────────────────
+Fix all occurrences of:
+
+❌ "apple1" (AntDesign invalid icon)
+
+REPLACE WITH:
+- Valid Ionicons OR OpenMoji equivalent via Iconify
+- Ensure Apple + Google sign-in buttons use supported icons only
+
+RULES:
+- NEVER use invalid icon names again
+- Keep icon sizes and positioning unchanged
+- Do NOT redesign buttons
+
+────────────────────────────────────
+🟠 2. REANIMATED WARNING FIX
+────────────────────────────────────
+Fix:
+"Property transform of AnimatedComponent(View) may be overwritten by a layout animation"
+
+RULE:
+- Outer wrapper must be a plain View OR layout-animated wrapper ONLY
+- Inner layer handles Reanimated transforms
+
+STRUCTURE:
+<View> (layout animation wrapper)
+   <Animated.View> (transform ONLY here)
+   </Animated.View>
+</View>
+
+DO NOT MIX layout animation + transform on same component.
+
+────────────────────────────────────
+🟡 3. EXPO ROUTER WARNINGS FIX
+────────────────────────────────────
+Remove or fix extraneous routes:
+
+❌ "card"
+❌ "history"
+
+OPTIONS:
+- If routes exist in navigation → CREATE missing files in /app
+- If not needed → REMOVE all references from:
+  - tabs layout
+  - navigation links
+  - buttons
+  - deep links
+
+Ensure:
+- All tab routes exist under /(tabs)
+- No orphan routes remain
+
+────────────────────────────────────
+🟢 4. NAVIGATION SAFETY RULE
+────────────────────────────────────
+Ensure:
+- No screen returns undefined/null
+- Every route returns valid JSX UI
+- No blank screens under any condition
+- Loading states always render fallback UI
+
+────────────────────────────────────
+🔵 5. EXPO GO STABILITY REQUIREMENT
+────────────────────────────────────
+App must:
+- Run cleanly in Expo Go (NOT web preview)
+- Have ZERO runtime warnings for:
+  - icons
+  - routes
+  - reanimated
+- Maintain full Payvora UI/fintech design unchanged
+
+────────────────────────────────────
+⚠️ STRICT CONSTRAINTS
+────────────────────────────────────
+DO NOT:
+- Change UI design
+- Change layout structure
+- Modify authentication logic
+- Refactor navigation system
+- Introduce new design system
+
+ONLY:
+- Fix warnings
+- Fix broken routes
+- Fix invalid icons
+- Fix animation conflicts
+
+────────────────────────────────────
+🏁 FINAL RESULT
+────────────────────────────────────
+- No console warnings
+- No missing routes
+- No invalid icons
+- No Reanimated layout conflicts
+- Fully working Expo Go app
