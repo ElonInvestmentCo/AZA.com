@@ -37,7 +37,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev -- --port 19002"
+args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev"
 
 [[workflows.workflow]]
 name = "Payvora Mobile"
@@ -97,6 +97,10 @@ externalPort = 4200
 [[ports]]
 localPort = 19002
 externalPort = 5000
+
+[[ports]]
+localPort = 19003
+externalPort = 5173
 
 [[ports]]
 localPort = 19665
