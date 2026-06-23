@@ -46,7 +46,6 @@ const C = {
 /* ─── Static data ──────────────────────────────────────────────────────────── */
 
 const SERVICES = [
-  { id: "gift",     icon: "tag"            as const, label: "Gift Card",   color: "#00B03C", route: "/(app)/gift-cards"    as const },
   { id: "settings", icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: null },
   { id: "elec",     icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
   { id: "cable",    icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
@@ -244,7 +243,7 @@ export default function HomeScreen() {
           <View style={[s.actionsBar, { backgroundColor: C.actionBar }]}>
             {[
               { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
-              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/gift-cards")) },
+              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/dashboard")) },
               { icon: "arrow-up"   as const, label: "Withdraw",    onPress: press(() => router.push("/(app)/dashboard")) },
             ].map((action, i) => (
               <React.Fragment key={action.label}>
@@ -291,7 +290,7 @@ export default function HomeScreen() {
               <PromoCard
                 key={p.id}
                 item={p}
-                onPress={press(() => router.push("/(app)/gift-cards"))}
+                onPress={press(() => router.push("/(app)/dashboard"))}
               />
             ))}
           </ScrollView>
