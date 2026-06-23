@@ -111,3 +111,4 @@ packages = ["nano"]
 [userenv.shared]
 PORT = "8080"
 EXPO_PUBLIC_DOMAIN = "www.payvora.org"
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID = "529491115901-mt2b2k6me217h5r11sruunhfingtoetv.apps.googleusercontent.com"
