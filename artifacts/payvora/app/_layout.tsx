@@ -49,11 +49,16 @@ function RootLayoutNav() {
   return (
     <>
       <AuthGate />
-      <Stack screenOptions={{ animation: "fade", contentStyle: { backgroundColor: "#0A0A0F" } }}>
+      <Stack screenOptions={{ animation: "slide_from_right", contentStyle: { backgroundColor: "#0A0A0F" } }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="gift-card" options={{ headerShown: false }} />
+        <Stack.Screen name="sell-gift-card" options={{ headerShown: false }} />
+        <Stack.Screen name="fund-wallet" options={{ headerShown: false }} />
+        <Stack.Screen name="confirm-transaction" options={{ headerShown: false }} />
+        <Stack.Screen name="trade-submitted" options={{ headerShown: false }} />
       </Stack>
     </>
   );
