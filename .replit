@@ -37,7 +37,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run dev"
+args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/mobile run dev"
 
 [[workflows.workflow]]
 name = "Payvora Mobile"
@@ -48,7 +48,7 @@ outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/payvora run dev"
+args = "DANGEROUSLY_DISABLE_HOST_CHECK=true pnpm --filter @workspace/payvora run dev"
 
 [[workflows.workflow]]
 name = "API Server"
@@ -97,10 +97,6 @@ externalPort = 4200
 [[ports]]
 localPort = 19002
 externalPort = 5000
-
-[[ports]]
-localPort = 19003
-externalPort = 5173
 
 [[ports]]
 localPort = 19665

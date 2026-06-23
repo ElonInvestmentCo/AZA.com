@@ -1,273 +1,241 @@
-import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Platform,
-  Pressable,
+  ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  FadeInUp,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 
-const BG      = "#FFFFFF";
-const TEXT    = "#0B0A0A";
-const TEXTSEC = "#595F67";
-const MUTED   = "#AAAFB5";
-const BORDER  = "#EDF1F3";
-const INPUTBG = "#F0F0F0";
-const SUCCESS = "#00B03C";
+const { width: SCREEN_W } = Dimensions.get("window");
 
-const CARDS = [
-  { id: "1", name: "Amazon",       category: "Shopping",      rate: "₦780/$", color: "#FF9900", icon: "shopping-bag" as const },
-  { id: "2", name: "iTunes",       category: "Entertainment", rate: "₦710/$", color: "#FC3C44", icon: "music"        as const },
-  { id: "3", name: "Steam",        category: "Gaming",        rate: "₦720/$", color: "#1B9AF5", icon: "monitor"      as const },
-  { id: "4", name: "Google Play",  category: "Apps",          rate: "₦700/$", color: "#34A853", icon: "smartphone"   as const },
-  { id: "5", name: "Netflix",      category: "Streaming",     rate: "₦650/$", color: "#E50914", icon: "tv"           as const },
-  { id: "6", name: "Xbox",         category: "Gaming",        rate: "₦730/$", color: "#52B043", icon: "headphones"   as const },
-  { id: "7", name: "Vanilla Visa", category: "Finance",       rate: "₦760/$", color: "#5C6BC0", icon: "credit-card"  as const },
-  { id: "8", name: "eBay",         category: "Shopping",      rate: "₦690/$", color: "#E53238", icon: "tag"          as const },
+const WHITE     = "#FFFFFF";
+const TEXT_DARK = "#0B0A0A";
+const TEXT_GRAY = "#595F67";
+const TEXT_LIGHT = "#AAAFB5";
+const INPUT_BG  = "#F0F0F0";
+const BORDER    = "#EDF1F3";
+const BLACK     = "#000000";
+
+const CARD_CATEGORIES = [
+  { id: "1",  label: "Amazon",       icon: "shopping-cart", color: "#FF9900", bg: "#FFF3E0" },
+  { id: "2",  label: "iTunes",       icon: "music",         color: "#FC3C44", bg: "#FFE8E9" },
+  { id: "3",  label: "Google Play",  icon: "play",          color: "#34A853", bg: "#E8F5E9" },
+  { id: "4",  label: "Steam",        icon: "monitor",       color: "#1B2838", bg: "#E3E8EE" },
+  { id: "5",  label: "eBay",         icon: "tag",           color: "#E53238", bg: "#FDEAEA" },
+  { id: "6",  label: "Walmart",      icon: "package",       color: "#0071CE", bg: "#E3F2FD" },
+  { id: "7",  label: "Visa",         icon: "credit-card",   color: "#1A1F71", bg: "#E8EAF6" },
+  { id: "8",  label: "Sephora",      icon: "heart",         color: "#000000", bg: "#F5F5F5" },
+  { id: "9",  label: "Nike",         icon: "zap",           color: "#111111", bg: "#F0F0F0" },
+  { id: "10", label: "Netflix",      icon: "film",          color: "#E50914", bg: "#FDEAEA" },
+  { id: "11", label: "Nordstrom",    icon: "star",          color: "#1D1D1B", bg: "#F5F5F5" },
+  { id: "12", label: "More",         icon: "grid",          color: "#595F67", bg: "#F5F5F5" },
 ];
 
-const CARD_H = 166;
+const POPULAR = CARD_CATEGORIES.slice(0, 4);
 
-function GiftCardItem({
-  item,
-  onUsePress,
-}: {
-  item: typeof CARDS[0];
-  onUsePress: () => void;
-}) {
-  const scale  = useSharedValue(1);
-  const flip   = useSharedValue(0);
-  const [flipped, setFlipped] = useState(false);
+interface GiftCardCategory {
+  id: string;
+  label: string;
+  icon: string;
+  color: string;
+  bg: string;
+}
 
-  const frontAnim = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 1000 },
-      { rotateY: `${interpolate(flip.value, [0, 1], [0, 180])}deg` },
-      { scale: scale.value },
-    ],
-    backfaceVisibility: "hidden" as const,
-  }));
-
-  const backAnim = useAnimatedStyle(() => ({
-    transform: [
-      { perspective: 1000 },
-      { rotateY: `${interpolate(flip.value, [0, 1], [180, 360])}deg` },
-      { scale: scale.value },
-    ],
-    backfaceVisibility: "hidden" as const,
-  }));
-
-  const handleTap = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const next = !flipped;
-    setFlipped(next);
-    flip.value = withTiming(next ? 1 : 0, { duration: 480 });
-  };
-
+function CategoryCard({ item, onPress }: { item: GiftCardCategory; onPress: () => void }) {
   return (
-    <View style={{ flex: 1 }}>
-      <Pressable
-        onPress={handleTap}
-        onPressIn={() => { scale.value = withSpring(0.96, { damping: 12, stiffness: 300 }); }}
-        onPressOut={() => { scale.value = withSpring(1.0,  { damping: 12, stiffness: 300 }); }}
-        style={{ flex: 1 }}
-      >
-        {/* FRONT */}
-        <Animated.View
-          style={[
-            cs.card,
-            { backgroundColor: BG, borderColor: BORDER },
-            frontAnim,
-            { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-          ]}
-        >
-          <View style={[cs.iconBox, { backgroundColor: item.color + "18" }]}>
-            <Feather name={item.icon} size={22} color={item.color} />
-          </View>
-          <Text style={cs.name}>{item.name}</Text>
-          <Text style={cs.cat}>{item.category}</Text>
-          <View style={[cs.badge, { backgroundColor: SUCCESS + "18" }]}>
-            <Text style={[cs.badgeTxt, { color: SUCCESS }]}>{item.rate}</Text>
-          </View>
-          <View style={cs.hint}>
-            <Feather name="refresh-cw" size={10} color={MUTED} />
-            <Text style={cs.hintTxt}>Tap to flip</Text>
-          </View>
-        </Animated.View>
-
-        {/* BACK */}
-        <Animated.View
-          style={[
-            cs.card,
-            cs.back,
-            { backgroundColor: "#111111", borderColor: item.color + "55" },
-            backAnim,
-          ]}
-        >
-          <View style={[cs.stripe, { backgroundColor: item.color + "44" }]} />
-          <View style={cs.backTop}>
-            <View style={[cs.backIconSm, { backgroundColor: item.color + "22" }]}>
-              <Feather name={item.icon} size={14} color={item.color} />
-            </View>
-            <Text style={[cs.backBrand, { color: item.color }]}>{item.name}</Text>
-          </View>
-          <Text style={cs.backLbl}>CARD NUMBER</Text>
-          <Text style={cs.backVal}>•••• •••• •••• 4821</Text>
-          <View style={cs.backRow}>
-            <View><Text style={cs.backLbl}>EXPIRY</Text><Text style={cs.backVal}>08/27</Text></View>
-            <View><Text style={cs.backLbl}>CVV</Text><Text style={cs.backVal}>472</Text></View>
-          </View>
-          <View style={cs.hint}>
-            <Feather name="refresh-cw" size={10} color="#555" />
-            <Text style={[cs.hintTxt, { color: "#555" }]}>Tap to flip back</Text>
-          </View>
-        </Animated.View>
-      </Pressable>
-
-      <View style={{ height: CARD_H }} />
-
-      {!flipped && (
-        <TouchableOpacity
-          style={[cs.useBtn, { backgroundColor: item.color + "14", borderColor: item.color + "44" }]}
-          onPress={onUsePress}
-          activeOpacity={0.8}
-        >
-          <Text style={[cs.useTxt, { color: item.color }]}>Use card →</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+    <TouchableOpacity style={styles.catCard} onPress={onPress} activeOpacity={0.7}>
+      <View style={[styles.catIconWrap, { backgroundColor: item.bg }]}>
+        <Feather name={item.icon as any} size={22} color={item.color} />
+      </View>
+      <Text style={styles.catLabel} numberOfLines={1}>{item.label}</Text>
+      <Feather name="chevron-right" size={13} color={TEXT_LIGHT} />
+    </TouchableOpacity>
   );
 }
 
 export default function GiftCardScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+
   const topPad = Platform.OS === "web" ? 20 : insets.top;
-  const [tab, setTab] = useState<"sell" | "trade">("sell");
+
+  const filtered = search.trim()
+    ? CARD_CATEGORIES.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
+    : CARD_CATEGORIES;
+
+  async function handleCategory(item: GiftCardCategory) {
+    await Haptics.selectionAsync();
+    router.push("/sell-gift-card" as any);
+  }
 
   return (
-    <View style={[s.root, { backgroundColor: BG }]}>
+    <View style={[styles.screen, { paddingTop: topPad }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={WHITE} />
+
       {/* Header */}
-      <View style={[s.header, { paddingTop: topPad + 12 }]}>
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={s.backBtn}
+          style={styles.backBtn}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Feather name="arrow-left" size={22} color="#1E232C" />
+          <Feather name="arrow-left" size={22} color={TEXT_DARK} />
         </TouchableOpacity>
-        <Text style={s.title}>Gift Cards</Text>
-        <View style={{ width: 40 }} />
+        <Text style={styles.headerTitle}>Gift Cards</Text>
+        <View style={styles.headerRight} />
       </View>
-      <View style={s.divider} />
 
-      {/* Toggle */}
-      <Animated.View
-        entering={FadeInUp.duration(340).springify().delay(30)}
-        style={[s.toggle, { backgroundColor: INPUTBG, borderColor: BORDER }]}
-      >
-        {(["sell", "trade"] as const).map((t) => (
-          <Pressable
-            key={t}
-            style={[s.toggleBtn, tab === t && s.toggleActive]}
-            onPress={() => { Haptics.selectionAsync(); setTab(t); }}
-          >
-            <Text style={[s.toggleTxt, { color: tab === t ? "#FFFFFF" : TEXTSEC }]}>
-              {t === "sell" ? "Sell Card" : "Trade Asset"}
-            </Text>
-          </Pressable>
-        ))}
-      </Animated.View>
+      {/* Search */}
+      <View style={styles.searchRow}>
+        <View style={styles.searchWrap}>
+          <Feather name="search" size={16} color={TEXT_LIGHT} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search gift cards…"
+            placeholderTextColor={TEXT_LIGHT}
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Feather name="x-circle" size={15} color={TEXT_LIGHT} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
-      <FlatList
-        data={CARDS}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={s.list}
-        columnWrapperStyle={s.colWrap}
+      <ScrollView
         showsVerticalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <Animated.View
-            style={{ flex: 1 }}
-            entering={FadeInUp.duration(320).springify().delay(60 + index * 40)}
-          >
-            <GiftCardItem
-              item={item}
-              onUsePress={() =>
-                router.push(
-                  tab === "sell"
-                    ? ("/sell-gift-card" as any)
-                    : ("/sell-gift-card" as any)
-                )
-              }
-            />
-          </Animated.View>
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        {/* Popular */}
+        {!search && (
+          <>
+            <Text style={styles.sectionTitle}>Popular</Text>
+            <View style={styles.popularRow}>
+              {POPULAR.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.popularItem}
+                  onPress={() => handleCategory(item)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.popularIcon, { backgroundColor: item.bg }]}>
+                    <Feather name={item.icon as any} size={24} color={item.color} />
+                  </View>
+                  <Text style={styles.popularLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.divider} />
+          </>
         )}
-      />
+
+        {/* All Categories */}
+        <Text style={styles.sectionTitle}>{search ? "Results" : "All Categories"}</Text>
+
+        {filtered.map((item) => (
+          <CategoryCard key={item.id} item={item} onPress={() => handleCategory(item)} />
+        ))}
+
+        {filtered.length === 0 && (
+          <View style={styles.emptyWrap}>
+            <Feather name="search" size={40} color={TEXT_LIGHT} />
+            <Text style={styles.emptyText}>No gift cards found</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Sell CTA */}
+      <View style={styles.ctaWrap}>
+        <TouchableOpacity
+          style={styles.ctaBtn}
+          onPress={async () => {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push("/sell-gift-card" as any);
+          }}
+          activeOpacity={0.82}
+        >
+          <Feather name="tag" size={18} color={WHITE} />
+          <Text style={styles.ctaText}>Sell a Gift Card</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
-const cs = StyleSheet.create({
-  card: {
-    height: CARD_H, borderRadius: 16, padding: 14, borderWidth: 1, gap: 4,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
-  },
-  back:      { position: "absolute", top: 0, left: 0, right: 0, height: CARD_H, gap: 0, justifyContent: "flex-end", overflow: "hidden" },
-  iconBox:   { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center", marginBottom: 2 },
-  name:      { fontSize: 15, fontFamily: "Manrope_700Bold",    color: TEXT },
-  cat:       { fontSize: 12, fontFamily: "Manrope_400Regular", color: TEXTSEC },
-  badge:     { alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, marginTop: 2 },
-  badgeTxt:  { fontSize: 11, fontFamily: "Manrope_600SemiBold" },
-  hint:      { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 3 },
-  hintTxt:   { fontSize: 9,  fontFamily: "Manrope_400Regular", color: MUTED },
-
-  stripe:    { position: "absolute", top: 32, left: 0, right: 0, height: 28 },
-  backTop:   { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8, marginTop: 4 },
-  backIconSm:{ width: 24, height: 24, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  backBrand: { fontSize: 11, fontFamily: "Manrope_700Bold" },
-  backLbl:   { fontSize: 8,  fontFamily: "Manrope_600SemiBold", color: "#555", letterSpacing: 0.8, marginBottom: 1 },
-  backVal:   { fontSize: 13, fontFamily: "Manrope_700Bold",    color: "#FFFFFF", marginBottom: 6 },
-  backRow:   { flexDirection: "row", gap: 24 },
-
-  useBtn: { marginTop: 6, height: 32, borderRadius: 8, borderWidth: 1, alignItems: "center", justifyContent: "center" },
-  useTxt: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
-});
-
-const s = StyleSheet.create({
-  root: { flex: 1 },
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: WHITE },
 
   header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: BG,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: BORDER,
   },
-  backBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  title:   { fontSize: 13, fontFamily: "Manrope_700Bold", color: TEXT, textAlign: "center" },
-  divider: { height: 1, backgroundColor: "#D1D1D1" },
+  backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: INPUT_BG, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontFamily: "Inter_700Bold", fontSize: 17, color: TEXT_DARK },
+  headerRight: { width: 36 },
 
-  toggle: {
-    flexDirection: "row", marginHorizontal: 20, marginVertical: 16,
-    borderRadius: 14, borderWidth: 1, padding: 4, gap: 4,
+  searchRow: { paddingHorizontal: 20, paddingVertical: 14 },
+  searchWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: INPUT_BG,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 46,
+    gap: 10,
   },
-  toggleBtn:    { flex: 1, height: 40, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  toggleActive: { backgroundColor: "#000000" },
-  toggleTxt:    { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+  searchIcon: {},
+  searchInput: { flex: 1, fontFamily: "Inter_400Regular", fontSize: 14, color: TEXT_DARK },
 
-  list:    { paddingHorizontal: 16, paddingBottom: 40 },
-  colWrap: { gap: 12, marginBottom: 12 },
+  sectionTitle: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: TEXT_DARK, paddingHorizontal: 20, marginBottom: 12, marginTop: 4 },
+
+  popularRow: { flexDirection: "row", paddingHorizontal: 20, gap: 12, marginBottom: 20 },
+  popularItem: { flex: 1, alignItems: "center", gap: 8 },
+  popularIcon: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  popularLabel: { fontFamily: "Inter_500Medium", fontSize: 11, color: TEXT_GRAY, textAlign: "center" },
+
+  divider: { height: 1, backgroundColor: BORDER, marginHorizontal: 20, marginBottom: 20 },
+
+  catCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: BORDER,
+    gap: 14,
+  },
+  catIconWrap: { width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  catLabel: { flex: 1, fontFamily: "Inter_500Medium", fontSize: 14, color: TEXT_DARK },
+
+  emptyWrap: { alignItems: "center", paddingTop: 48, gap: 12 },
+  emptyText: { fontFamily: "Inter_400Regular", fontSize: 14, color: TEXT_LIGHT },
+
+  ctaWrap: {
+    paddingHorizontal: 20, paddingVertical: 16,
+    borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: BORDER,
+    backgroundColor: WHITE,
+  },
+  ctaBtn: {
+    backgroundColor: BLACK, borderRadius: 14, height: 52,
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+  },
+  ctaText: { fontFamily: "Inter_600SemiBold", fontSize: 16, color: WHITE },
 });
