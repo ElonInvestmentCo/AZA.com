@@ -9,7 +9,7 @@
  * Apple Sign-In is shown on iOS only (native entitlement required).
  */
 
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Google from "expo-auth-session/providers/google";
 import * as Haptics from "expo-haptics";
@@ -190,7 +190,7 @@ function AppleSignIn({ onSuccess, onError }: Props) {
     >
       {loading
         ? <ActivityIndicator size="small" color="#FFF" />
-        : <><AntDesign name="apple1" size={20} color={disabled ? C.disabled.text : C.apple.icon} /><Text style={[ss.txt, { color: disabled ? C.disabled.text : C.apple.text }]}>Apple</Text></>
+        : <><Ionicons name="logo-apple" size={20} color={disabled ? C.disabled.text : C.apple.icon} /><Text style={[ss.txt, { color: disabled ? C.disabled.text : C.apple.text }]}>Apple</Text></>
       }
     </SocialBtn>
   );
@@ -218,7 +218,7 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
   const googleEnabled = canRunGoogleOnThisPlatform();
 
   return (
-    <Animated.View entering={FadeIn.duration(220)} style={ss.row}>
+    <View style={ss.row}>
       <View style={[ss.half, { width: btnW }]}>
         {googleEnabled
           ? <GoogleSignInActive onSuccess={onSuccess} onError={onError} />

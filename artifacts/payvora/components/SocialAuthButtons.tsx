@@ -16,7 +16,7 @@
  * Apple works on iOS native only; shows an informative alert on Android/web.
  */
 
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
@@ -245,7 +245,7 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
   const appleDisabled = Platform.OS !== "ios" || !appleAvail;
 
   return (
-    <Animated.View entering={FadeIn.duration(220)} style={styles.container}>
+    <View style={styles.container}>
       {/* Google */}
       <SocialBtn
         onPress={handleGoogle}
@@ -276,8 +276,8 @@ export default function SocialAuthButtons({ onSuccess, onError }: Props) {
           <ActivityIndicator size="small" color={C.loading} />
         ) : (
           <>
-            <AntDesign
-              name="apple1"
+            <Ionicons
+              name="logo-apple"
               size={20}
               color={appleDisabled ? C.disabled.icon : C.apple.icon}
             />
