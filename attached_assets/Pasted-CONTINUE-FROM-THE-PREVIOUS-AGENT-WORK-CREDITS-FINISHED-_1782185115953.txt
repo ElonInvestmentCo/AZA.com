@@ -1,0 +1,120 @@
+CONTINUE FROM THE PREVIOUS AGENT WORK (CREDITS FINISHED)
+
+Do NOT restart the project, redesign anything, or undo previous changes.
+
+The previous agent already started fixing:
+
+✅ Invalid "apple1" AntDesign icon warnings
+✅ Reanimated layout animation + transform conflict
+✅ Expo Router extraneous route warnings
+✅ Missing tab route issues
+✅ SocialAuthButtons JSX issues
+✅ Auth screen animation conflicts
+
+Continue from where it stopped.
+
+FIRST:
+Inspect the current codebase and verify the previous fixes actually applied.
+
+Check:
+
+1. EXPO GO RUNTIME
+- Start the app using Expo Go / Metro only
+- Do NOT use web preview
+- Confirm QR code works
+- Confirm app loads without blank screens
+
+2. FIX REMAINING WARNINGS
+
+ICON FIX:
+Search entire project for:
+"apple1"
+
+Replace any remaining invalid icon names with supported icons.
+
+Use:
+- Ionicons
+- Expo Vector Icons
+- OpenMoji/Iconify if already installed
+
+Do not change button design.
+
+3. REANIMATED FIX:
+Search for:
+entering=
+layout animations
+useAnimatedStyle
+transform
+
+Ensure no Animated.View has:
+- entering animation
+AND
+- transform style
+
+Use:
+
+<View>
+   <Animated.View entering={...}>
+      <Animated.View style={animatedTransformStyle}>
+          content
+      </Animated.View>
+   </Animated.View>
+</View>
+
+Keep UI unchanged.
+
+4. EXPO ROUTER FIX:
+Check all routes.
+
+Remove warnings like:
+
+"Too many screens defined"
+"Route card is extraneous"
+"Route history is extraneous"
+
+Either:
+- create missing routes properly
+OR
+- remove unused references
+
+Ensure every route has a valid component.
+
+5. NAVIGATION SAFETY:
+Test:
+
+Login → Signup
+Login → Forgot Password
+Auth → Home Dashboard
+Tabs navigation
+SendMoney navigation
+
+No blank screens.
+No undefined components.
+No broken router.push paths.
+
+6. EXPO GO ONLY:
+The final verification must be:
+
+Metro:
+"Using Expo Go"
+
+Not:
+Web preview
+
+7. DO NOT:
+- Change UI
+- Change colors
+- Redesign screens
+- Change navigation structure
+- Replace working components
+
+Only finish the fixes already started.
+
+Final requirement:
+
+App runs in Expo Go cleanly:
+✓ No invalid icons
+✓ No router warnings
+✓ No Reanimated warnings
+✓ No blank pages
+✓ Existing Payvora UI preserved

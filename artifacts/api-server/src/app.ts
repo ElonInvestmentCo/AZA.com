@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { getExpoUrl, buildQrPage } from "./lib/qr-page";
 
 const app: Express = express();
 
@@ -72,7 +73,17 @@ app.use(express.urlencoded({ extended: true }));
 /* ── Routes ──────────────────────────────────────────────────────────────── */
 app.use("/api", router);
 
-app.get("/", (_req: Request, res: Response) => {
+app.get("/", async (_req: Request, res: Response) => {
+  const [azaUrl, payvoraUrl] = await Promise.all([
+    getExpoUrl(19000),
+    getExpoUrl(19001),
+  ]);
+  const html = await buildQrPage(azaUrl, payvoraUrl);
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(html);
+});
+
+app.get("/api/status", (_req: Request, res: Response) => {
   res.json({ name: "Payvora API", version: "1.0.0", status: "ok" });
 });
 
