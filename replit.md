@@ -32,7 +32,7 @@ A fintech gift card trading platform — users can sell gift cards, fund their w
   - `app/onboarding.tsx` — 6-slide onboarding carousel
   - `context/AuthContext.tsx` — user auth state (AsyncStorage)
   - `assets/images/` — all local image assets
-- `artifacts/payvora/` — Payvora mobile app (separate brand)
+- `archive/payvora/` — Payvora (archived separate brand, not part of active workspace)
 - `attached_assets/aza_export/` — Figma export reference code
 - `attached_assets/design_ref/` — design reference screenshots
 
@@ -40,7 +40,7 @@ A fintech gift card trading platform — users can sell gift cards, fund their w
 
 - OTP verification (`/(auth)/otp`) is shown after email/password login AND after registration, but NOT after Google/Apple social auth (which goes directly to `/(tabs)`)
 - Gift Card button on the home dashboard opens a bottom sheet modal with two tiles: "Sell Gift Card" → `/(app)/sell-gift-card` and "Check Pending" → `/(app)/card-status`
-- White background light theme (bg: `#FFFFFF`, text: `#0B0A0A`, accent: `#35C2C1` teal) for AZA app
+- Dual-theme system: Light (bg `#FFFFFF`, accent `#35C2C1` teal, primary `#1E232C` black buttons) + Dark (bg `#070B14`, accent `#4F7CFF` blue). System-based switching via `useColorScheme`. Theme tokens live in `constants/colors.ts`, consumed via `hooks/useColors.ts`.
 - `/(app)/dashboard.tsx` is actually the "Fund Wallet" flow, not a real dashboard — the main home is at `/(tabs)/index.tsx`
 - AuthContext uses AsyncStorage to persist user session; login/register always succeed (mock auth)
 
