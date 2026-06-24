@@ -444,7 +444,7 @@ export default function RegisterScreen() {
           style={s.socialWrap}
         >
           <SocialAuthButtons
-            onSuccess={() => router.replace("/(auth)/otp")}
+            onSuccess={() => router.replace("/(tabs)")}
             onError={msg => { setSocialError(msg); }}
           />
           {socialError ? (

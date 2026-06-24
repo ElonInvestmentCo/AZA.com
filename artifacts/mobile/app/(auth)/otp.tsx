@@ -213,11 +213,11 @@ export default function OtpScreen() {
     }
     setLoading(true);
     setError("");
-    /* Simulate verification — navigate to new-password on success */
+    /* Simulate verification — navigate to main app on success */
     setTimeout(() => {
       setLoading(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.push("/(auth)/new-password");
+      router.replace("/(tabs)");
     }, 1200);
   };
 

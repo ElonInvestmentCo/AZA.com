@@ -343,7 +343,7 @@ export default function LoginScreen() {
           style={s.socialWrap}
         >
           <SocialAuthButtons
-            onSuccess={() => router.replace("/(auth)/otp")}
+            onSuccess={() => router.replace("/(tabs)")}
             onError={msg => { setSocialError(msg); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); }}
           />
           {socialError ? (

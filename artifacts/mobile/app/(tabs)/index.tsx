@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import {
   Dimensions,
   Image,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -42,7 +43,7 @@ const C = {
 };
 
 const SERVICES = [
-  { id: "gift",  icon: "gift"           as const, label: "Gift Card",   color: "#7C3AED", route: "/(app)/trade-asset" as const },
+  { id: "gift",  icon: "gift"           as const, label: "Gift Card",   color: "#7C3AED", route: null },
   { id: "set",   icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: null },
   { id: "elec",  icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
   { id: "cable", icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
@@ -134,7 +135,9 @@ export default function HomeScreen() {
   const insets   = useSafeAreaInsets();
   const { user } = useAuth();
 
-  const [balanceVisible, setBalanceVisible] = useState(true);
+  const [balanceVisible,   setBalanceVisible]   = useState(true);
+  const [giftModalVisible, setGiftModalVisible] = useState(false);
+
   const firstName = (user?.name ?? "User").split(" ")[0];
   const balance   = user?.balance ?? 200590;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -242,6 +245,7 @@ export default function HomeScreen() {
               <ServiceItem
                 item={item}
                 onPress={press(() => {
+                  if (item.id === "gift") { setGiftModalVisible(true); return; }
                   if (item.route) router.push(item.route as any);
                 })}
               />
@@ -293,6 +297,72 @@ export default function HomeScreen() {
         </Animated.View>
 
       </ScrollView>
+
+      {/* ── Gift Card Bottom Sheet Modal ─────────────────────────────────── */}
+      <Modal
+        visible={giftModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setGiftModalVisible(false)}
+      >
+        <Pressable style={gm.overlay} onPress={() => setGiftModalVisible(false)}>
+          <Pressable style={gm.sheet} onPress={() => {}}>
+            {/* Header */}
+            <View style={gm.sheetHeader}>
+              <Text style={gm.sheetTitle}>I want to?</Text>
+              <TouchableOpacity
+                style={gm.closeBtn}
+                onPress={() => setGiftModalVisible(false)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Feather name="x" size={18} color="#1E232C" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Option tiles */}
+            <View style={gm.tilesRow}>
+              {/* Sell Gift Card */}
+              <TouchableOpacity
+                style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
+                activeOpacity={0.82}
+                onPress={() => {
+                  setGiftModalVisible(false);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push("/(app)/sell-gift-card" as any);
+                }}
+              >
+                <View style={[gm.tileIconWrap, { backgroundColor: "rgba(0,0,0,0.08)" }]}>
+                  <Feather name="gift" size={26} color="#5C4000" />
+                </View>
+                <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
+                <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
+                  Sell local and international gift cards easily and instantly on aza.
+                </Text>
+              </TouchableOpacity>
+
+              {/* Check Pending */}
+              <TouchableOpacity
+                style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
+                activeOpacity={0.82}
+                onPress={() => {
+                  setGiftModalVisible(false);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push("/(app)/card-status" as any);
+                }}
+              >
+                <View style={[gm.tileIconWrap, { backgroundColor: "rgba(0,0,0,0.08)" }]}>
+                  <Feather name="clock" size={26} color="#7A1535" />
+                </View>
+                <Text style={[gm.tileTitle, { color: "#7A1535" }]}>Check Pending</Text>
+                <Text style={[gm.tileDesc, { color: "#7A153599" }]}>
+                  Check Status of Pending gift card sale.
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
     </View>
   );
 }
@@ -383,4 +453,72 @@ const tx = StyleSheet.create({
   title:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: "#595F67", marginBottom: 2 },
   date:   { fontSize: 11, fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
   amount: { fontSize: 12, fontFamily: "Manrope_700Bold" },
+});
+
+const gm = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: "#FFFFFF",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 36,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 24,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontFamily: "Manrope_700Bold",
+    color: "#1E232C",
+  },
+  closeBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#F7F8F9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tilesRow: {
+    flexDirection: "row",
+    gap: 14,
+  },
+  tile: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 16,
+    gap: 10,
+    minHeight: 160,
+  },
+  tileIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  tileTitle: {
+    fontSize: 14,
+    fontFamily: "Manrope_700Bold",
+  },
+  tileDesc: {
+    fontSize: 12,
+    fontFamily: "Manrope_400Regular",
+    lineHeight: 17,
+  },
 });
