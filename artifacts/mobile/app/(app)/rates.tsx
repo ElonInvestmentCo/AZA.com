@@ -1,8 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  FlatList,
   Platform,
   Pressable,
   ScrollView,
@@ -11,210 +11,207 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
   bg:      "#FFFFFF",
   text:    "#0B0A0A",
+  navy:    "#061941",
   textSec: "#595F67",
   textMut: "#AAAFB5",
-  border:  "#EDF1F3",
-  surface: "#F8F9FA",
-  accent:  "#35C2C1",
+  border:  "#F0F0F0",
   success: "#00B03C",
-  warn:    "#F59E0B",
+  danger:  "#EF4444",
+  primary: "#135EF2",
 };
 
-type RateCategory = "Gift Cards" | "Crypto" | "FX";
+type Category = "Gift Cards" | "Crypto" | "eSIM";
 
-type GiftRate = { id:string; brand:string; country:string; rate:string; trend:"up"|"down"|"flat"; updated:string };
-type CryptoRate = { id:string; symbol:string; name:string; buyRate:string; sellRate:string; change:string; pos:boolean };
-type FXRate = { id:string; pair:string; buy:string; sell:string };
-
-const GIFT_RATES: GiftRate[] = [
-  { id:"1", brand:"Amazon",      country:"USA",       rate:"₦1,580/$",  trend:"up",   updated:"5 min ago" },
-  { id:"2", brand:"Amazon",      country:"UK",        rate:"₦1,720/£",  trend:"up",   updated:"5 min ago" },
-  { id:"3", brand:"Amazon",      country:"Australia", rate:"₦980/A$",   trend:"flat", updated:"12 min ago" },
-  { id:"4", brand:"iTunes",      country:"USA",       rate:"₦1,500/$",  trend:"down", updated:"8 min ago" },
-  { id:"5", brand:"iTunes",      country:"UK",        rate:"₦1,680/£",  trend:"up",   updated:"8 min ago" },
-  { id:"6", brand:"Google Play", country:"USA",       rate:"₦1,350/$",  trend:"flat", updated:"15 min ago" },
-  { id:"7", brand:"Steam",       country:"USA",       rate:"₦1,200/$",  trend:"up",   updated:"10 min ago" },
-  { id:"8", brand:"PlayStation", country:"USA",       rate:"₦1,450/$",  trend:"down", updated:"20 min ago" },
-  { id:"9", brand:"Xbox",        country:"USA",       rate:"₦1,300/$",  trend:"flat", updated:"25 min ago" },
-  { id:"10",brand:"Walmart",     country:"USA",       rate:"₦1,480/$",  trend:"up",   updated:"7 min ago"  },
-  { id:"11",brand:"Target",      country:"USA",       rate:"₦1,420/$",  trend:"flat", updated:"18 min ago" },
-  { id:"12",brand:"Visa",        country:"USA",       rate:"₦1,600/$",  trend:"up",   updated:"3 min ago"  },
-  { id:"13",brand:"Mastercard",  country:"USA",       rate:"₦1,590/$",  trend:"up",   updated:"3 min ago"  },
-  { id:"14",brand:"Spotify",     country:"USA",       rate:"₦1,100/$",  trend:"down", updated:"30 min ago" },
-  { id:"15",brand:"Netflix",     country:"USA",       rate:"₦1,050/$",  trend:"flat", updated:"22 min ago" },
-  { id:"16",brand:"Razer Gold",  country:"Global",    rate:"₦1,250/$",  trend:"up",   updated:"9 min ago"  },
+const GIFT_RATES = [
+  { id:"1", name:"Amazon",         flag:"🇺🇸", rate:"₦1,650/USD", badge:"Popular",   badgeBg:"#FFF2CF", badgeColor:"#5C4000" },
+  { id:"2", name:"iTunes",         flag:"🍎", rate:"₦1,580/USD", badge:"Top Rate",  badgeBg:"#D6E1FF", badgeColor:"#1A3070" },
+  { id:"3", name:"Google Play",    flag:"▶️",  rate:"₦1,540/USD", badge:null,        badgeBg:"",         badgeColor:"" },
+  { id:"4", name:"Steam",          flag:"🎮", rate:"₦1,490/USD", badge:null,        badgeBg:"",         badgeColor:"" },
+  { id:"5", name:"Visa Gift Card", flag:"💳", rate:"₦1,600/USD", badge:"Fast Pay",  badgeBg:"#F0FFF4", badgeColor:"#059669" },
+  { id:"6", name:"Walmart",        flag:"🛒", rate:"₦1,450/USD", badge:null,        badgeBg:"",         badgeColor:"" },
+  { id:"7", name:"eBay",           flag:"🛍️", rate:"₦1,420/USD", badge:null,        badgeBg:"",         badgeColor:"" },
+  { id:"8", name:"Vanilla",        flag:"🍦", rate:"₦1,380/USD", badge:null,        badgeBg:"",         badgeColor:"" },
 ];
 
-const CRYPTO_RATES: CryptoRate[] = [
-  { id:"btc",  symbol:"BTC",  name:"Bitcoin",  buyRate:"₦72,800,000", sellRate:"₦70,500,000", change:"+2.4%", pos:true  },
-  { id:"eth",  symbol:"ETH",  name:"Ethereum", buyRate:"₦3,850,000",  sellRate:"₦3,720,000",  change:"-1.2%", pos:false },
-  { id:"usdt", symbol:"USDT", name:"Tether",   buyRate:"₦1,605",      sellRate:"₦1,595",      change:"+0.0%", pos:true  },
-  { id:"bnb",  symbol:"BNB",  name:"BNB",      buyRate:"₦520,000",    sellRate:"₦505,000",    change:"+1.8%", pos:true  },
-  { id:"sol",  symbol:"SOL",  name:"Solana",   buyRate:"₦165,000",    sellRate:"₦160,000",    change:"+5.2%", pos:true  },
-  { id:"xrp",  symbol:"XRP",  name:"XRP",      buyRate:"₦1,080",      sellRate:"₦1,040",      change:"-0.8%", pos:false },
+const CRYPTO_RATES = [
+  { id:"1", name:"Bitcoin",  symbol:"BTC", rate:"₦85,200,000",  change:"+2.4%",  up:true,  bg:"#FFF7ED", color:"#F7931A" },
+  { id:"2", name:"Ethereum", symbol:"ETH", rate:"₦5,100,000",   change:"+1.8%",  up:true,  bg:"#EFF6FF", color:"#627EEA" },
+  { id:"3", name:"USDT",     symbol:"USDT",rate:"₦1,620",       change:"0.0%",   up:true,  bg:"#F0FFF9", color:"#26A17B" },
+  { id:"4", name:"BNB",      symbol:"BNB", rate:"₦560,000",     change:"-0.7%",  up:false, bg:"#FFFBEB", color:"#F3BA2F" },
+  { id:"5", name:"Solana",   symbol:"SOL", rate:"₦128,000",     change:"+5.1%",  up:true,  bg:"#F5F3FF", color:"#9945FF" },
+  { id:"6", name:"XRP",      symbol:"XRP", rate:"₦920",         change:"-1.2%",  up:false, bg:"#F0F9FF", color:"#346AA9" },
 ];
-
-const FX_RATES: FXRate[] = [
-  { id:"usd", pair:"USD / NGN", buy:"₦1,610", sell:"₦1,590" },
-  { id:"gbp", pair:"GBP / NGN", buy:"₦2,040", sell:"₦2,010" },
-  { id:"eur", pair:"EUR / NGN", buy:"₦1,750", sell:"₦1,730" },
-  { id:"cad", pair:"CAD / NGN", buy:"₦1,190", sell:"₦1,170" },
-  { id:"aud", pair:"AUD / NGN", buy:"₦1,050", sell:"₦1,030" },
-];
-
-const CATEGORIES: RateCategory[] = ["Gift Cards", "Crypto", "FX"];
 
 export default function RatesScreen() {
-  const [category, setCategory] = useState<RateCategory>("Gift Cards");
-
-  const trendIcon = (t: GiftRate["trend"]) =>
-    t === "up" ? "trending-up" : t === "down" ? "trending-down" : "minus";
-  const trendColor = (t: GiftRate["trend"]) =>
-    t === "up" ? C.success : t === "down" ? "#FF4444" : C.textMut;
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 48 : insets.top;
+  const [tab, setTab] = useState<Category>("Gift Cards");
 
   return (
-    <View style={s.root}>
-      <ScreenHeader title="Live Rates" />
+    <View style={[s.root, { paddingTop: topPad }]}>
 
-      {/* Category tabs */}
-      <View style={s.tabRow}>
-        {CATEGORIES.map(cat => {
-          const active = cat === category;
-          return (
-            <TouchableOpacity
-              key={cat}
-              style={[s.tab, active && s.tabActive]}
-              onPress={() => { Haptics.selectionAsync(); setCategory(cat); }}
-            >
-              <Text style={[s.tabText, active && s.tabTextActive]}>{cat}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      {/* Header */}
+      <Animated.View entering={FadeInDown.duration(280)} style={s.header}>
+        <TouchableOpacity style={s.backBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}>
+          <Feather name="arrow-left" size={20} color={C.navy} />
+        </TouchableOpacity>
+        <Text style={s.title}>Rates</Text>
+        <View style={{ width: 36 }} />
+      </Animated.View>
 
-      {/* Live indicator */}
-      <View style={s.liveRow}>
-        <View style={s.liveDot} />
-        <Text style={s.liveText}>Live rates — updated every 5 minutes</Text>
-      </View>
+      {/* Tab bar */}
+      <Animated.View entering={FadeInDown.duration(290).delay(30)} style={s.tabBar}>
+        {(["Gift Cards", "Crypto", "eSIM"] as Category[]).map(t => (
+          <Pressable
+            key={t}
+            style={[s.tabItem, tab === t && s.tabItemActive]}
+            onPress={() => { Haptics.selectionAsync(); setTab(t); }}
+          >
+            <Text style={[s.tabText, tab === t && s.tabTextActive]}>{t}</Text>
+          </Pressable>
+        ))}
+      </Animated.View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 100 }]}
+      >
 
-        {/* Gift Cards */}
-        {category === "Gift Cards" && (
-          <>
-            {GIFT_RATES.map((r, i) => (
-              <Animated.View key={r.id} entering={FadeInDown.duration(260).delay(i * 20)}>
-                <View style={s.giftRow}>
-                  <View style={s.giftLeft}>
-                    <Text style={s.giftBrand}>{r.brand}</Text>
-                    <Text style={s.giftCountry}>{r.country} · {r.updated}</Text>
-                  </View>
-                  <View style={s.giftRight}>
-                    <Text style={s.giftRate}>{r.rate}</Text>
-                    <Feather name={trendIcon(r.trend)} size={14} color={trendColor(r.trend)} />
-                  </View>
-                </View>
-              </Animated.View>
-            ))}
-          </>
-        )}
-
-        {/* Crypto */}
-        {category === "Crypto" && (
-          <>
-            <View style={s.cryptoHeader}>
-              <Text style={s.colHead}>Asset</Text>
-              <Text style={s.colHead}>Buy</Text>
-              <Text style={s.colHead}>Sell</Text>
-              <Text style={s.colHead}>Change</Text>
+        {tab === "Gift Cards" && (
+          <Animated.View entering={FadeInDown.duration(300).delay(40)} style={{ gap: 1 }}>
+            {/* Header row */}
+            <View style={s.tableHeader}>
+              <Text style={[s.thText, { flex: 2 }]}>Gift Card</Text>
+              <Text style={[s.thText, { flex: 1, textAlign: "right" }]}>Rate</Text>
             </View>
-            {CRYPTO_RATES.map((r, i) => (
-              <Animated.View key={r.id} entering={FadeInDown.duration(260).delay(i * 25)}>
-                <View style={s.cryptoRow}>
-                  <Text style={s.cryptoSymbol}>{r.symbol}</Text>
-                  <Text style={s.cryptoPrice}>{r.buyRate}</Text>
-                  <Text style={s.cryptoPrice}>{r.sellRate}</Text>
-                  <Text style={[s.cryptoChange, { color: r.pos ? C.success : "#FF4444" }]}>{r.change}</Text>
-                </View>
-              </Animated.View>
-            ))}
-          </>
-        )}
-
-        {/* FX */}
-        {category === "FX" && (
-          <>
-            {FX_RATES.map((r, i) => (
-              <Animated.View key={r.id} entering={FadeInDown.duration(260).delay(i * 30)}>
-                <View style={s.fxRow}>
-                  <Text style={s.fxPair}>{r.pair}</Text>
-                  <View style={s.fxRates}>
-                    <View>
-                      <Text style={s.fxLabel}>Buy</Text>
-                      <Text style={s.fxVal}>{r.buy}</Text>
+            {GIFT_RATES.map((item, i) => (
+              <Animated.View key={item.id} entering={FadeInDown.duration(240).delay(i * 30)}>
+                <TouchableOpacity
+                  style={s.rateRow}
+                  activeOpacity={0.75}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push("/(app)/sell-gift-card" as any);
+                  }}
+                >
+                  <View style={s.rateLeft}>
+                    <View style={s.rateIconCircle}>
+                      <Text style={{ fontSize: 20 }}>{item.flag}</Text>
                     </View>
-                    <View>
-                      <Text style={s.fxLabel}>Sell</Text>
-                      <Text style={s.fxVal}>{r.sell}</Text>
+                    <View style={{ gap: 3 }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                        <Text style={s.rateName}>{item.name}</Text>
+                        {item.badge && (
+                          <View style={[s.badge, { backgroundColor: item.badgeBg }]}>
+                            <Text style={[s.badgeText, { color: item.badgeColor }]}>{item.badge}</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={s.rateSubtitle}>per USD</Text>
                     </View>
                   </View>
-                </View>
+                  <View style={s.rateRight}>
+                    <Text style={s.rateValue}>{item.rate}</Text>
+                    <Feather name="chevron-right" size={14} color={C.textMut} />
+                  </View>
+                </TouchableOpacity>
+                {i < GIFT_RATES.length - 1 && <View style={s.divider} />}
               </Animated.View>
             ))}
-          </>
+          </Animated.View>
         )}
+
+        {tab === "Crypto" && (
+          <Animated.View entering={FadeInDown.duration(300).delay(40)} style={{ gap: 1 }}>
+            <View style={s.tableHeader}>
+              <Text style={[s.thText, { flex: 2 }]}>Coin</Text>
+              <Text style={[s.thText, { flex: 1, textAlign: "right" }]}>Price (NGN)</Text>
+            </View>
+            {CRYPTO_RATES.map((item, i) => (
+              <Animated.View key={item.id} entering={FadeInDown.duration(240).delay(i * 30)}>
+                <TouchableOpacity
+                  style={s.rateRow}
+                  activeOpacity={0.75}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push("/(app)/crypto" as any);
+                  }}
+                >
+                  <View style={s.rateLeft}>
+                    <View style={[s.rateIconCircle, { backgroundColor: item.bg }]}>
+                      <Text style={{ fontSize: 14, fontFamily: "Manrope_700Bold", color: item.color }}>{item.symbol.slice(0,2)}</Text>
+                    </View>
+                    <View style={{ gap: 3 }}>
+                      <Text style={s.rateName}>{item.name}</Text>
+                      <Text style={s.rateSubtitle}>{item.symbol}</Text>
+                    </View>
+                  </View>
+                  <View style={s.rateRight}>
+                    <Text style={s.rateValue}>{item.rate}</Text>
+                    <Text style={{ fontSize: 11, fontFamily: "Manrope_600SemiBold", color: item.up ? C.success : C.danger }}>
+                      {item.change}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                {i < CRYPTO_RATES.length - 1 && <View style={s.divider} />}
+              </Animated.View>
+            ))}
+          </Animated.View>
+        )}
+
+        {tab === "eSIM" && (
+          <Animated.View entering={FadeInUp.duration(300).delay(40)} style={s.emptyState}>
+            <Feather name="wifi" size={40} color={C.textMut} />
+            <Text style={s.emptyTitle}>eSIM Rates</Text>
+            <Text style={s.emptyDesc}>eSIM rates will be available soon. Check back later.</Text>
+          </Animated.View>
+        )}
+
       </ScrollView>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root:  { flex: 1, backgroundColor: C.bg },
-  scroll:{ padding: 20, paddingBottom: 100 },
+  root: { flex: 1, backgroundColor: C.bg },
 
-  tabRow: { flexDirection:"row", marginHorizontal:20, marginBottom:0, backgroundColor:C.surface, borderRadius:12, padding:4 },
-  tab:    { flex:1, paddingVertical:10, alignItems:"center", borderRadius:10 },
-  tabActive: { backgroundColor:"#000" },
-  tabText:   { fontSize:13, fontFamily:"Manrope_600SemiBold", color:C.textSec },
-  tabTextActive: { color:"#fff" },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 12, paddingTop: 8 },
+  backBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
+  title: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.navy },
 
-  liveRow: { flexDirection:"row", alignItems:"center", gap:6, paddingHorizontal:20, paddingVertical:10 },
-  liveDot: { width:7, height:7, borderRadius:3.5, backgroundColor:"#00B03C" },
-  liveText:{ fontSize:12, fontFamily:"Manrope_400Regular", color:C.textSec },
+  tabBar: { flexDirection: "row", paddingHorizontal: 20, gap: 8, paddingBottom: 12 },
+  tabItem:       { flex: 1, paddingVertical: 9, borderRadius: 10, backgroundColor: "#F8F9FA", alignItems: "center", borderWidth: 1, borderColor: C.border },
+  tabItemActive: { backgroundColor: C.navy, borderColor: C.navy },
+  tabText:       { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.textSec },
+  tabTextActive: { color: "#FFFFFF" },
 
-  giftRow: {
-    flexDirection:"row", alignItems:"center", justifyContent:"space-between",
-    paddingVertical:14, borderBottomWidth:1, borderBottomColor:C.border,
+  scroll: { paddingHorizontal: 20, paddingTop: 4 },
+
+  tableHeader: {
+    flexDirection: "row", justifyContent: "space-between",
+    paddingHorizontal: 4, paddingVertical: 10, marginBottom: 2,
   },
-  giftLeft:    {},
-  giftBrand:   { fontSize:14, fontFamily:"Manrope_600SemiBold", color:C.text },
-  giftCountry: { fontSize:11, fontFamily:"Manrope_400Regular", color:C.textMut, marginTop:2 },
-  giftRight:   { flexDirection:"row", alignItems:"center", gap:6 },
-  giftRate:    { fontSize:14, fontFamily:"Manrope_700Bold", color:C.text },
+  thText: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.5 },
 
-  cryptoHeader: { flexDirection:"row", paddingBottom:8, borderBottomWidth:1, borderBottomColor:C.border, marginBottom:4 },
-  colHead: { flex:1, fontSize:11, fontFamily:"Manrope_600SemiBold", color:C.textMut, textAlign:"right" },
-  cryptoRow: {
-    flexDirection:"row", alignItems:"center",
-    paddingVertical:12, borderBottomWidth:1, borderBottomColor:C.border,
-  },
-  cryptoSymbol: { flex:1, fontSize:13, fontFamily:"Manrope_700Bold", color:C.text },
-  cryptoPrice:  { flex:1, fontSize:12, fontFamily:"Manrope_500Medium", color:C.text, textAlign:"right" },
-  cryptoChange: { flex:1, fontSize:12, fontFamily:"Manrope_700Bold", textAlign:"right" },
+  rateRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14 },
+  rateLeft:   { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+  rateRight:  { alignItems: "flex-end", gap: 3 },
+  rateIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center" },
+  rateName:    { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.text },
+  rateSubtitle:{ fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut },
+  rateValue:   { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.navy },
+  badge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  badgeText: { fontSize: 9, fontFamily: "Manrope_700Bold" },
+  divider: { height: 1, backgroundColor: C.border },
 
-  fxRow: {
-    flexDirection:"row", alignItems:"center", justifyContent:"space-between",
-    paddingVertical:16, borderBottomWidth:1, borderBottomColor:C.border,
-  },
-  fxPair:  { fontSize:15, fontFamily:"Manrope_600SemiBold", color:C.text },
-  fxRates: { flexDirection:"row", gap:24 },
-  fxLabel: { fontSize:10, fontFamily:"Manrope_400Regular", color:C.textMut, marginBottom:2 },
-  fxVal:   { fontSize:13, fontFamily:"Manrope_700Bold", color:C.text },
+  emptyState: { alignItems: "center", paddingTop: 80, gap: 12 },
+  emptyTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.navy },
+  emptyDesc:  { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.textSec, textAlign: "center", lineHeight: 22 },
 });

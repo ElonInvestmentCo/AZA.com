@@ -15,410 +15,270 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
-  bg:      "#FFFFFF",
-  text:    "#0B0A0A",
-  textSec: "#595F67",
-  textMut: "#AAAFB5",
-  border:  "#EDF1F3",
-  surface: "#F8F9FA",
-  inputBg: "#F7F8F9",
-  btn:     "#000000",
-  accent:  "#35C2C1",
-  success: "#00B03C",
-  danger:  "#FF4444",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  inputBg:   "#F0F0F0",
+  border:    "#EDF1F3",
+  success:   "#00B03C",
+  dark:      "#010101",
+  black:     "#000000",
 };
 
-type Asset = {
-  id:      string;
-  symbol:  string;
-  name:    string;
-  price:   number;
-  change:  number;
-  color:   string;
-  holding: number;
-};
-
-const ASSETS: Asset[] = [
-  { id:"btc",  symbol:"BTC",  name:"Bitcoin",      price:43250.00,  change:2.4,  color:"#F7931A", holding:0.0023 },
-  { id:"eth",  symbol:"ETH",  name:"Ethereum",     price:2315.50,   change:-1.2, color:"#627EEA", holding:0.15   },
-  { id:"usdt", symbol:"USDT", name:"Tether",       price:1.00,      change:0.01, color:"#26A17B", holding:120.00 },
-  { id:"usdc", symbol:"USDC", name:"USD Coin",     price:1.00,      change:0.0,  color:"#2775CA", holding:0      },
-  { id:"bnb",  symbol:"BNB",  name:"BNB",          price:312.80,    change:1.8,  color:"#F3BA2F", holding:0      },
-  { id:"sol",  symbol:"SOL",  name:"Solana",       price:98.40,     change:5.2,  color:"#9945FF", holding:0      },
-  { id:"xrp",  symbol:"XRP",  name:"XRP",          price:0.63,      change:-0.8, color:"#006097", holding:0      },
-  { id:"doge", symbol:"DOGE", name:"Dogecoin",     price:0.082,     change:3.1,  color:"#C2A633", holding:0      },
-  { id:"ltc",  symbol:"LTC",  name:"Litecoin",     price:74.20,     change:-2.3, color:"#BFBBBB", holding:0      },
-  { id:"trx",  symbol:"TRX",  name:"TRON",         price:0.112,     change:0.9,  color:"#EF0027", holding:0      },
+const COINS = [
+  { id: "btc",  name: "Bitcoin",  symbol: "BTC",  rate: 85200000, bg: "#FFF7ED", color: "#F7931A" },
+  { id: "eth",  name: "Ethereum", symbol: "ETH",  rate: 5100000,  bg: "#EFF6FF", color: "#627EEA" },
+  { id: "usdt", name: "Tether",   symbol: "USDT", rate: 1620,     bg: "#F0FFF9", color: "#26A17B" },
+  { id: "bnb",  name: "BNB",      symbol: "BNB",  rate: 560000,   bg: "#FFFBEB", color: "#F3BA2F" },
+  { id: "sol",  name: "Solana",   symbol: "SOL",  rate: 128000,   bg: "#F5F3FF", color: "#9945FF" },
+  { id: "xrp",  name: "XRP",      symbol: "XRP",  rate: 920,      bg: "#F0F9FF", color: "#346AA9" },
 ];
 
-type Mode = "list" | "buy" | "sell" | "confirm" | "success";
+const NETWORKS = ["ERC-20", "BEP-20", "TRC-20", "Solana", "Bitcoin"];
 
-const NETWORKS: Record<string,string[]> = {
-  usdt: ["ERC20","TRC20","BEP20"],
-  usdc: ["ERC20","Polygon"],
-  bnb:  ["BEP20"],
-  eth:  ["ERC20","Arbitrum","Optimism"],
-  sol:  ["Solana"],
-  btc:  ["Bitcoin"],
-  xrp:  ["XRP Ledger"],
-  doge: ["Dogecoin"],
-  ltc:  ["Litecoin"],
-  trx:  ["TRC20"],
-};
+function FieldLabel({ text }: { text: string }) {
+  return <Text style={f.label}>{text}</Text>;
+}
 
-function AssetRow({ asset, onPress }: { asset: Asset; onPress: () => void }) {
-  const pos = asset.change >= 0;
+const f = StyleSheet.create({
+  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24 },
+  input: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
+    borderRadius: 10, paddingHorizontal: 14, height: 46,
+  },
+  val: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
+  ph:  { color: "#646464", fontSize: 10 },
+});
+
+function PickerModal({
+  visible, title, onClose, children,
+}: { visible: boolean; title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <TouchableOpacity style={ar.wrap} activeOpacity={0.8} onPress={onPress}>
-      <View style={[ar.icon, { backgroundColor: asset.color + "20" }]}>
-        <Text style={[ar.sym, { color: asset.color }]}>{asset.symbol.charAt(0)}</Text>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={pm.overlay} onPress={onClose} />
+      <View style={pm.sheet}>
+        <View style={pm.handle} />
+        <Text style={pm.title}>{title}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>{children}</ScrollView>
       </View>
-      <View style={ar.info}>
-        <Text style={ar.name}>{asset.name}</Text>
-        <Text style={ar.symbol}>{asset.symbol}</Text>
-      </View>
-      <View style={ar.right}>
-        <Text style={ar.price}>${asset.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
-        <View style={[ar.badge, { backgroundColor: (pos ? C.success : C.danger) + "15" }]}>
-          <Feather name={pos ? "trending-up" : "trending-down"} size={10} color={pos ? C.success : C.danger} />
-          <Text style={[ar.change, { color: pos ? C.success : C.danger }]}>
-            {pos ? "+" : ""}{asset.change}%
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+    </Modal>
   );
 }
 
-const ar = StyleSheet.create({
-  wrap:   { flexDirection:"row", alignItems:"center", gap:12, paddingVertical:14, borderBottomWidth:1, borderBottomColor:"#EDF1F3" },
-  icon:   { width:44, height:44, borderRadius:22, alignItems:"center", justifyContent:"center" },
-  sym:    { fontSize:18, fontFamily:"Manrope_700Bold" },
-  info:   { flex:1 },
-  name:   { fontSize:14, fontFamily:"Manrope_600SemiBold", color:"#0B0A0A" },
-  symbol: { fontSize:12, fontFamily:"Manrope_400Regular", color:"#AAAFB5", marginTop:2 },
-  right:  { alignItems:"flex-end", gap:4 },
-  price:  { fontSize:14, fontFamily:"Manrope_700Bold", color:"#0B0A0A" },
-  badge:  { flexDirection:"row", alignItems:"center", gap:3, paddingHorizontal:6, paddingVertical:2, borderRadius:8 },
-  change: { fontSize:10, fontFamily:"Manrope_600SemiBold" },
+const pm = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
+  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, maxHeight: "65%" },
+  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
+  title:  { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
 });
 
 export default function CryptoScreen() {
   const router = useRouter();
-  const [mode,     setMode]     = useState<Mode>("list");
-  const [asset,    setAsset]    = useState<Asset | null>(null);
-  const [tab,      setTab]      = useState<"buy"|"sell">("buy");
-  const [amount,   setAmount]   = useState("");
-  const [network,  setNetwork]  = useState("");
-  const [address,  setAddress]  = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [searchQ,  setSearchQ]  = useState("");
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
 
-  const nets = asset ? (NETWORKS[asset.id] ?? ["Default"]) : [];
-  const filtered = ASSETS.filter(a =>
-    a.name.toLowerCase().includes(searchQ.toLowerCase()) ||
-    a.symbol.toLowerCase().includes(searchQ.toLowerCase())
-  );
+  const [selectedCoin, setSelectedCoin] = useState(COINS[0]);
+  const [network,      setNetwork]      = useState("");
+  const [address,      setAddress]      = useState("");
+  const [amount,       setAmount]       = useState("");
+  const [picker, setPicker] = useState<"coin" | "network" | null>(null);
 
-  const totalBalance = ASSETS.reduce((sum, a) => sum + a.holding * a.price, 0);
+  const nairaValue = amount ? (parseFloat(amount) * selectedCoin.rate) : 0;
 
-  const handleConfirm = async () => {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1600));
-    setLoading(false);
-    setMode("success");
-  };
-
-  const reset = () => {
-    setMode("list");
-    setAsset(null);
-    setAmount("");
-    setNetwork("");
-    setAddress("");
-  };
-
-  if (mode === "success") {
-    return (
-      <View style={s.root}>
-        <ScreenHeader title={tab === "buy" ? "Purchase Successful" : "Sale Successful"} showBack={false} />
-        <View style={s.successWrap}>
-          <Animated.View entering={FadeInDown.duration(400).springify()} style={[s.successCircle, { backgroundColor: asset?.color ?? C.success }]}>
-            <Feather name="check" size={38} color="#fff" />
-          </Animated.View>
-          <Animated.Text entering={FadeInUp.duration(320).delay(80)} style={s.successTitle}>
-            {tab === "buy" ? "Purchase Complete!" : "Sale Complete!"}
-          </Animated.Text>
-          <Animated.Text entering={FadeInUp.duration(320).delay(120)} style={s.successSub}>
-            {amount} worth of {asset?.name} has been {tab === "buy" ? "added to" : "removed from"} your wallet
-          </Animated.Text>
-          <Animated.View entering={FadeInUp.duration(300).delay(160)} style={s.receiptCard}>
-            {[
-              { label:"Asset",      value: `${asset?.name} (${asset?.symbol})` },
-              { label:"Action",     value: tab === "buy" ? "Buy" : "Sell" },
-              { label:"Amount",     value: amount },
-              { label:"Rate",       value: `$${asset?.price.toLocaleString()}` },
-              { label:"Network",    value: network },
-              { label:"Reference",  value: `CR-${Math.floor(Math.random()*9000000)+1000000}` },
-              { label:"Status",     value: "Completed" },
-            ].map(r => (
-              <View key={r.label} style={s.receiptRow}>
-                <Text style={s.receiptLabel}>{r.label}</Text>
-                <Text style={[s.receiptValue, r.label === "Status" && { color: C.success }]}>{r.value}</Text>
-              </View>
-            ))}
-          </Animated.View>
-          <TouchableOpacity style={s.btn} onPress={reset}>
-            <Text style={s.btnText}>Done</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  if (mode === "confirm") {
-    return (
-      <View style={s.root}>
-        <ScreenHeader title="Confirm Trade" />
-        <ScrollView contentContainerStyle={s.scroll}>
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
-            <View style={[s.assetHeader, { backgroundColor: (asset?.color ?? "#000") + "12" }]}>
-              <View style={[ar.icon, { backgroundColor: (asset?.color ?? "#000") + "25" }]}>
-                <Text style={[ar.sym, { color: asset?.color }]}>{asset?.symbol.charAt(0)}</Text>
-              </View>
-              <View>
-                <Text style={s.confName}>{asset?.name}</Text>
-                <Text style={s.confSym}>{tab === "buy" ? "Buy" : "Sell"} · {network}</Text>
-              </View>
-            </View>
-            <View style={s.receiptCard}>
-              {[
-                { label:"Action",     value: tab === "buy" ? "Purchase" : "Sale" },
-                { label:"Asset",      value: asset?.symbol ?? "" },
-                { label:"Amount (₦)", value: amount },
-                { label:"Rate",       value: `$${asset?.price.toLocaleString()}` },
-                { label:"Network",    value: network },
-                { label:"Fee",        value: "₦150" },
-              ].map(r => (
-                <View key={r.label} style={s.receiptRow}>
-                  <Text style={s.receiptLabel}>{r.label}</Text>
-                  <Text style={s.receiptValue}>{r.value}</Text>
-                </View>
-              ))}
-            </View>
-            <TouchableOpacity style={[s.btn, loading && s.btnDisabled]} disabled={loading} onPress={handleConfirm}>
-              <Text style={s.btnText}>{loading ? "Processing…" : `Confirm ${tab === "buy" ? "Purchase" : "Sale"}`}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={s.secondaryBtn} onPress={() => setMode(tab)}>
-              <Text style={s.secondaryText}>Go Back</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </ScrollView>
-      </View>
-    );
-  }
-
-  if (mode === "buy" || mode === "sell") {
-    return (
-      <KeyboardAvoidingView style={s.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScreenHeader title={`${mode === "buy" ? "Buy" : "Sell"} ${asset?.symbol}`} />
-        <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
-
-            <View style={[s.assetHeader, { backgroundColor: (asset?.color ?? "#000") + "12" }]}>
-              <View style={[ar.icon, { backgroundColor: (asset?.color ?? "#000") + "25" }]}>
-                <Text style={[ar.sym, { color: asset?.color }]}>{asset?.symbol.charAt(0)}</Text>
-              </View>
-              <View>
-                <Text style={s.confName}>{asset?.name}</Text>
-                <Text style={s.confSym}>Current Rate: ${asset?.price.toLocaleString()}</Text>
-              </View>
-            </View>
-
-            {/* Network */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Select Network</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 4 }}>
-                {nets.map(n => (
-                  <TouchableOpacity
-                    key={n}
-                    style={[s.netChip, network === n && s.netChipActive]}
-                    onPress={() => { Haptics.selectionAsync(); setNetwork(n); }}
-                  >
-                    <Text style={[s.netChipText, network === n && s.netChipTextActive]}>{n}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-
-            {/* Amount in Naira */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Amount (₦)</Text>
-              <TextInput
-                style={s.input}
-                placeholder="₦0.00"
-                placeholderTextColor={C.textMut}
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-              />
-              {amount ? (
-                <Text style={s.hint}>
-                  ≈ {(parseFloat(amount.replace(/[^0-9.]/g, "")) / (asset?.price ?? 1) / 1600).toFixed(8)} {asset?.symbol}
-                </Text>
-              ) : null}
-            </View>
-
-            {/* Wallet address for buy */}
-            {mode === "buy" && (
-              <View style={s.field}>
-                <Text style={s.fieldLabel}>Wallet Address (optional)</Text>
-                <TextInput
-                  style={s.input}
-                  placeholder="Receive to your AZA wallet if empty"
-                  placeholderTextColor={C.textMut}
-                  value={address}
-                  onChangeText={setAddress}
-                  autoCapitalize="none"
-                />
-              </View>
-            )}
-
-            <TouchableOpacity
-              style={[s.btn, (!network || !amount) && s.btnDisabled]}
-              disabled={!network || !amount}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setMode("confirm");
-              }}
-            >
-              <Text style={s.btnText}>Continue</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    );
-  }
-
-  // LIST view
   return (
-    <View style={s.root}>
-      <ScreenHeader title="Crypto" />
-      <ScrollView contentContainerStyle={[s.scroll, { paddingBottom: 100 }]} showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
 
-        {/* Portfolio summary */}
-        <Animated.View entering={FadeInDown.duration(320)} style={s.portfolioCard}>
-          <Text style={s.portLabel}>Portfolio Value</Text>
-          <Text style={s.portAmount}>${totalBalance.toFixed(2)}</Text>
-          <Text style={s.portSub}>≈ ₦{(totalBalance * 1600).toLocaleString("en-NG", { maximumFractionDigits: 0 })}</Text>
+      {/* Header */}
+      <Animated.View entering={FadeInDown.duration(280).springify()} style={[s.header, { paddingTop: topPad + 10 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Feather name="arrow-left" size={22} color="#1E232C" />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>Sell Crypto</Text>
+        <View style={{ width: 44 }} />
+      </Animated.View>
+      <View style={s.divider} />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
+      >
+
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(30)}>
+          <Text style={s.subtitle}>Select a cryptocurrency and enter trade details.</Text>
         </Animated.View>
 
-        {/* Buy / Sell toggle */}
-        <Animated.View entering={FadeInDown.duration(300).delay(40)} style={s.actionRow}>
-          {(["buy","sell"] as const).map((t) => (
-            <TouchableOpacity
-              key={t}
-              style={[s.actionBtn, tab === t && s.actionBtnActive]}
-              onPress={() => { Haptics.selectionAsync(); setTab(t); }}
-            >
-              <Feather name={t === "buy" ? "arrow-down-left" : "arrow-up-right"} size={16} color={tab === t ? "#fff" : C.textSec} />
-              <Text style={[s.actionBtnText, tab === t && s.actionBtnTextActive]}>{t === "buy" ? "Buy" : "Sell"}</Text>
+        {/* Coin selector */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(60)}>
+          <View style={{ gap: 4 }}>
+            <FieldLabel text="select coin" />
+            <TouchableOpacity style={f.input} onPress={() => setPicker("coin")} activeOpacity={0.8}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}>
+                <View style={[s.coinDot, { backgroundColor: selectedCoin.bg }]}>
+                  <Text style={{ fontSize: 12, fontFamily: "Manrope_700Bold", color: selectedCoin.color }}>{selectedCoin.symbol.slice(0,2)}</Text>
+                </View>
+                <Text style={f.val}>{selectedCoin.name} ({selectedCoin.symbol})</Text>
+              </View>
+              <Feather name="chevron-down" size={16} color={C.textMuted} />
             </TouchableOpacity>
-          ))}
+          </View>
         </Animated.View>
 
-        {/* Search */}
-        <Animated.View entering={FadeInDown.duration(300).delay(60)} style={s.searchWrap}>
-          <Feather name="search" size={16} color={C.textMut} />
-          <TextInput
-            style={s.searchInput}
-            placeholder="Search crypto"
-            placeholderTextColor={C.textMut}
-            value={searchQ}
-            onChangeText={setSearchQ}
-          />
+        {/* Network */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(90)}>
+          <View style={{ gap: 4 }}>
+            <FieldLabel text="network" />
+            <TouchableOpacity style={f.input} onPress={() => setPicker("network")} activeOpacity={0.8}>
+              <Text style={[f.val, !network && f.ph]}>{network || "   Select network"}</Text>
+              <Feather name="chevron-down" size={16} color={C.textMuted} />
+            </TouchableOpacity>
+          </View>
         </Animated.View>
 
-        {/* Asset list */}
-        {filtered.map((a, i) => (
-          <Animated.View key={a.id} entering={FadeInDown.duration(260).delay(80 + i * 20)}>
-            <AssetRow
-              asset={a}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setAsset(a);
-                setNetwork(NETWORKS[a.id]?.[0] ?? "Default");
-                setAmount("");
-                setMode(tab);
-              }}
-            />
-          </Animated.View>
-        ))}
+        {/* Wallet address */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(120)}>
+          <View style={{ gap: 4 }}>
+            <FieldLabel text="wallet address" />
+            <View style={f.input}>
+              <TextInput
+                style={[f.val]}
+                placeholder="   Enter wallet address"
+                placeholderTextColor="#646464"
+                value={address}
+                onChangeText={setAddress}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Amount */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(150)}>
+          <View style={{ gap: 4 }}>
+            <FieldLabel text="amount" />
+            <View style={f.input}>
+              <TextInput
+                style={[f.val]}
+                placeholder="   0.00"
+                placeholderTextColor="#646464"
+                value={amount}
+                onChangeText={t => setAmount(t.replace(/[^0-9.]/g, ""))}
+                keyboardType="decimal-pad"
+              />
+              <Text style={{ fontSize: 12, fontFamily: "Manrope_700Bold", color: C.textMuted }}>{selectedCoin.symbol}</Text>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Rate preview */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(180)} style={s.rateBox}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <Text style={s.rateLabel}>Current Rate</Text>
+            <Text style={s.rateValue}>₦{selectedCoin.rate.toLocaleString("en-NG")}/{selectedCoin.symbol}</Text>
+          </View>
+        </Animated.View>
+
+        {/* Summary */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(200)} style={s.summaryBox}>
+          <View style={s.summaryRow}>
+            <Text style={s.summaryLabel}>Rate</Text>
+            <Text style={s.summaryValue}>₦{selectedCoin.rate.toLocaleString("en-NG")}</Text>
+          </View>
+          <View style={s.summaryLine} />
+          <View style={s.summaryRow}>
+            <Text style={s.summaryLabel}>Total:</Text>
+            <Text style={[s.summaryValue, { fontSize: 14, fontFamily: "Manrope_700Bold" }]}>
+              ₦{nairaValue.toLocaleString("en-NG")}
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Proceed */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(230)}>
+          <TouchableOpacity
+            style={s.proceedBtn}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/(app)/confirm-transaction" as any);
+            }}
+            activeOpacity={0.85}
+          >
+            <Text style={s.proceedBtnText}>Proceed</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
       </ScrollView>
-    </View>
+
+      {/* Coin picker */}
+      <PickerModal visible={picker === "coin"} title="Select Cryptocurrency" onClose={() => setPicker(null)}>
+        {COINS.map(coin => (
+          <TouchableOpacity
+            key={coin.id}
+            style={[pm2.option, selectedCoin.id === coin.id && { backgroundColor: "#F8F9FA" }]}
+            onPress={() => { Haptics.selectionAsync(); setSelectedCoin(coin); setPicker(null); }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <View style={[s.coinDot, { backgroundColor: coin.bg, width: 36, height: 36, borderRadius: 18 }]}>
+                <Text style={{ fontSize: 11, fontFamily: "Manrope_700Bold", color: coin.color }}>{coin.symbol.slice(0,2)}</Text>
+              </View>
+              <View>
+                <Text style={pm2.optName}>{coin.name}</Text>
+                <Text style={pm2.optSymbol}>{coin.symbol}</Text>
+              </View>
+            </View>
+            {selectedCoin.id === coin.id && <Feather name="check" size={16} color="#7C3AED" />}
+          </TouchableOpacity>
+        ))}
+      </PickerModal>
+
+      {/* Network picker */}
+      <PickerModal visible={picker === "network"} title="Select Network" onClose={() => setPicker(null)}>
+        {NETWORKS.map(n => (
+          <TouchableOpacity key={n} style={pm2.option} onPress={() => { Haptics.selectionAsync(); setNetwork(n); setPicker(null); }}>
+            <Text style={pm2.optName}>{n}</Text>
+            {network === n && <Feather name="check" size={16} color="#7C3AED" />}
+          </TouchableOpacity>
+        ))}
+      </PickerModal>
+    </KeyboardAvoidingView>
   );
 }
 
+const pm2 = StyleSheet.create({
+  option: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
+  optName:   { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: C.text },
+  optSymbol: { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textMuted },
+});
+
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: 20, flexGrow: 1 },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
+  divider:     { height: 1, backgroundColor: "#D1D1D1" },
+  scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
+  subtitle:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, letterSpacing: 0.24 },
+  coinDot:     { width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center" },
 
-  portfolioCard: {
-    backgroundColor: C.text, borderRadius: 20, padding: 24, gap: 4, marginBottom: 16,
-    shadowColor: "#000", shadowOffset: { width:0, height:4 }, shadowOpacity:0.2, shadowRadius:12, elevation:6,
+  rateBox: {
+    backgroundColor: "#F8F9FA", borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
+    borderWidth: 1, borderColor: C.border,
   },
-  portLabel:  { fontSize:13, fontFamily:"Manrope_400Regular", color:"rgba(255,255,255,0.6)" },
-  portAmount: { fontSize:30, fontFamily:"Manrope_700Bold", color:"#FFFFFF", letterSpacing:-1 },
-  portSub:    { fontSize:13, fontFamily:"Manrope_400Regular", color:"rgba(255,255,255,0.45)" },
+  rateLabel: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
+  rateValue: { fontSize: 12, fontFamily: "Manrope_700Bold", color: C.text },
 
-  actionRow:        { flexDirection:"row", gap:10, marginBottom:16 },
-  actionBtn:        { flex:1, flexDirection:"row", alignItems:"center", justifyContent:"center", gap:8, paddingVertical:12, borderRadius:12, borderWidth:1, borderColor:C.border, backgroundColor:C.surface },
-  actionBtnActive:  { backgroundColor:C.btn, borderColor:C.btn },
-  actionBtnText:     { fontSize:14, fontFamily:"Manrope_600SemiBold", color:C.textSec, textTransform:"capitalize" },
-  actionBtnTextActive:{ color:"#fff" },
+  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14 },
+  summaryLine:  { height: 1, backgroundColor: "#E9E9E9" },
+  summaryLabel: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF", letterSpacing: -0.1 },
+  summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
-  searchWrap: {
-    flexDirection:"row", alignItems:"center", gap:10,
-    backgroundColor:C.inputBg, borderRadius:12, paddingHorizontal:14, paddingVertical:12,
-    borderWidth:1, borderColor:C.border, marginBottom:8,
-  },
-  searchInput: { flex:1, fontSize:14, fontFamily:"Manrope_400Regular", color:C.text },
-
-  assetHeader: { flexDirection:"row", alignItems:"center", gap:12, borderRadius:14, padding:14 },
-  confName: { fontSize:16, fontFamily:"Manrope_700Bold", color:C.text },
-  confSym:  { fontSize:12, fontFamily:"Manrope_400Regular", color:C.textSec, marginTop:2 },
-
-  field:      { gap: 8 },
-  fieldLabel: { fontSize:13, fontFamily:"Manrope_500Medium", color:C.textSec },
-
-  netChip:         { paddingHorizontal:14, paddingVertical:8, borderRadius:20, borderWidth:1, borderColor:C.border, backgroundColor:C.surface },
-  netChipActive:   { backgroundColor:C.btn, borderColor:C.btn },
-  netChipText:     { fontSize:12, fontFamily:"Manrope_500Medium", color:C.textSec },
-  netChipTextActive:{ color:"#fff" },
-
-  input: {
-    backgroundColor:C.inputBg, borderWidth:1, borderColor:C.border,
-    borderRadius:12, paddingHorizontal:16, paddingVertical:14,
-    fontSize:15, fontFamily:"Manrope_500Medium", color:C.text,
-  },
-  hint: { fontSize:12, fontFamily:"Manrope_400Regular", color:C.textMut },
-
-  btn:         { height:56, backgroundColor:C.btn, borderRadius:14, alignItems:"center", justifyContent:"center" },
-  btnDisabled: { opacity:0.5 },
-  btnText:     { fontSize:16, fontFamily:"Manrope_700Bold", color:"#fff" },
-
-  secondaryBtn:  { height:48, alignItems:"center", justifyContent:"center" },
-  secondaryText: { fontSize:14, fontFamily:"Manrope_600SemiBold", color:C.textSec },
-
-  receiptCard:  { backgroundColor:C.surface, borderRadius:16, padding:18, borderWidth:1, borderColor:C.border, gap:14 },
-  receiptRow:   { flexDirection:"row", justifyContent:"space-between", alignItems:"center" },
-  receiptLabel: { fontSize:13, fontFamily:"Manrope_400Regular", color:C.textSec },
-  receiptValue: { fontSize:13, fontFamily:"Manrope_600SemiBold", color:C.text },
-
-  successWrap:   { flex:1, alignItems:"center", justifyContent:"center", padding:24, gap:12 },
-  successCircle: { width:80, height:80, borderRadius:40, alignItems:"center", justifyContent:"center", marginBottom:8 },
-  successTitle:  { fontSize:22, fontFamily:"Manrope_700Bold", color:C.text },
-  successSub:    { fontSize:14, fontFamily:"Manrope_400Regular", color:C.textSec, textAlign:"center", lineHeight:22 },
+  proceedBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  proceedBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

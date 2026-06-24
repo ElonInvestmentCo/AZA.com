@@ -15,311 +15,248 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 const C = {
-  bg:      "#FFFFFF",
-  text:    "#0B0A0A",
-  textSec: "#595F67",
-  textMut: "#AAAFB5",
-  border:  "#EDF1F3",
-  surface: "#F8F9FA",
-  inputBg: "#F7F8F9",
-  btn:     "#000000",
-  accent:  "#35C2C1",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  inputBg:   "#F0F0F0",
+  border:    "#EDF1F3",
+  success:   "#00B03C",
+  dark:      "#010101",
+  black:     "#000000",
 };
 
 const BANKS = [
-  "Access Bank","First Bank","GTBank","UBA","Zenith Bank",
-  "Fidelity Bank","Union Bank","Sterling Bank","Wema Bank","Polaris Bank",
+  "Access Bank", "First Bank", "GTBank", "UBA", "Zenith Bank",
+  "Fidelity Bank", "Union Bank", "Sterling Bank", "FCMB", "Polaris Bank",
 ];
 
-const QUICK_AMOUNTS = ["₦5,000","₦10,000","₦20,000","₦50,000","₦100,000"];
+function FieldLabel({ text }: { text: string }) {
+  return <Text style={f.label}>{text}</Text>;
+}
 
-type Step = "form" | "confirm" | "success";
+function SelectField({
+  label, value, placeholder, onPress,
+}: { label: string; value: string; placeholder: string; onPress: () => void }) {
+  return (
+    <View style={f.wrap}>
+      <FieldLabel text={label} />
+      <TouchableOpacity style={f.input} onPress={onPress} activeOpacity={0.8}>
+        <Text style={[f.val, !value && f.ph]}>{value || placeholder}</Text>
+        <Feather name="chevron-down" size={16} color={C.textMuted} />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const f = StyleSheet.create({
+  wrap:  { gap: 4 },
+  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24 },
+  input: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
+    borderRadius: 10, paddingHorizontal: 14, height: 46,
+  },
+  val: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
+  ph:  { color: "#646464", fontSize: 10 },
+});
+
+function PickerModal({
+  visible, title, options, onSelect, onClose,
+}: { visible: boolean; title: string; options: string[]; onSelect: (v: string) => void; onClose: () => void }) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={pm.overlay} onPress={onClose} />
+      <View style={pm.sheet}>
+        <View style={pm.handle} />
+        <Text style={pm.title}>{title}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {options.map(o => (
+            <TouchableOpacity key={o} style={pm.option} onPress={() => { Haptics.selectionAsync(); onSelect(o); onClose(); }}>
+              <Text style={pm.optText}>{o}</Text>
+              <Feather name="chevron-right" size={16} color={C.textMuted} />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+}
+
+const pm = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
+  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, maxHeight: "60%" },
+  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
+  title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
+  option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
+  optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
+});
 
 export default function WithdrawScreen() {
-  const router = useRouter();
+  const router  = useRouter();
+  const insets  = useSafeAreaInsets();
   const { user } = useAuth();
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
 
-  const [step,      setStep]      = useState<Step>("form");
-  const [bank,      setBank]      = useState("");
-  const [accNum,    setAccNum]    = useState("");
-  const [accName,   setAccName]   = useState("");
-  const [amount,    setAmount]    = useState("");
-  const [loading,   setLoading]   = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [accLoading,setAccLoading]= useState(false);
+  const [bank,    setBank]    = useState("");
+  const [acctNum, setAcctNum] = useState("");
+  const [amount,  setAmount]  = useState("");
+  const [picker,  setPicker]  = useState(false);
+  const [done,    setDone]    = useState(false);
 
-  const balance = user?.balance ?? 200590;
-
-  const lookupAccount = async () => {
-    if (accNum.length < 10) return;
-    setAccLoading(true);
-    await new Promise(r => setTimeout(r, 900));
-    setAccLoading(false);
-    setAccName("JOHN DOE SAMPLE");
-  };
-
-  const handleWithdraw = async () => {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1800));
-    setLoading(false);
-    setStep("success");
-  };
-
-  if (step === "success") {
-    return (
-      <View style={s.root}>
-        <ScreenHeader title="Withdrawal Successful" showBack={false} />
-        <View style={s.successWrap}>
-          <Animated.View entering={FadeInDown.duration(400).springify()} style={s.successCircle}>
-            <Feather name="check" size={40} color="#fff" />
-          </Animated.View>
-          <Animated.Text entering={FadeInUp.duration(320).delay(80)} style={s.successTitle}>
-            Withdrawal Sent!
-          </Animated.Text>
-          <Animated.Text entering={FadeInUp.duration(320).delay(120)} style={s.successSub}>
-            {amount} has been sent to {bank}
-          </Animated.Text>
-          <Animated.View entering={FadeInUp.duration(300).delay(160)} style={s.receiptCard}>
-            {[
-              { label:"Bank",       value: bank },
-              { label:"Account",    value: accNum },
-              { label:"Name",       value: accName },
-              { label:"Amount",     value: amount },
-              { label:"Fee",        value: "₦52.50" },
-              { label:"Reference",  value: `WD-${Math.floor(Math.random()*900000)+100000}` },
-              { label:"Status",     value: "Processing" },
-            ].map(r => (
-              <View key={r.label} style={s.receiptRow}>
-                <Text style={s.receiptLabel}>{r.label}</Text>
-                <Text style={[s.receiptValue, r.label === "Status" && { color: "#F59E0B" }]}>{r.value}</Text>
-              </View>
-            ))}
-          </Animated.View>
-          <TouchableOpacity style={s.btn} onPress={() => router.back()}>
-            <Text style={s.btnText}>Done</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
+  const balance   = user?.balance ?? 200590;
+  const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const canProceed = !!bank && acctNum.length === 10 && !!amount;
 
   return (
-    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScreenHeader title="Withdraw Funds" />
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
 
-      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <Animated.View entering={FadeInDown.duration(280).springify()} style={[s.header, { paddingTop: topPad + 10 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Feather name="arrow-left" size={22} color="#1E232C" />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>Withdraw</Text>
+        <View style={{ width: 44 }} />
+      </Animated.View>
+      <View style={s.divider} />
 
-        {step === "form" && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
+      >
 
-            {/* Balance */}
-            <View style={s.balanceCard}>
-              <Text style={s.balLabel}>Available Balance</Text>
-              <Text style={s.balAmount}>₦{balance.toLocaleString("en-NG", { minimumFractionDigits: 2 })}</Text>
-            </View>
+        {/* Balance card */}
+        <Animated.View entering={FadeInDown.duration(320).springify().delay(40)} style={s.balCard}>
+          <View style={s.balTop}>
+            <View style={s.balDot} />
+            <Text style={s.balTag}>Available Balance</Text>
+          </View>
+          <Text style={s.balAmount}>{formatted}</Text>
+          <Text style={s.balSub}>Enter your bank details to withdraw</Text>
+        </Animated.View>
 
-            {/* Bank */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Select Bank</Text>
-              <TouchableOpacity style={s.selectField} onPress={() => setShowModal(true)}>
-                <Text style={[s.selectText, !bank && s.selectPh]}>{bank || "Choose bank"}</Text>
-                <Feather name="chevron-down" size={18} color={C.textMut} />
-              </TouchableOpacity>
-            </View>
+        {/* Bank */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(70)}>
+          <SelectField label="select bank" value={bank} placeholder="   Choose your bank" onPress={() => setPicker(true)} />
+        </Animated.View>
 
-            {/* Account number */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Account Number</Text>
+        {/* Account number */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(100)}>
+          <View style={f.wrap}>
+            <Text style={f.label}>account number</Text>
+            <View style={f.input}>
               <TextInput
-                style={s.input}
-                placeholder="Enter 10-digit account number"
-                placeholderTextColor={C.textMut}
-                value={accNum}
-                onChangeText={t => { setAccNum(t); setAccName(""); if (t.length === 10) lookupAccount(); }}
+                style={[f.val, { flex: 1 }]}
+                placeholder="   Enter 10-digit account number"
+                placeholderTextColor="#646464"
+                value={acctNum}
+                onChangeText={t => setAcctNum(t.replace(/\D/g, "").slice(0, 10))}
                 keyboardType="numeric"
                 maxLength={10}
               />
-              {accLoading && <Text style={s.hint}>Verifying account…</Text>}
-              {accName ? (
-                <View style={s.accNameRow}>
-                  <Feather name="check-circle" size={14} color="#00B03C" />
-                  <Text style={s.accName}>{accName}</Text>
-                </View>
-              ) : null}
+              {acctNum.length === 10 && <Feather name="check-circle" size={18} color={C.success} />}
             </View>
+          </View>
+        </Animated.View>
 
-            {/* Amount */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Amount</Text>
+        {/* Amount */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(130)}>
+          <View style={f.wrap}>
+            <Text style={f.label}>amount</Text>
+            <View style={f.input}>
+              <Text style={{ fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.textMuted, marginRight: 4 }}>₦</Text>
               <TextInput
-                style={s.input}
-                placeholder="₦0.00"
-                placeholderTextColor={C.textMut}
+                style={[f.val, { flex: 1 }]}
+                placeholder="0.00"
+                placeholderTextColor="#646464"
                 value={amount}
-                onChangeText={setAmount}
+                onChangeText={t => setAmount(t.replace(/\D/g, ""))}
                 keyboardType="numeric"
               />
             </View>
+          </View>
+        </Animated.View>
 
-            <View style={s.quickRow}>
-              {QUICK_AMOUNTS.map(qa => (
-                <TouchableOpacity
-                  key={qa}
-                  style={[s.quickChip, amount === qa && s.quickChipActive]}
-                  onPress={() => { Haptics.selectionAsync(); setAmount(qa); }}
-                >
-                  <Text style={[s.quickText, amount === qa && s.quickTextActive]}>{qa}</Text>
-                </TouchableOpacity>
-              ))}
+        {/* Summary */}
+        {!!amount && (
+          <Animated.View entering={FadeInUp.duration(260).springify()} style={s.summaryBox}>
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Amount</Text>
+              <Text style={s.summaryValue}>₦{parseInt(amount).toLocaleString("en-NG")}</Text>
             </View>
-
-            <View style={s.feeNote}>
-              <Feather name="info" size={14} color={C.textMut} />
-              <Text style={s.feeText}>Transaction fee: ₦52.50 applies</Text>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Fee</Text>
+              <Text style={s.summaryValue}>₦0.00</Text>
             </View>
-
-            <TouchableOpacity
-              style={[s.btn, (!bank || accNum.length < 10 || !amount) && s.btnDisabled]}
-              disabled={!bank || accNum.length < 10 || !amount}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setStep("confirm");
-              }}
-            >
-              <Text style={s.btnText}>Continue</Text>
-            </TouchableOpacity>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Total</Text>
+              <Text style={[s.summaryValue, { fontFamily: "Manrope_700Bold", fontSize: 12 }]}>
+                ₦{parseInt(amount).toLocaleString("en-NG")}
+              </Text>
+            </View>
           </Animated.View>
         )}
 
-        {step === "confirm" && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
-            <Text style={s.subheading}>Review your withdrawal</Text>
-            <View style={s.receiptCard}>
-              {[
-                { label:"Bank",     value: bank },
-                { label:"Account",  value: accNum },
-                { label:"Name",     value: accName },
-                { label:"Amount",   value: amount },
-                { label:"Fee",      value: "₦52.50" },
-              ].map(r => (
-                <View key={r.label} style={s.receiptRow}>
-                  <Text style={s.receiptLabel}>{r.label}</Text>
-                  <Text style={s.receiptValue}>{r.value}</Text>
-                </View>
-              ))}
-              <View style={[s.receiptRow, { borderTopWidth: 1, borderTopColor: C.border, paddingTop: 14 }]}>
-                <Text style={[s.receiptLabel, { fontFamily: "Manrope_700Bold" }]}>Total Deducted</Text>
-                <Text style={[s.receiptValue, { fontFamily: "Manrope_700Bold", color: C.text }]}>{amount} + ₦52.50</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={[s.btn, loading && s.btnDisabled]} disabled={loading} onPress={handleWithdraw}>
-              <Text style={s.btnText}>{loading ? "Processing…" : "Confirm Withdrawal"}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setStep("form")} style={s.secondaryBtn}>
-              <Text style={s.secondaryText}>Edit Details</Text>
-            </TouchableOpacity>
+        {done && (
+          <Animated.View entering={FadeInDown.duration(280)} style={s.successBox}>
+            <Feather name="check-circle" size={18} color={C.success} />
+            <Text style={s.successText}>Withdrawal initiated successfully!</Text>
           </Animated.View>
         )}
+
+        {/* Withdraw button */}
+        <TouchableOpacity
+          style={[s.withdrawBtn, !canProceed && { opacity: 0.45 }]}
+          onPress={() => {
+            if (!canProceed) return;
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            setDone(true);
+            setTimeout(() => { setDone(false); router.push("/(app)/success-payment" as any); }, 1000);
+          }}
+          activeOpacity={0.85}
+        >
+          <Text style={s.withdrawBtnText}>Withdraw</Text>
+        </TouchableOpacity>
+
       </ScrollView>
 
-      {/* Bank picker modal */}
-      <Modal visible={showModal} transparent animationType="slide" onRequestClose={() => setShowModal(false)}>
-        <Pressable style={s.modalOverlay} onPress={() => setShowModal(false)}>
-          <Pressable style={s.modalSheet} onPress={() => {}}>
-            <View style={s.modalHandle} />
-            <Text style={s.modalTitle}>Select Bank</Text>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {BANKS.map(b => (
-                <TouchableOpacity
-                  key={b}
-                  style={[s.bankRow, bank === b && s.bankRowActive]}
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setBank(b);
-                    setShowModal(false);
-                  }}
-                >
-                  <Text style={[s.bankName, bank === b && { color: C.accent }]}>{b}</Text>
-                  {bank === b && <Feather name="check" size={16} color={C.accent} />}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <PickerModal visible={picker} title="Select Bank" options={BANKS} onSelect={setBank} onClose={() => setPicker(false)} />
     </KeyboardAvoidingView>
   );
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: 20, flexGrow: 1 },
-  subheading: { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: C.textSec },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
+  divider:     { height: 1, backgroundColor: "#D1D1D1" },
+  scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
 
-  balanceCard: {
-    backgroundColor: C.text, borderRadius: 16, padding: 20, gap: 4,
-  },
-  balLabel:  { fontSize: 13, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.6)" },
-  balAmount: { fontSize: 26, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  balCard:   { backgroundColor: "#F0F7FF", borderRadius: 16, padding: 20, gap: 8, borderWidth: 1, borderColor: "#C7DFFF" },
+  balTop:    { flexDirection: "row", alignItems: "center", gap: 7 },
+  balDot:    { width: 8, height: 8, borderRadius: 4, backgroundColor: "#EF4444" },
+  balTag:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted },
+  balAmount: { fontSize: 30, fontFamily: "Manrope_700Bold", color: C.navy, letterSpacing: -0.5 },
+  balSub:    { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
 
-  field:      { gap: 8 },
-  fieldLabel: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textSec },
+  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", paddingVertical: 12 },
+  summaryLine:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
+  summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
+  summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
 
-  selectField: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
-    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-  },
-  selectText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
-  selectPh:   { color: C.textMut },
+  successBox:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F0FFF4", borderRadius: 10, padding: 14, borderWidth: 1, borderColor: "#BBF7D0" },
+  successText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.success },
 
-  input: {
-    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
-    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-    fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text,
-  },
-  hint: { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textMut },
-  accNameRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  accName:    { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: "#00B03C" },
-
-  quickRow:        { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  quickChip:       { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
-  quickChipActive: { backgroundColor: C.btn, borderColor: C.btn },
-  quickText:       { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
-  quickTextActive: { color: "#fff" },
-
-  feeNote: { flexDirection: "row", alignItems: "center", gap: 6 },
-  feeText: { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textMut },
-
-  btn:         { height: 56, backgroundColor: C.btn, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  btnDisabled: { opacity: 0.5 },
-  btnText:     { fontSize: 16, fontFamily: "Manrope_700Bold", color: "#fff" },
-
-  secondaryBtn:  { height: 48, alignItems: "center", justifyContent: "center" },
-  secondaryText: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.textSec },
-
-  receiptCard:  { backgroundColor: C.surface, borderRadius: 16, padding: 18, borderWidth: 1, borderColor: C.border, gap: 14 },
-  receiptRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  receiptLabel: { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
-  receiptValue: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
-
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
-  modalSheet: {
-    backgroundColor: C.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    padding: 24, maxHeight: "70%",
-  },
-  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 20 },
-  modalTitle:  { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 16 },
-  bankRow:     { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
-  bankRowActive:{ backgroundColor: C.accent + "08" },
-  bankName:    { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
-
-  successWrap:   { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  successCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: "#00B03C", alignItems: "center", justifyContent: "center", marginBottom: 8 },
-  successTitle:  { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.text },
-  successSub:    { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.textSec, textAlign: "center" },
+  withdrawBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  withdrawBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

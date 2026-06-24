@@ -9,114 +9,96 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withDelay,
+  withRepeat,
   withSequence,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+const C = {
+  bg:    "#FFFFFF",
+  text:  "#1E232C",
+  sub:   "#8391A1",
+  black: "#1E232C",
+};
+
 export default function SubmittedScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const iconScale   = useSharedValue(0);
-  const iconOpacity = useSharedValue(0);
-  const ringScale   = useSharedValue(0.5);
-  const ringOp      = useSharedValue(0);
-  const heroScale   = useSharedValue(0.8);
-  const heroOpacity = useSharedValue(0);
+  const checkScale = useSharedValue(0);
+  const checkOpacity = useSharedValue(0);
+  const ring1 = useSharedValue(1);
+  const ring2 = useSharedValue(1);
 
   useEffect(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-    heroOpacity.value = withTiming(1,   { duration: 500 });
-    heroScale.value   = withSpring(1.0, { damping: 14, stiffness: 100 });
-
-    iconOpacity.value = withDelay(200, withTiming(1, { duration: 300 }));
-    iconScale.value   = withDelay(200, withSequence(
-      withSpring(1.25, { damping: 7,  stiffness: 180 }),
-      withSpring(1.0,  { damping: 14, stiffness: 180 }),
+    checkScale.value = withDelay(300, withSpring(1, { damping: 10, stiffness: 160 }));
+    checkOpacity.value = withDelay(300, withTiming(1, { duration: 300 }));
+    ring1.value = withDelay(600, withRepeat(
+      withSequence(withTiming(1.35, { duration: 800 }), withTiming(1, { duration: 800 })),
+      -1, false,
     ));
-    ringOp.value    = withDelay(300, withTiming(1,   { duration: 400 }));
-    ringScale.value = withDelay(300, withSpring(1.0, { damping: 12, stiffness: 100 }));
+    ring2.value = withDelay(900, withRepeat(
+      withSequence(withTiming(1.6, { duration: 1000 }), withTiming(1, { duration: 1000 })),
+      -1, false,
+    ));
   }, []);
 
-  const iconStyle = useAnimatedStyle(() => ({
-    opacity:   iconOpacity.value,
-    transform: [{ scale: iconScale.value }],
+  const checkAnim = useAnimatedStyle(() => ({
+    transform: [{ scale: checkScale.value }],
+    opacity: checkOpacity.value,
   }));
-  const ringStyle = useAnimatedStyle(() => ({
-    opacity:   ringOp.value,
-    transform: [{ scale: ringScale.value }],
+  const ring1Anim = useAnimatedStyle(() => ({
+    transform: [{ scale: ring1.value }],
+    opacity: 2 - ring1.value,
   }));
-  const heroStyle = useAnimatedStyle(() => ({
-    opacity:   heroOpacity.value,
-    transform: [{ scale: heroScale.value }],
+  const ring2Anim = useAnimatedStyle(() => ({
+    transform: [{ scale: ring2.value }],
+    opacity: 2 - ring2.value,
   }));
 
   return (
-    <View
-      style={[
-        s.root,
-        { backgroundColor: "#FFFFFF", paddingTop: insets.top + 24, paddingBottom: insets.bottom + 32 },
-      ]}
-    >
-      {/* ── Superhero illustration placeholder ─────────────────────────────── */}
-      <Animated.View style={[s.heroWrap, heroStyle]}>
-        <View style={s.heroCard}>
-          <View style={s.heroBadge}>
-            <Feather name="star" size={32} color="#7C3AED" />
-          </View>
-          <View style={s.heroLines}>
-            {["#FCB3C5", "#D6E1FF", "#FFF2CF", "#D6E1FF", "#FCB3C5"].map((col, i) => (
-              <View key={i} style={[s.heroLine, { backgroundColor: col, width: 60 + i * 20 }]} />
-            ))}
-          </View>
-          <View style={s.heroBadge2}>
-            <Feather name="award" size={24} color="#F59E0B" />
-          </View>
-        </View>
-      </Animated.View>
+    <View style={[s.root, { paddingBottom: insets.bottom + 32 }]}>
 
-      {/* ── Animated success icon ──────────────────────────────────────────── */}
-      <View style={s.iconWrap}>
-        <Animated.View style={[s.outerRing, ringStyle]} />
-        <Animated.View style={[s.iconCircle, iconStyle]}>
-          <Feather name="check" size={42} color="#FFFFFF" />
+      {/* Illustration area */}
+      <View style={s.illustrationArea}>
+        {/* Decorative pattern background */}
+        <View style={s.bgPattern}>
+          {[...Array(5)].map((_, i) => (
+            <View key={i} style={[s.bgLine, { transform: [{ rotate: `${i * 36}deg` }] }]} />
+          ))}
+        </View>
+
+        {/* Success ring animations */}
+        <Animated.View style={[s.ring, s.ring2, ring2Anim]} />
+        <Animated.View style={[s.ring, s.ring1, ring1Anim]} />
+
+        {/* Checkmark circle */}
+        <Animated.View style={[s.checkCircle, checkAnim]}>
+          <View style={s.checkInner}>
+            <Feather name="check" size={44} color="#FFFFFF" strokeWidth={3} />
+          </View>
         </Animated.View>
       </View>
 
-      {/* ── Text ──────────────────────────────────────────────────────────── */}
-      <Animated.View
-        entering={FadeInDown.duration(380).springify().delay(320)}
-        style={s.textBlock}
-      >
-        <Text style={s.heading}>Trade Submitted</Text>
-        <Text style={s.sub}>Your trade has been submitted successfully</Text>
+      {/* Text */}
+      <Animated.View entering={FadeInDown.duration(400).delay(600)} style={s.textSection}>
+        <Text style={s.title}>Trade Submitted</Text>
+        <Text style={s.subtitle}>Your trade has been submitted successfully</Text>
       </Animated.View>
 
-      {/* ── Buttons ───────────────────────────────────────────────────────── */}
-      <Animated.View
-        entering={FadeInUp.duration(360).springify().delay(440)}
-        style={s.actions}
-      >
+      {/* Done button */}
+      <Animated.View entering={FadeInUp.duration(400).delay(800)} style={s.btnWrap}>
         <TouchableOpacity
           style={s.doneBtn}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.replace("/(tabs)");
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            router.replace("/(tabs)" as any);
           }}
           activeOpacity={0.85}
         >
           <Text style={s.doneBtnText}>Done</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={s.outlineBtn}
-          onPress={() => router.replace("/(app)/transactions")}
-          activeOpacity={0.75}
-        >
-          <Text style={s.outlineBtnText}>View Transactions</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -125,55 +107,56 @@ export default function SubmittedScreen() {
 
 const s = StyleSheet.create({
   root: {
-    flex: 1, alignItems: "center", paddingHorizontal: 32, gap: 24, justifyContent: "center",
+    flex: 1, backgroundColor: C.bg,
+    alignItems: "center", justifyContent: "center",
+    paddingHorizontal: 32,
   },
 
-  heroWrap: { width: "100%", alignItems: "center", marginBottom: 4 },
-  heroCard: {
-    width: 260, height: 150, backgroundColor: "#F8F9FA", borderRadius: 16,
-    alignItems: "center", justifyContent: "center", overflow: "hidden",
-    flexDirection: "row", gap: 20,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 3,
+  illustrationArea: {
+    width: 200, height: 200,
+    alignItems: "center", justifyContent: "center",
+    marginBottom: 40,
   },
-  heroBadge:  {
-    width: 64, height: 64, borderRadius: 32, backgroundColor: "#EDE9FE",
+  bgPattern: {
+    position: "absolute", width: 200, height: 200,
     alignItems: "center", justifyContent: "center",
   },
-  heroBadge2: {
-    width: 48, height: 48, borderRadius: 24, backgroundColor: "#FEF3C7",
+  bgLine: {
+    position: "absolute", width: 200, height: 1,
+    backgroundColor: "#F0F0F0",
+  },
+
+  ring: {
+    position: "absolute",
+    borderRadius: 120,
+    borderWidth: 2,
+  },
+  ring1: {
+    width: 120, height: 120,
+    borderColor: "rgba(0,0,0,0.08)",
+  },
+  ring2: {
+    width: 150, height: 150,
+    borderColor: "rgba(0,0,0,0.04)",
+  },
+
+  checkCircle: {
+    width: 100, height: 100, borderRadius: 50,
+    backgroundColor: C.black,
     alignItems: "center", justifyContent: "center",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2, shadowRadius: 20, elevation: 12,
   },
-  heroLines: { gap: 6, alignItems: "flex-start" },
-  heroLine:  { height: 8, borderRadius: 4, backgroundColor: "#FCB3C5" },
+  checkInner: { alignItems: "center", justifyContent: "center" },
 
-  iconWrap: { alignItems: "center", justifyContent: "center", marginBottom: 4 },
-  outerRing: {
-    position: "absolute", width: 130, height: 130, borderRadius: 65,
-    borderWidth: 1.5, borderColor: "rgba(0,0,0,0.12)",
-  },
-  iconCircle: {
-    width: 100, height: 100, borderRadius: 50, backgroundColor: "#000000",
-    alignItems: "center", justifyContent: "center",
-  },
+  textSection: { alignItems: "center", gap: 10, marginBottom: 48 },
+  title: { fontSize: 26, fontFamily: "Manrope_700Bold", color: C.text, textAlign: "center" },
+  subtitle: { fontSize: 15, fontFamily: "Manrope_400Regular", color: C.sub, textAlign: "center", lineHeight: 22 },
 
-  textBlock: { alignItems: "center", gap: 10 },
-  heading: {
-    fontSize: 26, fontFamily: "Manrope_700Bold", color: "#1E232C", letterSpacing: -0.4,
-  },
-  sub: {
-    fontSize: 15, fontFamily: "Manrope_400Regular", color: "#8391A1",
-    textAlign: "center", lineHeight: 22,
-  },
-
-  actions: { width: "100%", gap: 12 },
+  btnWrap: { width: "100%" },
   doneBtn: {
-    backgroundColor: "#1E232C", height: 52, borderRadius: 8,
+    backgroundColor: C.black, height: 56, borderRadius: 8,
     alignItems: "center", justifyContent: "center",
   },
   doneBtnText: { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF" },
-  outlineBtn: {
-    height: 52, borderRadius: 8, borderWidth: 1.5, borderColor: "#E8ECF4",
-    alignItems: "center", justifyContent: "center",
-  },
-  outlineBtnText: { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: "#1E232C" },
 });

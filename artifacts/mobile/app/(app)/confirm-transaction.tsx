@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,132 +12,117 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "@/context/AuthContext";
 
 const C = {
   bg:        "#FFFFFF",
   text:      "#1B1B1B",
   textSec:   "#6C7278",
   border:    "#D1D1D1",
-  rowBorder: "#F0F0F0",
-  summaryBg: "#010101",
+  borderSoft:"#E9E9E9",
+  dark:      "#010101",
+  black:     "#000000",
 };
 
-const RATE  = 1200;
-const TOTAL = 200040;
-
-const now = new Date();
-const DATE_STR =
-  now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).replace(/ /g, " ") +
-  " - " +
-  now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+const DETAILS = [
+  { label: "Date & Time",                  value: "Aug 06, 2024 — 6:17 PM",    right: "Total Amount" },
+  { label: "Gift Card Category",           value: "Amazon",                   right: "Australia Amazon" },
+  { label: "Gift card Type/sub-category",  value: "Australia Amazon",         right: null },
+  { label: "Gift card Amount",             value: "Aug 06, 2024 — 6:17 PM",  right: null },
+];
 
 const ROWS = [
-  { label: "Date & Time",                 value: DATE_STR,          right: false },
-  { label: "Total Amount",                value: "₦200,040",        right: true  },
-  { label: "Gift Card Category",          value: "Amazon",          right: false },
-  { label: "Gift card Type/sub-category", value: "Australia Amazon",right: true  },
-  { label: "Gift card Amount",            value: "Aug 06,2024 -6:17PM", right: false },
+  { left: { label: "Date & Time",    value: "Aug 06, 2024 — 6:17 PM"  }, right: { label: "Total Amount",    value: "₦200,040" } },
+  { left: { label: "Gift Card Category", value: "Amazon" },               right: { label: "Gift card Type/sub-category", value: "Australia Amazon" } },
+  { left: { label: "Gift card Amount",   value: "Aug 06, 2024 — 6:17PM" }, right: null },
 ];
 
 export default function ConfirmTransactionScreen() {
-  const router          = useRouter();
-  const insets          = useSafeAreaInsets();
-  const { updateBalance } = useAuth();
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setLoading(true);
-    setTimeout(() => {
-      updateBalance(TOTAL);
-      setLoading(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace("/(app)/submitted");
-    }, 1500);
-  };
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
 
   return (
-    <View style={[s.root, { backgroundColor: C.bg }]}>
+    <View style={s.root}>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <Animated.View
-        entering={FadeInDown.duration(320).springify()}
-        style={[s.header, { paddingTop: (insets.top || 16) + 12 }]}
+        entering={FadeInDown.duration(280).springify()}
+        style={[s.header, { paddingTop: topPad + 10 }]}
       >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={s.backBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Feather name="arrow-left" size={22} color="#1E232C" />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Confirm transaction Details</Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 44 }} />
       </Animated.View>
-      <View style={s.headerDivider} />
+      <View style={s.topDivider} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
       >
 
-        {/* ── Transaction detail rows ────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInDown.duration(360).springify().delay(60)}
-          style={s.detailCard}
-        >
+        {/* Detail rows */}
+        <Animated.View entering={FadeInDown.duration(320).springify().delay(40)} style={s.detailCard}>
           {ROWS.map((row, i) => (
-            <View
-              key={row.label}
-              style={[s.detailRow, i === ROWS.length - 1 && { borderBottomWidth: 0 }]}
-            >
-              <Text style={[s.rowLabel, row.right && s.rowLabelRight]}>{row.label}</Text>
-              <Text style={[s.rowValue, row.right && s.rowValueRight]}>{row.value}</Text>
+            <View key={i}>
+              <View style={s.pairRow}>
+                <View style={s.pairCell}>
+                  <Text style={s.detailLabel}>{row.left.label}</Text>
+                  <Text style={s.detailValue}>{row.left.value}</Text>
+                </View>
+                {row.right && (
+                  <View style={[s.pairCell, { alignItems: "flex-end" }]}>
+                    <Text style={s.detailLabel}>{row.right.label}</Text>
+                    <Text style={[s.detailValue, { textAlign: "right" }]}>{row.right.value}</Text>
+                  </View>
+                )}
+              </View>
+              {i < ROWS.length - 1 && <View style={s.rowDivider} />}
             </View>
           ))}
         </Animated.View>
 
-        {/* ── Upload gift card image ─────────────────────────────────────────── */}
-        <Animated.View entering={FadeInDown.duration(340).springify().delay(120)} style={s.uploadSection}>
-          <Text style={s.uploadLabel}>Gift card image</Text>
-          <View style={s.uploadRow}>
-            {[
-              { bg: "#FFB6C1", icon: "image" as const, iconColor: "#d63384" },
-              { bg: "#AED6F1", icon: "image" as const, iconColor: "#2980b9" },
-              { bg: "#BBBBBB", icon: "plus"  as const, iconColor: "#FFFFFF" },
-            ].map((item, i) => (
-              <TouchableOpacity key={i} style={[s.uploadCircle, { backgroundColor: item.bg }]} activeOpacity={0.8}>
-                <Feather name={item.icon} size={18} color={item.iconColor} />
-              </TouchableOpacity>
-            ))}
+        {/* Gift card image */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(80)}>
+          <Text style={s.imgLabel}>gift card image</Text>
+          <View style={s.imgRow}>
+            <View style={[s.imgThumb, { backgroundColor: "#FFB6C1" }]}>
+              <Feather name="image" size={18} color="#C0392B" />
+            </View>
+            <View style={[s.imgThumb, { backgroundColor: "#AED6F1" }]}>
+              <Feather name="image" size={18} color="#2980B9" />
+            </View>
+            <View style={[s.imgThumb, { backgroundColor: "#BBBBBB" }]}>
+              <Feather name="plus" size={16} color="#fff" />
+            </View>
           </View>
         </Animated.View>
 
-        {/* ── Rate / Total summary box ───────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(160)} style={s.summaryBox}>
+        {/* Summary */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(120)} style={s.summaryBox}>
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Rate</Text>
-            <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")}</Text>
+            <Text style={s.summaryValue}>₦1200</Text>
           </View>
-          <View style={s.summaryDivider} />
+          <View style={s.summaryLine} />
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Total:</Text>
-            <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>
-              ₦{TOTAL.toLocaleString("en-NG")}
-            </Text>
+            <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>₦200,400</Text>
           </View>
         </Animated.View>
 
-        {/* ── Submit Trade button ────────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(200)}>
+        {/* Submit */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(160)}>
           <TouchableOpacity
-            style={[s.submitBtn, loading && { opacity: 0.7 }]}
-            onPress={handleSubmit}
+            style={s.submitBtn}
+            onPress={() => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              router.push("/(app)/submitted" as any);
+            }}
             activeOpacity={0.85}
-            disabled={loading}
           >
-            <Text style={s.submitBtnText}>{loading ? "Submitting…" : "Submit Trade"}</Text>
+            <Text style={s.submitBtnText}>Submit Trade</Text>
           </TouchableOpacity>
         </Animated.View>
 
@@ -146,52 +132,30 @@ export default function ConfirmTransactionScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#FFFFFF" },
+  root:        { flex: 1, backgroundColor: C.bg },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14 },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
+  topDivider:  { height: 1, backgroundColor: C.border },
+  scroll:      { paddingHorizontal: 20, paddingTop: 24, gap: 20 },
 
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: "#FFFFFF",
-  },
-  backBtn:     { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  headerTitle: {
-    fontSize: 13, fontFamily: "Manrope_700Bold", color: "#000000",
-    textAlign: "center", flex: 1, textTransform: "capitalize",
-  },
-  headerDivider: { height: 1, backgroundColor: "#D1D1D1" },
+  detailCard:  { borderRadius: 12, borderWidth: 1, borderColor: "#EEEEEE", backgroundColor: C.bg, overflow: "hidden" },
+  pairRow:     { paddingHorizontal: 16, paddingVertical: 14, flexDirection: "row", justifyContent: "space-between" },
+  pairCell:    { flex: 1, gap: 4 },
+  rowDivider:  { height: 1, backgroundColor: "#F5F5F5" },
+  detailLabel: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec, letterSpacing: 0.24 },
+  detailValue: { fontSize: 12, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: 0.24 },
 
-  scroll: { padding: 20, gap: 20 },
+  imgLabel: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec, textTransform: "capitalize", letterSpacing: 0.24, marginBottom: 10 },
+  imgRow:   { flexDirection: "row", gap: 10 },
+  imgThumb: { width: 49, height: 49, borderRadius: 24.5, alignItems: "center", justifyContent: "center" },
 
-  detailCard: {
-    backgroundColor: "#FFFFFF", borderRadius: 10, borderWidth: 1, borderColor: "#F0F0F0",
-    paddingHorizontal: 16,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1,
-  },
-  detailRow: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start",
-    paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: "#F0F0F0",
-  },
-  rowLabel:       { fontSize: 12, fontFamily: "Manrope_500Medium", color: "#6C7278", flex: 1, letterSpacing: 0.24 },
-  rowLabelRight:  { textAlign: "right" },
-  rowValue:       { fontSize: 12, fontFamily: "Manrope_700Bold",   color: "#1B1B1B", flex: 1, letterSpacing: 0.24 },
-  rowValueRight:  { textAlign: "right" },
+  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14 },
+  summaryLine:  { height: 1, backgroundColor: C.borderSoft },
+  summaryLabel: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF", letterSpacing: -0.1 },
+  summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
-  uploadSection: { gap: 8 },
-  uploadLabel:   { fontSize: 12, fontFamily: "Manrope_500Medium", color: "#6C7278", textTransform: "capitalize" },
-  uploadRow:     { flexDirection: "row", gap: 10, alignItems: "center" },
-  uploadCircle:  { width: 49, height: 49, borderRadius: 24.5, alignItems: "center", justifyContent: "center" },
-
-  summaryBox: {
-    backgroundColor: "#010101", borderRadius: 10, paddingHorizontal: 16, paddingVertical: 4,
-  },
-  summaryRow:     { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12 },
-  summaryDivider: { height: 1, backgroundColor: "rgba(233,233,233,0.25)" },
-  summaryLabel:   { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
-  summaryValue:   { fontSize: 10, fontFamily: "Manrope_700Bold",   color: "#FFFFFF" },
-
-  submitBtn: {
-    backgroundColor: "#000000", height: 48, borderRadius: 10,
-    alignItems: "center", justifyContent: "center",
-    shadowColor: "#375DFB", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.48, shadowRadius: 2, elevation: 4,
-  },
-  submitBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  submitBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  submitBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

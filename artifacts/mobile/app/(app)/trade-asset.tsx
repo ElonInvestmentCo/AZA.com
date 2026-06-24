@@ -3,216 +3,131 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  Pressable,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const MAX_W = 430;
-
 const C = {
-  bg:        "#FFFFFF",
-  text:      "#0B0A0A",
-  textSec:   "#595F67",
-  textMuted: "#AAAFB5",
-  border:    "#EDF1F3",
-  success:   "#00B03C",
-  danger:    "#FF0000",
+  bg:      "#FFFFFF",
+  text:    "#0B0A0A",
+  navy:    "#061941",
+  textSec: "#595F67",
+  textMut: "#AAAFB5",
+  border:  "#F0F0F0",
 };
 
-const SERVICES = [
-  { id: "gift",  icon: "gift"            as const, label: "Gift Card",   color: "#7C3AED" },
-  { id: "water", icon: "droplet"         as const, label: "Water",       color: "#3B82F6" },
-  { id: "elec",  icon: "zap"             as const, label: "Electricity", color: "#F59E0B" },
-  { id: "cable", icon: "tv"              as const, label: "Cable TV",    color: "#EF4444" },
-  { id: "rates", icon: "bar-chart-2"     as const, label: "Rates",       color: "#3B82F6" },
-  { id: "txn",   icon: "list"            as const, label: "Transaction", color: "#8B5CF6" },
-  { id: "bet",   icon: "grid"            as const, label: "Bet Funding", color: "#F97316" },
-  { id: "more",  icon: "more-horizontal" as const, label: "More",        color: "#06B6D4" },
-] as const;
-
-const PROMOS = [
-  { id: "p1", pct: "50% OFF",  title: "Black friday deal",   desc: "Get discount for every top up and payment",        bg: "#D6E1FF", textColor: "#1A3070" },
-  { id: "p2", pct: "50% OFF",  title: "Summer special deal", desc: "Get discount for every transaction this weekend",  bg: "#FCB3C5", textColor: "#7A1535" },
-  { id: "p3", pct: "50% OFF",  title: "Black friday deal",   desc: "Get discount for every top up and payment",        bg: "#FFF2CF", textColor: "#5C4000" },
+const ASSETS = [
+  {
+    id: "gift",
+    title: "Gift Card",
+    subtitle: "Sell Amazon, iTunes, Steam & more",
+    bg: "#FFF2CF",
+    iconBg: "rgba(92,64,0,0.12)",
+    iconColor: "#5C4000",
+    icon: "gift" as const,
+    route: "/(app)/sell-gift-card" as const,
+    badge: "Best Rate",
+    badgeBg: "#5C4000",
+  },
+  {
+    id: "crypto",
+    title: "Cryptocurrency",
+    subtitle: "Sell BTC, ETH, USDT & other coins",
+    bg: "#F0FFF9",
+    iconBg: "rgba(38,161,123,0.12)",
+    iconColor: "#26A17B",
+    icon: "trending-up" as const,
+    route: "/(app)/crypto" as const,
+    badge: "Fast",
+    badgeBg: "#26A17B",
+  },
+  {
+    id: "esim",
+    title: "eSIM Data",
+    subtitle: "Sell international eSIM data plans",
+    bg: "#EFF6FF",
+    iconBg: "rgba(37,99,235,0.12)",
+    iconColor: "#2563EB",
+    icon: "wifi" as const,
+    route: "/(app)/esim" as const,
+    badge: null,
+    badgeBg: "",
+  },
 ];
-
-const TRANSACTIONS = [
-  { id: "t1", icon: "arrow-down-circle" as const, title: "Deposit Giftcard", date: "February 24, 2022", amount: "₦200,40.00",  positive: true  },
-  { id: "t2", icon: "arrow-up-circle"   as const, title: "Withdraws",        date: "February 24, 2022", amount: "₦400,000.00", positive: false },
-];
-
-function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
-  const { width } = useWindowDimensions();
-  const ITEM_W = (Math.min(width, MAX_W) - 40) / 4;
-  const sc   = useSharedValue(1);
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
-
-  return (
-    <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
-      <Pressable
-        onPress={onPress}
-        onPressIn={() => { sc.value = withSpring(0.88, { damping: 12 }); }}
-        onPressOut={() => { sc.value = withSpring(1,    { damping: 12 }); }}
-        style={sv.wrap}
-      >
-        <View style={[sv.iconBox, { backgroundColor: item.color + "20" }]}>
-          <Feather name={item.icon} size={22} color={item.color} />
-        </View>
-        <Text style={sv.label} numberOfLines={1}>{item.label}</Text>
-      </Pressable>
-    </Animated.View>
-  );
-}
-
-function PromoCard({ item }: { item: typeof PROMOS[number] }) {
-  const { width } = useWindowDimensions();
-  const promoW = Math.min(width, MAX_W) - 60;
-  const sc   = useSharedValue(1);
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
-  return (
-    <Animated.View style={[anim, { width: promoW, marginRight: 16 }]}>
-      <Pressable
-        onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
-        onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
-      >
-        <View style={[pc.card, { backgroundColor: item.bg }]}>
-          <View style={pc.orb} />
-          <Text style={[pc.pct,   { color: item.textColor }]}>{item.pct}</Text>
-          <Text style={[pc.title, { color: item.textColor }]}>{item.title}</Text>
-          <Text style={[pc.desc,  { color: item.textColor + "CC" }]}>{item.desc}</Text>
-        </View>
-      </Pressable>
-    </Animated.View>
-  );
-}
 
 export default function TradeAssetScreen() {
-  const router  = useRouter();
-  const insets  = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-  const promoW  = Math.min(width, MAX_W) - 60;
-
-  const press = (fn: () => void) => () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    fn();
-  };
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 48 : insets.top;
 
   return (
-    <View style={[s.root, { backgroundColor: C.bg }]}>
+    <View style={[s.root, { paddingTop: topPad }]}>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <Animated.View
-        entering={FadeInDown.duration(320).springify()}
-        style={[s.header, { paddingTop: (insets.top || 16) + 12 }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={s.backBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Feather name="arrow-left" size={22} color="#1E232C" />
+      {/* Header */}
+      <Animated.View entering={FadeInDown.duration(280)} style={s.header}>
+        <TouchableOpacity style={s.backBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}>
+          <Feather name="arrow-left" size={20} color={C.navy} />
         </TouchableOpacity>
-        <Text style={s.headerTitle}>Gift Card</Text>
-        <View style={{ width: 40 }} />
+        <Text style={s.title}>Sell Assets</Text>
+        <View style={{ width: 36 }} />
       </Animated.View>
-      <View style={s.headerDivider} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 100 }]}
       >
 
-        {/* ── Services grid (2×4) ──────────────────────────────────────────── */}
-        <Animated.View
-          entering={FadeInDown.duration(360).springify().delay(80)}
-          style={s.servicesGrid}
-        >
-          {SERVICES.map((item, i) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInDown.duration(300).springify().delay(80 + i * 28)}
+        <Animated.View entering={FadeInDown.duration(300).delay(30)}>
+          <Text style={s.subtitle}>What would you like to sell today?</Text>
+        </Animated.View>
+
+        {ASSETS.map((item, i) => (
+          <Animated.View key={item.id} entering={FadeInUp.duration(320).delay(60 + i * 60)}>
+            <TouchableOpacity
+              style={[s.card, { backgroundColor: item.bg }]}
+              activeOpacity={0.82}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push(item.route as any);
+              }}
             >
-              <ServiceItem
-                item={item}
-                onPress={press(() => {
-                  if (item.id === "gift") router.push("/(app)/sell-gift-card" as any);
-                })}
-              />
-            </Animated.View>
-          ))}
-        </Animated.View>
+              <View style={s.cardOrb} />
 
-        {/* ── Promo banners ─────────────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(180)}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={s.promoScroll}
-            snapToInterval={promoW + 16}
-            decelerationRate="fast"
-          >
-            {PROMOS.map(p => <PromoCard key={p.id} item={p} />)}
-          </ScrollView>
-        </Animated.View>
+              <View style={s.cardLeft}>
+                <View style={[s.iconWrap, { backgroundColor: item.iconBg }]}>
+                  <Feather name={item.icon} size={28} color={item.iconColor} />
+                </View>
+                <View style={s.cardText}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    <Text style={[s.cardTitle, { color: item.iconColor }]}>{item.title}</Text>
+                    {item.badge && (
+                      <View style={[s.badgePill, { backgroundColor: item.badgeBg }]}>
+                        <Text style={s.badgeText}>{item.badge}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={[s.cardSubtitle, { color: item.iconColor + "99" }]}>{item.subtitle}</Text>
+                </View>
+              </View>
 
-        {/* ── Recent Transactions ───────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(220)}>
-          <View style={s.secHdr}>
-            <Text style={s.secTitle}>Recent Transaction</Text>
-            <TouchableOpacity onPress={press(() => router.push("/(app)/transactions"))}>
-              <Text style={s.seeAll}>See All</Text>
+              <Feather name="chevron-right" size={20} color={item.iconColor + "88"} />
             </TouchableOpacity>
-          </View>
+          </Animated.View>
+        ))}
 
-          <View style={s.txList}>
-            {TRANSACTIONS.map((item, i) => (
-              <Animated.View
-                key={item.id}
-                entering={FadeInUp.duration(280).springify().delay(220 + i * 40)}
-              >
-                <TouchableOpacity
-                  style={[s.txRow, { borderBottomColor: C.border, borderBottomWidth: i < TRANSACTIONS.length - 1 ? 1 : 0 }]}
-                  activeOpacity={0.75}
-                >
-                  <View style={[s.txIcon, { backgroundColor: (item.positive ? C.success : C.danger) + "18" }]}>
-                    <Feather name={item.icon} size={18} color={item.positive ? C.success : C.danger} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={s.txTitle}>{item.title}</Text>
-                    <Text style={s.txDate}>{item.date}</Text>
-                  </View>
-                  <Text style={[s.txAmount, { color: item.positive ? C.success : C.danger }]}>
-                    {item.amount}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            ))}
+        {/* Info card */}
+        <Animated.View entering={FadeInUp.duration(300).delay(260)} style={s.infoCard}>
+          <Feather name="shield" size={20} color="#2563EB" />
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text style={s.infoTitle}>Secure & Fast Transactions</Text>
+            <Text style={s.infoDesc}>All trades are processed securely with instant payouts to your wallet.</Text>
           </View>
-        </Animated.View>
-
-        {/* ── Sell Gift Card button ─────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(280)}>
-          <TouchableOpacity
-            style={s.sellBtn}
-            onPress={press(() => router.push("/(app)/sell-gift-card" as any))}
-            activeOpacity={0.85}
-          >
-            <Feather name="gift" size={18} color="#FFFFFF" />
-            <Text style={s.sellBtnText}>Sell Gift Card</Text>
-          </TouchableOpacity>
         </Animated.View>
 
       </ScrollView>
@@ -221,66 +136,37 @@ export default function TradeAssetScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#FFFFFF" },
+  root: { flex: 1, backgroundColor: C.bg },
 
-  header: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: "#FFFFFF",
-  },
-  backBtn:     { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#000000", textAlign: "center", flex: 1 },
-  headerDivider: { height: 1, backgroundColor: "#D1D1D1" },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 12, paddingTop: 8 },
+  backBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
+  title: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.navy },
 
-  scroll: { paddingTop: 20, gap: 20 },
+  scroll: { paddingHorizontal: 20, paddingTop: 8, gap: 16 },
+  subtitle: { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.textSec, marginBottom: 4 },
 
-  servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 10, rowGap: 20 },
-
-  promoScroll: { paddingHorizontal: 20 },
-
-  secHdr: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    paddingHorizontal: 20, marginBottom: 10,
-  },
-  secTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: "#0B0A0A" },
-  seeAll:   { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: "#1B1B1B" },
-
-  txList: {
-    marginHorizontal: 20, borderRadius: 6, borderWidth: 1, borderColor: "#EDF1F3",
-    overflow: "hidden", backgroundColor: "#FFFFFF",
-    shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
-  },
-  txRow: {
-    flexDirection: "row", alignItems: "center", gap: 12,
-    paddingHorizontal: 16, paddingVertical: 12, backgroundColor: "#FFFFFF",
-  },
-  txIcon:   { width: 25, height: 25, borderRadius: 3, alignItems: "center", justifyContent: "center" },
-  txTitle:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: "#595F67", marginBottom: 2 },
-  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
-  txAmount: { fontSize: 12, fontFamily: "Manrope_700Bold" },
-
-  sellBtn: {
-    marginHorizontal: 20, backgroundColor: "#000000", height: 52, borderRadius: 10,
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 4,
-  },
-  sellBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-});
-
-const sv = StyleSheet.create({
-  wrap:    { alignItems: "center", gap: 8, paddingVertical: 4 },
-  iconBox: { width: 54, height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center", color: "#595F67" },
-});
-
-const pc = StyleSheet.create({
   card: {
-    borderRadius: 6, padding: 16, paddingBottom: 20, overflow: "hidden", gap: 4, height: 97, justifyContent: "center",
+    borderRadius: 16, padding: 20, flexDirection: "row",
+    alignItems: "center", justifyContent: "space-between",
+    overflow: "hidden",
   },
-  orb: {
-    position: "absolute", width: 100, height: 100, borderRadius: 50,
-    backgroundColor: "rgba(255,255,255,0.2)", top: -30, right: -20,
+  cardOrb: {
+    position: "absolute", width: 120, height: 120, borderRadius: 60,
+    backgroundColor: "rgba(255,255,255,0.25)", top: -30, right: -20,
   },
-  pct:   { fontSize: 13, fontFamily: "Manrope_700Bold" },
-  title: { fontSize: 13, fontFamily: "Manrope_700Bold" },
-  desc:  { fontSize: 10, fontFamily: "Manrope_400Regular", lineHeight: 15, marginTop: 2 },
+  cardLeft: { flexDirection: "row", alignItems: "center", gap: 14, flex: 1 },
+  iconWrap: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  cardText: { flex: 1, gap: 5 },
+  cardTitle: { fontSize: 16, fontFamily: "Manrope_700Bold" },
+  cardSubtitle: { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 17 },
+  badgePill: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
+  badgeText: { fontSize: 9, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+
+  infoCard: {
+    flexDirection: "row", gap: 12, alignItems: "flex-start",
+    backgroundColor: "#EFF6FF", borderRadius: 12, padding: 16,
+    borderWidth: 1, borderColor: "#BFDBFE",
+  },
+  infoTitle: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: "#1D4ED8" },
+  infoDesc:  { fontSize: 12, fontFamily: "Manrope_400Regular", color: "#3B82F6", lineHeight: 17 },
 });
