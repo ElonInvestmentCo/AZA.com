@@ -166,7 +166,7 @@ export default function RegisterScreen() {
           ) : null}
 
           <TouchableOpacity
-            style={[styles.submitBtn, { backgroundColor: colors.primary, opacity: isLoading ? 0.7 : 1 }]}
+            style={[styles.submitBtn, { backgroundColor: "#000000", opacity: isLoading ? 0.7 : 1 }]}
             onPress={handleRegister}
             disabled={isLoading}
             activeOpacity={0.85}
