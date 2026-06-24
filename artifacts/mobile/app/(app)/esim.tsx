@@ -10,315 +10,226 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
-  bg:      "#FFFFFF",
-  text:    "#0B0A0A",
-  textSec: "#595F67",
-  textMut: "#AAAFB5",
-  border:  "#EDF1F3",
-  surface: "#F8F9FA",
-  inputBg: "#F7F8F9",
-  btn:     "#000000",
-  accent:  "#35C2C1",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  inputBg:   "#F0F0F0",
+  border:    "#EDF1F3",
+  success:   "#00B03C",
+  dark:      "#010101",
+  black:     "#000000",
+  primary:   "#135EF2",
 };
 
-type Region = { id:string; label:string; emoji:string; countries:number };
-type ESimPlan = { id:string; data:string; validity:string; price:string; speed:string };
+const REGIONS = ["Africa", "Europe", "Americas", "Asia Pacific", "Middle East", "Global"];
 
-const REGIONS: Region[] = [
-  { id:"global",  label:"Global",        emoji:"🌍", countries:190 },
-  { id:"africa",  label:"Africa",        emoji:"🌍", countries:54  },
-  { id:"europe",  label:"Europe",        emoji:"🇪🇺", countries:40  },
-  { id:"asia",    label:"Asia Pacific",  emoji:"🌏", countries:35  },
-  { id:"america", label:"Americas",      emoji:"🌎", countries:30  },
-  { id:"mena",    label:"Middle East",   emoji:"🕌", countries:22  },
+const ESIM_PLANS = [
+  { id:"1",  country:"Nigeria",       flag:"🇳🇬", data:"1GB",  duration:"7 Days",  price:"₦2,500",  popular:true  },
+  { id:"2",  country:"Nigeria",       flag:"🇳🇬", data:"3GB",  duration:"30 Days", price:"₦6,000",  popular:false },
+  { id:"3",  country:"United States", flag:"🇺🇸", data:"5GB",  duration:"30 Days", price:"₦8,500",  popular:true  },
+  { id:"4",  country:"United Kingdom",flag:"🇬🇧", data:"3GB",  duration:"30 Days", price:"₦7,200",  popular:false },
+  { id:"5",  country:"Europe",        flag:"🇪🇺", data:"5GB",  duration:"15 Days", price:"₦9,000",  popular:false },
+  { id:"6",  country:"Global",        flag:"🌍",  data:"10GB", duration:"30 Days", price:"₦18,000", popular:true  },
+  { id:"7",  country:"Canada",        flag:"🇨🇦", data:"3GB",  duration:"14 Days", price:"₦6,500",  popular:false },
+  { id:"8",  country:"Germany",       flag:"🇩🇪", data:"5GB",  duration:"30 Days", price:"₦8,000",  popular:false },
 ];
 
-const PLANS_BY_REGION: Record<string, ESimPlan[]> = {
-  global:  [
-    { id:"g1", data:"1GB",  validity:"7 Days",  price:"$9.99",  speed:"4G/LTE" },
-    { id:"g2", data:"3GB",  validity:"15 Days", price:"$19.99", speed:"4G/LTE" },
-    { id:"g3", data:"5GB",  validity:"30 Days", price:"$29.99", speed:"5G/4G"  },
-    { id:"g4", data:"10GB", validity:"30 Days", price:"$49.99", speed:"5G/4G"  },
-    { id:"g5", data:"20GB", validity:"60 Days", price:"$79.99", speed:"5G/4G"  },
-  ],
-  africa:  [
-    { id:"a1", data:"1GB",  validity:"7 Days",  price:"$4.99",  speed:"4G/LTE" },
-    { id:"a2", data:"3GB",  validity:"15 Days", price:"$11.99", speed:"4G/LTE" },
-    { id:"a3", data:"10GB", validity:"30 Days", price:"$24.99", speed:"4G"     },
-  ],
-  europe:  [
-    { id:"e1", data:"1GB",  validity:"7 Days",  price:"$6.99",  speed:"4G/LTE" },
-    { id:"e2", data:"5GB",  validity:"30 Days", price:"$24.99", speed:"5G/4G"  },
-    { id:"e3", data:"10GB", validity:"30 Days", price:"$39.99", speed:"5G/4G"  },
-  ],
-  asia:    [
-    { id:"as1", data:"2GB",  validity:"15 Days", price:"$8.99",  speed:"4G/LTE" },
-    { id:"as2", data:"5GB",  validity:"30 Days", price:"$19.99", speed:"5G/4G"  },
-  ],
-  america: [
-    { id:"am1", data:"1GB",  validity:"7 Days",  price:"$7.99",  speed:"4G/LTE" },
-    { id:"am2", data:"5GB",  validity:"30 Days", price:"$26.99", speed:"5G/4G"  },
-  ],
-  mena:    [
-    { id:"m1", data:"1GB",  validity:"7 Days",  price:"$5.99",  speed:"4G/LTE" },
-    { id:"m2", data:"5GB",  validity:"30 Days", price:"$22.99", speed:"4G/LTE" },
-  ],
-};
-
-type Step = "region" | "plans" | "confirm" | "success";
-
-function QRCodeDisplay() {
-  // Decorative QR code placeholder
-  const cells = 10;
-  const pattern = [
-    [1,1,1,1,1,1,1,0,1,0],
-    [1,0,0,0,0,0,1,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0],
-    [1,0,1,1,1,0,1,1,1,1],
-    [1,0,1,1,1,0,1,0,0,0],
-    [1,0,0,0,0,0,1,0,1,1],
-    [1,1,1,1,1,1,1,0,1,0],
-    [0,1,0,0,1,0,0,0,0,1],
-    [1,0,1,1,0,1,1,1,0,1],
-    [0,1,0,1,0,0,1,0,1,1],
-  ];
-  const size = 160;
-  const cell = size / cells;
-  return (
-    <View style={{ width:size, height:size, backgroundColor:"#fff", padding:cell*0.5, borderRadius:8, borderWidth:1, borderColor:"#EDF1F3" }}>
-      {pattern.map((row,r) => (
-        <View key={r} style={{ flexDirection:"row" }}>
-          {row.map((filled,c) => (
-            <View key={c} style={{ width:cell, height:cell, backgroundColor:filled?"#000":"#fff" }} />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
-
-export default function ESimScreen() {
+export default function EsimScreen() {
   const router = useRouter();
-  const [step,    setStep]    = useState<Step>("region");
-  const [region,  setRegion]  = useState<Region | null>(null);
-  const [plan,    setPlan]    = useState<ESimPlan | null>(null);
-  const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
 
-  const handlePay = async () => {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1800));
-    setLoading(false);
-    setStep("success");
-  };
+  const [region,     setRegion]     = useState("All");
+  const [search,     setSearch]     = useState("");
+  const [selected,   setSelected]   = useState("");
+  const [showModal,  setShowModal]  = useState(false);
 
-  if (step === "success") {
-    return (
-      <View style={s.root}>
-        <ScreenHeader title="eSIM Ready" showBack={false} />
-        <ScrollView contentContainerStyle={s.successScroll}>
-          <Animated.View entering={FadeInDown.duration(380).springify()} style={s.successCircle}>
-            <Feather name="wifi" size={38} color="#fff" />
-          </Animated.View>
-          <Animated.Text entering={FadeInUp.duration(320).delay(80)} style={s.successTitle}>eSIM Activated!</Animated.Text>
-          <Animated.Text entering={FadeInUp.duration(320).delay(100)} style={s.successSub}>
-            Scan the QR code below to install your eSIM profile
-          </Animated.Text>
+  const plan = ESIM_PLANS.find(p => p.id === selected);
 
-          <Animated.View entering={FadeInUp.duration(320).delay(140)} style={s.qrCard}>
-            <QRCodeDisplay />
-            <Text style={s.qrScan}>Point your camera at this QR code</Text>
-          </Animated.View>
-
-          <Animated.View entering={FadeInUp.duration(300).delay(180)} style={s.receiptCard}>
-            {[
-              { label:"Region",    value: region?.label ?? "" },
-              { label:"Plan",      value: `${plan?.data} / ${plan?.validity}` },
-              { label:"Speed",     value: plan?.speed ?? "" },
-              { label:"Amount",    value: plan?.price ?? "" },
-              { label:"Reference", value: `ES-${Math.floor(Math.random()*900000)+100000}` },
-            ].map(r => (
-              <View key={r.label} style={s.receiptRow}>
-                <Text style={s.receiptLabel}>{r.label}</Text>
-                <Text style={s.receiptValue}>{r.value}</Text>
-              </View>
-            ))}
-          </Animated.View>
-
-          <Text style={s.installNote}>
-            Go to Settings → Mobile Data → Add eSIM and scan the QR code, or tap "Install eSIM" in your device settings.
-          </Text>
-
-          <TouchableOpacity style={s.btn} onPress={() => router.back()}>
-            <Text style={s.btnText}>Done</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-    );
-  }
+  const filtered = ESIM_PLANS.filter(p =>
+    (region === "All" || p.country.toLowerCase().includes(region.toLowerCase())) &&
+    (search === "" || p.country.toLowerCase().includes(search.toLowerCase()))
+  );
 
   return (
-    <View style={s.root}>
-      <ScreenHeader title={
-        step === "region"  ? "eSIM Packages" :
-        step === "plans"   ? `${region?.emoji} ${region?.label} Plans` :
-        "Confirm Purchase"
-      } />
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
 
-      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+      <Animated.View entering={FadeInDown.duration(280).springify()} style={[s.header, { paddingTop: topPad + 10 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Feather name="arrow-left" size={22} color="#1E232C" />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>eSIM Plans</Text>
+        <View style={{ width: 44 }} />
+      </Animated.View>
+      <View style={s.divider} />
 
-        {/* REGION */}
-        {step === "region" && (
-          <Animated.View entering={FadeInDown.duration(300)}>
-            <Text style={s.subheading}>Select a region</Text>
-            <View style={s.regionGrid}>
-              {REGIONS.map((reg, i) => (
-                <Animated.View key={reg.id} entering={FadeInDown.duration(270).delay(i * 30)}>
-                  <TouchableOpacity
-                    style={s.regionCard}
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setRegion(reg);
-                      setStep("plans");
-                    }}
-                  >
-                    <Text style={s.regionEmoji}>{reg.emoji}</Text>
-                    <Text style={s.regionLabel}>{reg.label}</Text>
-                    <Text style={s.regionSub}>{reg.countries} countries</Text>
-                  </TouchableOpacity>
-                </Animated.View>
-              ))}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}>
+
+        <Animated.View entering={FadeInDown.duration(300).delay(30)}>
+          <Text style={s.subtitle}>Browse and buy international eSIM data plans.</Text>
+        </Animated.View>
+
+        {/* Search */}
+        <Animated.View entering={FadeInDown.duration(300).delay(50)} style={s.searchRow}>
+          <Feather name="search" size={16} color={C.textMuted} />
+          <TextInput
+            style={s.searchInput}
+            placeholder="Search country or region..."
+            placeholderTextColor="#646464"
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch("")}>
+              <Feather name="x" size={16} color={C.textMuted} />
+            </TouchableOpacity>
+          )}
+        </Animated.View>
+
+        {/* Region chips */}
+        <Animated.View entering={FadeInDown.duration(300).delay(70)}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.regionScroll}>
+            {["All", ...REGIONS].map(r => (
+              <Pressable
+                key={r}
+                style={[s.regionChip, region === r && s.regionChipActive]}
+                onPress={() => { Haptics.selectionAsync(); setRegion(r); }}
+              >
+                <Text style={[s.regionText, region === r && s.regionTextActive]}>{r}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </Animated.View>
+
+        {/* Plans list */}
+        <Animated.View entering={FadeInDown.duration(300).delay(100)}>
+          {filtered.length === 0 ? (
+            <View style={s.empty}>
+              <Feather name="globe" size={32} color={C.textMuted} />
+              <Text style={s.emptyText}>No plans found</Text>
             </View>
-          </Animated.View>
-        )}
-
-        {/* PLANS */}
-        {step === "plans" && region && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 10 }}>
-            <Text style={s.subheading}>Select a data plan</Text>
-            {(PLANS_BY_REGION[region.id] ?? []).map((p, i) => (
-              <Animated.View key={p.id} entering={FadeInDown.duration(260).delay(i * 30)}>
+          ) : (
+            filtered.map((p, i) => (
+              <Animated.View key={p.id} entering={FadeInDown.duration(240).delay(i * 25)}>
                 <TouchableOpacity
-                  style={[s.planCard, plan?.id === p.id && s.planCardActive]}
-                  activeOpacity={0.85}
-                  onPress={() => {
-                    Haptics.selectionAsync();
-                    setPlan(p);
-                  }}
+                  style={[s.planCard, selected === p.id && { borderColor: C.primary, borderWidth: 2 }]}
+                  activeOpacity={0.82}
+                  onPress={() => { Haptics.selectionAsync(); setSelected(p.id); }}
                 >
-                  <View>
-                    <Text style={s.planData}>{p.data}</Text>
-                    <Text style={s.planMeta}>{p.validity} · {p.speed}</Text>
+                  <View style={s.planLeft}>
+                    <Text style={s.planFlag}>{p.flag}</Text>
+                    <View style={s.planInfo}>
+                      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                        <Text style={s.planCountry}>{p.country}</Text>
+                        {p.popular && (
+                          <View style={s.popularBadge}>
+                            <Text style={s.popularText}>Popular</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={s.planMeta}>{p.data} · {p.duration}</Text>
+                    </View>
                   </View>
                   <View style={s.planRight}>
                     <Text style={s.planPrice}>{p.price}</Text>
-                    {plan?.id === p.id && <Feather name="check-circle" size={18} color={C.accent} />}
+                    <View style={[s.selectCircle, selected === p.id && { backgroundColor: C.primary, borderColor: C.primary }]}>
+                      {selected === p.id && <Feather name="check" size={10} color="#fff" />}
+                    </View>
                   </View>
                 </TouchableOpacity>
+                {i < filtered.length - 1 && <View style={s.planDivider} />}
               </Animated.View>
-            ))}
-            <TouchableOpacity
-              style={[s.btn, { marginTop: 12 }, !plan && s.btnDisabled]}
-              disabled={!plan}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setStep("confirm");
-              }}
-            >
-              <Text style={s.btnText}>Continue</Text>
-            </TouchableOpacity>
+            ))
+          )}
+        </Animated.View>
+
+        {/* Selected summary */}
+        {plan && (
+          <Animated.View entering={FadeInUp.duration(260)} style={s.summaryBox}>
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Plan</Text>
+              <Text style={s.summaryValue}>{plan.flag} {plan.country} — {plan.data}</Text>
+            </View>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Duration</Text>
+              <Text style={s.summaryValue}>{plan.duration}</Text>
+            </View>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Total:</Text>
+              <Text style={[s.summaryValue, { fontFamily: "Manrope_700Bold", fontSize: 13 }]}>{plan.price}</Text>
+            </View>
           </Animated.View>
         )}
 
-        {/* CONFIRM */}
-        {step === "confirm" && plan && region && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
-            <Text style={s.subheading}>Review your eSIM order</Text>
-            <View style={s.receiptCard}>
-              {[
-                { label:"Region",    value: `${region.emoji} ${region.label}` },
-                { label:"Countries", value: `${region.countries} countries` },
-                { label:"Data",      value: plan.data },
-                { label:"Validity",  value: plan.validity },
-                { label:"Speed",     value: plan.speed },
-                { label:"Price",     value: plan.price },
-              ].map(r => (
-                <View key={r.label} style={s.receiptRow}>
-                  <Text style={s.receiptLabel}>{r.label}</Text>
-                  <Text style={s.receiptValue}>{r.value}</Text>
-                </View>
-              ))}
-            </View>
-            <View style={[s.infoBox, { backgroundColor: C.accent + "12" }]}>
-              <Feather name="info" size={14} color={C.accent} />
-              <Text style={[s.infoText, { color: C.accent }]}>
-                Your eSIM QR code will be generated immediately after payment.
-              </Text>
-            </View>
-            <TouchableOpacity style={[s.btn, loading && s.btnDisabled]} disabled={loading} onPress={handlePay}>
-              <Text style={s.btnText}>{loading ? "Processing…" : `Pay ${plan.price}`}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={s.secondaryBtn} onPress={() => setStep("plans")}>
-              <Text style={s.secondaryText}>Change Plan</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
+        <TouchableOpacity
+          style={[s.buyBtn, !selected && { opacity: 0.45 }]}
+          onPress={() => {
+            if (!selected) return;
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            router.push("/(app)/success-payment" as any);
+          }}
+          activeOpacity={0.85}
+        >
+          <Text style={s.buyBtnText}>Purchase eSIM</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root:  { flex:1, backgroundColor:C.bg },
-  scroll:{ padding:20, flexGrow:1 },
-  subheading: { fontSize:15, fontFamily:"Manrope_600SemiBold", color:C.textSec, marginBottom:16 },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
+  divider:     { height: 1, backgroundColor: "#D1D1D1" },
+  scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 16 },
+  subtitle:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, letterSpacing: 0.24 },
 
-  regionGrid: { flexDirection:"row", flexWrap:"wrap", gap:12 },
-  regionCard: {
-    width:"47%", backgroundColor:C.surface, borderRadius:16, padding:18,
-    alignItems:"center", gap:6, borderWidth:1, borderColor:C.border,
-  },
-  regionEmoji: { fontSize:32, marginBottom:4 },
-  regionLabel: { fontSize:14, fontFamily:"Manrope_700Bold", color:C.text },
-  regionSub:   { fontSize:11, fontFamily:"Manrope_400Regular", color:C.textMut },
+  searchRow:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: C.inputBg, borderRadius: 10, paddingHorizontal: 14, height: 46, borderWidth: 1, borderColor: C.border },
+  searchInput: { flex: 1, fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text },
 
-  planCard: {
-    flexDirection:"row", alignItems:"center", justifyContent:"space-between",
-    backgroundColor:C.surface, borderRadius:14, padding:16,
-    borderWidth:1, borderColor:C.border,
-  },
-  planCardActive: { borderColor:C.accent, backgroundColor:C.accent + "08" },
-  planData:  { fontSize:16, fontFamily:"Manrope_700Bold", color:C.text },
-  planMeta:  { fontSize:12, fontFamily:"Manrope_400Regular", color:C.textMut, marginTop:3 },
-  planRight: { flexDirection:"row", alignItems:"center", gap:8 },
-  planPrice: { fontSize:16, fontFamily:"Manrope_700Bold", color:C.text },
+  regionScroll: { gap: 8, paddingBottom: 4 },
+  regionChip:        { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },
+  regionChipActive:  { backgroundColor: C.navy, borderColor: C.navy },
+  regionText:        { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
+  regionTextActive:  { color: "#FFFFFF" },
 
-  receiptCard:  { backgroundColor:C.surface, borderRadius:16, padding:18, borderWidth:1, borderColor:C.border, gap:14 },
-  receiptRow:   { flexDirection:"row", justifyContent:"space-between", alignItems:"center" },
-  receiptLabel: { fontSize:13, fontFamily:"Manrope_400Regular", color:C.textSec },
-  receiptValue: { fontSize:13, fontFamily:"Manrope_600SemiBold", color:C.text },
+  planCard: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: "transparent", paddingHorizontal: 4 },
+  planLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+  planFlag: { fontSize: 28 },
+  planInfo: { flex: 1, gap: 3 },
+  planCountry: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.text },
+  planMeta:    { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textMuted },
+  planRight:   { alignItems: "flex-end", gap: 8 },
+  planPrice:   { fontSize: 14, fontFamily: "Manrope_700Bold", color: C.navy },
+  selectCircle: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: C.border, alignItems: "center", justifyContent: "center" },
+  planDivider: { height: 1, backgroundColor: C.border },
 
-  infoBox: { flexDirection:"row", alignItems:"flex-start", gap:8, borderRadius:12, padding:12 },
-  infoText:{ flex:1, fontSize:12, fontFamily:"Manrope_400Regular", lineHeight:18 },
+  popularBadge: { backgroundColor: "#FFF2CF", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  popularText:  { fontSize: 9, fontFamily: "Manrope_700Bold", color: "#5C4000" },
 
-  btn:         { height:56, backgroundColor:C.btn, borderRadius:14, alignItems:"center", justifyContent:"center" },
-  btnDisabled: { opacity:0.5 },
-  btnText:     { fontSize:16, fontFamily:"Manrope_700Bold", color:"#fff" },
-  secondaryBtn:  { height:48, alignItems:"center", justifyContent:"center" },
-  secondaryText: { fontSize:14, fontFamily:"Manrope_600SemiBold", color:C.textSec },
+  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 13 },
+  summaryLine:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
+  summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
+  summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
 
-  successScroll: { padding:24, alignItems:"center", gap:16, paddingBottom:60 },
-  successCircle: { width:80, height:80, borderRadius:40, backgroundColor:C.accent, alignItems:"center", justifyContent:"center", marginBottom:4 },
-  successTitle:  { fontSize:22, fontFamily:"Manrope_700Bold", color:C.text },
-  successSub:    { fontSize:14, fontFamily:"Manrope_400Regular", color:C.textSec, textAlign:"center" },
-  qrCard:  { alignItems:"center", gap:12, padding:20, backgroundColor:C.surface, borderRadius:20, borderWidth:1, borderColor:C.border, width:"100%" },
-  qrScan:  { fontSize:12, fontFamily:"Manrope_400Regular", color:C.textSec },
-  installNote: { fontSize:12, fontFamily:"Manrope_400Regular", color:C.textSec, textAlign:"center", lineHeight:18 },
+  buyBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  buyBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+
+  empty: { alignItems: "center", paddingVertical: 40, gap: 8 },
+  emptyText: { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.textMuted },
 });
