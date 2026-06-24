@@ -1,224 +1,282 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  Platform,
+  Dimensions,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-/* ─── Light theme colors ─────────────────────────────────────────────────────── */
+const { width: SW } = Dimensions.get("window");
+const PROMO_W = SW - 60;
+
 const C = {
-  bg:         "#FFFFFF",
-  text:       "#1B1B1B",
-  textSec:    "#6C7278",
-  textMuted:  "#AAAFB5",
-  border:     "#EDF1F3",
-  summaryBox: "#010101",
-  divider:    "#D1D1D1",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  textSec:   "#595F67",
+  textMuted: "#AAAFB5",
+  border:    "#EDF1F3",
+  success:   "#00B03C",
+  danger:    "#FF0000",
 };
 
-/* ─── Detail row ─────────────────────────────────────────────────────────────── */
-function DetailRow({ label, value }: { label: string; value: string }) {
+const SERVICES = [
+  { id: "gift",  icon: "gift"            as const, label: "Gift Card",   color: "#7C3AED" },
+  { id: "water", icon: "droplet"         as const, label: "Water",       color: "#3B82F6" },
+  { id: "elec",  icon: "zap"             as const, label: "Electricity", color: "#F59E0B" },
+  { id: "cable", icon: "tv"              as const, label: "Cable TV",    color: "#EF4444" },
+  { id: "rates", icon: "bar-chart-2"     as const, label: "Rates",       color: "#3B82F6" },
+  { id: "txn",   icon: "list"            as const, label: "Transaction", color: "#8B5CF6" },
+  { id: "bet",   icon: "grid"            as const, label: "Bet Funding", color: "#F97316" },
+  { id: "more",  icon: "more-horizontal" as const, label: "More",        color: "#06B6D4" },
+] as const;
+
+const PROMOS = [
+  { id: "p1", pct: "50% OFF",  title: "Black friday deal",   desc: "Get discount for every top up and payment",        bg: "#D6E1FF", textColor: "#1A3070" },
+  { id: "p2", pct: "50% OFF",  title: "Summer special deal", desc: "Get discount for every transaction this weekend",  bg: "#FCB3C5", textColor: "#7A1535" },
+  { id: "p3", pct: "50% OFF",  title: "Black friday deal",   desc: "Get discount for every top up and payment",        bg: "#FFF2CF", textColor: "#5C4000" },
+];
+
+const TRANSACTIONS = [
+  { id: "t1", icon: "arrow-down-circle" as const, title: "Deposit Giftcard", date: "February 24, 2022", amount: "₦200,40.00",  positive: true  },
+  { id: "t2", icon: "arrow-up-circle"   as const, title: "Withdraws",        date: "February 24, 2022", amount: "₦400,000.00", positive: false },
+];
+
+function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
+  const sc   = useSharedValue(1);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+  const ITEM_W = (SW - 40) / 4;
+
   return (
-    <View style={dr.wrap}>
-      <Text style={dr.label}>{label}</Text>
-      <Text style={dr.value}>{value}</Text>
-    </View>
+    <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={() => { sc.value = withSpring(0.88, { damping: 12 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 12 }); }}
+        style={sv.wrap}
+      >
+        <View style={[sv.iconBox, { backgroundColor: item.color + "20" }]}>
+          <Feather name={item.icon} size={22} color={item.color} />
+        </View>
+        <Text style={sv.label} numberOfLines={1}>{item.label}</Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 
-const dr = StyleSheet.create({
-  wrap: {
-    flexDirection:   "row",
-    justifyContent:  "space-between",
-    alignItems:      "flex-start",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-  },
-  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec, flex: 1 },
-  value: { fontSize: 12, fontFamily: "Manrope_700Bold",   color: C.text, flex: 1, textAlign: "right" },
-});
+function PromoCard({ item }: { item: typeof PROMOS[number] }) {
+  const sc   = useSharedValue(1);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+  return (
+    <Animated.View style={[anim, { width: PROMO_W, marginRight: 16 }]}>
+      <Pressable
+        onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
+      >
+        <View style={[pc.card, { backgroundColor: item.bg }]}>
+          <View style={pc.orb} />
+          <Text style={[pc.pct,   { color: item.textColor }]}>{item.pct}</Text>
+          <Text style={[pc.title, { color: item.textColor }]}>{item.title}</Text>
+          <Text style={[pc.desc,  { color: item.textColor + "CC" }]}>{item.desc}</Text>
+        </View>
+      </Pressable>
+    </Animated.View>
+  );
+}
 
-/* ─── Main screen ────────────────────────────────────────────────────────────── */
 export default function TradeAssetScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const { card } = useLocalSearchParams<{ card: string }>();
 
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("en-US", {
-    month: "short", day: "2-digit", year: "numeric",
-  }) + " - " + now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
-
-  const rate  = 1200;
-  const total = 200040;
+  const press = (fn: () => void) => () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    fn();
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.bg }}>
-      {/* Header */}
-      <View style={[hdr.wrap, { paddingTop: (insets.top || 16) + 12 }]}>
+    <View style={[s.root, { backgroundColor: C.bg }]}>
+
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <Animated.View
+        entering={FadeInDown.duration(320).springify()}
+        style={[s.header, { paddingTop: (insets.top || 16) + 12 }]}
+      >
         <TouchableOpacity
           onPress={() => router.back()}
-          style={hdr.back}
+          style={s.backBtn}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Feather name="arrow-left" size={22} color="#1E232C" />
         </TouchableOpacity>
-        <Text style={hdr.title}>Confirm transaction Details</Text>
+        <Text style={s.headerTitle}>Gift Card</Text>
         <View style={{ width: 40 }} />
-      </View>
-      <View style={hdr.divider} />
+      </Animated.View>
+      <View style={s.headerDivider} />
 
       <ScrollView
-        contentContainerStyle={sc.content}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
       >
-        {/* Transaction detail rows */}
-        <View style={sc.card}>
-          <DetailRow label="Date & Time"               value={dateStr} />
-          <DetailRow label="Gift Card Category"         value={card ?? "Amazon"} />
-          <DetailRow label="Gift card Type/sub-category" value="Australia Amazon" />
-          <DetailRow label="Gift card Amount"           value="Aug 06,2024 -6:17PM" />
-          <View style={[dr.wrap, { borderBottomWidth: 0 }]}>
-            <Text style={dr.label}>Total Amount</Text>
-            <Text style={[dr.value, { color: C.text, fontFamily: "Manrope_700Bold" }]}>
-              ₦{total.toLocaleString("en-NG")}
-            </Text>
-          </View>
-        </View>
 
-        {/* Upload gift card images section */}
-        <View style={up.wrap}>
-          <Text style={up.label}>gift card image</Text>
-          <View style={up.row}>
-            {[["#FFB6C1", "#d63384"], ["#AED6F1", "#2980b9"]].map(([bg, col], i) => (
-              <View key={i} style={[up.circle, { backgroundColor: bg }]}>
-                <Feather name="image" size={16} color={col} />
-              </View>
-            ))}
-            <View style={[up.circle, { backgroundColor: "#BBBBBB" }]}>
-              <Feather name="plus" size={18} color="#FFFFFF" />
-            </View>
-          </View>
-        </View>
-
-        {/* Rate / Total summary box */}
-        <View style={sb.box}>
-          <View style={sb.row}>
-            <Text style={sb.label}>Rate</Text>
-            <Text style={sb.value}>₦{rate.toLocaleString("en-NG")}</Text>
-          </View>
-          <View style={sb.line} />
-          <View style={sb.row}>
-            <Text style={sb.label}>Total:</Text>
-            <Text style={[sb.value, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>
-              ₦{total.toLocaleString("en-NG")}
-            </Text>
-          </View>
-        </View>
-
-        {/* Submit Trade button */}
-        <TouchableOpacity
-          style={btn.wrap}
-          onPress={() => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            router.push("/(app)/submitted");
-          }}
-          activeOpacity={0.85}
+        {/* ── Services grid (2×4) ──────────────────────────────────────────── */}
+        <Animated.View
+          entering={FadeInDown.duration(360).springify().delay(80)}
+          style={s.servicesGrid}
         >
-          <Text style={btn.text}>Submit Trade</Text>
-        </TouchableOpacity>
+          {SERVICES.map((item, i) => (
+            <Animated.View
+              key={item.id}
+              entering={FadeInDown.duration(300).springify().delay(80 + i * 28)}
+            >
+              <ServiceItem
+                item={item}
+                onPress={press(() => {
+                  if (item.id === "gift") router.push("/(app)/sell-gift-card" as any);
+                })}
+              />
+            </Animated.View>
+          ))}
+        </Animated.View>
+
+        {/* ── Promo banners ─────────────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.duration(340).springify().delay(180)}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.promoScroll}
+            snapToInterval={PROMO_W + 16}
+            decelerationRate="fast"
+          >
+            {PROMOS.map(p => <PromoCard key={p.id} item={p} />)}
+          </ScrollView>
+        </Animated.View>
+
+        {/* ── Recent Transactions ───────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.duration(340).springify().delay(220)}>
+          <View style={s.secHdr}>
+            <Text style={s.secTitle}>Recent Transaction</Text>
+            <TouchableOpacity onPress={press(() => router.push("/(app)/transactions"))}>
+              <Text style={s.seeAll}>See All</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={s.txList}>
+            {TRANSACTIONS.map((item, i) => (
+              <Animated.View
+                key={item.id}
+                entering={FadeInUp.duration(280).springify().delay(220 + i * 40)}
+              >
+                <TouchableOpacity
+                  style={[s.txRow, { borderBottomColor: C.border, borderBottomWidth: i < TRANSACTIONS.length - 1 ? 1 : 0 }]}
+                  activeOpacity={0.75}
+                >
+                  <View style={[s.txIcon, { backgroundColor: (item.positive ? C.success : C.danger) + "18" }]}>
+                    <Feather name={item.icon} size={18} color={item.positive ? C.success : C.danger} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.txTitle}>{item.title}</Text>
+                    <Text style={s.txDate}>{item.date}</Text>
+                  </View>
+                  <Text style={[s.txAmount, { color: item.positive ? C.success : C.danger }]}>
+                    {item.amount}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* ── Sell Gift Card button ─────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.duration(340).springify().delay(280)}>
+          <TouchableOpacity
+            style={s.sellBtn}
+            onPress={press(() => router.push("/(app)/sell-gift-card" as any))}
+            activeOpacity={0.85}
+          >
+            <Feather name="gift" size={18} color="#FFFFFF" />
+            <Text style={s.sellBtnText}>Sell Gift Card</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
       </ScrollView>
     </View>
   );
 }
 
-/* ─── Styles ─────────────────────────────────────────────────────────────────── */
+const s = StyleSheet.create({
+  root: { flex: 1, backgroundColor: "#FFFFFF" },
 
-const hdr = StyleSheet.create({
-  wrap: {
-    flexDirection:     "row",
-    alignItems:        "center",
-    justifyContent:    "space-between",
-    paddingHorizontal: 20,
-    paddingBottom:     16,
-    backgroundColor:   C.bg,
+  header: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: "#FFFFFF",
   },
-  back:   { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  title:  {
-    fontSize:    13,
-    fontFamily:  "Manrope_700Bold",
-    color:       "#000000",
-    textAlign:   "center",
-    flex:        1,
-    textTransform: "capitalize",
+  backBtn:     { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#000000", textAlign: "center", flex: 1 },
+  headerDivider: { height: 1, backgroundColor: "#D1D1D1" },
+
+  scroll: { paddingTop: 20, gap: 20 },
+
+  servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 10, rowGap: 20 },
+
+  promoScroll: { paddingHorizontal: 20 },
+
+  secHdr: {
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 20, marginBottom: 10,
   },
-  divider:{ height: 1, backgroundColor: C.divider },
+  secTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: "#0B0A0A" },
+  seeAll:   { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: "#1B1B1B" },
+
+  txList: {
+    marginHorizontal: 20, borderRadius: 6, borderWidth: 1, borderColor: "#EDF1F3",
+    overflow: "hidden", backgroundColor: "#FFFFFF",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+  },
+  txRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingHorizontal: 16, paddingVertical: 12, backgroundColor: "#FFFFFF",
+  },
+  txIcon:   { width: 25, height: 25, borderRadius: 3, alignItems: "center", justifyContent: "center" },
+  txTitle:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: "#595F67", marginBottom: 2 },
+  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
+  txAmount: { fontSize: 12, fontFamily: "Manrope_700Bold" },
+
+  sellBtn: {
+    marginHorizontal: 20, backgroundColor: "#000000", height: 52, borderRadius: 10,
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 4,
+  },
+  sellBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 });
 
-const sc = StyleSheet.create({
-  content: { padding: 20, gap: 20, paddingBottom: 48 },
+const sv = StyleSheet.create({
+  wrap:    { alignItems: "center", gap: 8, paddingVertical: 4 },
+  iconBox: { width: 54, height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center", color: "#595F67" },
+});
+
+const pc = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius:    10,
-    borderWidth:     1,
-    borderColor:     "#F0F0F0",
-    paddingHorizontal: 16,
-    shadowColor:     "#000",
-    shadowOffset:    { width: 0, height: 1 },
-    shadowOpacity:   0.05,
-    shadowRadius:    4,
-    elevation:       1,
+    borderRadius: 6, padding: 16, paddingBottom: 20, overflow: "hidden", gap: 4, height: 97, justifyContent: "center",
   },
-});
-
-const up = StyleSheet.create({
-  wrap:  { gap: 8 },
-  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
-  row:   { flexDirection: "row", gap: 10, alignItems: "center" },
-  circle: {
-    width: 49, height: 49, borderRadius: 24.5,
-    alignItems: "center", justifyContent: "center",
+  orb: {
+    position: "absolute", width: 100, height: 100, borderRadius: 50,
+    backgroundColor: "rgba(255,255,255,0.2)", top: -30, right: -20,
   },
-});
-
-const sb = StyleSheet.create({
-  box: {
-    backgroundColor: C.summaryBox,
-    borderRadius:    10,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  row: {
-    flexDirection:   "row",
-    justifyContent:  "space-between",
-    alignItems:      "center",
-    paddingVertical: 12,
-  },
-  line:  { height: 1, backgroundColor: "rgba(233,233,233,0.25)" },
-  label: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
-  value: { fontSize: 10, fontFamily: "Manrope_700Bold",   color: "#FFFFFF" },
-});
-
-const btn = StyleSheet.create({
-  wrap: {
-    backgroundColor: "#000000",
-    height:          48,
-    borderRadius:    10,
-    alignItems:      "center",
-    justifyContent:  "center",
-    shadowColor:     "#375DFB",
-    shadowOffset:    { width: 0, height: 1 },
-    shadowOpacity:   0.48,
-    shadowRadius:    2,
-    elevation:       4,
-  },
-  text: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  pct:   { fontSize: 13, fontFamily: "Manrope_700Bold" },
+  title: { fontSize: 13, fontFamily: "Manrope_700Bold" },
+  desc:  { fontSize: 10, fontFamily: "Manrope_400Regular", lineHeight: 15, marginTop: 2 },
 });

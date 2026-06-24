@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Image,
@@ -24,9 +24,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 const { width: SW } = Dimensions.get("window");
-const PROMO_W = 263;
+const PROMO_W = SW - 60;
 
-/* ─── Light theme colors (matching design reference) ───────────────────────── */
 const C = {
   bg:          "#FFFFFF",
   surface:     "#F8F9FA",
@@ -40,58 +39,33 @@ const C = {
   promoPink:   "#FCB3C5",
   promoYellow: "#FFF2CF",
   promoBlue:   "#D6E1FF",
-  seeAll:      "#1B1B1B",
 };
 
-/* ─── Static data ──────────────────────────────────────────────────────────── */
-
 const SERVICES = [
-  { id: "settings", icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: null },
-  { id: "elec",     icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
-  { id: "cable",    icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
-  { id: "rates",    icon: "bar-chart-2"    as const, label: "Rates",       color: "#3B82F6", route: null },
-  { id: "txn",      icon: "list"           as const, label: "Transaction", color: "#8B5CF6", route: "/(app)/transactions"  as const },
-  { id: "bet",      icon: "grid"           as const, label: "Bet Funding", color: "#F97316", route: null },
-  { id: "more",     icon: "more-horizontal" as const, label: "More",       color: "#06B6D4", route: null },
+  { id: "gift",  icon: "gift"           as const, label: "Gift Card",   color: "#7C3AED", route: "/(app)/trade-asset" as const },
+  { id: "set",   icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: null },
+  { id: "elec",  icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
+  { id: "cable", icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
+  { id: "rates", icon: "bar-chart-2"    as const, label: "Rates",       color: "#3B82F6", route: null },
+  { id: "txn",   icon: "list"           as const, label: "Transaction", color: "#8B5CF6", route: "/(app)/transactions" as const },
+  { id: "bet",   icon: "grid"           as const, label: "Bet Funding", color: "#F97316", route: null },
+  { id: "more",  icon: "more-horizontal" as const, label: "More",       color: "#06B6D4", route: null },
 ] as const;
 
 const PROMOS = [
-  {
-    id: "p1",
-    pct: "50% OFF",
-    title: "Summer special deal",
-    desc: "Get discount for every transaction this weekend",
-    bg: C.promoPink,
-    textColor: "#7A1535",
-  },
-  {
-    id: "p2",
-    pct: "50% OFF",
-    title: "Black friday deal",
-    desc: "Get discount for every sign up and payment",
-    bg: C.promoYellow,
-    textColor: "#5C4000",
-  },
-  {
-    id: "p3",
-    pct: "Top Rates",
-    title: "Sell Gift Cards",
-    desc: "Amazon, iTunes, Steam — paid to wallet instantly",
-    bg: C.promoBlue,
-    textColor: "#1A3070",
-  },
+  { id: "p1", pct: "50% OFF", title: "Summer special deal",  desc: "Get discount for every transaction this weekend", bg: "#FCB3C5", textColor: "#7A1535" },
+  { id: "p2", pct: "50% OFF", title: "Black friday deal",    desc: "Get discount for every top up and payment",       bg: "#FFF2CF", textColor: "#5C4000" },
+  { id: "p3", pct: "Top Rates", title: "Sell Gift Cards",    desc: "Amazon, iTunes, Steam — paid to wallet instantly", bg: "#D6E1FF", textColor: "#1A3070" },
 ];
 
 const TRANSACTIONS = [
-  { id: "t1", icon: "arrow-down-circle" as const, title: "Deposit Giftcard", date: "February 24, 2022", amount: "₦200,40.00",  positive: true },
+  { id: "t1", icon: "arrow-down-circle" as const, title: "Deposit Giftcard", date: "February 24, 2022", amount: "₦200,40.00",  positive: true  },
   { id: "t2", icon: "arrow-up-circle"   as const, title: "Withdraws",        date: "February 24, 2022", amount: "₦400,000.00", positive: false },
-  { id: "t3", icon: "tag"               as const, title: "Amazon Gift Card",  date: "April 28, 2024",   amount: "+₦200,040",   positive: true },
+  { id: "t3", icon: "tag"               as const, title: "Amazon Gift Card",  date: "April 28, 2024",   amount: "+₦200,040",   positive: true  },
 ];
 
-/* ─── Sub-components ────────────────────────────────────────────────────────── */
-
 function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
-  const sc = useSharedValue(1);
+  const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   const ITEM_W = (SW - 40) / 4;
 
@@ -100,7 +74,7 @@ function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress
       <Pressable
         onPress={onPress}
         onPressIn={() => { sc.value = withSpring(0.88, { damping: 12 }); }}
-        onPressOut={() => { sc.value = withSpring(1, { damping: 12 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 12 }); }}
         style={sv.wrap}
       >
         <View style={[sv.iconBox, { backgroundColor: item.color + "20" }]}>
@@ -113,15 +87,15 @@ function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress
 }
 
 function PromoCard({ item, onPress }: { item: typeof PROMOS[number]; onPress: () => void }) {
-  const sc = useSharedValue(1);
+  const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
 
   return (
-    <Animated.View style={[anim, { width: PROMO_W, marginRight: 12 }]}>
+    <Animated.View style={[anim, { width: PROMO_W, marginRight: 16 }]}>
       <Pressable
         onPress={onPress}
         onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
-        onPressOut={() => { sc.value = withSpring(1, { damping: 14 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
       >
         <View style={[pc.card, { backgroundColor: item.bg }]}>
           <View style={pc.orb} />
@@ -154,8 +128,6 @@ function TxRow({ item, onPress }: { item: typeof TRANSACTIONS[number]; onPress: 
     </TouchableOpacity>
   );
 }
-
-/* ─── Main screen ───────────────────────────────────────────────────────────── */
 
 export default function HomeScreen() {
   const router   = useRouter();
@@ -242,9 +214,9 @@ export default function HomeScreen() {
         >
           <View style={[s.actionsBar, { backgroundColor: C.actionBar }]}>
             {[
-              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
-              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/dashboard")) },
-              { icon: "arrow-up"   as const, label: "Withdraw",    onPress: press(() => router.push("/(app)/dashboard")) },
+              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => {}) },
+              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset")) },
+              { icon: "arrow-up"    as const, label: "Withdraw",    onPress: press(() => {}) },
             ].map((action, i) => (
               <React.Fragment key={action.label}>
                 {i > 0 && <View style={s.actionDivider} />}
@@ -283,14 +255,14 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={s.promoScroll}
-            snapToInterval={PROMO_W + 12}
+            snapToInterval={PROMO_W + 16}
             decelerationRate="fast"
           >
             {PROMOS.map(p => (
               <PromoCard
                 key={p.id}
                 item={p}
-                onPress={press(() => router.push("/(app)/dashboard"))}
+                onPress={press(() => {})}
               />
             ))}
           </ScrollView>
@@ -301,11 +273,11 @@ export default function HomeScreen() {
           <View style={s.secHdr}>
             <Text style={[s.secTitle, { color: C.text }]}>Recent Transaction</Text>
             <TouchableOpacity onPress={press(() => router.push("/(app)/transactions"))}>
-              <Text style={[s.seeAll, { color: C.seeAll }]}>See All</Text>
+              <Text style={[s.seeAll, { color: C.text }]}>See All</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={[s.txList, { backgroundColor: "#FFFFFF", borderColor: C.border }]}>
+          <View style={[s.txList, { borderColor: C.border }]}>
             {TRANSACTIONS.map((item, i) => (
               <Animated.View
                 key={item.id}
@@ -325,8 +297,6 @@ export default function HomeScreen() {
   );
 }
 
-/* ─── Styles ─────────────────────────────────────────────────────────────────── */
-
 const s = StyleSheet.create({
   root:   { flex: 1 },
   scroll: { paddingTop: 8, gap: 20 },
@@ -340,26 +310,15 @@ const s = StyleSheet.create({
   },
   hdrBtn: {
     width: 40, height: 40,
-    borderRadius: 12,
-    borderWidth:  1,
-    alignItems:   "center",
-    justifyContent: "center",
+    borderRadius: 12, borderWidth: 1,
+    alignItems: "center", justifyContent: "center",
   },
   logo: { width: 80, height: 28 },
 
   balCard: {
-    marginHorizontal: 20,
-    borderRadius:     20,
-    borderWidth:      1,
-    padding:          20,
-    flexDirection:    "row",
-    alignItems:       "center",
-    justifyContent:   "space-between",
-    shadowColor:      "#000",
-    shadowOffset:     { width: 0, height: 2 },
-    shadowOpacity:    0.06,
-    shadowRadius:     8,
-    elevation:        2,
+    marginHorizontal: 20, borderRadius: 20, borderWidth: 1, padding: 20,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   userLeft:  { flexDirection: "row", alignItems: "center", gap: 12 },
   avatar:    { width: 52, height: 52, borderRadius: 26 },
@@ -371,84 +330,43 @@ const s = StyleSheet.create({
 
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {
-    borderRadius:    34,
-    flexDirection:   "row",
-    alignItems:      "center",
-    paddingVertical: 18,
-    shadowColor:     "#000",
-    shadowOffset:    { width: 0, height: 4 },
-    shadowOpacity:   0.3,
-    shadowRadius:    12,
-    elevation:       6,
+    borderRadius: 34, flexDirection: "row", alignItems: "center", paddingVertical: 18,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
   },
-  actionBtn: {
-    flex:           1,
-    alignItems:     "center",
-    justifyContent: "center",
-    gap:            8,
-  },
-  actionLabel: {
-    fontSize:    11,
-    fontFamily:  "Manrope_600SemiBold",
-    color:       "#FFFFFF",
-    letterSpacing: 0.2,
-  },
+  actionBtn: { flex: 1, alignItems: "center", justifyContent: "center", gap: 8 },
+  actionLabel: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF", letterSpacing: 0.2 },
   actionDivider: { width: 1, height: 36, backgroundColor: "rgba(255,255,255,0.2)" },
 
-  servicesGrid: {
-    flexDirection:     "row",
-    flexWrap:          "wrap",
-    paddingHorizontal: 10,
-    rowGap:            20,
-  },
+  servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 10, rowGap: 20 },
 
   promoScroll: { paddingHorizontal: 20 },
 
   secHdr: {
-    flexDirection:     "row",
-    justifyContent:    "space-between",
-    alignItems:        "center",
-    paddingHorizontal: 20,
-    marginBottom:      10,
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 20, marginBottom: 10,
   },
   secTitle: { fontSize: 18, fontFamily: "Manrope_700Bold" },
   seeAll:   { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+
   txList: {
-    marginHorizontal: 20,
-    borderRadius:     3,
-    borderWidth:      1,
-    overflow:         "hidden",
-    shadowColor:      "#000",
-    shadowOffset:     { width: 0, height: 1 },
-    shadowOpacity:    0.04,
-    shadowRadius:     4,
-    elevation:        1,
+    marginHorizontal: 20, borderRadius: 3, borderWidth: 1, overflow: "hidden",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
 });
 
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 8, paddingVertical: 4 },
   iconBox: { width: 54, height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center", color: C.textSec },
+  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center", color: "#595F67" },
 });
 
 const pc = StyleSheet.create({
   card: {
-    borderRadius: 12,
-    padding:      20,
-    paddingBottom: 22,
-    overflow:     "hidden",
-    gap:          4,
-    height:       97,
-    justifyContent: "center",
+    borderRadius: 6, padding: 16, paddingBottom: 20, overflow: "hidden", gap: 4, height: 97, justifyContent: "center",
   },
   orb: {
-    position:     "absolute",
-    width:        100,
-    height:       100,
-    borderRadius: 50,
-    backgroundColor: "rgba(255,255,255,0.2)",
-    top: -30, right: -20,
+    position: "absolute", width: 100, height: 100, borderRadius: 50,
+    backgroundColor: "rgba(255,255,255,0.2)", top: -30, right: -20,
   },
   pct:   { fontSize: 13, fontFamily: "Manrope_700Bold" },
   title: { fontSize: 13, fontFamily: "Manrope_700Bold" },
@@ -457,22 +375,12 @@ const pc = StyleSheet.create({
 
 const tx = StyleSheet.create({
   row: {
-    flexDirection:     "row",
-    alignItems:        "center",
-    gap:               12,
-    paddingHorizontal: 16,
-    paddingVertical:   12,
-    borderBottomWidth: 1,
-    backgroundColor:   "#FFFFFF",
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, backgroundColor: "#FFFFFF",
   },
-  iconWrap: {
-    width:  25, height: 25,
-    borderRadius: 3,
-    alignItems:   "center",
-    justifyContent: "center",
-  },
+  iconWrap: { width: 25, height: 25, borderRadius: 3, alignItems: "center", justifyContent: "center" },
   info:   { flex: 1 },
-  title:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
-  date:   { fontSize: 11, fontFamily: "Manrope_400Regular" },
+  title:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: "#595F67", marginBottom: 2 },
+  date:   { fontSize: 11, fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
   amount: { fontSize: 12, fontFamily: "Manrope_700Bold" },
 });

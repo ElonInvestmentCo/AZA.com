@@ -11,6 +11,7 @@ export default function AppLayout() {
       <Stack.Screen name="success-payment" />
       <Stack.Screen name="transactions" />
       <Stack.Screen name="card-status" />
+      <Stack.Screen name="sell-gift-card" />
     </Stack>
   );
 }
