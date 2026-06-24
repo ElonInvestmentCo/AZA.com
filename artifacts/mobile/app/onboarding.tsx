@@ -569,10 +569,10 @@ export default function OnboardingScreen() {
   const activeSlide = SLIDES[activeIndex];
 
   return (
-    <View style={[styles.root, { paddingTop: topInset }]}>
+    <View style={[styles.root, { backgroundColor: activeSlide.bgColor }]}>
 
-      {/* Header */}
-      <View style={[styles.header, { height: HEADER_H }]}>
+      {/* Header — transparent so slide bg bleeds through under status bar */}
+      <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: activeSlide.bgColor }]}>
         <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
       </View>
 
@@ -681,7 +681,7 @@ export default function OnboardingScreen() {
             {activeSlide.title}
           </Text>
           <Text
-            style={[styles.subtitle, { fontSize: 16, lineHeight: 24 }]}
+            style={styles.subtitle}
             numberOfLines={2}
           >
             {activeSlide.subtitle}
@@ -711,16 +711,16 @@ export default function OnboardingScreen() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   root:          { flex: 1, backgroundColor: "#fff" },
-  header:        { alignItems: "center", justifyContent: "center", backgroundColor: "#fff" },
+  header:        { alignItems: "center", justifyContent: "center" },
   logo:          { fontFamily: "Manrope_700Bold", letterSpacing: 1.5, color: "#0b0a0a" },
   bottom:        { backgroundColor: "#fff" },
   dots:          { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
   dot:           { width: 8, height: 8, borderRadius: 2 },
-  dotActive:     { backgroundColor: "#0b0a0a" },
+  dotActive:     { backgroundColor: "transparent", borderWidth: 1.5, borderColor: "#0b0a0a" },
   dotInactive:   { backgroundColor: "#d0d3d8" },
-  textBlock:     { alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 4 },
+  textBlock:     { alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 4 },
   title:         { fontFamily: "Manrope_700Bold", color: "#0b0a0a", textAlign: "center", letterSpacing: -0.3 },
-  subtitle:      { fontFamily: "Manrope_400Regular", color: "#616263", textAlign: "center" },
+  subtitle:      { fontFamily: "Manrope_400Regular", color: "#8A8F96", textAlign: "center", fontSize: 14, lineHeight: 21 },
   buttons:       { alignItems: "center", justifyContent: "center", gap: 12, marginTop: 8 },
   btnLogin:      { height: 50, backgroundColor: "#000", borderRadius: 4, alignItems: "center", justifyContent: "center" },
   btnLoginText:  { color: "#fff", fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: 0.3 },
