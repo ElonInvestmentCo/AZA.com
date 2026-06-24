@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="45" height="45" viewBox="0 0 45 45" fill="none">
+<mask id="mask0_75_1332" maskUnits="userSpaceOnUse" x="0" y="0" width="45" height="45">
+<circle cx="22.5" cy="22.5" r="22.5" fill="#BBBBBB"/>
+</mask>
+<g mask="url(#mask0_75_1332)">
+<rect x="-6" y="3" width="56.2308" height="51" fill="url(#pattern0_75_1332)"/>
+</g>
+<defs>
+
+
+</defs>
+</svg>
