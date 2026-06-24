@@ -3,7 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
-import { getExpoUrl, buildQrPage } from "./lib/qr-page";
+import { getExpoUrl, buildQrPage, isMetroUp } from "./lib/qr-page";
 
 const app: Express = express();
 
@@ -74,11 +74,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 app.get("/", async (_req: Request, res: Response) => {
-  const [azaUrl, payvoraUrl] = await Promise.all([
+  const [azaUrl, payvoraUrl, azaUp, payvoraUp] = await Promise.all([
     getExpoUrl(19000),
-    getExpoUrl(19001),
+    getExpoUrl(19665),
+    isMetroUp(19000),
+    isMetroUp(19665),
   ]);
-  const html = await buildQrPage(azaUrl, payvoraUrl);
+  const html = await buildQrPage(azaUrl, payvoraUrl, azaUp, payvoraUp);
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.send(html);
 });

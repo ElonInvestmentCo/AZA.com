@@ -33,25 +33,48 @@ async function makeSvg(url: string): Promise<string> {
   });
 }
 
+export async function isMetroUp(port: number): Promise<boolean> {
+  try {
+    const res = await fetch(`http://localhost:${port}/status`, {
+      signal: AbortSignal.timeout(1000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export async function buildQrPage(
   azaUrl: string | null,
   payvoraUrl: string | null,
+  azaUp = false,
+  payvoraUp = false,
 ): Promise<string> {
   const [azaSvg, payvoraSvg] = await Promise.all([
     azaUrl ? makeSvg(azaUrl) : Promise.resolve(""),
     payvoraUrl ? makeSvg(payvoraUrl) : Promise.resolve(""),
   ]);
 
+  const bothUp = azaUp && payvoraUp;
+  const statusText = bothUp
+    ? "Both apps are running and ready."
+    : azaUp
+      ? "AZA Mobile is running. Payvora is starting…"
+      : payvoraUp
+        ? "Payvora is running. AZA Mobile is starting…"
+        : "Starting Metro bundlers — refresh in a moment.";
+
   const card = (
     name: string,
     port: number,
+    isUp: boolean,
     dotClass: string,
     url: string | null,
     svg: string,
   ) => /* html */ `
     <div class="card">
       <div class="card-header">
-        <div class="app-dot ${dotClass}"></div>
+        <div class="app-dot ${isUp ? dotClass : "offline"}"></div>
         <span class="app-name">${name}</span>
         <span class="app-port">:${port}</span>
       </div>
@@ -157,6 +180,7 @@ export async function buildQrPage(
     }
 
     .app-dot.purple { background: #8B5CF6; }
+    .app-dot.offline { background: #555566; }
 
     .app-name { font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
 
@@ -249,12 +273,12 @@ export async function buildQrPage(
   <header>
     <div class="badge">● Live</div>
     <h1>Scan to open in <span>Expo Go</span></h1>
-    <p class="subtitle">Open the Expo Go app on your phone and scan a QR code below.<br/>Both apps are running and ready.</p>
+    <p class="subtitle">Open the Expo Go app on your phone and scan a QR code below.<br/>${statusText}</p>
   </header>
 
   <div class="cards">
-    ${card("AZA Mobile", 19000, "purple", azaUrl, azaSvg)}
-    ${card("Payvora Mobile", 19001, "", payvoraUrl, payvoraSvg)}
+    ${card("AZA Mobile", 19000, azaUp, "purple", azaUrl, azaSvg)}
+    ${card("Payvora Mobile", 19665, payvoraUp, "", payvoraUrl, payvoraSvg)}
   </div>
 
   <div class="instruction">
