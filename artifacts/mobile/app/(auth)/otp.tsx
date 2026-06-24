@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -25,25 +26,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-/* ── Design tokens — light theme matching login/register ─────────────────── */
-const C = {
-  bg:          "#FFFFFF",
-  inputBg:     "#F7F8F9",
-  inputBorder: "#E8ECF4",
-  inputFocus:  "#35C2C1",   /* Primary teal — CSS spec */
-  text:        "#1E232C",
-  subtext:     "#8391A1",
-  placeholder: "#8391A1",
-  btn:         "#1E232C",
-  btnText:     "#FFFFFF",
-  resend:      "#35C2C1",
-  error:       "#FF5B7A",
-};
+import { useColors } from "@/hooks/useColors";
 
 const OTP_LENGTH = 4;
 
-/* ── Single OTP digit box — matches CSS spec exactly ─────────────────────── */
+/* ── Single OTP digit box ─────────────────────────────────────────────────── */
 function OtpBox({
   value,
   isFocused,
@@ -59,6 +46,7 @@ function OtpBox({
   onKeyPress: (key: string) => void;
   onChangeText: (t: string) => void;
 }) {
+  const C = useColors();
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
@@ -71,20 +59,16 @@ function OtpBox({
     }
   }, [value]);
 
-  /* Filled box: white bg + #35C2C1 border (1.2px) — CSS spec */
-  /* Empty box : #F7F8F9 bg + #E8ECF4 border (1px)  — CSS spec */
-  const boxStyle = value
-    ? ob.boxFilled
-    : isFocused
-    ? ob.boxFocused
-    : ob.boxEmpty;
+  const bgColor     = value || isFocused ? C.surface : C.muted;
+  const borderColor = value || isFocused ? C.accent   : C.inputBorder;
+  const borderWidth = value || isFocused ? 1.5        : 1;
 
   return (
     <Animated.View style={[ob.wrap, animStyle]}>
-      <View style={[ob.box, boxStyle]}>
+      <View style={[ob.box, { backgroundColor: bgColor, borderColor, borderWidth }]}>
         <TextInput
           ref={inputRef}
-          style={ob.digit}
+          style={[ob.digit, { color: C.text }]}
           value={value}
           onFocus={onFocus}
           onChangeText={onChangeText}
@@ -100,38 +84,18 @@ function OtpBox({
 }
 
 const ob = StyleSheet.create({
-  wrap:       { },
+  wrap: {},
   box: {
-    /* CSS spec: width 69.13px, height 60px, border-radius 8px */
     width: 69,
     height: 60,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
-  /* Filled / focused: white bg, 1.2px #35C2C1 border */
-  boxFilled: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.2,
-    borderColor: "#35C2C1",
-  },
-  boxFocused: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.2,
-    borderColor: "#35C2C1",
-  },
-  /* Empty: #F7F8F9 bg, 1px #E8ECF4 border */
-  boxEmpty: {
-    backgroundColor: "#F7F8F9",
-    borderWidth: 1,
-    borderColor: "#E8ECF4",
-  },
   digit: {
-    /* CSS spec: Urbanist 700, 22px, #1E232C → Manrope_700Bold closest match */
     fontFamily: "Manrope_700Bold",
     fontSize: 22,
     lineHeight: 26,
-    color: "#1E232C",
     textAlign: "center",
     width: "100%",
     height: "100%",
@@ -145,12 +109,13 @@ export default function OtpScreen() {
   const insets  = useSafeAreaInsets();
   const params  = useLocalSearchParams<{ email?: string }>();
   const email   = params.email ?? "";
+  const C       = useColors();
 
-  const [digits,   setDigits]   = useState<string[]>(["", "", "", ""]);
-  const [focused,  setFocused]  = useState(0);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState("");
-  const [resent,   setResent]   = useState(false);
+  const [digits,    setDigits]    = useState<string[]>(["", "", "", ""]);
+  const [focused,   setFocused]   = useState(0);
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
+  const [resent,    setResent]    = useState(false);
   const [countdown, setCountdown] = useState(0);
 
   const refs = [
@@ -160,12 +125,10 @@ export default function OtpScreen() {
     useRef<TextInput>(null),
   ];
 
-  /* Auto-focus first box on mount */
   useEffect(() => {
     setTimeout(() => refs[0].current?.focus(), 300);
   }, []);
 
-  /* Countdown timer for resend */
   useEffect(() => {
     if (countdown <= 0) return;
     const t = setTimeout(() => setCountdown(c => c - 1), 1000);
@@ -200,7 +163,6 @@ export default function OtpScreen() {
     }
   };
 
-  /* Button spring */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
@@ -213,7 +175,6 @@ export default function OtpScreen() {
     }
     setLoading(true);
     setError("");
-    /* Simulate verification — navigate to main app on success */
     setTimeout(() => {
       setLoading(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -237,7 +198,7 @@ export default function OtpScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={s.root}
+      style={[s.root, { backgroundColor: C.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View
@@ -249,28 +210,28 @@ export default function OtpScreen() {
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <TouchableOpacity
-            style={s.backBtn}
+            style={[s.backBtn, { borderColor: C.border, backgroundColor: C.surface }]}
             onPress={() => router.back()}
             activeOpacity={0.8}
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
           </TouchableOpacity>
-          <Text style={s.wordmark}>AZA.</Text>
+          <Text style={[s.wordmark, { color: C.text }]}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 
-        {/* ── Heading — "OTP Verification" from image ── */}
+        {/* ── Heading ── */}
         <Animated.View
           entering={FadeInDown.duration(450).delay(60).springify()}
           style={s.headBlock}
         >
-          <Text style={s.heading}>OTP Verification</Text>
-          <Text style={s.subheading}>
+          <Text style={[s.heading, { color: C.text }]}>OTP Verification</Text>
+          <Text style={[s.subheading, { color: C.mutedForeground }]}>
             {"Enter the verification code we just sent on your\nemail address."}
           </Text>
         </Animated.View>
 
-        {/* ── OTP boxes — CSS spec: 69×60, radius 8, #35C2C1 border ── */}
+        {/* ── OTP boxes ── */}
         <Animated.View
           entering={FadeInUp.duration(420).delay(120).springify()}
           style={s.otpRow}
@@ -288,49 +249,54 @@ export default function OtpScreen() {
           ))}
         </Animated.View>
 
-        {/* Error */}
         {error ? (
-          <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
+          <Animated.Text entering={FadeIn.duration(200)} style={[s.errorText, { color: C.destructive }]}>
             {error}
           </Animated.Text>
         ) : null}
 
-        {/* Resent toast */}
         {resent ? (
-          <Animated.Text
-            entering={FadeIn.duration(200)}
-            style={s.resentText}
-          >
+          <Animated.Text entering={FadeIn.duration(200)} style={[s.resentText, { color: C.success }]}>
             Code resent successfully!
           </Animated.Text>
         ) : null}
 
-        {/* ── Verify button ── */}
+        {/* ── Verify button (gradient) ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
           style={[btnStyle, s.btnWrap]}
         >
-          <Pressable
-            style={[s.verifyBtn, (!isComplete || loading) && { opacity: 0.65 }]}
-            onPress={handleVerify}
-            onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
-            }}
-            onPressOut={() => {
-              btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
-            }}
-            disabled={!isComplete || loading}
+          <LinearGradient
+            colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[
+              s.verifyBtnGrad,
+              { shadowColor: C.accentGlow, opacity: (!isComplete || loading) ? 0.65 : 1 },
+            ]}
           >
-            {loading ? (
-              <ActivityIndicator color={C.btnText} size="small" />
-            ) : (
-              <Text style={s.verifyBtnText}>Verify</Text>
-            )}
-          </Pressable>
+            <Pressable
+              style={s.verifyBtnPress}
+              onPress={handleVerify}
+              onPressIn={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
+              }}
+              onPressOut={() => {
+                btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
+              }}
+              disabled={!isComplete || loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Text style={s.verifyBtnText}>Verify</Text>
+              )}
+            </Pressable>
+          </LinearGradient>
         </Animated.View>
 
-        {/* ── "Didn't received code? Resend" ── */}
+        {/* ── Resend row ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.resendRow}
@@ -344,10 +310,10 @@ export default function OtpScreen() {
             onPress={handleResend}
             activeOpacity={countdown > 0 ? 1 : 0.7}
             disabled={countdown > 0}
-            style={countdown > 0 && { opacity: 0.45 }}
+            style={countdown > 0 ? { opacity: 0.45 } : undefined}
           >
             {countdown > 0 ? (
-              <Text style={s.resendCountdown}>{`(${countdown}s)`}</Text>
+              <Text style={[s.resendCountdown, { color: C.accent }]}>{`(${countdown}s)`}</Text>
             ) : (
               <Image
                 source={require("../../assets/images/resend.png")}
@@ -364,7 +330,7 @@ export default function OtpScreen() {
 
 /* ── Styles ──────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:  { flex: 1, backgroundColor: C.bg },
+  root:  { flex: 1 },
   inner: { flex: 1, paddingHorizontal: 24 },
 
   topBar: {
@@ -375,14 +341,12 @@ const s = StyleSheet.create({
   },
   backBtn: {
     width: 44, height: 44, borderRadius: 12,
-    borderWidth: 1, borderColor: C.inputBorder,
-    backgroundColor: C.bg,
+    borderWidth: 1,
     alignItems: "center", justifyContent: "center",
   },
   wordmark: {
     fontSize: 32,
     fontFamily: "Manrope_700Bold",
-    color: C.text,
     letterSpacing: -0.5,
   },
 
@@ -390,18 +354,15 @@ const s = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontFamily: "Manrope_700Bold",
-    color: C.text,
     letterSpacing: -0.4,
     marginBottom: 12,
   },
   subheading: {
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
-    color: C.subtext,
     lineHeight: 22,
   },
 
-  /* CSS spec: total row 330px, 4 boxes × 69px + gaps */
   otpRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -411,35 +372,35 @@ const s = StyleSheet.create({
   errorText: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
-    color: C.error,
     textAlign: "center",
     marginBottom: 8,
   },
   resentText: {
     fontSize: 13,
     fontFamily: "Manrope_600SemiBold",
-    color: C.resend,
     textAlign: "center",
     marginBottom: 8,
   },
 
   btnWrap: { marginTop: 28, marginBottom: 32 },
-  verifyBtn: {
+  verifyBtnGrad: {
     height: 60,
-    backgroundColor: C.btn,
     borderRadius: 14,
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  verifyBtnPress: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#1E232C",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
   },
   verifyBtnText: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",
-    color: C.btnText,
+    color: "#FFFFFF",
     letterSpacing: 0.2,
   },
 
@@ -449,18 +410,11 @@ const s = StyleSheet.create({
     alignItems: "center",
     gap: 4,
   },
-  resendLabelImg: {
-    height: 21,
-    width: 146,
-  },
-  resendImg: {
-    height: 21,
-    width: 50,
-  },
+  resendLabelImg: { height: 21, width: 146 },
+  resendImg: { height: 21, width: 50 },
   resendCountdown: {
     fontSize: 15,
     fontFamily: "Manrope_700Bold",
-    color: "#35C2C1",
     lineHeight: 21,
   },
 });

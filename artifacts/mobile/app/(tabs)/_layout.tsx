@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-/* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 
+/* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 function PillTabBar({ state, descriptors, navigation }: any) {
   return (
     <View style={pill.outer} pointerEvents="box-none">
@@ -87,14 +87,14 @@ const pill = StyleSheet.create({
     flexDirection:     "row",
     alignItems:        "center",
     justifyContent:    "space-around",
-    backgroundColor:   "#000000",
+    backgroundColor:   "#0D1320",
     borderRadius:      40,
     height:            68,
     width:             "100%",
     paddingHorizontal: 20,
-    shadowColor:       "#000",
+    shadowColor:       "#4F7CFF",
     shadowOffset:      { width: 0, height: 8 },
-    shadowOpacity:     0.4,
+    shadowOpacity:     0.25,
     shadowRadius:      20,
     elevation:         12,
   },
@@ -112,7 +112,7 @@ const pill = StyleSheet.create({
     justifyContent: "center",
   },
   iconWrapActive: {
-    backgroundColor: "rgba(139,92,246,0.35)",
+    backgroundColor: "rgba(79,124,255,0.30)",
   },
   badge: {
     position:        "absolute",
@@ -121,14 +121,13 @@ const pill = StyleSheet.create({
     width:           8,
     height:          8,
     borderRadius:    4,
-    backgroundColor: "#FF3B30",
+    backgroundColor: "#FF5A6B",
     borderWidth:     1.5,
-    borderColor:     "#000",
+    borderColor:     "#0D1320",
   },
 });
 
 /* ─── Tab layout ────────────────────────────────────────────────────────────── */
-
 export default function TabLayout() {
   return (
     <Tabs

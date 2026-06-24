@@ -1,3 +1,4 @@
-- [Dark fintech design system](dark-fintech-design.md) — all screens use dark palette (#0A0A0F bg, #00D9A0 accent); colors.light keys are dark values for compat.
+- [Dark fintech design system](dark-fintech-design.md) — fully migrated: proper light (#FFFFFF bg, #4F7CFF accent) + premium dark (#070B14 bg, gradient #8B5CF6→#6C5CFF→#4F7CFF) in colors.ts with separate `light` and `dark` keys.
 - [Payvora production config](payvora-production-config.md) — Railway + www.payvora.org wiring: app.config.js, CORS, API URL resolution, OAuth redirect URIs.
 - [Expo package versions](expo-package-versions.md) — expo 54 requires expo-auth-session ~7.0.11, expo-crypto ~15.0.9, expo-apple-authentication ~8.0.8; ^56.x versions break with "Cannot find native module ExpoCryptoAES".
+- [useColors dark cast](usecolors-dark-cast.md) — must cast `(colors as any).dark` not `Record<string, typeof colors.light>` because `radius: number` breaks the index signature overlap check.

@@ -23,24 +23,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { useColors } from "@/hooks/useColors";
 
 const { width: SW } = Dimensions.get("window");
 const PROMO_W = SW - 60;
-
-const C = {
-  bg:          "#FFFFFF",
-  surface:     "#F8F9FA",
-  text:        "#0B0A0A",
-  textSec:     "#595F67",
-  textMuted:   "#AAAFB5",
-  border:      "#EDF1F3",
-  success:     "#00B03C",
-  danger:      "#FF0000",
-  actionBar:   "#000000",
-  promoPink:   "#FCB3C5",
-  promoYellow: "#FFF2CF",
-  promoBlue:   "#D6E1FF",
-};
 
 const SERVICES = [
   { id: "gift",  icon: "gift"            as const, label: "Gift Card",   color: "#7C3AED", route: null },
@@ -66,6 +52,7 @@ const TRANSACTIONS = [
 ];
 
 function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
+  const C    = useColors();
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   const ITEM_W = (SW - 40) / 4;
@@ -81,7 +68,7 @@ function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress
         <View style={[sv.iconBox, { backgroundColor: item.color + "20" }]}>
           <Feather name={item.icon} size={22} color={item.color} />
         </View>
-        <Text style={sv.label} numberOfLines={1}>{item.label}</Text>
+        <Text style={[sv.label, { color: C.subtitle }]} numberOfLines={1}>{item.label}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -110,20 +97,21 @@ function PromoCard({ item, onPress }: { item: typeof PROMOS[number]; onPress: ()
 }
 
 function TxRow({ item, onPress }: { item: typeof TRANSACTIONS[number]; onPress: () => void }) {
+  const C = useColors();
   return (
     <TouchableOpacity
-      style={[tx.row, { borderBottomColor: C.border }]}
+      style={[tx.row, { borderBottomColor: C.border, backgroundColor: C.surface }]}
       onPress={onPress}
       activeOpacity={0.75}
     >
-      <View style={[tx.iconWrap, { backgroundColor: (item.positive ? C.success : C.danger) + "18" }]}>
-        <Feather name={item.icon} size={18} color={item.positive ? C.success : C.danger} />
+      <View style={[tx.iconWrap, { backgroundColor: (item.positive ? C.success : C.destructive) + "18" }]}>
+        <Feather name={item.icon} size={18} color={item.positive ? C.success : C.destructive} />
       </View>
       <View style={tx.info}>
-        <Text style={[tx.title, { color: C.textSec }]}>{item.title}</Text>
-        <Text style={[tx.date,  { color: C.textMuted }]}>{item.date}</Text>
+        <Text style={[tx.title, { color: C.subtitle }]}>{item.title}</Text>
+        <Text style={[tx.date,  { color: C.mutedForeground }]}>{item.date}</Text>
       </View>
-      <Text style={[tx.amount, { color: item.positive ? C.success : C.danger }]}>
+      <Text style={[tx.amount, { color: item.positive ? C.success : C.destructive }]}>
         {item.amount}
       </Text>
     </TouchableOpacity>
@@ -134,6 +122,7 @@ export default function HomeScreen() {
   const router   = useRouter();
   const insets   = useSafeAreaInsets();
   const { user } = useAuth();
+  const C        = useColors();
 
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
@@ -150,15 +139,15 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[s.root, { backgroundColor: C.bg }]}>
+    <View style={[s.root, { backgroundColor: C.background }]}>
 
       {/* ── Top header ─────────────────────────────────────────────────────── */}
       <Animated.View
         entering={FadeInDown.duration(350).springify()}
-        style={[s.header, { paddingTop: topPad + 10, backgroundColor: C.bg }]}
+        style={[s.header, { paddingTop: topPad + 10, backgroundColor: C.background }]}
       >
         <TouchableOpacity style={[s.hdrBtn, { backgroundColor: C.surface, borderColor: C.border }]}>
-          <Feather name="bell" size={18} color={C.textMuted} />
+          <Feather name="bell" size={18} color={C.mutedForeground} />
         </TouchableOpacity>
 
         <Image
@@ -171,7 +160,7 @@ export default function HomeScreen() {
           style={[s.hdrBtn, { backgroundColor: C.surface, borderColor: C.border }]}
           onPress={press(() => router.push("/(app)/settings" as any))}
         >
-          <Feather name="user" size={18} color={C.textMuted} />
+          <Feather name="user" size={18} color={C.mutedForeground} />
         </TouchableOpacity>
       </Animated.View>
 
@@ -193,7 +182,7 @@ export default function HomeScreen() {
             />
             <View>
               <Text style={[s.greeting, { color: C.text }]}>Hi, {firstName}</Text>
-              <Text style={[s.balLabel, { color: C.textMuted }]}>Your available balance</Text>
+              <Text style={[s.balLabel, { color: C.mutedForeground }]}>Your available balance</Text>
             </View>
           </View>
 
@@ -202,7 +191,7 @@ export default function HomeScreen() {
               onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setBalanceVisible(v => !v); }}
               style={s.eyeBtn}
             >
-              <Feather name={balanceVisible ? "eye" : "eye-off"} size={18} color={C.textMuted} />
+              <Feather name={balanceVisible ? "eye" : "eye-off"} size={18} color={C.mutedForeground} />
             </TouchableOpacity>
             <Text style={[s.balAmount, { color: C.text }]}>
               {balanceVisible ? formatted : "₦•••,•••.••"}
@@ -210,12 +199,12 @@ export default function HomeScreen() {
           </View>
         </Animated.View>
 
-        {/* ── Quick actions (black pill) ────────────────────────────────────── */}
+        {/* ── Quick actions bar ─────────────────────────────────────────────── */}
         <Animated.View
           entering={FadeInDown.duration(360).springify().delay(100)}
           style={s.actionsWrap}
         >
-          <View style={[s.actionsBar, { backgroundColor: C.actionBar }]}>
+          <View style={[s.actionsBar, { backgroundColor: C.card }]}>
             {[
               { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
               { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset")) },
@@ -232,7 +221,7 @@ export default function HomeScreen() {
           </View>
         </Animated.View>
 
-        {/* ── Services grid (2×4) ──────────────────────────────────────────── */}
+        {/* ── Services grid ─────────────────────────────────────────────────── */}
         <Animated.View
           entering={FadeInUp.duration(360).springify().delay(130)}
           style={s.servicesGrid}
@@ -277,7 +266,7 @@ export default function HomeScreen() {
           <View style={s.secHdr}>
             <Text style={[s.secTitle, { color: C.text }]}>Recent Transaction</Text>
             <TouchableOpacity onPress={press(() => router.push("/(app)/transactions"))}>
-              <Text style={[s.seeAll, { color: C.text }]}>See All</Text>
+              <Text style={[s.seeAll, { color: C.accent }]}>See All</Text>
             </TouchableOpacity>
           </View>
 
@@ -306,22 +295,21 @@ export default function HomeScreen() {
         onRequestClose={() => setGiftModalVisible(false)}
       >
         <Pressable style={gm.overlay} onPress={() => setGiftModalVisible(false)}>
-          <Pressable style={gm.sheet} onPress={() => {}}>
+          <Pressable style={[gm.sheet, { backgroundColor: C.surface }]} onPress={() => {}}>
             {/* Header */}
             <View style={gm.sheetHeader}>
-              <Text style={gm.sheetTitle}>I want to?</Text>
+              <Text style={[gm.sheetTitle, { color: C.text }]}>I want to?</Text>
               <TouchableOpacity
-                style={gm.closeBtn}
+                style={[gm.closeBtn, { backgroundColor: C.card }]}
                 onPress={() => setGiftModalVisible(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Feather name="x" size={18} color="#1E232C" />
+                <Feather name="x" size={18} color={C.text} />
               </TouchableOpacity>
             </View>
 
             {/* Option tiles */}
             <View style={gm.tilesRow}>
-              {/* Sell Gift Card */}
               <TouchableOpacity
                 style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
                 activeOpacity={0.82}
@@ -340,7 +328,6 @@ export default function HomeScreen() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Check Pending */}
               <TouchableOpacity
                 style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
                 activeOpacity={0.82}
@@ -401,11 +388,11 @@ const s = StyleSheet.create({
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {
     borderRadius: 34, flexDirection: "row", alignItems: "center", paddingVertical: 18,
-    shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+    shadowColor: "#4F7CFF", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 16, elevation: 6,
   },
   actionBtn: { flex: 1, alignItems: "center", justifyContent: "center", gap: 8 },
   actionLabel: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF", letterSpacing: 0.2 },
-  actionDivider: { width: 1, height: 36, backgroundColor: "rgba(255,255,255,0.2)" },
+  actionDivider: { width: 1, height: 36, backgroundColor: "rgba(255,255,255,0.15)" },
 
   servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 10, rowGap: 20 },
 
@@ -427,7 +414,7 @@ const s = StyleSheet.create({
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 8, paddingVertical: 4 },
   iconBox: { width: 54, height: 54, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center", color: "#595F67" },
+  label:   { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center" },
 });
 
 const pc = StyleSheet.create({
@@ -446,23 +433,22 @@ const pc = StyleSheet.create({
 const tx = StyleSheet.create({
   row: {
     flexDirection: "row", alignItems: "center", gap: 12,
-    paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1,
   },
   iconWrap: { width: 25, height: 25, borderRadius: 3, alignItems: "center", justifyContent: "center" },
   info:   { flex: 1 },
-  title:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: "#595F67", marginBottom: 2 },
-  date:   { fontSize: 11, fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
+  title:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
+  date:   { fontSize: 11, fontFamily: "Manrope_400Regular" },
   amount: { fontSize: 12, fontFamily: "Manrope_700Bold" },
 });
 
 const gm = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: "rgba(0,0,0,0.55)",
     justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingHorizontal: 20,
@@ -480,45 +466,19 @@ const gm = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 24,
   },
-  sheetTitle: {
-    fontSize: 18,
-    fontFamily: "Manrope_700Bold",
-    color: "#1E232C",
-  },
+  sheetTitle: { fontSize: 18, fontFamily: "Manrope_700Bold" },
   closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "#F7F8F9",
-    alignItems: "center",
-    justifyContent: "center",
+    width: 34, height: 34, borderRadius: 17,
+    alignItems: "center", justifyContent: "center",
   },
-  tilesRow: {
-    flexDirection: "row",
-    gap: 14,
-  },
+  tilesRow: { flexDirection: "row", gap: 14 },
   tile: {
-    flex: 1,
-    borderRadius: 16,
-    padding: 16,
-    gap: 10,
-    minHeight: 160,
+    flex: 1, borderRadius: 16, padding: 16, gap: 10, minHeight: 160,
   },
   tileIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
+    width: 48, height: 48, borderRadius: 14,
+    alignItems: "center", justifyContent: "center", marginBottom: 4,
   },
-  tileTitle: {
-    fontSize: 14,
-    fontFamily: "Manrope_700Bold",
-  },
-  tileDesc: {
-    fontSize: 12,
-    fontFamily: "Manrope_400Regular",
-    lineHeight: 17,
-  },
+  tileTitle: { fontSize: 14, fontFamily: "Manrope_700Bold" },
+  tileDesc: { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 17 },
 });

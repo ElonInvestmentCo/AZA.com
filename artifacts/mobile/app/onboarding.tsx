@@ -1,6 +1,7 @@
 // @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -11,6 +12,7 @@ import {
   Text,
   View,
   ViewToken,
+  useColorScheme,
   useWindowDimensions,
 } from "react-native";
 import Animated, {
@@ -28,6 +30,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColors } from "@/hooks/useColors";
 
 // ── Assets ────────────────────────────────────────────────────────────────────
 const slide1Img       = require("@/assets/images/slide1.png");
@@ -58,81 +61,32 @@ type SlideItem = {
   type: "animated-wallet" | "giftcard" | "image" | "chatgpt-portfolio" | "chatgpt-card" | "chatgpt-esim";
   title: string;
   subtitle: string;
-  bgColor: string;
+  bgColorLight: string;
+  bgColorDark:  string;
 };
 
 const SLIDES: SlideItem[] = [
-  {
-    id: "1",
-    type: "animated-wallet",
-    title: "Withdraw like a Boss",
-    subtitle: "Fast, secure withdrawals made simple.",
-    bgColor: "#ffffff",
-  },
-  {
-    id: "2",
-    type: "giftcard",
-    title: "Sell your gift card",
-    subtitle: "Sell smarter. Get paid faster.",
-    bgColor: "#EDE7F6",
-  },
-  {
-    id: "3",
-    type: "image",
-    title: "Bill payments",
-    subtitle: "Pay your bills seamlessly in one place",
-    bgColor: "#ffffff",
-  },
-  {
-    id: "4",
-    type: "chatgpt-portfolio",
-    title: "Track Your Portfolio",
-    subtitle: "Monitor your crypto assets in real time.",
-    bgColor: "#ffffff",
-  },
-  {
-    id: "5",
-    type: "chatgpt-card",
-    title: "Virtual Card",
-    subtitle: "Pay anywhere with your PAYVORA virtual card.",
-    bgColor: "#ffffff",
-  },
-  {
-    id: "6",
-    type: "chatgpt-esim",
-    title: "Global eSIM",
-    subtitle: "Stay connected wherever you go.",
-    bgColor: "#ffffff",
-  },
+  { id: "1", type: "animated-wallet",   title: "Withdraw like a Boss",   subtitle: "Fast, secure withdrawals made simple.",            bgColorLight: "#ffffff", bgColorDark: "#070B14" },
+  { id: "2", type: "giftcard",          title: "Sell your gift card",    subtitle: "Sell smarter. Get paid faster.",                    bgColorLight: "#EDE7F6", bgColorDark: "#0D0B1A" },
+  { id: "3", type: "image",             title: "Bill payments",          subtitle: "Pay your bills seamlessly in one place",           bgColorLight: "#ffffff", bgColorDark: "#070B14" },
+  { id: "4", type: "chatgpt-portfolio", title: "Track Your Portfolio",   subtitle: "Monitor your crypto assets in real time.",         bgColorLight: "#ffffff", bgColorDark: "#070B14" },
+  { id: "5", type: "chatgpt-card",      title: "Virtual Card",           subtitle: "Pay anywhere with your AZA virtual card.",        bgColorLight: "#ffffff", bgColorDark: "#070B14" },
+  { id: "6", type: "chatgpt-esim",      title: "Global eSIM",            subtitle: "Stay connected wherever you go.",                  bgColorLight: "#ffffff", bgColorDark: "#070B14" },
 ];
 
 // ── Animated pressable button ─────────────────────────────────────────────────
 function ScaleBtn({
-  style,
-  textStyle,
-  label,
-  onPress,
-}: {
-  style: object;
-  textStyle: object;
-  label: string;
-  onPress: () => void;
-}) {
+  style, textStyle, label, onPress,
+}: { style: object; textStyle: object; label: string; onPress: () => void }) {
   const scale = useSharedValue(1);
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   return (
     <Animated.View style={animStyle}>
       <Pressable
         style={style}
         onPress={onPress}
-        onPressIn={() => {
-          scale.value = withSpring(0.96, { damping: 14, stiffness: 320 });
-        }}
-        onPressOut={() => {
-          scale.value = withSpring(1, { damping: 14, stiffness: 320 });
-        }}
+        onPressIn={() => { scale.value = withSpring(0.96, { damping: 14, stiffness: 320 }); }}
+        onPressOut={() => { scale.value = withSpring(1,    { damping: 14, stiffness: 320 }); }}
       >
         <Text style={textStyle}>{label}</Text>
       </Pressable>
@@ -142,17 +96,8 @@ function ScaleBtn({
 
 // ── Slide 1: Wallet + man + premium ring pulse ────────────────────────────────
 function AnimatedWalletSlide({
-  illustrationSize,
-  slideW,
-  slideH,
-  isActive,
-}: {
-  illustrationSize: number;
-  slideW: number;
-  slideH: number;
-  isActive: boolean;
-}) {
-  // Layout
+  illustrationSize, slideW, slideH, isActive,
+}: { illustrationSize: number; slideW: number; slideH: number; isActive: boolean }) {
   const manH     = illustrationSize * 1.38;
   const manW     = manH * 0.72;
   const illusTop  = (slideH - illustrationSize) / 2;
@@ -160,78 +105,32 @@ function AnimatedWalletSlide({
   const manTop    = illusTop  + illustrationSize * 0.62 - manH * 0.50;
   const manLeft   = illusLeft - manW * 0.08;
   const startY    = -(slideH + manH);
-
-  // Ring overlay on PAY button
   const ringSize = illustrationSize * 0.22;
   const ringTop  = illusTop  + illustrationSize * 0.62 - ringSize / 2;
   const ringLeft = illusLeft + illustrationSize * 0.61 - ringSize / 2;
 
-  // Shared values
-  const manY        = useSharedValue(startY);
-  const illusOp     = useSharedValue(0);
-  const illusSc     = useSharedValue(0.90);
-  const ringOp      = useSharedValue(0);
-  const ringSc      = useSharedValue(1);
+  const manY     = useSharedValue(startY);
+  const illusOp  = useSharedValue(0);
+  const illusSc  = useSharedValue(0.90);
+  const ringOp   = useSharedValue(0);
+  const ringSc   = useSharedValue(1);
 
-  // JS-thread function that drives the ring pulse (called via runOnJS)
   const triggerPulse = useCallback(() => {
-    ringOp.value = 0;
-    ringSc.value = 1;
-    // 3 expanding white ring pulses
-    ringOp.value = withRepeat(
-      withSequence(
-        withTiming(0.72, { duration: 90, easing: Easing.out(Easing.quad) }),
-        withTiming(0,    { duration: 580, easing: Easing.in(Easing.quad) }),
-        withDelay(120, withTiming(0, { duration: 0 })),
-      ),
-      3,
-      false,
-    );
-    ringSc.value = withRepeat(
-      withSequence(
-        withTiming(1.0,  { duration: 90 }),
-        withTiming(2.5,  { duration: 580, easing: Easing.out(Easing.quad) }),
-        withDelay(120, withTiming(1.0, { duration: 0 })),
-      ),
-      3,
-      false,
-    );
+    ringOp.value = 0; ringSc.value = 1;
+    ringOp.value = withRepeat(withSequence(withTiming(0.72, { duration: 90, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 580, easing: Easing.in(Easing.quad) }), withDelay(120, withTiming(0, { duration: 0 }))), 3, false);
+    ringSc.value = withRepeat(withSequence(withTiming(1.0,  { duration: 90 }), withTiming(2.5, { duration: 580, easing: Easing.out(Easing.quad) }), withDelay(120, withTiming(1.0, { duration: 0 }))), 3, false);
   }, []);
 
   useEffect(() => {
     if (!isActive) {
-      cancelAnimation(manY);
-      cancelAnimation(illusOp);
-      cancelAnimation(illusSc);
-      cancelAnimation(ringOp);
-      cancelAnimation(ringSc);
-      manY.value    = startY;
-      illusOp.value = 0;
-      illusSc.value = 0.90;
-      ringOp.value  = 0;
-      ringSc.value  = 1;
+      cancelAnimation(manY); cancelAnimation(illusOp); cancelAnimation(illusSc); cancelAnimation(ringOp); cancelAnimation(ringSc);
+      manY.value = startY; illusOp.value = 0; illusSc.value = 0.90; ringOp.value = 0; ringSc.value = 1;
       return;
     }
-    // Reset
-    manY.value    = startY;
-    illusOp.value = 0;
-    illusSc.value = 0.90;
-    ringOp.value  = 0;
-    ringSc.value  = 1;
-
-    // 1. Illustration fades + scales in
+    manY.value = startY; illusOp.value = 0; illusSc.value = 0.90; ringOp.value = 0; ringSc.value = 1;
     illusOp.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
     illusSc.value = withSpring(1, { damping: 18, stiffness: 150 });
-
-    // 2. Man slides down; on completion trigger ring pulse
-    manY.value = withDelay(
-      200,
-      withTiming(0, { duration: 1100, easing: Easing.out(Easing.cubic) },
-        (finished) => {
-          "worklet";
-          if (finished) runOnJS(triggerPulse)();
-        }),
-    );
+    manY.value = withDelay(200, withTiming(0, { duration: 1100, easing: Easing.out(Easing.cubic) }, (finished) => { "worklet"; if (finished) runOnJS(triggerPulse)(); }));
   }, [isActive, illustrationSize]);
 
   const manStyle   = useAnimatedStyle(() => ({ transform: [{ translateY: manY.value }] }));
@@ -240,185 +139,68 @@ function AnimatedWalletSlide({
 
   return (
     <View style={{ width: slideW, height: slideH }}>
-      {/* Illustration — fades + scales in */}
-      <Animated.View
-        style={[
-          { position: "absolute", top: illusTop, left: illusLeft,
-            width: illustrationSize, height: illustrationSize },
-          illusStyle,
-        ]}
-      >
-        <Image
-          source={slide1Img}
-          style={{ width: illustrationSize, height: illustrationSize }}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+      <Animated.View style={[{ position: "absolute", top: illusTop, left: illusLeft, width: illustrationSize, height: illustrationSize }, illusStyle]}>
+        <Image source={slide1Img} style={{ width: illustrationSize, height: illustrationSize }} contentFit="contain" cachePolicy="memory-disk" priority="high" />
       </Animated.View>
-
-      {/* Premium white ring pulse on PAY button */}
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            top: ringTop,
-            left: ringLeft,
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: 2.5,
-            borderColor: "#FFFFFF",
-            backgroundColor: "transparent",
-          },
-          ringStyle,
-        ]}
-      />
-
-      {/* Man — slides in from top */}
-      <Animated.View
-        style={[
-          { position: "absolute", top: manTop, left: manLeft, width: manW, height: manH },
-          manStyle,
-        ]}
-      >
-        <Image
-          source={manImg}
-          style={{ width: manW, height: manH }}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+      <Animated.View style={[{ position: "absolute", top: ringTop, left: ringLeft, width: ringSize, height: ringSize, borderRadius: ringSize / 2, borderWidth: 2.5, borderColor: "#FFFFFF", backgroundColor: "transparent" }, ringStyle]} />
+      <Animated.View style={[{ position: "absolute", top: manTop, left: manLeft, width: manW, height: manH }, manStyle]}>
+        <Image source={manImg} style={{ width: manW, height: manH }} contentFit="contain" cachePolicy="memory-disk" priority="high" />
       </Animated.View>
     </View>
   );
 }
 
-// ── QR code placeholder (decorative) ──────────────────────────────────────────
+// ── QR code placeholder ────────────────────────────────────────────────────────
 function QRPlaceholder({ size }: { size: number }) {
   const cell = size / 10;
   const pattern = [
-    [1,1,1,1,1,1,1,0,1,0],
-    [1,0,0,0,0,0,1,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0],
-    [1,0,1,1,1,0,1,1,1,1],
-    [1,0,1,1,1,0,1,0,0,0],
-    [1,0,0,0,0,0,1,0,1,1],
-    [1,1,1,1,1,1,1,0,1,0],
-    [0,1,0,0,1,0,0,0,0,1],
-    [1,0,1,1,0,1,1,1,0,1],
-    [0,1,0,1,0,0,1,0,1,1],
+    [1,1,1,1,1,1,1,0,1,0], [1,0,0,0,0,0,1,0,0,1], [1,0,1,1,1,0,1,0,1,0],
+    [1,0,1,1,1,0,1,1,1,1], [1,0,1,1,1,0,1,0,0,0], [1,0,0,0,0,0,1,0,1,1],
+    [1,1,1,1,1,1,1,0,1,0], [0,1,0,0,1,0,0,0,0,1], [1,0,1,1,0,1,1,1,0,1], [0,1,0,1,0,0,1,0,1,1],
   ];
   return (
     <View style={{ width: size, height: size, backgroundColor: "#fff", padding: cell * 0.4 }}>
       {pattern.map((row, r) => (
         <View key={r} style={{ flexDirection: "row" }}>
-          {row.map((filled, c) => (
-            <View
-              key={c}
-              style={{
-                width: cell,
-                height: cell,
-                backgroundColor: filled ? "#000" : "#fff",
-              }}
-            />
-          ))}
+          {row.map((filled, c) => <View key={c} style={{ width: cell, height: cell, backgroundColor: filled ? "#000" : "#fff" }} />)}
         </View>
       ))}
     </View>
   );
 }
 
-// ── Slide 2: Gift card — fade + spring in ─────────────────────────────────────
-function GiftCardSlide({
-  slideW,
-  slideH,
-  isActive,
-}: {
-  slideW: number;
-  slideH: number;
-  isActive: boolean;
-}) {
+// ── Slide 2: Gift card ────────────────────────────────────────────────────────
+function GiftCardSlide({ slideW, slideH, isActive }: { slideW: number; slideH: number; isActive: boolean }) {
   const blackCardW    = clamp(slideW * 0.88, 280, 420);
   const blackCardH    = blackCardW / 1.586;
   const blackCardLeft = (slideW - blackCardW) / 2;
   const blackCardTop  = (slideH - blackCardH) / 2;
-
   const qrSize = blackCardH * 0.50;
   const pad    = blackCardW * 0.06;
-
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
 
   useEffect(() => {
-    if (!isActive) {
-      cancelAnimation(cardOp);
-      cancelAnimation(cardSc);
-      cardOp.value = 0;
-      cardSc.value = 0.88;
-      return;
-    }
+    if (!isActive) { cancelAnimation(cardOp); cancelAnimation(cardSc); cardOp.value = 0; cardSc.value = 0.88; return; }
     cardOp.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
     cardSc.value = withSpring(1, { damping: 18, stiffness: 140 });
   }, [isActive]);
 
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: cardOp.value,
-    transform: [{ scale: cardSc.value }],
-  }));
+  const cardStyle = useAnimatedStyle(() => ({ opacity: cardOp.value, transform: [{ scale: cardSc.value }] }));
 
   return (
     <View style={{ width: slideW, height: slideH }}>
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            top: blackCardTop,
-            left: blackCardLeft,
-            width: blackCardW,
-            height: blackCardH,
-            backgroundColor: "#0A0A0A",
-            borderRadius: 22,
-            overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: 0.45,
-            shadowRadius: 28,
-            elevation: 16,
-            padding: pad,
-          },
-          cardStyle,
-        ]}
-      >
-        {/* Top row: title + ID */}
+      <Animated.View style={[{ position: "absolute", top: blackCardTop, left: blackCardLeft, width: blackCardW, height: blackCardH, backgroundColor: "#0A0A0A", borderRadius: 22, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.45, shadowRadius: 28, elevation: 16, padding: pad }, cardStyle]}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
           <View>
-            <Text style={{ color: "#fff", fontSize: blackCardW * 0.048, fontFamily: "Manrope_700Bold", letterSpacing: -0.3 }}>
-              Visa Gift Card
-            </Text>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular", marginTop: 3 }}>
-              {"United States 🇺🇸"}
-            </Text>
+            <Text style={{ color: "#fff", fontSize: blackCardW * 0.048, fontFamily: "Manrope_700Bold", letterSpacing: -0.3 }}>Visa Gift Card</Text>
+            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular", marginTop: 3 }}>{"United States 🇺🇸"}</Text>
           </View>
-          <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular" }}>
-            {"ID: 12345678"}
-          </Text>
+          <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular" }}>{"ID: 12345678"}</Text>
         </View>
-
-        {/* Bottom row: amount + QR */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", flex: 1, marginTop: 8 }}>
-          <Text style={{ color: "#fff", fontSize: blackCardW * 0.13, fontFamily: "Manrope_700Bold", letterSpacing: -1 }}>
-            $100
-          </Text>
-          <View style={{
-            borderRadius: 6,
-            overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.18,
-            shadowRadius: 6,
-            elevation: 4,
-          }}>
+          <Text style={{ color: "#fff", fontSize: blackCardW * 0.13, fontFamily: "Manrope_700Bold", letterSpacing: -1 }}>$100</Text>
+          <View style={{ borderRadius: 6, overflow: "hidden", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.18, shadowRadius: 6, elevation: 4 }}>
             <QRPlaceholder size={qrSize} />
           </View>
         </View>
@@ -427,112 +209,31 @@ function GiftCardSlide({
   );
 }
 
-// ── Slide 3: Illustration — fade + spring in + parallax ───────────────────────
-function ImageSlide({
-  illustrationSize,
-  slideW,
-  slideH,
-  isActive,
-  parallaxFactor,
-}: {
-  illustrationSize: number;
-  slideW: number;
-  slideH: number;
-  isActive: boolean;
-  parallaxFactor: number;
-}) {
-  const op = useSharedValue(0);
-  const sc = useSharedValue(0.88);
-  const px = useSharedValue(parallaxFactor * slideW * 0.13);
-
-  useEffect(() => {
-    if (!isActive) {
-      cancelAnimation(op);
-      cancelAnimation(sc);
-      op.value = 0;
-      sc.value = 0.88;
-    } else {
-      op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-      sc.value = withSpring(1, { damping: 18, stiffness: 140 });
-    }
-  }, [isActive]);
-
-  useEffect(() => {
-    const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13;
-    px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 });
-  }, [parallaxFactor]);
-
-  const animStyle = useAnimatedStyle(() => ({
-    opacity: op.value,
-    transform: [{ scale: sc.value }, { translateX: px.value }],
-  }));
-
+// ── Slide 3: Illustration ──────────────────────────────────────────────────────
+function ImageSlide({ illustrationSize, slideW, slideH, isActive, parallaxFactor }: { illustrationSize: number; slideW: number; slideH: number; isActive: boolean; parallaxFactor: number }) {
+  const op = useSharedValue(0); const sc = useSharedValue(0.88); const px = useSharedValue(parallaxFactor * slideW * 0.13);
+  useEffect(() => { if (!isActive) { cancelAnimation(op); cancelAnimation(sc); op.value = 0; sc.value = 0.88; } else { op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) }); sc.value = withSpring(1, { damping: 18, stiffness: 140 }); } }, [isActive]);
+  useEffect(() => { const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13; px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 }); }, [parallaxFactor]);
+  const animStyle = useAnimatedStyle(() => ({ opacity: op.value, transform: [{ scale: sc.value }, { translateX: px.value }] }));
   return (
     <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
       <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
-        <Image
-          source={slide3Img}
-          style={{ width: slideW * 1.3, height: slideH }}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+        <Image source={slide3Img} style={{ width: slideW * 1.3, height: slideH }} contentFit="contain" cachePolicy="memory-disk" priority="high" />
       </Animated.View>
     </View>
   );
 }
 
-// ── Slide N: Static image — fade + spring in + parallax depth ─────────────────
-function ImageSlideStatic({
-  source,
-  slideW,
-  slideH,
-  isActive,
-  parallaxFactor,
-}: {
-  source: number;
-  slideW: number;
-  slideH: number;
-  isActive: boolean;
-  parallaxFactor: number;
-}) {
-  const op = useSharedValue(0);
-  const sc = useSharedValue(0.88);
-  const px = useSharedValue(parallaxFactor * slideW * 0.13);
-
-  useEffect(() => {
-    if (!isActive) {
-      cancelAnimation(op);
-      cancelAnimation(sc);
-      op.value = 0;
-      sc.value = 0.88;
-    } else {
-      op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-      sc.value = withSpring(1, { damping: 18, stiffness: 140 });
-    }
-  }, [isActive]);
-
-  useEffect(() => {
-    const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13;
-    px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 });
-  }, [parallaxFactor]);
-
-  /* Combined transform — single Animated.View avoids the "overwritten transform" warning */
-  const animStyle = useAnimatedStyle(() => ({
-    opacity: op.value,
-    transform: [{ scale: sc.value }, { translateX: px.value }],
-  }));
-
+// ── Slide N: Static image ──────────────────────────────────────────────────────
+function ImageSlideStatic({ source, slideW, slideH, isActive, parallaxFactor }: { source: number; slideW: number; slideH: number; isActive: boolean; parallaxFactor: number }) {
+  const op = useSharedValue(0); const sc = useSharedValue(0.88); const px = useSharedValue(parallaxFactor * slideW * 0.13);
+  useEffect(() => { if (!isActive) { cancelAnimation(op); cancelAnimation(sc); op.value = 0; sc.value = 0.88; } else { op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) }); sc.value = withSpring(1, { damping: 18, stiffness: 140 }); } }, [isActive]);
+  useEffect(() => { const target = Math.max(Math.min(parallaxFactor, 1), -1) * slideW * 0.13; px.value = withSpring(target, { damping: 20, stiffness: 160, mass: 0.8 }); }, [parallaxFactor]);
+  const animStyle = useAnimatedStyle(() => ({ opacity: op.value, transform: [{ scale: sc.value }, { translateX: px.value }] }));
   return (
     <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
       <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
-        <Image
-          source={source}
-          style={{ width: slideW * 1.3, height: slideH }}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+        <Image source={source} style={{ width: slideW * 1.3, height: slideH }} contentFit="contain" cachePolicy="memory-disk" priority="high" />
       </Animated.View>
     </View>
   );
@@ -542,6 +243,9 @@ function ImageSlideStatic({
 export default function OnboardingScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  const C       = useColors();
+  const scheme  = useColorScheme();
+  const isDark  = scheme === "dark";
   const { width, height } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
@@ -567,16 +271,17 @@ export default function OnboardingScreen() {
   ).current;
 
   const activeSlide = SLIDES[activeIndex];
+  const slideBg = isDark ? activeSlide.bgColorDark : activeSlide.bgColorLight;
 
   return (
-    <View style={[styles.root, { backgroundColor: activeSlide.bgColor }]}>
+    <View style={[styles.root, { backgroundColor: slideBg }]}>
 
-      {/* Header — transparent so slide bg bleeds through under status bar */}
-      <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: activeSlide.bgColor }]}>
-        <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
+      {/* Header */}
+      <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: slideBg }]}>
+        <Text style={[styles.logo, { fontSize: logoSize, color: C.text }]}>AZA.</Text>
       </View>
 
-      {/* Slide carousel — scroll drives the parallax depth on image slides */}
+      {/* Slide carousel */}
       <FlatList
         ref={flatListRef}
         data={SLIDES}
@@ -591,54 +296,26 @@ export default function OnboardingScreen() {
         getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
         renderItem={({ item, index }) => {
           const isActive = index === activeIndex;
+          const bg = isDark ? item.bgColorDark : item.bgColorLight;
           return (
-            <View style={{ width, height: slideAreaH, backgroundColor: item.bgColor }}>
+            <View style={{ width, height: slideAreaH, backgroundColor: bg }}>
               {item.type === "animated-wallet" && (
-                <AnimatedWalletSlide
-                  illustrationSize={illustrationSize}
-                  slideW={width}
-                  slideH={slideAreaH}
-                  isActive={isActive}
-                />
+                <AnimatedWalletSlide illustrationSize={illustrationSize} slideW={width} slideH={slideAreaH} isActive={isActive} />
               )}
               {item.type === "giftcard" && (
                 <GiftCardSlide slideW={width} slideH={slideAreaH} isActive={isActive} />
               )}
               {item.type === "image" && (
-                <ImageSlide
-                  illustrationSize={illustrationSize}
-                  slideW={width}
-                  slideH={slideAreaH}
-                  isActive={isActive}
-                  parallaxFactor={index - activeIndex}
-                />
+                <ImageSlide illustrationSize={illustrationSize} slideW={width} slideH={slideAreaH} isActive={isActive} parallaxFactor={index - activeIndex} />
               )}
               {item.type === "chatgpt-portfolio" && (
-                <ImageSlideStatic
-                  source={onboardPortfolio}
-                  slideW={width}
-                  slideH={slideAreaH}
-                  isActive={isActive}
-                  parallaxFactor={index - activeIndex}
-                />
+                <ImageSlideStatic source={onboardPortfolio} slideW={width} slideH={slideAreaH} isActive={isActive} parallaxFactor={index - activeIndex} />
               )}
               {item.type === "chatgpt-card" && (
-                <ImageSlideStatic
-                  source={onboardCard}
-                  slideW={width}
-                  slideH={slideAreaH}
-                  isActive={isActive}
-                  parallaxFactor={index - activeIndex}
-                />
+                <ImageSlideStatic source={onboardCard} slideW={width} slideH={slideAreaH} isActive={isActive} parallaxFactor={index - activeIndex} />
               )}
               {item.type === "chatgpt-esim" && (
-                <ImageSlideStatic
-                  source={onboardEsim}
-                  slideW={width}
-                  slideH={slideAreaH}
-                  isActive={isActive}
-                  parallaxFactor={index - activeIndex}
-                />
+                <ImageSlideStatic source={onboardEsim} slideW={width} slideH={slideAreaH} isActive={isActive} parallaxFactor={index - activeIndex} />
               )}
             </View>
           );
@@ -649,12 +326,7 @@ export default function OnboardingScreen() {
       <View
         style={[
           styles.bottom,
-          {
-            paddingBottom: bottomInset + 20,
-            paddingHorizontal: hPad,
-            alignSelf: "center",
-            width: contentMaxW,
-          },
+          { backgroundColor: slideBg, paddingBottom: bottomInset + 20, paddingHorizontal: hPad, alignSelf: "center", width: contentMaxW },
         ]}
       >
         {/* Dots */}
@@ -662,43 +334,52 @@ export default function OnboardingScreen() {
           {SLIDES.map((_, i) => (
             <View
               key={i}
-              style={[styles.dot, i === activeIndex ? styles.dotActive : styles.dotInactive]}
+              style={[
+                styles.dot,
+                i === activeIndex
+                  ? { backgroundColor: "transparent", borderWidth: 1.5, borderColor: C.text }
+                  : { backgroundColor: isDark ? "rgba(255,255,255,0.2)" : "#d0d3d8" },
+              ]}
             />
           ))}
         </View>
 
-        {/* Text — remounts on slide change, triggering slide-up entering animation */}
+        {/* Text */}
         <Animated.View
           key={activeIndex}
           entering={FadeInUp.duration(380).springify().damping(22).stiffness(200)}
           style={[styles.textBlock, { minHeight: TEXT_H }]}
         >
           <Text
-            style={[styles.title, { fontSize: titleSize, lineHeight: titleSize * 1.2 }]}
+            style={[styles.title, { fontSize: titleSize, lineHeight: titleSize * 1.2, color: C.text }]}
             numberOfLines={2}
             adjustsFontSizeToFit
           >
             {activeSlide.title}
           </Text>
-          <Text
-            style={styles.subtitle}
-            numberOfLines={2}
-          >
+          <Text style={[styles.subtitle, { color: C.mutedForeground }]} numberOfLines={2}>
             {activeSlide.subtitle}
           </Text>
         </Animated.View>
 
-        {/* Buttons — with press-scale feedback */}
+        {/* Buttons */}
         <View style={[styles.buttons, { height: BTNS_H }]}>
+          <LinearGradient
+            colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.btnLoginGrad, { width: btnWidth }]}
+          >
+            <ScaleBtn
+              style={styles.btnLoginPress}
+              textStyle={styles.btnLoginText}
+              label="Login"
+              onPress={() => router.push("/(auth)/login")}
+            />
+          </LinearGradient>
           <ScaleBtn
-            style={[styles.btnLogin, { width: btnWidth }]}
-            textStyle={styles.btnLoginText}
-            label="Login"
-            onPress={() => router.push("/(auth)/login")}
-          />
-          <ScaleBtn
-            style={[styles.btnSignUp, { width: btnWidth }]}
-            textStyle={styles.btnSignUpText}
+            style={[styles.btnSignUp, { width: btnWidth, borderColor: C.text }]}
+            textStyle={[styles.btnSignUpText, { color: C.text }]}
             label="Sign Up"
             onPress={() => router.push("/(auth)/register")}
           />
@@ -710,20 +391,19 @@ export default function OnboardingScreen() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root:          { flex: 1, backgroundColor: "#fff" },
-  header:        { alignItems: "center", justifyContent: "center" },
-  logo:          { fontFamily: "Manrope_700Bold", letterSpacing: 1.5, color: "#0b0a0a" },
-  bottom:        { backgroundColor: "#fff" },
-  dots:          { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
-  dot:           { width: 8, height: 8, borderRadius: 2 },
-  dotActive:     { backgroundColor: "transparent", borderWidth: 1.5, borderColor: "#0b0a0a" },
-  dotInactive:   { backgroundColor: "#d0d3d8" },
-  textBlock:     { alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 4 },
-  title:         { fontFamily: "Manrope_700Bold", color: "#0b0a0a", textAlign: "center", letterSpacing: -0.3 },
-  subtitle:      { fontFamily: "Manrope_400Regular", color: "#8A8F96", textAlign: "center", fontSize: 14, lineHeight: 21 },
-  buttons:       { alignItems: "center", justifyContent: "center", gap: 12, marginTop: 8 },
-  btnLogin:      { height: 50, backgroundColor: "#000", borderRadius: 4, alignItems: "center", justifyContent: "center" },
+  root:    { flex: 1 },
+  header:  { alignItems: "center", justifyContent: "center" },
+  logo:    { fontFamily: "Manrope_700Bold", letterSpacing: 1.5 },
+  bottom:  {},
+  dots:    { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
+  dot:     { width: 8, height: 8, borderRadius: 2 },
+  textBlock: { alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 4 },
+  title:     { fontFamily: "Manrope_700Bold", textAlign: "center", letterSpacing: -0.3 },
+  subtitle:  { fontFamily: "Manrope_400Regular", textAlign: "center", fontSize: 14, lineHeight: 21 },
+  buttons:   { alignItems: "center", justifyContent: "center", gap: 12, marginTop: 8 },
+  btnLoginGrad: { height: 50, borderRadius: 4, overflow: "hidden" },
+  btnLoginPress: { flex: 1, alignItems: "center", justifyContent: "center" },
   btnLoginText:  { color: "#fff", fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: 0.3 },
-  btnSignUp:     { height: 50, borderRadius: 4, borderWidth: 1, borderColor: "#000", backgroundColor: "transparent", alignItems: "center", justifyContent: "center" },
-  btnSignUpText: { color: "#000", fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: 0.3 },
+  btnSignUp:     { height: 50, borderRadius: 4, borderWidth: 1, backgroundColor: "transparent", alignItems: "center", justifyContent: "center" },
+  btnSignUpText: { fontSize: 15, fontFamily: "Manrope_700Bold", letterSpacing: 0.3 },
 });

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { EyeIcon } from "@/components/EyeIcon";
+import { LinearGradient } from "expo-linear-gradient";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -27,23 +28,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-
-/* ── Design tokens ───────────────────────────────────────────────────────── */
-const C = {
-  bg:          "#FFFFFF",
-  inputBg:     "#F7F8F9",
-  inputBorder: "#E8ECF4",
-  inputFocus:  "#1E232C",
-  inputValid:  "#00C48C",
-  inputError:  "#FF5B7A",
-  text:        "#1E232C",
-  placeholder: "#8391A1",
-  btn:         "#000000",
-  btnText:     "#FFFFFF",
-  error:       "#FF5B7A",
-  footerLink:  "#35C2C1",
-  hint:        "#8391A1",
-};
+import { useColors } from "@/hooks/useColors";
 
 /* ── Validation rules ────────────────────────────────────────────────────── */
 const validateUsername = (v: string): string => {
@@ -90,6 +75,7 @@ function ValidatedInput({
   touched?: boolean;
   onBlur?: () => void;
 }) {
+  const C = useColors();
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
 
@@ -97,9 +83,9 @@ function ValidatedInput({
   const isValid = touched && !error && value.length > 0;
 
   const borderColor = isError
-    ? C.inputError
+    ? C.destructive
     : isValid
-    ? C.inputValid
+    ? C.success
     : focused
     ? C.inputFocus
     : C.inputBorder;
@@ -109,12 +95,12 @@ function ValidatedInput({
       <View
         style={[
           inp.wrap,
-          { borderColor },
+          { backgroundColor: C.input, borderColor },
           isValid && inp.validShadow,
         ]}
       >
         <TextInput
-          style={inp.field}
+          style={[inp.field, { color: C.text }]}
           placeholder={placeholder}
           placeholderTextColor={C.placeholder}
           value={value}
@@ -125,31 +111,25 @@ function ValidatedInput({
           onFocus={() => setFocused(true)}
           onBlur={() => { setFocused(false); onBlur?.(); }}
         />
-        {/* Valid checkmark */}
         {isValid && !secure && (
           <Animated.View entering={FadeIn.duration(180)}>
-            <Ionicons name="checkmark-circle" size={20} color={C.inputValid} />
+            <Ionicons name="checkmark-circle" size={20} color={C.success} />
           </Animated.View>
         )}
-        {/* Password toggle */}
         {secure && (
           <Pressable
             onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={inp.eyeBtn}
           >
-            <EyeIcon open={showPass} size={22} color="#8391A1" />
+            <EyeIcon open={showPass} size={22} color={C.placeholder} />
           </Pressable>
         )}
       </View>
-      {/* Per-field error message */}
       {isError && (
-        <Animated.View
-          entering={FadeIn.duration(180)}
-          style={inp.errorRow}
-        >
-          <Ionicons name="alert-circle-outline" size={13} color={C.inputError} />
-          <Text style={inp.errorMsg}>{error}</Text>
+        <Animated.View entering={FadeIn.duration(180)} style={inp.errorRow}>
+          <Ionicons name="alert-circle-outline" size={13} color={C.destructive} />
+          <Text style={[inp.errorMsg, { color: C.destructive }]}>{error}</Text>
         </Animated.View>
       )}
     </View>
@@ -160,9 +140,7 @@ const inp = StyleSheet.create({
   wrap: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: C.inputBg,
     borderWidth: 1.5,
-    borderColor: C.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 18,
     height: 58,
@@ -178,7 +156,6 @@ const inp = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
-    color: C.text,
     height: "100%",
   },
   eyeBtn:   { padding: 2 },
@@ -192,7 +169,6 @@ const inp = StyleSheet.create({
   errorMsg: {
     fontSize: 12,
     fontFamily: "Manrope_400Regular",
-    color: C.inputError,
     flex: 1,
   },
 });
@@ -227,15 +203,16 @@ function LinkBtn({
 
 /* ── Password strength indicator ─────────────────────────────────────────── */
 function PasswordStrength({ value }: { value: string }) {
+  const C = useColors();
   if (!value) return null;
-  const hasLen  = value.length >= 6;
+  const hasLen   = value.length >= 6;
   const hasUpper = /[A-Z]/.test(value);
-  const hasNum  = /[0-9]/.test(value);
-  const score   = [hasLen, hasUpper, hasNum].filter(Boolean).length;
-  const colors  = ["#FF5B7A", "#F59E0B", "#00C48C"];
-  const labels  = ["Weak", "Fair", "Strong"];
-  const color   = colors[score - 1] ?? "#E8ECF4";
-  const label   = labels[score - 1] ?? "";
+  const hasNum   = /[0-9]/.test(value);
+  const score    = [hasLen, hasUpper, hasNum].filter(Boolean).length;
+  const barColors = ["#FF5A6B", "#FFB020", "#00D68F"];
+  const labels    = ["Weak", "Fair", "Strong"];
+  const color     = barColors[score - 1] ?? C.border;
+  const label     = labels[score - 1] ?? "";
 
   return (
     <Animated.View entering={FadeIn.duration(220)} style={ps.wrap}>
@@ -243,7 +220,7 @@ function PasswordStrength({ value }: { value: string }) {
         {[0, 1, 2].map((i) => (
           <View
             key={i}
-            style={[ps.bar, { backgroundColor: i < score ? color : "#E8ECF4" }]}
+            style={[ps.bar, { backgroundColor: i < score ? color : C.border }]}
           />
         ))}
       </View>
@@ -265,33 +242,29 @@ export default function RegisterScreen() {
   const router       = useRouter();
   const insets       = useSafeAreaInsets();
   const { register } = useAuth();
+  const C            = useColors();
 
   const [username,    setUsername]    = useState("");
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
   const [confirm,     setConfirm]     = useState("");
   const [loading,     setLoading]     = useState(false);
-  const [submitted,   setSubmitted]   = useState(false);
   const [socialError, setSocialError] = useState("");
 
-  /* touched state — set true on blur OR on first submit attempt */
   const [touchedUsername, setTouchedUsername] = useState(false);
   const [touchedEmail,    setTouchedEmail]    = useState(false);
   const [touchedPassword, setTouchedPassword] = useState(false);
   const [touchedConfirm,  setTouchedConfirm]  = useState(false);
 
-  /* Computed errors */
   const errUsername = validateUsername(username);
   const errEmail    = validateEmail(email);
   const errPassword = validatePassword(password);
   const errConfirm  = validateConfirm(confirm, password);
   const hasErrors   = !!(errUsername || errEmail || errPassword || errConfirm);
 
-  /* register button scale */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
-  /* form shake */
   const shakeX     = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
@@ -306,12 +279,10 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    /* Mark all fields as touched so errors appear */
     setTouchedUsername(true);
     setTouchedEmail(true);
     setTouchedPassword(true);
     setTouchedConfirm(true);
-    setSubmitted(true);
 
     if (hasErrors) {
       triggerShake();
@@ -327,7 +298,7 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={s.root}
+      style={[s.root, { backgroundColor: C.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -341,13 +312,13 @@ export default function RegisterScreen() {
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <Pressable
-            style={s.backBtn}
+            style={[s.backBtn, { borderColor: C.border, backgroundColor: C.surface }]}
             onPress={() => router.back()}
             hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
           </Pressable>
-          <Text style={s.wordmark}>AZA.</Text>
+          <Text style={[s.wordmark, { color: C.text }]}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 
@@ -356,7 +327,7 @@ export default function RegisterScreen() {
           entering={FadeInDown.duration(450).delay(60).springify()}
           style={s.headBlock}
         >
-          <Text style={s.heading}>{"Welcome!\nFill your Details Here..."}</Text>
+          <Text style={[s.heading, { color: C.text }]}>{"Welcome!\nFill your Details Here..."}</Text>
         </Animated.View>
 
         {/* ── Form ── */}
@@ -403,28 +374,35 @@ export default function RegisterScreen() {
           </Animated.View>
         </Animated.View>
 
-        {/* ── Register button ── */}
+        {/* ── Register button (gradient) ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
           style={s.btnWrap}
         >
           <Animated.View style={btnStyle}>
-            <Pressable
-              style={[s.regBtn, loading && { opacity: 0.75 }]}
-              onPress={handleRegister}
-              onPressIn={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
-              }}
-              onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}
-              disabled={loading}
+            <LinearGradient
+              colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={[s.regBtnGrad, { shadowColor: C.accentGlow, opacity: loading ? 0.75 : 1 }]}
             >
-              {loading ? (
-                <ActivityIndicator color={C.btnText} size="small" />
-              ) : (
-                <Text style={s.regBtnText}>Agree and Register</Text>
-              )}
-            </Pressable>
+              <Pressable
+                style={s.regBtnPress}
+                onPress={handleRegister}
+                onPressIn={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
+                }}
+                onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 }); }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text style={s.regBtnText}>Agree and Register</Text>
+                )}
+              </Pressable>
+            </LinearGradient>
           </Animated.View>
         </Animated.View>
 
@@ -433,9 +411,9 @@ export default function RegisterScreen() {
           entering={FadeInUp.duration(380).delay(220).springify()}
           style={s.dividerRow}
         >
-          <View style={s.dividerLine} />
-          <Text style={s.dividerText}>Or Login with</Text>
-          <View style={s.dividerLine} />
+          <View style={[s.dividerLine, { backgroundColor: C.border }]} />
+          <Text style={[s.dividerText, { color: C.mutedForeground }]}>Or Login with</Text>
+          <View style={[s.dividerLine, { backgroundColor: C.border }]} />
         </Animated.View>
 
         {/* ── Social buttons ── */}
@@ -448,7 +426,7 @@ export default function RegisterScreen() {
             onError={msg => { setSocialError(msg); }}
           />
           {socialError ? (
-            <Animated.Text entering={FadeIn.duration(200)} style={s.socialError}>
+            <Animated.Text entering={FadeIn.duration(200)} style={[s.socialError, { color: C.destructive }]}>
               {socialError}
             </Animated.Text>
           ) : null}
@@ -459,10 +437,10 @@ export default function RegisterScreen() {
           entering={FadeInUp.duration(380).delay(300).springify()}
           style={s.footer}
         >
-          <Text style={s.footerText}>Already have an account? </Text>
+          <Text style={[s.footerText, { color: C.mutedForeground }]}>Already have an account? </Text>
           <LinkBtn
             onPress={() => { Haptics.selectionAsync(); router.replace("/(auth)/login"); }}
-            textStyle={s.footerLink}
+            textStyle={[s.footerLink, { color: C.accent }]}
             label="Sign In"
           />
         </Animated.View>
@@ -473,7 +451,7 @@ export default function RegisterScreen() {
 
 /* ── Styles ──────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:  { flex: 1, backgroundColor: C.bg },
+  root:  { flex: 1 },
   scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
   topBar: {
@@ -484,14 +462,12 @@ const s = StyleSheet.create({
   },
   backBtn: {
     width: 44, height: 44, borderRadius: 12,
-    borderWidth: 1, borderColor: C.inputBorder,
-    backgroundColor: C.bg,
+    borderWidth: 1,
     alignItems: "center", justifyContent: "center",
   },
   wordmark: {
     fontSize: 32,
     fontFamily: "Manrope_700Bold",
-    color: C.text,
     letterSpacing: -0.5,
   },
 
@@ -499,7 +475,6 @@ const s = StyleSheet.create({
   heading: {
     fontSize: 26,
     fontFamily: "Manrope_700Bold",
-    color: C.text,
     lineHeight: 36,
     letterSpacing: -0.3,
   },
@@ -507,22 +482,24 @@ const s = StyleSheet.create({
   form:    { gap: 14, marginBottom: 28 },
 
   btnWrap: { marginBottom: 32 },
-  regBtn: {
+  regBtnGrad: {
     height: 60,
-    backgroundColor: C.btn,
     borderRadius: 14,
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  regBtnPress: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
   },
   regBtnText: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",
-    color: C.btnText,
+    color: "#FFFFFF",
     letterSpacing: 0.2,
   },
 
@@ -531,22 +508,17 @@ const s = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  dividerLine: { flex: 1, height: 1, backgroundColor: "#E8ECF4" },
+  dividerLine: { flex: 1, height: 1 },
   dividerText: {
     marginHorizontal: 12,
     fontSize: 14,
     fontFamily: "Manrope_400Regular",
-    color: "#6A707C",
   },
 
-  socialWrap: {
-    marginBottom: 24,
-    gap: 10,
-  },
+  socialWrap: { marginBottom: 24, gap: 10 },
   socialError: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
-    color: "#FF5B7A",
     textAlign: "center",
     marginTop: 4,
   },
@@ -556,14 +528,6 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  footerText: {
-    fontSize: 15,
-    fontFamily: "Manrope_400Regular",
-    color: C.text,
-  },
-  footerLink: {
-    fontSize: 15,
-    fontFamily: "Manrope_700Bold",
-    color: C.footerLink,
-  },
+  footerText: { fontSize: 15, fontFamily: "Manrope_400Regular" },
+  footerLink: { fontSize: 15, fontFamily: "Manrope_700Bold" },
 });
