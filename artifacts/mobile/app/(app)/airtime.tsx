@@ -3,9 +3,9 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,206 +14,175 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { ScreenHeader } from "@/components/ScreenHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
-  bg:      "#FFFFFF",
-  text:    "#0B0A0A",
-  textSec: "#595F67",
-  textMut: "#AAAFB5",
-  border:  "#EDF1F3",
-  surface: "#F8F9FA",
-  inputBg: "#F7F8F9",
-  btn:     "#000000",
-  accent:  "#35C2C1",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  inputBg:   "#F0F0F0",
+  border:    "#EDF1F3",
+  success:   "#00B03C",
+  dark:      "#010101",
+  black:     "#000000",
 };
 
 const NETWORKS = [
-  { id:"mtn",    label:"MTN",    color:"#FFCC00", bg:"#FFCC0020", icon:"📶" },
-  { id:"airtel", label:"Airtel", color:"#FF0000", bg:"#FF000020", icon:"📡" },
-  { id:"glo",    label:"Glo",    color:"#008000", bg:"#00800020", icon:"📱" },
-  { id:"9mob",   label:"9mobile",color:"#006633", bg:"#00663320", icon:"📲" },
+  { id: "mtn",    name: "MTN",     color: "#FFC300", bg: "#FFFBEB" },
+  { id: "airtel", name: "Airtel",  color: "#E11D48", bg: "#FFF1F2" },
+  { id: "glo",    name: "Glo",     color: "#059669", bg: "#F0FFF4" },
+  { id: "9mobile",name: "9Mobile", color: "#059669", bg: "#ECFEFF" },
 ];
 
-const QUICK_AMOUNTS = ["₦50","₦100","₦200","₦500","₦1,000","₦2,000","₦5,000"];
-
-type Step = "form" | "confirm" | "success";
+const QUICK_AMOUNTS = ["₦50", "₦100", "₦200", "₦500", "₦1,000", "₦2,000"];
 
 export default function AirtimeScreen() {
   const router = useRouter();
-  const [step,    setStep]    = useState<Step>("form");
-  const [network, setNetwork] = useState("");
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 20 : insets.top;
+
+  const [network, setNetwork] = useState(NETWORKS[0]);
   const [phone,   setPhone]   = useState("");
   const [amount,  setAmount]  = useState("");
-  const [self,    setSelf]    = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [done,    setDone]    = useState(false);
 
-  const selectedNet = NETWORKS.find(n => n.id === network);
+  const canProceed = phone.length === 11 && !!amount;
 
-  const handlePay = async () => {
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    setLoading(false);
-    setStep("success");
+  const handleBuy = () => {
+    if (!canProceed) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setDone(true);
+    setTimeout(() => { setDone(false); router.push("/(app)/success-payment" as any); }, 800);
   };
 
-  if (step === "success") {
-    return (
-      <View style={s.root}>
-        <ScreenHeader title="Airtime Purchased" showBack={false} />
-        <View style={s.successWrap}>
-          <Animated.View entering={FadeInDown.duration(380).springify()} style={s.successCircle}>
-            <Feather name="check" size={38} color="#fff" />
-          </Animated.View>
-          <Animated.Text entering={FadeInUp.duration(320).delay(80)} style={s.successTitle}>
-            Airtime Sent!
-          </Animated.Text>
-          <Animated.Text entering={FadeInUp.duration(320).delay(120)} style={s.successSub}>
-            {amount} {selectedNet?.label} airtime sent to {phone}
-          </Animated.Text>
-          <Animated.View entering={FadeInUp.duration(300).delay(160)} style={s.receiptCard}>
-            {[
-              { label:"Network",   value: selectedNet?.label ?? "" },
-              { label:"Phone",     value: phone },
-              { label:"Amount",    value: amount },
-              { label:"Reference", value: `AT-${Math.floor(Math.random()*90000)+10000}` },
-              { label:"Status",    value: "Successful" },
-            ].map(r => (
-              <View key={r.label} style={s.receiptRow}>
-                <Text style={s.receiptLabel}>{r.label}</Text>
-                <Text style={s.receiptValue}>{r.value}</Text>
-              </View>
-            ))}
-          </Animated.View>
-          <TouchableOpacity style={s.btn} onPress={() => router.back()}>
-            <Text style={s.btnText}>Done</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
   return (
-    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScreenHeader title="Buy Airtime" />
-      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
 
-        {step === "form" && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
+      {/* Header */}
+      <Animated.View entering={FadeInDown.duration(280).springify()} style={[s.header, { paddingTop: topPad + 10 }]}>
+        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+          <Feather name="arrow-left" size={22} color="#1E232C" />
+        </TouchableOpacity>
+        <Text style={s.headerTitle}>Buy Airtime</Text>
+        <View style={{ width: 44 }} />
+      </Animated.View>
+      <View style={s.divider} />
 
-            {/* Self / Others toggle */}
-            <View style={s.toggleRow}>
-              {["Self Recharge","Third Party"].map((opt, i) => {
-                const active = i === 0 ? self : !self;
-                return (
-                  <TouchableOpacity
-                    key={opt}
-                    style={[s.toggleBtn, active && s.toggleBtnActive]}
-                    onPress={() => { Haptics.selectionAsync(); setSelf(i === 0); }}
-                  >
-                    <Text style={[s.toggleText, active && s.toggleTextActive]}>{opt}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}>
 
-            {/* Network selection */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Select Network</Text>
-              <View style={s.networkRow}>
-                {NETWORKS.map(net => (
-                  <TouchableOpacity
-                    key={net.id}
-                    style={[s.netCard, network === net.id && { borderColor: net.color, borderWidth: 2 }]}
-                    onPress={() => { Haptics.selectionAsync(); setNetwork(net.id); }}
-                  >
-                    <Text style={s.netIcon}>{net.icon}</Text>
-                    <Text style={[s.netLabel, { color: net.color }]}>{net.label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+        <Animated.View entering={FadeInDown.duration(300).delay(30)}>
+          <Text style={s.subtitle}>Select your network and enter phone number.</Text>
+        </Animated.View>
 
-            {/* Phone number */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Phone Number</Text>
-              <TextInput
-                style={s.input}
-                placeholder={self ? "Your phone number" : "Recipient number"}
-                placeholderTextColor={C.textMut}
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-                maxLength={11}
-              />
-            </View>
-
-            {/* Amount */}
-            <View style={s.field}>
-              <Text style={s.fieldLabel}>Amount</Text>
-              <TextInput
-                style={s.input}
-                placeholder="₦0"
-                placeholderTextColor={C.textMut}
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-              />
-            </View>
-
-            {/* Quick amounts */}
-            <View style={s.quickRow}>
-              {QUICK_AMOUNTS.map(qa => (
-                <TouchableOpacity
-                  key={qa}
-                  style={[s.quickChip, amount === qa && s.quickChipActive]}
-                  onPress={() => { Haptics.selectionAsync(); setAmount(qa); }}
-                >
-                  <Text style={[s.quickText, amount === qa && s.quickTextActive]}>{qa}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <TouchableOpacity
-              style={[s.btn, (!network || !phone || !amount) && s.btnDisabled]}
-              disabled={!network || !phone || !amount}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                setStep("confirm");
-              }}
-            >
-              <Text style={s.btnText}>Continue</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-
-        {step === "confirm" && (
-          <Animated.View entering={FadeInDown.duration(300)} style={{ gap: 20 }}>
-            <Text style={s.subheading}>Confirm your purchase</Text>
-            <View style={s.receiptCard}>
-              {[
-                { label:"Network",  value: selectedNet?.label ?? "" },
-                { label:"Phone",    value: phone },
-                { label:"Amount",   value: amount },
-                { label:"Fee",      value: "Free" },
-                { label:"Total",    value: amount },
-              ].map(r => (
-                <View key={r.label} style={s.receiptRow}>
-                  <Text style={s.receiptLabel}>{r.label}</Text>
-                  <Text style={[s.receiptValue, r.label === "Total" && { fontFamily: "Manrope_700Bold" }]}>
-                    {r.value}
-                  </Text>
+        {/* Network selector */}
+        <Animated.View entering={FadeInDown.duration(300).delay(60)}>
+          <Text style={s.label}>select network</Text>
+          <View style={s.networkRow}>
+            {NETWORKS.map(n => (
+              <Pressable
+                key={n.id}
+                style={[s.networkItem, network.id === n.id && { borderColor: n.color, borderWidth: 2 }]}
+                onPress={() => { Haptics.selectionAsync(); setNetwork(n); }}
+              >
+                <View style={[s.networkIcon, { backgroundColor: n.bg }]}>
+                  <Text style={{ fontSize: 11, fontFamily: "Manrope_700Bold", color: n.color }}>{n.name.slice(0,3).toUpperCase()}</Text>
                 </View>
-              ))}
+                <Text style={s.networkName}>{n.name}</Text>
+                {network.id === n.id && (
+                  <View style={[s.networkCheck, { backgroundColor: n.color }]}>
+                    <Feather name="check" size={8} color="#fff" />
+                  </View>
+                )}
+              </Pressable>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Phone */}
+        <Animated.View entering={FadeInDown.duration(300).delay(90)}>
+          <Text style={s.label}>phone number</Text>
+          <View style={s.inputField}>
+            <Text style={s.inputPrefix}>+234</Text>
+            <View style={s.inputSep} />
+            <TextInput
+              style={s.inputText}
+              placeholder="   08012345678"
+              placeholderTextColor="#646464"
+              value={phone}
+              onChangeText={t => setPhone(t.replace(/\D/g, "").slice(0, 11))}
+              keyboardType="phone-pad"
+              maxLength={11}
+            />
+            {phone.length === 11 && <Feather name="check-circle" size={18} color={C.success} />}
+          </View>
+        </Animated.View>
+
+        {/* Amount */}
+        <Animated.View entering={FadeInDown.duration(300).delay(120)}>
+          <Text style={s.label}>amount</Text>
+          <View style={s.inputField}>
+            <Text style={{ fontSize: 14, fontFamily: "Manrope_700Bold", color: C.textMuted, marginRight: 4 }}>₦</Text>
+            <TextInput
+              style={[s.inputText, { flex: 1 }]}
+              placeholder="0.00"
+              placeholderTextColor="#646464"
+              value={amount}
+              onChangeText={t => setAmount(t.replace(/\D/g, ""))}
+              keyboardType="numeric"
+            />
+          </View>
+        </Animated.View>
+
+        {/* Quick amounts */}
+        <Animated.View entering={FadeInDown.duration(300).delay(150)}>
+          <Text style={s.label}>quick amount</Text>
+          <View style={s.quickRow}>
+            {QUICK_AMOUNTS.map(a => (
+              <TouchableOpacity
+                key={a}
+                style={[s.quickChip, amount === a.replace("₦","").replace(",","") && { backgroundColor: "#000000", borderColor: "#000000" }]}
+                onPress={() => { Haptics.selectionAsync(); setAmount(a.replace("₦","").replace(",","")); }}
+              >
+                <Text style={[s.quickText, amount === a.replace("₦","").replace(",","") && { color: "#FFFFFF" }]}>{a}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Summary */}
+        {!!amount && (
+          <Animated.View entering={FadeInUp.duration(260)} style={s.summaryBox}>
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Phone Number</Text>
+              <Text style={s.summaryValue}>{phone || "—"}</Text>
             </View>
-            <TouchableOpacity style={[s.btn, loading && s.btnDisabled]} disabled={loading} onPress={handlePay}>
-              <Text style={s.btnText}>{loading ? "Processing…" : "Buy Airtime"}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setStep("form")} style={s.secondaryBtn}>
-              <Text style={s.secondaryText}>Edit Details</Text>
-            </TouchableOpacity>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Network</Text>
+              <Text style={s.summaryValue}>{network.name}</Text>
+            </View>
+            <View style={s.summaryLine} />
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Total:</Text>
+              <Text style={[s.summaryValue, { fontFamily: "Manrope_700Bold", fontSize: 14 }]}>
+                ₦{parseInt(amount || "0").toLocaleString("en-NG")}
+              </Text>
+            </View>
           </Animated.View>
         )}
+
+        {done && (
+          <Animated.View entering={FadeInDown.duration(280)} style={s.successBox}>
+            <Feather name="check-circle" size={18} color={C.success} />
+            <Text style={s.successText}>Airtime purchase successful!</Text>
+          </Animated.View>
+        )}
+
+        <TouchableOpacity style={[s.buyBtn, !canProceed && { opacity: 0.45 }]} onPress={handleBuy} activeOpacity={0.85}>
+          <Text style={s.buyBtnText}>Buy Airtime</Text>
+        </TouchableOpacity>
 
       </ScrollView>
     </KeyboardAvoidingView>
@@ -221,54 +190,46 @@ export default function AirtimeScreen() {
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { padding: 20, gap: 4, flexGrow: 1 },
-
-  subheading: { fontSize: 15, fontFamily: "Manrope_600SemiBold", color: C.textSec },
-
-  toggleRow: { flexDirection: "row", backgroundColor: C.surface, borderRadius: 12, padding: 4 },
-  toggleBtn: { flex: 1, paddingVertical: 10, alignItems: "center", borderRadius: 10 },
-  toggleBtnActive: { backgroundColor: C.btn },
-  toggleText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.textSec },
-  toggleTextActive: { color: "#fff" },
-
-  field:      { gap: 8 },
-  fieldLabel: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textSec },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
+  divider:     { height: 1, backgroundColor: "#D1D1D1" },
+  scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
+  subtitle:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, letterSpacing: 0.24 },
+  label:       { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24, marginBottom: 6 },
 
   networkRow: { flexDirection: "row", gap: 10 },
-  netCard: {
-    flex: 1, alignItems: "center", paddingVertical: 14, borderRadius: 12,
-    borderWidth: 1, borderColor: C.border, backgroundColor: C.surface, gap: 4,
+  networkItem: {
+    flex: 1, alignItems: "center", gap: 6, paddingVertical: 12,
+    borderRadius: 12, borderWidth: 1, borderColor: C.border,
+    backgroundColor: "#F8F9FA", position: "relative",
   },
-  netIcon:  { fontSize: 22 },
-  netLabel: { fontSize: 11, fontFamily: "Manrope_600SemiBold" },
+  networkIcon:  { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+  networkName:  { fontSize: 10, fontFamily: "Manrope_600SemiBold", color: C.text },
+  networkCheck: { position: "absolute", top: 6, right: 6, width: 14, height: 14, borderRadius: 7, alignItems: "center", justifyContent: "center" },
 
-  input: {
-    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
-    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14,
-    fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text,
+  inputField: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: C.inputBg, borderRadius: 10, paddingHorizontal: 14, height: 46,
+    borderWidth: 1, borderColor: C.border,
   },
+  inputPrefix: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.textMuted },
+  inputSep:    { width: 1, height: 20, backgroundColor: C.border, marginHorizontal: 8 },
+  inputText:   { flex: 1, fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text },
 
-  quickRow:        { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  quickChip:       { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
-  quickChipActive: { backgroundColor: C.btn, borderColor: C.btn },
-  quickText:       { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
-  quickTextActive: { color: "#fff" },
+  quickRow:  { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  quickChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },
+  quickText: { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.textSec },
 
-  btn:         { height: 56, backgroundColor: C.btn, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  btnDisabled: { opacity: 0.5 },
-  btnText:     { fontSize: 16, fontFamily: "Manrope_700Bold", color: "#fff" },
+  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 13 },
+  summaryLine:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
+  summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
+  summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
 
-  secondaryBtn:  { height: 48, alignItems: "center", justifyContent: "center" },
-  secondaryText: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.textSec },
+  successBox:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F0FFF4", borderRadius: 10, padding: 14, borderWidth: 1, borderColor: "#BBF7D0" },
+  successText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.success },
 
-  receiptCard: { backgroundColor: C.surface, borderRadius: 16, padding: 18, borderWidth: 1, borderColor: C.border, gap: 14 },
-  receiptRow:  { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  receiptLabel:{ fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
-  receiptValue:{ fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
-
-  successWrap:   { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 12 },
-  successCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: "#00B03C", alignItems: "center", justifyContent: "center", marginBottom: 8 },
-  successTitle:  { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.text },
-  successSub:    { fontSize: 14, fontFamily: "Manrope_400Regular", color: C.textSec, textAlign: "center" },
+  buyBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  buyBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });
