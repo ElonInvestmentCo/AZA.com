@@ -3,13 +3,13 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  Dimensions,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeInDown,
@@ -20,8 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width: SW } = Dimensions.get("window");
-const PROMO_W = SW - 60;
+const MAX_W = 430;
 
 const C = {
   bg:        "#FFFFFF",
@@ -56,9 +55,10 @@ const TRANSACTIONS = [
 ];
 
 function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
+  const { width } = useWindowDimensions();
+  const ITEM_W = (Math.min(width, MAX_W) - 40) / 4;
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
-  const ITEM_W = (SW - 40) / 4;
 
   return (
     <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
@@ -78,10 +78,12 @@ function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress
 }
 
 function PromoCard({ item }: { item: typeof PROMOS[number] }) {
+  const { width } = useWindowDimensions();
+  const promoW = Math.min(width, MAX_W) - 60;
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   return (
-    <Animated.View style={[anim, { width: PROMO_W, marginRight: 16 }]}>
+    <Animated.View style={[anim, { width: promoW, marginRight: 16 }]}>
       <Pressable
         onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
         onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
@@ -100,6 +102,8 @@ function PromoCard({ item }: { item: typeof PROMOS[number] }) {
 export default function TradeAssetScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const promoW  = Math.min(width, MAX_W) - 60;
 
   const press = (fn: () => void) => () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -157,7 +161,7 @@ export default function TradeAssetScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={s.promoScroll}
-            snapToInterval={PROMO_W + 16}
+            snapToInterval={promoW + 16}
             decelerationRate="fast"
           >
             {PROMOS.map(p => <PromoCard key={p.id} item={p} />)}

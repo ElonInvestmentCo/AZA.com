@@ -4,7 +4,6 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
-  Dimensions,
   Platform,
   Pressable,
   ScrollView,
@@ -12,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeInDown,
@@ -20,7 +20,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-const { width: SW } = Dimensions.get("window");
+const MAX_W = 430;
 
 const C = {
   bg:       "#FFFFFF",
@@ -36,8 +36,6 @@ const C = {
   warn:     "#F59E0B",
 };
 
-const CARD_W = SW - 40;
-const CARD_H = CARD_W * 0.56;
 
 type Action = {
   icon: React.ComponentProps<typeof Feather>["name"];
@@ -50,6 +48,9 @@ export default function CardScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
   const { user } = useAuth();
+  const { width } = useWindowDimensions();
+  const CARD_W  = Math.min(width, MAX_W) - 40;
+  const CARD_H  = CARD_W * 0.56;
   const topPad  = Platform.OS === "web" ? 48 : insets.top;
 
   const [cvvVisible, setCvvVisible] = useState(false);
@@ -138,7 +139,7 @@ export default function CardScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 100 }]}>
 
         {/* Virtual Card */}
-        <Animated.View entering={FadeInDown.duration(380).delay(40)} style={[s.card, frozen && s.cardFrozen]}>
+        <Animated.View entering={FadeInDown.duration(380).delay(40)} style={[s.card, { width: CARD_W, height: CARD_H }, frozen && s.cardFrozen]}>
           {/* Chip */}
           <View style={s.chip}>
             <View style={s.chipInner} />
@@ -257,7 +258,6 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingTop: 4, gap: 16 },
 
   card: {
-    width: CARD_W, height: CARD_H,
     backgroundColor: C.card,
     borderRadius: 20,
     padding: 20,

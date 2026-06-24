@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Dimensions,
   Image,
   Modal,
   Platform,
@@ -13,6 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeInDown,
@@ -24,8 +24,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-const { width: SW } = Dimensions.get("window");
-const PROMO_W = SW - 60;
+const MAX_W = 430;
 
 const C = {
   bg:          "#FFFFFF",
@@ -66,9 +65,10 @@ const TRANSACTIONS = [
 ];
 
 function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress: () => void }) {
+  const { width } = useWindowDimensions();
+  const ITEM_W = (Math.min(width, MAX_W) - 40) / 4;
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
-  const ITEM_W = (SW - 40) / 4;
 
   return (
     <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
@@ -88,11 +88,13 @@ function ServiceItem({ item, onPress }: { item: typeof SERVICES[number]; onPress
 }
 
 function PromoCard({ item, onPress }: { item: typeof PROMOS[number]; onPress: () => void }) {
+  const { width } = useWindowDimensions();
+  const promoW = Math.min(width, MAX_W) - 60;
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
 
   return (
-    <Animated.View style={[anim, { width: PROMO_W, marginRight: 16 }]}>
+    <Animated.View style={[anim, { width: promoW, marginRight: 16 }]}>
       <Pressable
         onPress={onPress}
         onPressIn={() => { sc.value = withSpring(0.97, { damping: 14 }); }}
@@ -134,6 +136,9 @@ export default function HomeScreen() {
   const router   = useRouter();
   const insets   = useSafeAreaInsets();
   const { user } = useAuth();
+
+  const { width } = useWindowDimensions();
+  const PROMO_W = Math.min(width, MAX_W) - 60;
 
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
