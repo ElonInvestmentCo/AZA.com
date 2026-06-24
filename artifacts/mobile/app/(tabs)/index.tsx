@@ -388,7 +388,7 @@ const s = StyleSheet.create({
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {
     borderRadius: 34, flexDirection: "row", alignItems: "center", paddingVertical: 18,
-    shadowColor: "#4F7CFF", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 16, elevation: 6,
+    shadowColor: "#000000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.10, shadowRadius: 12, elevation: 4,
   },
   actionBtn: { flex: 1, alignItems: "center", justifyContent: "center", gap: 8 },
   actionLabel: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF", letterSpacing: 0.2 },
