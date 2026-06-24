@@ -44,7 +44,7 @@ const C = {
 
 const SERVICES = [
   { id: "gift",  icon: "gift"           as const, label: "Gift Card",   color: "#7C3AED", route: null },
-  { id: "set",   icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: null },
+  { id: "set",   icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: "/(app)/settings" as const },
   { id: "elec",  icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
   { id: "cable", icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
   { id: "rates", icon: "bar-chart-2"    as const, label: "Rates",       color: "#3B82F6", route: null },
@@ -217,7 +217,7 @@ export default function HomeScreen() {
         >
           <View style={[s.actionsBar, { backgroundColor: C.actionBar }]}>
             {[
-              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => {}) },
+              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
               { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset")) },
               { icon: "arrow-up"    as const, label: "Withdraw",    onPress: press(() => {}) },
             ].map((action, i) => (

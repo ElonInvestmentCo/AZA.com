@@ -80,18 +80,12 @@ export default function SplashIndex() {
           alignItems: "center",
         }}
       >
-        {/* PAYVORA wordmark */}
+        {/* AZA wordmark */}
         <View style={s.logoWrap}>
-          <Text style={s.logo}>PAYVORA</Text>
+          <Text style={s.logo}>AZA.</Text>
           {/* Shimmer overlay that glows on top of the text */}
           <Animated.View style={[s.shimmerOverlay, { opacity: glowOpacity }]} />
         </View>
-
-        {/* Thin accent line beneath */}
-        <View style={s.accentLine} />
-
-        {/* Tagline */}
-        <Text style={s.tagline}>FINTECH · REIMAGINED</Text>
       </Animated.View>
     </View>
   );
@@ -111,8 +105,8 @@ const s = StyleSheet.create({
   },
   logo: {
     fontFamily: "Manrope_700Bold",
-    fontSize: 54,
-    letterSpacing: 10,
+    fontSize: 68,
+    letterSpacing: 4,
     color: "#FFFFFF",
     textAlign: "center",
     textShadowColor: "rgba(255,255,255,0.30)",
