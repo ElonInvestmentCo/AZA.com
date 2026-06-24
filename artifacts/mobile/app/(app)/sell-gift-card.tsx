@@ -3,6 +3,9 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Modal,
+  Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,33 +17,106 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const C = {
-  bg:         "#FFFFFF",
-  text:       "#1B1B1B",
-  textSec:    "#6C7278",
-  textMuted:  "#ACACAC",
-  inputBg:    "#F0F0F0",
-  border:     "#EDF1F3",
-  summaryBg:  "#010101",
-  placeholder:"#646464",
+  bg:        "#FFFFFF",
+  text:      "#1B1B1B",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  inputBg:   "#F7F8F9",
+  border:    "#E8ECF4",
+  black:     "#000000",
 };
 
-const FIELDS = [
-  { key: "category", label: "Gift card category",           placeholder: "Select" },
-  { key: "country",  label: "Gift card Country (optional)", placeholder: "Select" },
-  { key: "type",     label: "Gift card Type/sub-category",  placeholder: "Select" },
-  { key: "amount",   label: "Amount",                       placeholder: "200,400" },
-] as const;
+const CATEGORIES = ["Amazon", "iTunes", "Steam", "Google Play", "Visa Gift Card", "Vanilla", "eBay", "Walmart"];
+const COUNTRIES   = ["United States", "United Kingdom", "Canada", "Australia", "Germany", "France"];
+const TYPES       = ["Physical Card", "E-Code", "Physical + E-Code"];
 
 const RATE  = 1200;
-const TOTAL = 200400;
+
+function SelectField({
+  label, value, placeholder, onPress,
+}: { label: string; value: string; placeholder: string; onPress: () => void }) {
+  return (
+    <View style={sf.wrap}>
+      <Text style={sf.label}>{label}</Text>
+      <TouchableOpacity style={sf.field} onPress={onPress} activeOpacity={0.8}>
+        <Text style={[sf.value, !value && sf.ph]}>{value || placeholder}</Text>
+        <Feather name="chevron-down" size={16} color={C.textMuted} />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const sf = StyleSheet.create({
+  wrap:  { gap: 7 },
+  label: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text, textTransform: "capitalize" },
+  field: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: C.inputBg, borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 12, paddingHorizontal: 14, height: 50,
+  },
+  value: { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.text },
+  ph:    { color: C.textMuted, fontSize: 13 },
+});
+
+function PickerModal({
+  visible, title, options, onSelect, onClose,
+}: {
+  visible: boolean; title: string; options: string[];
+  onSelect: (v: string) => void; onClose: () => void;
+}) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={pm.overlay} onPress={onClose} />
+      <View style={pm.sheet}>
+        <View style={pm.handle} />
+        <Text style={pm.title}>{title}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {options.map(o => (
+            <TouchableOpacity
+              key={o}
+              style={pm.option}
+              onPress={() => { Haptics.selectionAsync(); onSelect(o); onClose(); }}
+            >
+              <Text style={pm.optText}>{o}</Text>
+              <Feather name="check" size={14} color="#7C3AED" />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+}
+
+const pm = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
+  sheet: {
+    backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, maxHeight: "60%",
+  },
+  handle: {
+    width: 40, height: 4, borderRadius: 2, backgroundColor: C.border,
+    alignSelf: "center", marginBottom: 16,
+  },
+  title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
+  option:  {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border,
+  },
+  optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
+});
 
 export default function SellGiftCardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [values, setValues] = useState<Record<string, string>>({
-    category: "", country: "", type: "", amount: "",
-  });
+  const [category, setCategory] = useState("");
+  const [country,  setCountry]  = useState("");
+  const [type,     setType]     = useState("");
+  const [amount,   setAmount]   = useState("");
+  const [picker,   setPicker]   = useState<"category" | "country" | "type" | null>(null);
+
+  const total = amount ? parseInt(amount.replace(/,/g, "")) * RATE : RATE * 200;
 
   const press = (fn: () => void) => () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -48,22 +124,22 @@ export default function SellGiftCardScreen() {
   };
 
   return (
-    <View style={[s.root, { backgroundColor: C.bg }]}>
+    <View style={[s.root]}>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      {/* Header */}
       <Animated.View
-        entering={FadeInDown.duration(320).springify()}
-        style={[s.header, { paddingTop: (insets.top || 16) + 12 }]}
+        entering={FadeInDown.duration(280).springify()}
+        style={[s.header, { paddingTop: (Platform.OS === "web" ? 20 : insets.top) + 10 }]}
       >
         <TouchableOpacity
           onPress={() => router.back()}
           style={s.backBtn}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Feather name="arrow-left" size={22} color="#1E232C" />
+          <Feather name="arrow-left" size={22} color={C.navy} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Sell Gift Card</Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 44 }} />
       </Animated.View>
       <View style={s.headerDivider} />
 
@@ -73,52 +149,82 @@ export default function SellGiftCardScreen() {
         contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
       >
 
-        {/* ── Subtitle ───────────────────────────────────────────────────────── */}
-        <Animated.View entering={FadeInDown.duration(340).springify().delay(60)}>
-          <Text style={s.subtitle}>Kindly provide your gift card details.</Text>
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(40)}>
+          <Text style={s.subtitle}>Kindly provide your gift card details to get started.</Text>
         </Animated.View>
 
-        {/* ── Input fields ───────────────────────────────────────────────────── */}
-        {FIELDS.map((field, i) => (
-          <Animated.View
-            key={field.key}
-            entering={FadeInDown.duration(340).springify().delay(80 + i * 50)}
-            style={s.fieldWrap}
-          >
-            <Text style={s.fieldLabel}>{field.label}</Text>
-            <View style={s.inputWrap}>
-              <TextInput
-                style={s.input}
-                placeholder={field.placeholder}
-                placeholderTextColor={C.placeholder}
-                value={values[field.key]}
-                onChangeText={val => setValues(prev => ({ ...prev, [field.key]: val }))}
-                keyboardType={field.key === "amount" ? "numeric" : "default"}
-              />
-              <Feather name="chevron-down" size={16} color={C.textSec} style={s.chevron} />
-            </View>
-          </Animated.View>
-        ))}
+        {/* Category */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(70)}>
+          <SelectField
+            label="Gift card category"
+            value={category}
+            placeholder="Select category"
+            onPress={() => setPicker("category")}
+          />
+        </Animated.View>
 
-        {/* ── Upload gift card image ─────────────────────────────────────────── */}
-        <Animated.View entering={FadeInDown.duration(340).springify().delay(280)} style={s.uploadSection}>
-          <Text style={s.fieldLabel}>Upload gift card image</Text>
-          <Text style={s.uploadHint}>You can upload multiple files at once</Text>
-          <View style={s.uploadRow}>
-            {[
-              { bg: "#FFB6C1", icon: "image" as const,  iconColor: "#d63384" },
-              { bg: "#AED6F1", icon: "image" as const,  iconColor: "#2980b9" },
-              { bg: "#BBBBBB", icon: "plus"  as const,  iconColor: "#FFFFFF" },
-            ].map((item, i) => (
-              <TouchableOpacity key={i} style={[s.uploadCircle, { backgroundColor: item.bg }]} activeOpacity={0.8}>
-                <Feather name={item.icon} size={18} color={item.iconColor} />
-              </TouchableOpacity>
-            ))}
+        {/* Country */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(100)}>
+          <SelectField
+            label="Gift card Country (optional)"
+            value={country}
+            placeholder="Select country"
+            onPress={() => setPicker("country")}
+          />
+        </Animated.View>
+
+        {/* Type */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(130)}>
+          <SelectField
+            label="Gift card Type / sub-category"
+            value={type}
+            placeholder="Select type"
+            onPress={() => setPicker("type")}
+          />
+        </Animated.View>
+
+        {/* Amount */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(160)}>
+          <View style={sf.wrap}>
+            <Text style={sf.label}>Amount</Text>
+            <View style={[sf.field]}>
+              <Text style={{ fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.textMuted, marginRight: 6 }}>$</Text>
+              <TextInput
+                style={{ flex: 1, fontSize: 14, fontFamily: "Manrope_500Medium", color: C.text }}
+                placeholder="200,400"
+                placeholderTextColor={C.textMuted}
+                value={amount}
+                onChangeText={t => setAmount(t.replace(/[^0-9,]/g, ""))}
+                keyboardType="numeric"
+              />
+            </View>
           </View>
         </Animated.View>
 
-        {/* ── Rate / Total summary box ───────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(320)} style={s.summaryBox}>
+        {/* Upload */}
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(190)} style={s.uploadSection}>
+          <Text style={sf.label}>Upload gift card image</Text>
+          <Text style={s.uploadHint}>You can upload multiple files at once</Text>
+          <View style={s.uploadRow}>
+            {[
+              { bg: "#FFB6C1", iconColor: "#C0392B" },
+              { bg: "#AED6F1", iconColor: "#2980B9" },
+            ].map((item, i) => (
+              <View key={i} style={[s.uploadThumb, { backgroundColor: item.bg }]}>
+                <Feather name="image" size={20} color={item.iconColor} />
+              </View>
+            ))}
+            <TouchableOpacity
+              style={[s.uploadThumb, { backgroundColor: C.inputBg, borderWidth: 2, borderColor: C.border, borderStyle: "dashed" }]}
+              activeOpacity={0.8}
+            >
+              <Feather name="plus" size={20} color={C.textMuted} />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* Rate / Total summary */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(220)} style={s.summaryBox}>
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Rate</Text>
             <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")}</Text>
@@ -127,13 +233,13 @@ export default function SellGiftCardScreen() {
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Total:</Text>
             <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>
-              ₦{TOTAL.toLocaleString("en-NG")}
+              ₦{total.toLocaleString("en-NG")}
             </Text>
           </View>
         </Animated.View>
 
-        {/* ── Proceed button ─────────────────────────────────────────────────── */}
-        <Animated.View entering={FadeInUp.duration(340).springify().delay(360)}>
+        {/* Proceed */}
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(250)}>
           <TouchableOpacity
             style={s.proceedBtn}
             onPress={press(() => router.push("/(app)/confirm-transaction"))}
@@ -144,66 +250,69 @@ export default function SellGiftCardScreen() {
         </Animated.View>
 
       </ScrollView>
+
+      <PickerModal
+        visible={picker === "category"}
+        title="Select Gift Card Category"
+        options={CATEGORIES}
+        onSelect={setCategory}
+        onClose={() => setPicker(null)}
+      />
+      <PickerModal
+        visible={picker === "country"}
+        title="Select Country"
+        options={COUNTRIES}
+        onSelect={setCountry}
+        onClose={() => setPicker(null)}
+      />
+      <PickerModal
+        visible={picker === "type"}
+        title="Select Type"
+        options={TYPES}
+        onSelect={setType}
+        onClose={() => setPicker(null)}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#FFFFFF" },
+  root: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg,
   },
-  backBtn:     { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  headerTitle: {
-    fontSize: 13, fontFamily: "Manrope_700Bold", color: "#000000",
-    textAlign: "center", flex: 1, textTransform: "capitalize",
-  },
-  headerDivider: { height: 1, backgroundColor: "#D1D1D1" },
+  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  headerTitle: { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.navy, textAlign: "center" },
+  headerDivider: { height: 1, backgroundColor: C.border },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 16, gap: 16 },
+  scroll: { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
 
-  subtitle: {
-    fontSize: 12, fontFamily: "Manrope_500Medium", color: "#6C7278", letterSpacing: 0.24,
-  },
+  subtitle: { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
 
-  fieldWrap: { gap: 4 },
-  fieldLabel: {
-    fontSize: 12, fontFamily: "Manrope_500Medium", color: "#6C7278",
-    letterSpacing: -0.24, textTransform: "capitalize",
-  },
-  inputWrap: {
-    backgroundColor: "#F0F0F0", height: 46, borderRadius: 10, borderWidth: 1,
-    borderColor: "#EDF1F3", flexDirection: "row", alignItems: "center",
-    paddingHorizontal: 14,
-  },
-  input: {
-    flex: 1, fontSize: 10, fontFamily: "Manrope_500Medium", color: "#646464",
-  },
-  chevron: { marginLeft: 8 },
-
-  uploadSection: { gap: 6 },
-  uploadHint: { fontSize: 6, fontFamily: "Manrope_500Medium", color: "#ACACAC" },
-  uploadRow: { flexDirection: "row", gap: 10, alignItems: "center", marginTop: 4 },
-  uploadCircle: {
-    width: 49, height: 49, borderRadius: 24.5, alignItems: "center", justifyContent: "center",
+  uploadSection: { gap: 7 },
+  uploadHint:    { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted },
+  uploadRow:     { flexDirection: "row", gap: 10, alignItems: "center" },
+  uploadThumb:   {
+    width: 56, height: 56, borderRadius: 14, alignItems: "center", justifyContent: "center",
   },
 
   summaryBox: {
-    backgroundColor: "#010101", borderRadius: 10, paddingHorizontal: 16, paddingVertical: 4,
+    backgroundColor: "#0A0A0A", borderRadius: 12, paddingHorizontal: 18, paddingVertical: 6,
   },
   summaryRow: {
-    flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12,
+    flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 13,
   },
-  summaryDivider: { height: 1, backgroundColor: "rgba(233,233,233,0.25)" },
-  summaryLabel: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
-  summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold",   color: "#FFFFFF" },
+  summaryDivider: { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
+  summaryLabel:   { fontSize: 13, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
+  summaryValue:   { fontSize: 13, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
   proceedBtn: {
-    backgroundColor: "#000000", height: 48, borderRadius: 10,
+    backgroundColor: C.black, height: 54, borderRadius: 12,
     alignItems: "center", justifyContent: "center",
-    shadowColor: "#375DFB", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.48, shadowRadius: 2, elevation: 4,
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3, shadowRadius: 6, elevation: 4,
   },
-  proceedBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  proceedBtnText: { fontSize: 15, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 });

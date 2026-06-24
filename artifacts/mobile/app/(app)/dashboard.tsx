@@ -18,32 +18,26 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-/* ─── Light theme ────────────────────────────────────────────────────────────── */
 const C = {
-  bg:         "#FFFFFF",
-  text:       "#0B0A0A",
-  textSec:    "#595F67",
-  textMuted:  "#6C7278",
-  border:     "#EDF1F3",
-  inputBg:    "#F0F0F0",
-  success:    "#00B03C",
-  divider:    "#D1D1D1",
+  bg:        "#FFFFFF",
+  text:      "#0B0A0A",
+  navy:      "#061941",
+  textSec:   "#595F67",
+  textMuted: "#6C7278",
+  border:    "#EDF1F3",
+  inputBg:   "#F7F8F9",
+  success:   "#008A48",
+  divider:   "#E8ECF4",
+  black:     "#000000",
 };
 
 const BANKS = [
-  "Access Bank",
-  "First Bank",
-  "GTBank",
-  "UBA",
-  "Zenith Bank",
-  "Fidelity Bank",
-  "Union Bank",
-  "Sterling Bank",
+  "Access Bank", "First Bank", "GTBank", "UBA", "Zenith Bank",
+  "Fidelity Bank", "Union Bank", "Sterling Bank", "FCMB", "Polaris Bank",
 ];
 
 const AMOUNTS = ["₦5,000", "₦10,000", "₦20,000", "₦50,000", "₦100,000"];
 
-/* ─── Dropdown field ─────────────────────────────────────────────────────────── */
 function SelectField({
   label, value, placeholder, onPress,
 }: { label: string; value: string; placeholder: string; onPress: () => void }) {
@@ -59,24 +53,17 @@ function SelectField({
 }
 
 const sf = StyleSheet.create({
-  wrap:  { gap: 6 },
-  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, paddingLeft: 2 },
+  wrap:  { gap: 8 },
+  label: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
   field: {
-    flexDirection:  "row",
-    alignItems:     "center",
-    justifyContent: "space-between",
-    backgroundColor: C.inputBg,
-    borderWidth:    1.5,
-    borderColor:    C.border,
-    borderRadius:   10,
-    paddingHorizontal: 16,
-    paddingVertical:   14,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: C.inputBg, borderWidth: 1.5, borderColor: C.border,
+    borderRadius: 12, paddingHorizontal: 16, paddingVertical: 15,
   },
   value: { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.text },
   ph:    { color: C.textMuted },
 });
 
-/* ─── Picker modal ───────────────────────────────────────────────────────────── */
 function PickerModal({
   visible, title, options, onSelect, onClose,
 }: {
@@ -109,34 +96,21 @@ function PickerModal({
 const pm = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)" },
   sheet: {
-    backgroundColor:     "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius:20,
-    paddingHorizontal:   24,
-    paddingTop:          16,
-    paddingBottom:       40,
-    maxHeight:           "60%",
+    backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, maxHeight: "60%",
   },
   handle: {
-    width: 40, height: 4,
-    borderRadius:    2,
-    backgroundColor: C.border,
-    alignSelf:       "center",
-    marginBottom:    16,
+    width: 40, height: 4, borderRadius: 2, backgroundColor: C.border,
+    alignSelf: "center", marginBottom: 16,
   },
   title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
   option:  {
-    flexDirection:   "row",
-    alignItems:      "center",
-    justifyContent:  "space-between",
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: C.border,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border,
   },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
 });
 
-/* ─── Quick amount chip ──────────────────────────────────────────────────────── */
 function AmountChip({
   label, selected, onPress,
 }: { label: string; selected: boolean; onPress: () => void }) {
@@ -152,34 +126,33 @@ function AmountChip({
 }
 
 const ac = StyleSheet.create({
-  chip:     { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1.5, borderColor: C.border, backgroundColor: C.inputBg },
-  chipSel:  { backgroundColor: "#000000", borderColor: "#000000" },
+  chip:     { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1.5, borderColor: C.border, backgroundColor: C.inputBg },
+  chipSel:  { backgroundColor: C.black, borderColor: C.black },
   label:    { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.textSec },
   labelSel: { color: "#FFFFFF" },
 });
 
-/* ─── Main screen ────────────────────────────────────────────────────────────── */
 export default function DashboardScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [bank,    setBank]    = useState("");
   const [acctNum, setAcctNum] = useState("");
   const [amount,  setAmount]  = useState("");
   const [selAmt,  setSelAmt]  = useState("");
-  const [picker,  setPicker]  = useState<"bank" | "amt" | null>(null);
+  const [picker,  setPicker]  = useState<"bank" | null>(null);
   const [success, setSuccess] = useState(false);
 
   const firstName = (user?.name ?? "User").split(" ")[0];
   const balance   = user?.balance ?? 200590;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  const canProceed = !!bank && !!acctNum && (!!amount || !!selAmt);
+  const canProceed = !!bank && acctNum.length === 10 && (!!amount || !!selAmt);
 
   const handleAmtChip = (a: string) => {
     setSelAmt(a);
-    setAmount(a.replace("₦", "").replace(",", ""));
+    setAmount(a.replace("₦", "").replace(/,/g, ""));
   };
 
   return (
@@ -188,22 +161,16 @@ export default function DashboardScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View style={[hdr.wrap, { paddingTop: (insets.top || 16) + 12 }]}>
+      <View style={[hdr.wrap, { paddingTop: (insets.top || 20) + 8 }]}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={hdr.back}
+          style={hdr.iconBtn}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Feather name="arrow-left" size={22} color="#1E232C" />
+          <Feather name="arrow-left" size={22} color={C.navy} />
         </TouchableOpacity>
         <Text style={hdr.title}>Fund Wallet</Text>
-        <TouchableOpacity
-          onPress={logout}
-          style={hdr.back}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Feather name="log-out" size={20} color={C.textMuted} />
-        </TouchableOpacity>
+        <View style={{ width: 44 }} />
       </View>
       <View style={hdr.divider} />
 
@@ -212,21 +179,18 @@ export default function DashboardScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Balance preview card */}
-        <Animated.View
-          entering={FadeInDown.duration(380).springify().delay(40)}
-          style={bc.card}
-        >
-          <View style={bc.row}>
-            <View style={[bc.dot, { backgroundColor: C.success }]} />
+        {/* Balance card */}
+        <Animated.View entering={FadeInDown.duration(320).springify().delay(40)} style={bc.card}>
+          <View style={bc.topRow}>
+            <View style={bc.dot} />
             <Text style={bc.tag}>Wallet Balance</Text>
           </View>
           <Text style={bc.amount}>{formatted}</Text>
-          <Text style={bc.sub}>Hi, {firstName} — top up your wallet below</Text>
+          <Text style={bc.sub}>Hi, {firstName} — fund your wallet below</Text>
         </Animated.View>
 
         {/* Bank select */}
-        <Animated.View entering={FadeInUp.duration(360).springify().delay(80)}>
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(70)}>
           <SelectField
             label="Select Bank"
             value={bank}
@@ -236,10 +200,10 @@ export default function DashboardScreen() {
         </Animated.View>
 
         {/* Account number */}
-        <Animated.View entering={FadeInUp.duration(360).springify().delay(110)}>
+        <Animated.View entering={FadeInDown.duration(300).springify().delay(100)}>
           <View style={sf.wrap}>
             <Text style={sf.label}>Account Number</Text>
-            <View style={[sf.field, { backgroundColor: C.inputBg }]}>
+            <View style={[sf.field]}>
               <TextInput
                 style={[sf.value, { flex: 1 }]}
                 placeholder="Enter 10-digit account number"
@@ -257,7 +221,7 @@ export default function DashboardScreen() {
         </Animated.View>
 
         {/* Quick amounts */}
-        <Animated.View entering={FadeInUp.duration(360).springify().delay(140)} style={qa.wrap}>
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(130)} style={qa.wrap}>
           <Text style={qa.label}>Quick Amount</Text>
           <View style={qa.row}>
             {AMOUNTS.map(a => (
@@ -272,11 +236,11 @@ export default function DashboardScreen() {
         </Animated.View>
 
         {/* Custom amount */}
-        <Animated.View entering={FadeInUp.duration(360).springify().delay(170)}>
+        <Animated.View entering={FadeInUp.duration(300).springify().delay(155)}>
           <View style={sf.wrap}>
             <Text style={sf.label}>Or enter custom amount</Text>
-            <View style={[sf.field, { backgroundColor: C.inputBg }]}>
-              <Text style={{ fontSize: 16, fontFamily: "Manrope_600SemiBold", color: C.textMuted, marginRight: 4 }}>₦</Text>
+            <View style={sf.field}>
+              <Text style={{ fontSize: 16, fontFamily: "Manrope_600SemiBold", color: C.textMuted, marginRight: 6 }}>₦</Text>
               <TextInput
                 style={[sf.value, { flex: 1 }]}
                 placeholder="0.00"
@@ -289,9 +253,9 @@ export default function DashboardScreen() {
           </View>
         </Animated.View>
 
-        {/* Summary */}
+        {/* Summary box */}
         {(amount || selAmt) ? (
-          <Animated.View entering={FadeInUp.duration(300).springify()} style={sm.box}>
+          <Animated.View entering={FadeInUp.duration(260).springify()} style={sm.box}>
             <View style={sm.row}>
               <Text style={sm.label}>Amount</Text>
               <Text style={sm.val}>₦{parseInt(amount || "0").toLocaleString("en-NG")}</Text>
@@ -326,7 +290,7 @@ export default function DashboardScreen() {
         </TouchableOpacity>
 
         {success && (
-          <Animated.View entering={FadeInDown.duration(300).springify()} style={ok.box}>
+          <Animated.View entering={FadeInDown.duration(280).springify()} style={ok.box}>
             <Feather name="check-circle" size={18} color={C.success} />
             <Text style={ok.text}>Funding initiated successfully!</Text>
           </Animated.View>
@@ -344,91 +308,59 @@ export default function DashboardScreen() {
   );
 }
 
-/* ─── Styles ─────────────────────────────────────────────────────────────────── */
-
 const hdr = StyleSheet.create({
   wrap: {
-    flexDirection:     "row",
-    alignItems:        "center",
-    justifyContent:    "space-between",
-    paddingHorizontal: 20,
-    paddingBottom:     16,
-    backgroundColor:   C.bg,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 20, paddingBottom: 16, backgroundColor: C.bg,
   },
-  back:    { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  title:   { fontSize: 13, fontFamily: "Manrope_700Bold", color: "#000000", textAlign: "center" },
+  iconBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
+  title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.navy, textAlign: "center" },
   divider: { height: 1, backgroundColor: C.divider },
 });
 
-const sc = StyleSheet.create({
-  content: { padding: 20, gap: 18, paddingBottom: 48 },
-});
+const sc = StyleSheet.create({ content: { padding: 20, gap: 20, paddingBottom: 48 } });
 
 const bc = StyleSheet.create({
   card: {
-    backgroundColor: "#F8F9FA",
-    borderRadius:    16,
-    padding:         20,
-    gap:             8,
-    borderWidth:     1,
-    borderColor:     C.border,
+    backgroundColor: "#F0F7FF", borderRadius: 16, padding: 20,
+    gap: 8, borderWidth: 1, borderColor: "#C7DFFF",
   },
-  row:    { flexDirection: "row", alignItems: "center", gap: 6 },
-  dot:    { width: 8, height: 8, borderRadius: 4 },
+  topRow: { flexDirection: "row", alignItems: "center", gap: 7 },
+  dot:    { width: 8, height: 8, borderRadius: 4, backgroundColor: C.success },
   tag:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted },
-  amount: { fontSize: 28, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5 },
+  amount: { fontSize: 30, fontFamily: "Manrope_700Bold", color: C.navy, letterSpacing: -0.5 },
   sub:    { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
 });
 
 const qa = StyleSheet.create({
   wrap:  { gap: 10 },
-  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, paddingLeft: 2 },
+  label: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
   row:   { flexDirection: "row", flexWrap: "wrap", gap: 8 },
 });
 
 const sm = StyleSheet.create({
-  box: {
-    backgroundColor: "#010101",
-    borderRadius:    10,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-  row: {
-    flexDirection:   "row",
-    justifyContent:  "space-between",
-    paddingVertical: 11,
-  },
+  box: { backgroundColor: "#0A0A0A", borderRadius: 12, paddingHorizontal: 18, paddingVertical: 6 },
+  row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 12 },
   line:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
-  label: { fontSize: 12, fontFamily: "Manrope_400Regular", color: "#FFFFFF" },
-  val:   { fontSize: 12, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
+  label: { fontSize: 13, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
+  val:   { fontSize: 13, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
 });
 
 const btn = StyleSheet.create({
   wrap: {
-    backgroundColor: "#000000",
-    height:          50,
-    borderRadius:    10,
-    alignItems:      "center",
-    justifyContent:  "center",
-    shadowColor:     "#375DFB",
-    shadowOffset:    { width: 0, height: 1 },
-    shadowOpacity:   0.48,
-    shadowRadius:    2,
-    elevation:       4,
+    backgroundColor: C.black, height: 54, borderRadius: 12,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#000", shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3, shadowRadius: 6, elevation: 4,
   },
   text: { fontSize: 15, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 });
 
 const ok = StyleSheet.create({
   box: {
-    flexDirection:  "row",
-    alignItems:     "center",
-    gap:            8,
-    backgroundColor:"#F0FFF4",
-    borderRadius:   10,
-    padding:        14,
-    borderWidth:    1,
-    borderColor:    "#C3E6CB",
+    flexDirection: "row", alignItems: "center", gap: 10,
+    backgroundColor: "#F0FFF4", borderRadius: 10, padding: 14,
+    borderWidth: 1, borderColor: "#BBF7D0",
   },
   text: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.success },
 });
