@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -13,9 +12,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
+
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -24,10 +23,8 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { EyeIcon } from "@/components/EyeIcon";
 import { useColors } from "@/hooks/useColors";
-
-const eyeOpenImg   = require("../../assets/images/eye-open.svg");
-const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 
 function PasswordInput({
   placeholder,
@@ -64,17 +61,13 @@ function PasswordInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      <TouchableOpacity
+      <Pressable
         onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <Image
-          source={showPass ? eyeOpenImg : eyeClosedImg}
-          style={{ width: 22, height: 22 }}
-          contentFit="contain"
-        />
-      </TouchableOpacity>
+        <EyeIcon open={showPass} size={22} color={C.placeholder} />
+      </Pressable>
     </View>
   );
 }
