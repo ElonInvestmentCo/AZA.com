@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -23,7 +22,18 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useColors } from "@/hooks/useColors";
+
+const C = {
+  bg:          "#FFFFFF",
+  dark:        "#1E232C",
+  gray:        "#8391A1",
+  inputBg:     "#F7F8F9",
+  inputBorder: "#DADADA",
+  inputFocus:  "#1E232C",
+  primary:     "#35C2C1",
+  white:       "#FFFFFF",
+  btnBorder:   "#E8ECF4",
+};
 
 function EmailInput({
   value,
@@ -32,23 +42,13 @@ function EmailInput({
   value: string;
   onChangeText: (t: string) => void;
 }) {
-  const C = useColors();
   const [focused, setFocused] = useState(false);
   return (
-    <View
-      style={[
-        inp.row,
-        {
-          backgroundColor: C.input,
-          borderColor: focused ? C.inputFocus : C.inputBorder,
-          borderWidth: focused ? 1.5 : 1,
-        },
-      ]}
-    >
+    <View style={[inp.row, focused && inp.focused]}>
       <TextInput
-        style={[inp.input, { color: C.text }]}
+        style={inp.input}
         placeholder="Enter your email"
-        placeholderTextColor={C.placeholder}
+        placeholderTextColor={C.gray}
         value={value}
         onChangeText={onChangeText}
         keyboardType="email-address"
@@ -64,13 +64,18 @@ function EmailInput({
 const inp = StyleSheet.create({
   row: {
     height: 56,
+    backgroundColor: C.inputBg,
+    borderWidth: 1,
+    borderColor: C.inputBorder,
     borderRadius: 8,
     paddingHorizontal: 18,
     justifyContent: "center",
   },
+  focused: { borderColor: C.inputFocus },
   input: {
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
+    color: C.dark,
     height: "100%",
   },
 });
@@ -78,7 +83,6 @@ const inp = StyleSheet.create({
 export default function ForgotPasswordScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const C       = useColors();
 
   const [email,   setEmail]   = useState("");
   const [loading, setLoading] = useState(false);
@@ -107,7 +111,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[s.root, { backgroundColor: C.background }]}
+      style={s.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -121,20 +125,20 @@ export default function ForgotPasswordScreen() {
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <Pressable
-            style={[s.backBtn, { borderColor: C.border, backgroundColor: C.surface }]}
+            style={s.backBtn}
             onPress={() => router.back()}
             hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
-            <Ionicons name="chevron-back" size={22} color={C.text} />
+            <Ionicons name="chevron-back" size={22} color={C.dark} />
           </Pressable>
-          <Text style={[s.wordmark, { color: C.text }]}>AZA.</Text>
+          <Text style={s.wordmark}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Title ── */}
         <Animated.View entering={FadeInUp.duration(380).delay(80).springify()} style={s.titleBlock}>
-          <Text style={[s.heading, { color: C.text }]}>Forgot Password?</Text>
-          <Text style={[s.subText, { color: C.mutedForeground }]}>
+          <Text style={s.heading}>Forgot Password?</Text>
+          <Text style={s.subText}>
             Don't worry! It occurs. Please enter the email address linked with your account.
           </Text>
         </Animated.View>
@@ -143,50 +147,43 @@ export default function ForgotPasswordScreen() {
         <Animated.View entering={FadeInUp.duration(380).delay(140).springify()} style={s.formBlock}>
           <EmailInput value={email} onChangeText={t => { setEmail(t); setError(""); }} />
           {!!error && (
-            <Animated.Text entering={FadeIn.duration(220)} style={[s.errorText, { color: C.destructive }]}>
+            <Animated.Text entering={FadeIn.duration(220)} style={s.errorText}>
               {error}
             </Animated.Text>
           )}
         </Animated.View>
 
-        {/* ── Send Code button (gradient) ── */}
+        {/* ── Send Code button ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(200).springify()}
           style={[btnStyle, s.btnWrap]}
         >
-          <LinearGradient
-            colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[s.sendBtnGrad, { shadowColor: C.accentGlow, opacity: loading ? 0.72 : 1 }]}
+          <Pressable
+            style={[s.sendBtn, loading && { opacity: 0.72 }]}
+            onPress={handleSubmit}
+            onPressIn={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              btnSc.value = withSpring(0.97, { damping: 13, stiffness: 320 });
+            }}
+            onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 320 }); }}
+            disabled={loading}
           >
-            <Pressable
-              style={s.sendBtnPress}
-              onPress={handleSubmit}
-              onPressIn={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                btnSc.value = withSpring(0.97, { damping: 13, stiffness: 320 });
-              }}
-              onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 320 }); }}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={s.sendBtnText}>Send Code</Text>
-              )}
-            </Pressable>
-          </LinearGradient>
+            {loading ? (
+              <ActivityIndicator color={C.white} size="small" />
+            ) : (
+              <Text style={s.sendBtnText}>Send Code</Text>
+            )}
+          </Pressable>
         </Animated.View>
 
-        {/* ── Footer ── */}
+        {/* ── Footer: Remember Password? Login ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(260).springify()}
           style={s.footer}
         >
-          <Text style={[s.footerText, { color: C.mutedForeground }]}>Remember Password? </Text>
+          <Text style={s.footerText}>Remember Password? </Text>
           <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-            <Text style={[s.footerLink, { color: C.accent }]}>Login</Text>
+            <Text style={s.footerLink}>Login</Text>
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
@@ -195,7 +192,7 @@ export default function ForgotPasswordScreen() {
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1 },
+  root:   { flex: 1, backgroundColor: C.bg },
   scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
   topBar: {
@@ -205,12 +202,24 @@ const s = StyleSheet.create({
     marginBottom: 32,
   },
   backBtn: {
-    width: 44, height: 44, borderRadius: 12, borderWidth: 1,
-    alignItems: "center", justifyContent: "center",
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.btnBorder,
+    backgroundColor: C.white,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   wordmark: {
     fontSize: 32,
     fontFamily: "Manrope_700Bold",
+    color: C.dark,
     letterSpacing: -0.5,
   },
 
@@ -218,6 +227,7 @@ const s = StyleSheet.create({
   heading: {
     fontSize: 30,
     fontFamily: "Manrope_700Bold",
+    color: C.dark,
     letterSpacing: -0.3,
     marginBottom: 12,
     lineHeight: 39,
@@ -225,6 +235,7 @@ const s = StyleSheet.create({
   subText: {
     fontSize: 16,
     fontFamily: "Manrope_400Regular",
+    color: C.gray,
     lineHeight: 24,
   },
 
@@ -233,27 +244,26 @@ const s = StyleSheet.create({
     marginTop: 8,
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
+    color: "#E74C3C",
   },
 
   btnWrap: { marginBottom: 28 },
-  sendBtnGrad: {
+  sendBtn: {
     height: 60,
+    backgroundColor: C.dark,
     borderRadius: 14,
-    overflow: "hidden",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  sendBtnPress: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   sendBtnText: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",
-    color: "#FFFFFF",
+    color: C.white,
     letterSpacing: 0.2,
   },
 
@@ -264,6 +274,16 @@ const s = StyleSheet.create({
     marginTop: "auto",
     paddingTop: 24,
   },
-  footerText: { fontSize: 15, fontFamily: "Manrope_400Regular", lineHeight: 21 },
-  footerLink: { fontSize: 15, fontFamily: "Manrope_700Bold", lineHeight: 21 },
+  footerText: {
+    fontSize: 15,
+    fontFamily: "Manrope_400Regular",
+    color: C.dark,
+    lineHeight: 21,
+  },
+  footerLink: {
+    fontSize: 15,
+    fontFamily: "Manrope_700Bold",
+    color: C.primary,
+    lineHeight: 21,
+  },
 });

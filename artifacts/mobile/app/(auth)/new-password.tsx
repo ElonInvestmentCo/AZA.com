@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -12,9 +12,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-
 import Animated, {
   FadeIn,
   FadeInUp,
@@ -23,8 +23,21 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { EyeIcon } from "@/components/EyeIcon";
-import { useColors } from "@/hooks/useColors";
+
+const eyeOpenImg   = require("../../assets/images/eye-open.svg");
+const eyeClosedImg = require("../../assets/images/eye-closed.svg");
+
+const C = {
+  bg:          "#FFFFFF",
+  dark:        "#1E232C",
+  gray:        "#8391A1",
+  inputBg:     "#F7F8F9",
+  inputBorder: "#DADADA",
+  inputFocus:  "#1E232C",
+  white:       "#FFFFFF",
+  btnBorder:   "#E8ECF4",
+  error:       "#E74C3C",
+};
 
 function PasswordInput({
   placeholder,
@@ -35,24 +48,14 @@ function PasswordInput({
   value: string;
   onChangeText: (t: string) => void;
 }) {
-  const C = useColors();
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
   return (
-    <View
-      style={[
-        inp.row,
-        {
-          backgroundColor: C.input,
-          borderColor: focused ? C.inputFocus : C.inputBorder,
-          borderWidth: focused ? 1.5 : 1,
-        },
-      ]}
-    >
+    <View style={[inp.row, focused && inp.focused]}>
       <TextInput
-        style={[inp.input, { color: C.text }]}
+        style={inp.input}
         placeholder={placeholder}
-        placeholderTextColor={C.placeholder}
+        placeholderTextColor={C.gray}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!showPass}
@@ -61,13 +64,17 @@ function PasswordInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      <Pressable
+      <TouchableOpacity
         onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <EyeIcon open={showPass} size={22} color={C.placeholder} />
-      </Pressable>
+        <Image
+          source={showPass ? eyeOpenImg : eyeClosedImg}
+          style={{ width: 22, height: 22 }}
+          contentFit="contain"
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -77,13 +84,18 @@ const inp = StyleSheet.create({
     height: 56,
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: C.inputBg,
+    borderWidth: 1,
+    borderColor: C.inputBorder,
     borderRadius: 8,
     paddingHorizontal: 18,
   },
+  focused: { borderColor: C.inputFocus },
   input: {
     flex: 1,
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
+    color: C.dark,
     height: "100%",
   },
   eyeBtn: { paddingLeft: 8 },
@@ -92,12 +104,11 @@ const inp = StyleSheet.create({
 export default function NewPasswordScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const C       = useColors();
 
-  const [newPass, setNewPass] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState("");
+  const [newPass,  setNewPass]  = useState("");
+  const [confirm,  setConfirm]  = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState("");
 
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
@@ -123,7 +134,7 @@ export default function NewPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[s.root, { backgroundColor: C.background }]}
+      style={s.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
@@ -137,20 +148,20 @@ export default function NewPasswordScreen() {
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <Pressable
-            style={[s.backBtn, { borderColor: C.border, backgroundColor: C.surface }]}
+            style={s.backBtn}
             onPress={() => router.back()}
             hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
-            <Ionicons name="chevron-back" size={22} color={C.text} />
+            <Ionicons name="chevron-back" size={22} color={C.dark} />
           </Pressable>
-          <Text style={[s.wordmark, { color: C.text }]}>AZA.</Text>
+          <Text style={s.wordmark}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* ── Title ── */}
         <Animated.View entering={FadeInUp.duration(380).delay(80).springify()} style={s.titleBlock}>
-          <Text style={[s.heading, { color: C.text }]}>Create new password</Text>
-          <Text style={[s.subText, { color: C.mutedForeground }]}>
+          <Text style={s.heading}>Create new password</Text>
+          <Text style={s.subText}>
             Your new password must be unique from those previously used.
           </Text>
         </Animated.View>
@@ -168,40 +179,33 @@ export default function NewPasswordScreen() {
             onChangeText={t => { setConfirm(t); setError(""); }}
           />
           {!!error && (
-            <Animated.Text entering={FadeIn.duration(220)} style={[s.errorText, { color: C.destructive }]}>
+            <Animated.Text entering={FadeIn.duration(220)} style={s.errorText}>
               {error}
             </Animated.Text>
           )}
         </Animated.View>
 
-        {/* ── Reset Password button (gradient) ── */}
+        {/* ── Reset Password button ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(200).springify()}
           style={[btnStyle, s.btnWrap]}
         >
-          <LinearGradient
-            colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[s.resetBtnGrad, { shadowColor: C.accentGlow, opacity: loading ? 0.72 : 1 }]}
+          <Pressable
+            style={[s.resetBtn, loading && { opacity: 0.72 }]}
+            onPress={handleSubmit}
+            onPressIn={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              btnSc.value = withSpring(0.97, { damping: 13, stiffness: 320 });
+            }}
+            onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 320 }); }}
+            disabled={loading}
           >
-            <Pressable
-              style={s.resetBtnPress}
-              onPress={handleSubmit}
-              onPressIn={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                btnSc.value = withSpring(0.97, { damping: 13, stiffness: 320 });
-              }}
-              onPressOut={() => { btnSc.value = withSpring(1.0, { damping: 13, stiffness: 320 }); }}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-              ) : (
-                <Text style={s.resetBtnText}>Reset Password</Text>
-              )}
-            </Pressable>
-          </LinearGradient>
+            {loading ? (
+              <ActivityIndicator color={C.white} size="small" />
+            ) : (
+              <Text style={s.resetBtnText}>Reset Password</Text>
+            )}
+          </Pressable>
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -209,7 +213,7 @@ export default function NewPasswordScreen() {
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1 },
+  root:   { flex: 1, backgroundColor: C.bg },
   scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
   topBar: {
@@ -219,12 +223,24 @@ const s = StyleSheet.create({
     marginBottom: 32,
   },
   backBtn: {
-    width: 44, height: 44, borderRadius: 12, borderWidth: 1,
-    alignItems: "center", justifyContent: "center",
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: C.btnBorder,
+    backgroundColor: C.white,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   wordmark: {
     fontSize: 32,
     fontFamily: "Manrope_700Bold",
+    color: C.dark,
     letterSpacing: -0.5,
   },
 
@@ -232,6 +248,7 @@ const s = StyleSheet.create({
   heading: {
     fontSize: 30,
     fontFamily: "Manrope_700Bold",
+    color: C.dark,
     letterSpacing: -0.3,
     lineHeight: 39,
     marginBottom: 12,
@@ -239,6 +256,7 @@ const s = StyleSheet.create({
   subText: {
     fontSize: 16,
     fontFamily: "Manrope_400Regular",
+    color: C.gray,
     lineHeight: 24,
   },
 
@@ -246,27 +264,26 @@ const s = StyleSheet.create({
   errorText: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
+    color: C.error,
   },
 
   btnWrap: {},
-  resetBtnGrad: {
+  resetBtn: {
     height: 60,
+    backgroundColor: C.dark,
     borderRadius: 14,
-    overflow: "hidden",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  resetBtnPress: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#1E232C",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   resetBtnText: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",
-    color: "#FFFFFF",
+    color: C.white,
     letterSpacing: 0.2,
   },
 });

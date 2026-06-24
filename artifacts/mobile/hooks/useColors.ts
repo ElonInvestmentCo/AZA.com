@@ -16,10 +16,9 @@ import colors from "@/constants/colors";
  */
 export function useColors() {
   const scheme = useColorScheme();
-  const palette: typeof colors.light =
+  const palette =
     scheme === "dark" && "dark" in colors
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? (colors as any).dark
+      ? (colors as Record<string, typeof colors.light>).dark
       : colors.light;
   return { ...palette, radius: colors.radius };
 }

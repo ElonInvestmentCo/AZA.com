@@ -1,5 +1,12 @@
 /**
  * SocialAuthButtons — Google OAuth + Apple Sign-In for AZA.
+ *
+ * Google auth is isolated to its own inner component so it can be
+ * conditionally rendered. On iOS, it requires a dedicated iOS OAuth
+ * client ID (EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID). Without one the button
+ * is shown in a disabled state with an informative message.
+ *
+ * Apple Sign-In is shown on iOS only (native entitlement required).
  */
 
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -25,9 +32,16 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
-import { useColors } from "@/hooks/useColors";
 
 WebBrowser.maybeCompleteAuthSession();
+
+/* ─── Design tokens ─────────────────────────────────────────────────────────── */
+const C = {
+  google:   { bg: "#FFFFFF", border: "#E8ECF4", text: "#1E232C", icon: "#4285F4", shadow: "rgba(0,0,0,0.06)" },
+  apple:    { bg: "#1E232C", border: "#1E232C", text: "#FFFFFF", icon: "#FFFFFF", shadow: "rgba(0,0,0,0.14)" },
+  loading:  "#8391A1",
+  disabled: { bg: "#F7F8F9", border: "#E8ECF4", text: "#C4C9D4" },
+};
 
 interface Props {
   onSuccess: () => void;
@@ -41,7 +55,6 @@ function SocialBtn({
   onPress: () => void; loading: boolean; disabled: boolean;
   bg: string; border: string; shadow: string; children: React.ReactNode;
 }) {
-  const C    = useColors();
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   const off  = disabled || loading;
@@ -58,11 +71,7 @@ function SocialBtn({
         disabled={off}
         style={[
           sb.btn,
-          {
-            backgroundColor: off && !loading ? C.muted : bg,
-            borderColor:      off && !loading ? C.border : border,
-            shadowColor:      shadow,
-          },
+          { backgroundColor: off && !loading ? C.disabled.bg : bg, borderColor: off && !loading ? C.disabled.border : border, shadowColor: shadow },
           off && sb.dim,
         ]}
       >
@@ -73,26 +82,13 @@ function SocialBtn({
 }
 
 const sb = StyleSheet.create({
-  btn: {
-    height: 58,
-    borderRadius: 14,
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+  btn: { height: 58, borderRadius: 14, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 12, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 3 },
   dim: { opacity: 0.5 },
 });
 
-/* ─── Google sign-in — active ───────────────────────────────────────────────── */
+/* ─── Google sign-in — inner component (uses hook, only rendered on eligible platforms) */
 function GoogleSignInActive({ onSuccess, onError }: Props) {
   const { loginWithSocial } = useAuth();
-  const C = useColors();
   const [loading, setLoading] = useState(false);
 
   const IOS_ID  = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
@@ -131,32 +127,26 @@ function GoogleSignInActive({ onSuccess, onError }: Props) {
         await promptAsync();
       }}
       loading={loading} disabled={false}
-      bg={C.surface} border={C.border} shadow={C.overlay}
+      bg={C.google.bg} border={C.google.border} shadow={C.google.shadow}
     >
       {loading
-        ? <ActivityIndicator size="small" color={C.mutedForeground} />
-        : (
-          <>
-            <AntDesign name="google" size={20} color="#4285F4" />
-            <Text style={[ss.txt, { color: C.text }]}>Google</Text>
-          </>
-        )
+        ? <ActivityIndicator size="small" color={C.loading} />
+        : <><AntDesign name="google" size={20} color={C.google.icon} /><Text style={[ss.txt, { color: C.google.text }]}>Google</Text></>
       }
     </SocialBtn>
   );
 }
 
-/* ─── Google sign-in — disabled placeholder ────────────────────────────────── */
+/* ─── Google sign-in — disabled placeholder (no hook) ──────────────────────── */
 function GoogleSignInDisabled() {
-  const C = useColors();
   return (
     <SocialBtn
       onPress={() => Alert.alert("Google Sign-In", "Google sign-in is not available on iOS in this build.\n\nAn iOS OAuth client ID is required in Google Cloud Console.")}
       loading={false} disabled={true}
-      bg={C.muted} border={C.border} shadow="transparent"
+      bg={C.disabled.bg} border={C.disabled.border} shadow="transparent"
     >
-      <AntDesign name="google" size={20} color={C.placeholder} />
-      <Text style={[ss.txt, { color: C.placeholder }]}>Google</Text>
+      <AntDesign name="google" size={20} color={C.disabled.text} />
+      <Text style={[ss.txt, { color: C.disabled.text }]}>Google</Text>
     </SocialBtn>
   );
 }
@@ -164,9 +154,8 @@ function GoogleSignInDisabled() {
 /* ─── Apple sign-in ─────────────────────────────────────────────────────────── */
 function AppleSignIn({ onSuccess, onError }: Props) {
   const { loginWithSocial } = useAuth();
-  const C = useColors();
-  const [loading, setLoading] = useState(false);
-  const [avail,   setAvail]   = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [avail,   setAvail]     = useState(false);
 
   useEffect(() => {
     if (Platform.OS === "ios") {
@@ -195,24 +184,28 @@ function AppleSignIn({ onSuccess, onError }: Props) {
         }
       }}
       loading={loading} disabled={disabled}
-      bg={disabled ? C.muted : C.card}
-      border={disabled ? C.border : C.border}
-      shadow={C.overlay}
+      bg={disabled ? C.disabled.bg  : C.apple.bg}
+      border={disabled ? C.disabled.border : C.apple.border}
+      shadow={C.apple.shadow}
     >
       {loading
         ? <ActivityIndicator size="small" color="#FFF" />
-        : (
-          <>
-            <Ionicons name="logo-apple" size={20} color={disabled ? C.placeholder : C.text} />
-            <Text style={[ss.txt, { color: disabled ? C.placeholder : C.text }]}>Apple</Text>
-          </>
-        )
+        : <><Ionicons name="logo-apple" size={20} color={disabled ? C.disabled.text : C.apple.icon} /><Text style={[ss.txt, { color: disabled ? C.disabled.text : C.apple.text }]}>Apple</Text></>
       }
     </SocialBtn>
   );
 }
 
 /* ─── Exported component ─────────────────────────────────────────────────────── */
+
+/*
+ * Determines whether this device/platform can run Google Sign-In.
+ * - Web: yes (webClientId)
+ * - Android: yes (falls back to webClientId)
+ * - iOS: ONLY when EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID is explicitly set.
+ *        Passing the web client ID as iosClientId does not work because
+ *        the library uses it to build native redirect schemes.
+ */
 function canRunGoogleOnThisPlatform(): boolean {
   if (Platform.OS === "web" || Platform.OS === "android") return true;
   if (Platform.OS === "ios") return !!process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;

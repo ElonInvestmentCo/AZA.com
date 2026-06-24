@@ -19,9 +19,22 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import { useColors } from "@/hooks/useColors";
 
 const { width: SW } = Dimensions.get("window");
+
+const C = {
+  bg:       "#FFFFFF",
+  text:     "#0B0A0A",
+  textSec:  "#595F67",
+  textMut:  "#AAAFB5",
+  border:   "#EDF1F3",
+  surface:  "#F8F9FA",
+  accent:   "#35C2C1",
+  card:     "#000000",
+  success:  "#00B03C",
+  danger:   "#FF4444",
+  warn:     "#F59E0B",
+};
 
 const CARD_W = SW - 40;
 const CARD_H = CARD_W * 0.56;
@@ -37,7 +50,6 @@ export default function CardScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
   const { user } = useAuth();
-  const C       = useColors();
   const topPad  = Platform.OS === "web" ? 48 : insets.top;
 
   const [cvvVisible, setCvvVisible] = useState(false);
@@ -63,7 +75,7 @@ export default function CardScreen() {
     {
       icon: frozen ? "unlock" : "lock",
       label: frozen ? "Unfreeze" : "Freeze",
-      color: frozen ? C.success : C.warning,
+      color: frozen ? C.success : C.warn,
       onPress: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         setFrozen(v => !v);
@@ -81,7 +93,7 @@ export default function CardScreen() {
     {
       icon: "trash-2",
       label: "Terminate",
-      color: C.destructive,
+      color: C.danger,
       onPress: () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
         Alert.alert(
@@ -104,13 +116,13 @@ export default function CardScreen() {
   ];
 
   return (
-    <View style={[s.root, { backgroundColor: C.background, paddingTop: topPad }]}>
+    <View style={[s.root, { paddingTop: topPad }]}>
 
       {/* Header */}
       <Animated.View entering={FadeInDown.duration(300)} style={s.header}>
-        <Text style={[s.title, { color: C.text }]}>My Card</Text>
+        <Text style={s.title}>My Card</Text>
         <TouchableOpacity
-          style={[s.addBtn, { borderColor: C.border }]}
+          style={s.addBtn}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             Alert.alert("Create New Card", "Create a new USD virtual dollar card?", [
@@ -127,9 +139,12 @@ export default function CardScreen() {
 
         {/* Virtual Card */}
         <Animated.View entering={FadeInDown.duration(380).delay(40)} style={[s.card, frozen && s.cardFrozen]}>
+          {/* Chip */}
           <View style={s.chip}>
             <View style={s.chipInner} />
           </View>
+
+          {/* Top row */}
           <View style={s.cardTop}>
             <Text style={s.cardLabel}>AZA Virtual Card</Text>
             {frozen && (
@@ -139,7 +154,11 @@ export default function CardScreen() {
               </View>
             )}
           </View>
+
+          {/* Card number */}
           <Text style={s.cardNumber}>{cardNumber}</Text>
+
+          {/* Bottom row */}
           <View style={s.cardBottom}>
             <View>
               <Text style={s.cardMeta}>Card Holder</Text>
@@ -156,13 +175,15 @@ export default function CardScreen() {
               </Pressable>
             </View>
           </View>
+
+          {/* VISA label */}
           <Text style={s.visaLabel}>VISA</Text>
         </Animated.View>
 
         {/* Balance chip */}
-        <Animated.View entering={FadeInDown.duration(340).delay(80)} style={[s.balChip, { backgroundColor: C.surface }]}>
-          <Text style={[s.balLabel, { color: C.subtitle }]}>Available Balance</Text>
-          <Text style={[s.balAmount, { color: C.text }]}>$240.00</Text>
+        <Animated.View entering={FadeInDown.duration(340).delay(80)} style={s.balChip}>
+          <Text style={s.balLabel}>Available Balance</Text>
+          <Text style={s.balAmount}>$240.00</Text>
         </Animated.View>
 
         {/* Actions */}
@@ -172,14 +193,14 @@ export default function CardScreen() {
               <View style={[s.actionIcon, { backgroundColor: a.color + "18" }]}>
                 <Feather name={a.icon} size={20} color={a.color} />
               </View>
-              <Text style={[s.actionLabel, { color: C.subtitle }]}>{a.label}</Text>
+              <Text style={s.actionLabel}>{a.label}</Text>
             </TouchableOpacity>
           ))}
         </Animated.View>
 
         {/* Card Details */}
-        <Animated.View entering={FadeInUp.duration(320).delay(130)} style={[s.detailCard, { borderColor: C.border, backgroundColor: C.surface }]}>
-          <Text style={[s.sectionTitle, { color: C.text }]}>Card Details</Text>
+        <Animated.View entering={FadeInUp.duration(320).delay(130)} style={[s.detailCard, { borderColor: C.border }]}>
+          <Text style={s.sectionTitle}>Card Details</Text>
           {[
             { label: "Card Type",    value: "Virtual Dollar Card" },
             { label: "Network",      value: "Visa" },
@@ -188,8 +209,8 @@ export default function CardScreen() {
             { label: "Spending Limit", value: "$5,000 / month" },
           ].map(row => (
             <View key={row.label} style={s.detailRow}>
-              <Text style={[s.detailLabel, { color: C.subtitle }]}>{row.label}</Text>
-              <Text style={[s.detailValue, { color: C.text }, row.accent && { color: C.success }]}>{row.value}</Text>
+              <Text style={s.detailLabel}>{row.label}</Text>
+              <Text style={[s.detailValue, row.accent && { color: C.success }]}>{row.value}</Text>
             </View>
           ))}
         </Animated.View>
@@ -197,21 +218,21 @@ export default function CardScreen() {
         {/* Recent Transactions */}
         <Animated.View entering={FadeInUp.duration(320).delay(160)}>
           <View style={s.secHeader}>
-            <Text style={[s.sectionTitle, { color: C.text }]}>Recent Transactions</Text>
+            <Text style={s.sectionTitle}>Recent Transactions</Text>
             <TouchableOpacity onPress={() => router.push("/(app)/transactions" as any)}>
               <Text style={[s.seeAll, { color: C.accent }]}>See All</Text>
             </TouchableOpacity>
           </View>
           {RECENT.map(tx => (
             <View key={tx.id} style={[s.txRow, { borderColor: C.border }]}>
-              <View style={[s.txIcon, { backgroundColor: (tx.positive ? C.success : C.destructive) + "15" }]}>
-                <Feather name={tx.positive ? "arrow-down-left" : "arrow-up-right"} size={16} color={tx.positive ? C.success : C.destructive} />
+              <View style={[s.txIcon, { backgroundColor: (tx.positive ? C.success : C.danger) + "15" }]}>
+                <Feather name={tx.positive ? "arrow-down-left" : "arrow-up-right"} size={16} color={tx.positive ? C.success : C.danger} />
               </View>
               <View style={s.txInfo}>
-                <Text style={[s.txName, { color: C.text }]}>{tx.name}</Text>
-                <Text style={[s.txDate, { color: C.mutedForeground }]}>{tx.date}</Text>
+                <Text style={s.txName}>{tx.name}</Text>
+                <Text style={s.txDate}>{tx.date}</Text>
               </View>
-              <Text style={[s.txAmount, { color: tx.positive ? C.success : C.destructive }]}>{tx.amount}</Text>
+              <Text style={[s.txAmount, { color: tx.positive ? C.success : C.danger }]}>{tx.amount}</Text>
             </View>
           ))}
         </Animated.View>
@@ -222,14 +243,14 @@ export default function CardScreen() {
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1 },
+  root:   { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     paddingHorizontal: 20, paddingBottom: 16, paddingTop: 8,
   },
-  title: { fontSize: 22, fontFamily: "Manrope_700Bold" },
+  title: { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.text },
   addBtn: {
-    width: 40, height: 40, borderRadius: 12, borderWidth: 1,
+    width: 40, height: 40, borderRadius: 12, borderWidth: 1, borderColor: C.border,
     alignItems: "center", justifyContent: "center",
   },
 
@@ -237,13 +258,13 @@ const s = StyleSheet.create({
 
   card: {
     width: CARD_W, height: CARD_H,
-    backgroundColor: "#0D1320",
+    backgroundColor: C.card,
     borderRadius: 20,
     padding: 20,
     justifyContent: "space-between",
-    shadowColor: "#4F7CFF",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.35,
     shadowRadius: 20,
     elevation: 10,
   },
@@ -288,21 +309,21 @@ const s = StyleSheet.create({
 
   balChip: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    borderRadius: 14, paddingHorizontal: 20, paddingVertical: 14,
+    backgroundColor: C.surface, borderRadius: 14, paddingHorizontal: 20, paddingVertical: 14,
   },
-  balLabel:  { fontSize: 14, fontFamily: "Manrope_500Medium" },
-  balAmount: { fontSize: 18, fontFamily: "Manrope_700Bold" },
+  balLabel:  { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.textSec },
+  balAmount: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.text },
 
   actions: { flexDirection: "row", justifyContent: "space-between" },
   actionItem: { alignItems: "center", gap: 8, flex: 1 },
   actionIcon: { width: 52, height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  actionLabel: { fontSize: 11, fontFamily: "Manrope_500Medium", textAlign: "center" },
+  actionLabel: { fontSize: 11, fontFamily: "Manrope_500Medium", color: C.textSec, textAlign: "center" },
 
   detailCard: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 12 },
-  sectionTitle: { fontSize: 16, fontFamily: "Manrope_700Bold", marginBottom: 4 },
+  sectionTitle: { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 4 },
   detailRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  detailLabel: { fontSize: 13, fontFamily: "Manrope_400Regular" },
-  detailValue: { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
+  detailLabel: { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
+  detailValue: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
 
   secHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   seeAll:    { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
@@ -313,7 +334,7 @@ const s = StyleSheet.create({
   },
   txIcon: { width: 38, height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   txInfo: { flex: 1 },
-  txName:   { fontSize: 13, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
-  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular", marginTop: 2 },
+  txName:   { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
+  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut, marginTop: 2 },
   txAmount: { fontSize: 13, fontFamily: "Manrope_700Bold" },
 });

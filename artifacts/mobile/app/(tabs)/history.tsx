@@ -13,7 +13,19 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useColors } from "@/hooks/useColors";
+
+const C = {
+  bg:      "#FFFFFF",
+  text:    "#0B0A0A",
+  textSec: "#595F67",
+  textMut: "#AAAFB5",
+  border:  "#EDF1F3",
+  surface: "#F8F9FA",
+  accent:  "#35C2C1",
+  success: "#00B03C",
+  danger:  "#FF4444",
+  warn:    "#F59E0B",
+};
 
 type TxCategory = "All" | "Gift Card" | "Crypto" | "Bills" | "Airtime" | "Wallet";
 
@@ -50,11 +62,10 @@ const ALL_TX: TxItem[] = [
 const CATEGORIES: TxCategory[] = ["All", "Gift Card", "Crypto", "Bills", "Airtime", "Wallet"];
 
 function StatusBadge({ status }: { status: TxItem["status"] }) {
-  const C = useColors();
   const config = {
-    completed: { bg: C.successLight,          text: C.success,     label: "Completed" },
-    pending:   { bg: C.warningLight,           text: C.warning,     label: "Pending"   },
-    failed:    { bg: C.destructiveDim,         text: C.destructive, label: "Failed"    },
+    completed: { bg: "#00B03C18", text: "#00B03C", label: "Completed" },
+    pending:   { bg: "#F59E0B18", text: "#F59E0B", label: "Pending"   },
+    failed:    { bg: "#FF444418", text: "#FF4444", label: "Failed"    },
   }[status];
   return (
     <View style={[badge.wrap, { backgroundColor: config.bg }]}>
@@ -71,7 +82,6 @@ const badge = StyleSheet.create({
 export default function HistoryScreen() {
   const insets   = useSafeAreaInsets();
   const router   = useRouter();
-  const C        = useColors();
   const topPad   = Platform.OS === "web" ? 48 : insets.top;
   const [filter, setFilter] = useState<TxCategory>("All");
 
@@ -81,13 +91,13 @@ export default function HistoryScreen() {
   const totalDebit  = ALL_TX.filter(t => !t.positive).reduce((sum, t) => sum + parseFloat(t.amount.replace(/[^0-9.]/g, "")), 0);
 
   return (
-    <View style={[s.root, { backgroundColor: C.background, paddingTop: topPad }]}>
+    <View style={[s.root, { paddingTop: topPad }]}>
 
       {/* Header */}
       <Animated.View entering={FadeInDown.duration(300)} style={s.header}>
-        <Text style={[s.title, { color: C.text }]}>History</Text>
+        <Text style={s.title}>History</Text>
         <TouchableOpacity
-          style={[s.filterBtn, { borderColor: C.border }]}
+          style={s.filterBtn}
           onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
         >
           <Feather name="sliders" size={18} color={C.text} />
@@ -96,17 +106,17 @@ export default function HistoryScreen() {
 
       {/* Summary row */}
       <Animated.View entering={FadeInDown.duration(320).delay(40)} style={s.summaryRow}>
-        <View style={[s.summaryCard, { backgroundColor: C.successLight }]}>
+        <View style={[s.summaryCard, { backgroundColor: "#00B03C10" }]}>
           <Feather name="arrow-down-left" size={14} color={C.success} />
           <Text style={[s.summaryLabel, { color: C.success }]}>Total In</Text>
           <Text style={[s.summaryAmount, { color: C.success }]}>
             ₦{totalCredit.toLocaleString("en-NG", { minimumFractionDigits: 0 })}
           </Text>
         </View>
-        <View style={[s.summaryCard, { backgroundColor: C.destructiveDim }]}>
-          <Feather name="arrow-up-right" size={14} color={C.destructive} />
-          <Text style={[s.summaryLabel, { color: C.destructive }]}>Total Out</Text>
-          <Text style={[s.summaryAmount, { color: C.destructive }]}>
+        <View style={[s.summaryCard, { backgroundColor: "#FF444410" }]}>
+          <Feather name="arrow-up-right" size={14} color={C.danger} />
+          <Text style={[s.summaryLabel, { color: C.danger }]}>Total Out</Text>
+          <Text style={[s.summaryAmount, { color: C.danger }]}>
             ₦{totalDebit.toLocaleString("en-NG", { minimumFractionDigits: 0 })}
           </Text>
         </View>
@@ -124,17 +134,13 @@ export default function HistoryScreen() {
             const active = item === filter;
             return (
               <Pressable
-                style={[
-                  s.filterChip,
-                  { borderColor: C.border, backgroundColor: C.surface },
-                  active && { backgroundColor: C.accent, borderColor: C.accent },
-                ]}
+                style={[s.filterChip, active && s.filterChipActive]}
                 onPress={() => {
                   Haptics.selectionAsync();
                   setFilter(item);
                 }}
               >
-                <Text style={[s.filterChipText, { color: C.subtitle }, active && { color: "#FFFFFF" }]}>{item}</Text>
+                <Text style={[s.filterChipText, active && s.filterChipTextActive]}>{item}</Text>
               </Pressable>
             );
           }}
@@ -149,8 +155,8 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={s.empty}>
-            <Feather name="inbox" size={36} color={C.mutedForeground} />
-            <Text style={[s.emptyText, { color: C.mutedForeground }]}>No transactions</Text>
+            <Feather name="inbox" size={36} color={C.textMut} />
+            <Text style={s.emptyText}>No transactions</Text>
           </View>
         }
         renderItem={({ item, index }) => (
@@ -167,15 +173,15 @@ export default function HistoryScreen() {
                 <Feather name={item.icon} size={18} color={item.iconColor} />
               </View>
               <View style={s.txInfo}>
-                <Text style={[s.txType, { color: C.text }]} numberOfLines={1}>{item.type}</Text>
+                <Text style={s.txType} numberOfLines={1}>{item.type}</Text>
                 <View style={s.txMeta}>
-                  <Text style={[s.txDate, { color: C.mutedForeground }]}>{item.date}</Text>
-                  <View style={[s.dot, { backgroundColor: C.mutedForeground }]} />
-                  <Text style={[s.txCat, { color: C.mutedForeground }]}>{item.category}</Text>
+                  <Text style={s.txDate}>{item.date}</Text>
+                  <View style={s.dot} />
+                  <Text style={s.txCat}>{item.category}</Text>
                 </View>
               </View>
               <View style={s.txRight}>
-                <Text style={[s.txAmount, { color: item.positive ? C.success : C.destructive }]}>
+                <Text style={[s.txAmount, { color: item.positive ? C.success : C.danger }]}>
                   {item.amount}
                 </Text>
                 <StatusBadge status={item.status} />
@@ -189,15 +195,15 @@ export default function HistoryScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     paddingHorizontal: 20, paddingBottom: 12, paddingTop: 8,
   },
-  title:     { fontSize: 22, fontFamily: "Manrope_700Bold" },
+  title:     { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.text },
   filterBtn: {
-    width: 40, height: 40, borderRadius: 12, borderWidth: 1,
+    width: 40, height: 40, borderRadius: 12, borderWidth: 1, borderColor: C.border,
     alignItems: "center", justifyContent: "center",
   },
 
@@ -208,9 +214,11 @@ const s = StyleSheet.create({
   summaryLabel:  { fontSize: 11, fontFamily: "Manrope_500Medium" },
   summaryAmount: { fontSize: 15, fontFamily: "Manrope_700Bold" },
 
-  filterScroll:  { paddingHorizontal: 20, gap: 8, paddingBottom: 12 },
-  filterChip:    { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
-  filterChipText: { fontSize: 13, fontFamily: "Manrope_500Medium" },
+  filterScroll:      { paddingHorizontal: 20, gap: 8, paddingBottom: 12 },
+  filterChip:        { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: C.surface },
+  filterChipActive:  { backgroundColor: C.text, borderColor: C.text },
+  filterChipText:     { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textSec },
+  filterChipTextActive: { color: "#FFFFFF" },
 
   list: { paddingHorizontal: 20, paddingTop: 4 },
 
@@ -220,14 +228,14 @@ const s = StyleSheet.create({
   },
   iconWrap: { width: 42, height: 42, borderRadius: 13, alignItems: "center", justifyContent: "center" },
   txInfo:   { flex: 1, gap: 3 },
-  txType:   { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
+  txType:   { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
   txMeta:   { flexDirection: "row", alignItems: "center", gap: 6 },
-  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular" },
-  txCat:    { fontSize: 11, fontFamily: "Manrope_400Regular" },
-  dot:      { width: 3, height: 3, borderRadius: 1.5 },
+  txDate:   { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut },
+  txCat:    { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut },
+  dot:      { width: 3, height: 3, borderRadius: 1.5, backgroundColor: C.textMut },
   txRight:  { alignItems: "flex-end", gap: 4 },
   txAmount: { fontSize: 13, fontFamily: "Manrope_700Bold" },
 
   empty: { alignItems: "center", justifyContent: "center", paddingTop: 80, gap: 12 },
-  emptyText: { fontSize: 15, fontFamily: "Manrope_500Medium" },
+  emptyText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.textMut },
 });

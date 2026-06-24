@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { EyeIcon } from "@/components/EyeIcon";
-import { LinearGradient } from "expo-linear-gradient";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -30,7 +29,30 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import { useColors } from "@/hooks/useColors";
+
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+const C = {
+  bg:           "#FFFFFF",
+  inputBg:      "#F7F8F9",
+  inputBorder:  "#E8ECF4",
+  inputFocus:   "#1E232C",
+  text:         "#1E232C",
+  placeholder:  "#8391A1",
+  subtext:      "#6A707C",
+  loginBtn:     "#000000",
+  loginBtnText: "#FFFFFF",
+  forgotText:   "#6A707C",
+  divider:      "#E8ECF4",
+  dividerText:  "#1E232C",
+  socialBg:     "#FFFFFF",
+  socialBorder: "#E8ECF4",
+  footerText:   "#1E232C",
+  footerLink:   "#35C2C1",
+  backBg:       "#FFFFFF",
+  backBorder:   "#E8ECF4",
+  backIcon:     "#1E232C",
+  error:        "#FF5B7A",
+};
 
 const fingerprintImg = require("@/assets/images/fingerprint.png");
 
@@ -48,21 +70,11 @@ function EmailInput({
   keyboardType?: any;
   error?: boolean;
 }) {
-  const C = useColors();
   const [focused, setFocused] = useState(false);
   return (
-    <View
-      style={[
-        inp.wrap,
-        {
-          backgroundColor: C.input,
-          borderColor: error ? C.destructive : focused ? C.inputFocus : C.inputBorder,
-          borderWidth: focused || error ? 1.5 : 1,
-        },
-      ]}
-    >
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
-        style={[inp.field, { color: C.text }]}
+        style={inp.field}
         placeholder={placeholder}
         placeholderTextColor={C.placeholder}
         value={value}
@@ -86,22 +98,12 @@ function PasswordInput({
   onChangeText: (t: string) => void;
   error?: boolean;
 }) {
-  const C = useColors();
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
   return (
-    <View
-      style={[
-        inp.wrap,
-        {
-          backgroundColor: C.input,
-          borderColor: error ? C.destructive : focused ? C.inputFocus : C.inputBorder,
-          borderWidth: focused || error ? 1.5 : 1,
-        },
-      ]}
-    >
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
-        style={[inp.field, { color: C.text }]}
+        style={inp.field}
         placeholder="Enter your password"
         placeholderTextColor={C.placeholder}
         value={value}
@@ -116,7 +118,7 @@ function PasswordInput({
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <EyeIcon open={showPass} size={22} color={C.placeholder} />
+        <EyeIcon open={showPass} size={22} color="#8391A1" />
       </Pressable>
     </View>
   );
@@ -126,14 +128,20 @@ const inp = StyleSheet.create({
   wrap: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: C.inputBg,
+    borderWidth: 1,
+    borderColor: C.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 18,
     height: 58,
   },
+  focused: { borderColor: C.inputFocus },
+  errored: { borderColor: C.error },
   field: {
     flex: 1,
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
+    color: C.text,
     height: "100%",
   },
   eyeBtn: { padding: 2 },
@@ -172,7 +180,6 @@ export default function LoginScreen() {
   const router    = useRouter();
   const insets    = useSafeAreaInsets();
   const { login } = useAuth();
-  const C         = useColors();
 
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
@@ -180,11 +187,13 @@ export default function LoginScreen() {
   const [error,       setError]       = useState("");
   const [socialError, setSocialError] = useState("");
 
+  /* login button scale — lives on its OWN Animated.View (no entering prop) */
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({
     transform: [{ scale: btnSc.value }],
   }));
 
+  /* form shake on bad login */
   const shakeX     = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeX.value }],
@@ -223,10 +232,10 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={[s.root, { backgroundColor: C.background }]}
+      style={s.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
 
       <ScrollView
         contentContainerStyle={[
@@ -239,22 +248,21 @@ export default function LoginScreen() {
         {/* ── Top bar ── */}
         <Animated.View entering={FadeIn.duration(400)} style={s.topBar}>
           <Pressable
-            style={[s.backBtn, { borderColor: C.border, backgroundColor: C.surface }]}
+            style={s.backBtn}
             onPress={() => router.back()}
             hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
           >
-            <Ionicons name="chevron-back" size={22} color={C.text} />
+            <Ionicons name="chevron-back" size={22} color={C.backIcon} />
           </Pressable>
-          <Text style={[s.wordmark, { color: C.text }]}>AZA.</Text>
+          <Text style={s.wordmark}>AZA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 
-        {/* ── Fingerprint icon with ambient glow ── */}
+        {/* ── Fingerprint icon ── */}
         <Animated.View
           entering={FadeInDown.duration(500).delay(80).springify()}
           style={s.fingerprintWrap}
         >
-          <View style={[s.fingerprintGlow, { backgroundColor: C.accentDim, shadowColor: C.accent }]} />
           <Image
             source={fingerprintImg}
             style={{ width: 90, height: 90 }}
@@ -279,50 +287,43 @@ export default function LoginScreen() {
               error={!!error}
             />
             {error ? (
-              <Animated.Text entering={FadeIn.duration(200)} style={[s.errorText, { color: C.destructive }]}>
+              <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
                 {error}
               </Animated.Text>
             ) : null}
             <LinkBtn
               onPress={() => { Haptics.selectionAsync(); router.push("/(auth)/forgot-password"); }}
               style={s.forgotWrap}
-              textStyle={[s.forgotText, { color: C.accent }]}
+              textStyle={s.forgotText}
               label="Forgot Password?"
             />
           </Animated.View>
         </Animated.View>
 
-        {/* ── Login button (gradient) ── */}
+        {/* ── Login button — entering on a wrapper, scale on an inner view ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
           style={s.btnWrap}
         >
           <Animated.View style={btnStyle}>
-            <LinearGradient
-              colors={[C.gradientStart, C.gradientMid, C.gradientEnd] as [string, string, string]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={[s.loginBtnGrad, { shadowColor: C.accentGlow, opacity: loading ? 0.75 : 1 }]}
+            <Pressable
+              style={[s.loginBtn, loading && { opacity: 0.75 }]}
+              onPress={handleLogin}
+              onPressIn={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
+              }}
+              onPressOut={() => {
+                btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
+              }}
+              disabled={loading}
             >
-              <Pressable
-                style={s.loginBtnPress}
-                onPress={handleLogin}
-                onPressIn={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  btnSc.value = withSpring(0.96, { damping: 13, stiffness: 300 });
-                }}
-                onPressOut={() => {
-                  btnSc.value = withSpring(1.0, { damping: 13, stiffness: 300 });
-                }}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
-                ) : (
-                  <Text style={s.loginBtnText}>Login</Text>
-                )}
-              </Pressable>
-            </LinearGradient>
+              {loading ? (
+                <ActivityIndicator color={C.loginBtnText} size="small" />
+              ) : (
+                <Text style={s.loginBtnText}>Login</Text>
+              )}
+            </Pressable>
           </Animated.View>
         </Animated.View>
 
@@ -331,9 +332,9 @@ export default function LoginScreen() {
           entering={FadeInUp.duration(380).delay(260).springify()}
           style={s.dividerRow}
         >
-          <View style={[s.dividerLine, { backgroundColor: C.border }]} />
-          <Text style={[s.dividerText, { color: C.mutedForeground }]}>Or Login with</Text>
-          <View style={[s.dividerLine, { backgroundColor: C.border }]} />
+          <View style={s.dividerLine} />
+          <Text style={s.dividerText}>Or Login with</Text>
+          <View style={s.dividerLine} />
         </Animated.View>
 
         {/* ── Social buttons ── */}
@@ -346,7 +347,7 @@ export default function LoginScreen() {
             onError={msg => { setSocialError(msg); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error); }}
           />
           {socialError ? (
-            <Animated.Text entering={FadeIn.duration(200)} style={[s.socialError, { color: C.destructive }]}>
+            <Animated.Text entering={FadeIn.duration(200)} style={s.socialError}>
               {socialError}
             </Animated.Text>
           ) : null}
@@ -357,10 +358,10 @@ export default function LoginScreen() {
           entering={FadeInUp.duration(380).delay(340).springify()}
           style={s.footer}
         >
-          <Text style={[s.footerText, { color: C.mutedForeground }]}>Don't have an account? </Text>
+          <Text style={s.footerText}>Don't have an account? </Text>
           <LinkBtn
             onPress={() => router.push("/(auth)/register")}
-            textStyle={[s.footerLink, { color: C.accent }]}
+            textStyle={s.footerLink}
             label="Register Now"
           />
         </Animated.View>
@@ -371,7 +372,7 @@ export default function LoginScreen() {
 
 /* ── Styles ─────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:   { flex: 1 },
+  root:   { flex: 1, backgroundColor: C.bg },
   scroll: { paddingHorizontal: 24, flexGrow: 1 },
 
   topBar: {
@@ -385,12 +386,20 @@ const s = StyleSheet.create({
     height: 44,
     borderRadius: 12,
     borderWidth: 1,
+    borderColor: C.backBorder,
+    backgroundColor: C.backBg,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   wordmark: {
     fontSize: 32,
     fontFamily: "Manrope_700Bold",
+    color: C.text,
     letterSpacing: -0.5,
   },
 
@@ -400,48 +409,38 @@ const s = StyleSheet.create({
     marginBottom: 44,
     marginTop: 8,
   },
-  fingerprintGlow: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 50,
-    elevation: 0,
-  },
 
   form:      { gap: 16, marginBottom: 28 },
   errorText: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
+    color: C.error,
     textAlign: "center",
   },
   forgotWrap: { alignSelf: "flex-end", marginTop: 2 },
   forgotText: {
     fontSize: 14,
     fontFamily: "Manrope_600SemiBold",
+    color: C.forgotText,
   },
 
   btnWrap: { marginBottom: 32 },
-  loginBtnGrad: {
+  loginBtn: {
     height: 60,
+    backgroundColor: C.loginBtn,
     borderRadius: 14,
-    overflow: "hidden",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  loginBtnPress: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
   },
   loginBtnText: {
     fontSize: 16,
     fontFamily: "Manrope_700Bold",
-    color: "#FFFFFF",
+    color: C.loginBtnText,
     letterSpacing: 0.2,
   },
 
@@ -450,17 +449,26 @@ const s = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  dividerLine: { flex: 1, height: 1 },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E8ECF4",
+  },
   dividerText: {
     marginHorizontal: 12,
     fontSize: 14,
     fontFamily: "Manrope_400Regular",
+    color: "#6A707C",
   },
 
-  socialWrap: { marginBottom: 24, gap: 10 },
+  socialWrap: {
+    marginBottom: 24,
+    gap: 10,
+  },
   socialError: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
+    color: "#FF5B7A",
     textAlign: "center",
     marginTop: 4,
   },
@@ -470,6 +478,14 @@ const s = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  footerText: { fontSize: 15, fontFamily: "Manrope_400Regular" },
-  footerLink: { fontSize: 15, fontFamily: "Manrope_700Bold" },
+  footerText: {
+    fontSize: 15,
+    fontFamily: "Manrope_400Regular",
+    color: C.footerText,
+  },
+  footerLink: {
+    fontSize: 15,
+    fontFamily: "Manrope_700Bold",
+    color: C.footerLink,
+  },
 });
