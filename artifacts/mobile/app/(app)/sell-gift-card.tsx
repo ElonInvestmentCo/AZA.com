@@ -203,7 +203,7 @@ const s = StyleSheet.create({
   proceedBtn: {
     backgroundColor: "#000000", height: 48, borderRadius: 10,
     alignItems: "center", justifyContent: "center",
-    shadowColor: "#000000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.18, shadowRadius: 4, elevation: 4,
+    shadowColor: "#375DFB", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.48, shadowRadius: 2, elevation: 4,
   },
   proceedBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 });

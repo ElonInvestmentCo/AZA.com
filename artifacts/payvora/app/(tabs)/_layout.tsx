@@ -13,11 +13,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-type BottomTabBarProps = {
-  state: { routes: { key: string; name: string }[]; index: number };
-  navigation: { navigate: (name: string) => void };
-  descriptors?: Record<string, unknown>;
-};
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 const ACTIVE_PILL = "#E8DEF8";
 const ACTIVE_ICON = "#4A148C";
@@ -56,7 +52,7 @@ function TabIcon({
   if (Platform.OS === "ios" && cfg.sf) {
     return (
       <SymbolView
-        name={cfg.sf as any}
+        name={cfg.sf}
         tintColor={color}
         size={size}
       />

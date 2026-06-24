@@ -6,24 +6,14 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
-  useColorScheme,
   View,
 } from "react-native";
 
 /* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 function PillTabBar({ state, descriptors, navigation }: any) {
-  const scheme = useColorScheme();
-  const isDark = scheme === "dark";
-
-  const barBg        = isDark ? "#0D1320"                   : "#0B0A0A";
-  const shadowCol    = isDark ? "#4F7CFF"                   : "#000000";
-  const shadowOp     = isDark ? 0.25                        : 0.18;
-  const activePillBg = isDark ? "rgba(79,124,255,0.30)"     : "rgba(255,255,255,0.20)";
-  const badgeBorder  = isDark ? "#0D1320"                   : "#0B0A0A";
-
   return (
     <View style={pill.outer} pointerEvents="box-none">
-      <View style={[pill.bar, { backgroundColor: barBg, shadowColor: shadowCol, shadowOpacity: shadowOp }]}>
+      <View style={pill.bar}>
         {state.routes.map((route: any, i: number) => {
           const focused = state.index === i;
 
@@ -52,7 +42,7 @@ function PillTabBar({ state, descriptors, navigation }: any) {
               }}
               activeOpacity={0.8}
             >
-              <View style={[pill.iconWrap, focused && { borderRadius: 22, backgroundColor: activePillBg }]}>
+              <View style={[pill.iconWrap, focused && pill.iconWrapActive]}>
                 {Platform.OS === "ios" && route.name === "index" ? (
                   <SymbolView
                     name={focused ? "house.fill" : "house"}
@@ -74,7 +64,7 @@ function PillTabBar({ state, descriptors, navigation }: any) {
                 ) : (
                   <Feather name={icon} size={22} color="#FFFFFF" />
                 )}
-                {showBadge && <View style={[pill.badge, { borderColor: badgeBorder }]} />}
+                {showBadge && <View style={pill.badge} />}
               </View>
             </TouchableOpacity>
           );
@@ -97,11 +87,14 @@ const pill = StyleSheet.create({
     flexDirection:     "row",
     alignItems:        "center",
     justifyContent:    "space-around",
+    backgroundColor:   "#0D1320",
     borderRadius:      40,
     height:            68,
     width:             "100%",
     paddingHorizontal: 20,
+    shadowColor:       "#4F7CFF",
     shadowOffset:      { width: 0, height: 8 },
+    shadowOpacity:     0.25,
     shadowRadius:      20,
     elevation:         12,
   },
@@ -118,6 +111,9 @@ const pill = StyleSheet.create({
     alignItems:     "center",
     justifyContent: "center",
   },
+  iconWrapActive: {
+    backgroundColor: "rgba(79,124,255,0.30)",
+  },
   badge: {
     position:        "absolute",
     top:             2,
@@ -127,6 +123,7 @@ const pill = StyleSheet.create({
     borderRadius:    4,
     backgroundColor: "#FF5A6B",
     borderWidth:     1.5,
+    borderColor:     "#0D1320",
   },
 });
 
