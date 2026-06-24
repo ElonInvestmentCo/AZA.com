@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
+import { EyeIcon } from "@/components/EyeIcon";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -27,10 +27,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-
-/* ── Assets ─────────────────────────────────────────────────────────────── */
-const eyeOpenImg   = require("../../assets/images/eye-open.svg");
-const eyeClosedImg = require("../../assets/images/eye-closed.svg");
 
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 const C = {
@@ -142,11 +138,7 @@ function ValidatedInput({
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={inp.eyeBtn}
           >
-            <Image
-              source={showPass ? eyeOpenImg : eyeClosedImg}
-              style={{ width: 22, height: 22 }}
-              contentFit="contain"
-            />
+            <EyeIcon open={showPass} size={22} color="#8391A1" />
           </Pressable>
         )}
       </View>
