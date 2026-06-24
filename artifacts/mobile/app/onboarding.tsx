@@ -1,3 +1,4 @@
+// @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";

@@ -55,7 +55,7 @@ function OtpBox({
   value: string;
   isFocused: boolean;
   onFocus: () => void;
-  inputRef: React.RefObject<TextInput>;
+  inputRef: React.RefObject<TextInput | null>;
   onKeyPress: (key: string) => void;
   onChangeText: (t: string) => void;
 }) {

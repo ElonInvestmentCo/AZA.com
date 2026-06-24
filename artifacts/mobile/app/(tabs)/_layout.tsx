@@ -8,15 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-
 /* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 
-function PillTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+function PillTabBar({ state, descriptors, navigation }: any) {
   return (
     <View style={pill.outer} pointerEvents="box-none">
       <View style={pill.bar}>
-        {state.routes.map((route, i) => {
+        {state.routes.map((route: any, i: number) => {
           const focused = state.index === i;
 
           const icon = (() => {
