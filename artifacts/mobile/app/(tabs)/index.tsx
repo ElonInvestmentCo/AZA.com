@@ -43,14 +43,14 @@ const C = {
 };
 
 const SERVICES = [
-  { id: "gift",  icon: "gift"           as const, label: "Gift Card",   color: "#7C3AED", route: null },
-  { id: "set",   icon: "sliders"        as const, label: "Settings",    color: "#8B8FA3", route: "/(app)/settings" as const },
-  { id: "elec",  icon: "zap"            as const, label: "Electricity", color: "#F59E0B", route: null },
-  { id: "cable", icon: "tv"             as const, label: "Cable TV",    color: "#EF4444", route: null },
-  { id: "rates", icon: "bar-chart-2"    as const, label: "Rates",       color: "#3B82F6", route: null },
-  { id: "txn",   icon: "list"           as const, label: "Transaction", color: "#8B5CF6", route: "/(app)/transactions" as const },
-  { id: "bet",   icon: "grid"           as const, label: "Bet Funding", color: "#F97316", route: null },
-  { id: "more",  icon: "more-horizontal" as const, label: "More",       color: "#06B6D4", route: null },
+  { id: "gift",  icon: "gift"            as const, label: "Gift Card",   color: "#7C3AED", route: null },
+  { id: "set",   icon: "sliders"         as const, label: "Settings",    color: "#8B8FA3", route: "/(app)/settings" as const },
+  { id: "elec",  icon: "zap"             as const, label: "Electricity", color: "#F59E0B", route: "/(app)/bills" as const },
+  { id: "cable", icon: "tv"              as const, label: "Cable TV",    color: "#EF4444", route: "/(app)/bills" as const },
+  { id: "rates", icon: "bar-chart-2"     as const, label: "Rates",       color: "#3B82F6", route: "/(app)/rates" as const },
+  { id: "txn",   icon: "list"            as const, label: "Transaction", color: "#8B5CF6", route: "/(app)/transactions" as const },
+  { id: "bet",   icon: "grid"            as const, label: "Bet Funding", color: "#F97316", route: "/(app)/bills" as const },
+  { id: "more",  icon: "more-horizontal" as const, label: "More",        color: "#06B6D4", route: "/(app)/more" as const },
 ] as const;
 
 const PROMOS = [
@@ -169,7 +169,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={[s.hdrBtn, { backgroundColor: C.surface, borderColor: C.border }]}
-          onPress={press(() => router.push("/(app)/dashboard"))}
+          onPress={press(() => router.push("/(app)/settings" as any))}
         >
           <Feather name="user" size={18} color={C.textMuted} />
         </TouchableOpacity>
@@ -219,7 +219,7 @@ export default function HomeScreen() {
             {[
               { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard")) },
               { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset")) },
-              { icon: "arrow-up"    as const, label: "Withdraw",    onPress: press(() => {}) },
+              { icon: "arrow-up"    as const, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
             ].map((action, i) => (
               <React.Fragment key={action.label}>
                 {i > 0 && <View style={s.actionDivider} />}
