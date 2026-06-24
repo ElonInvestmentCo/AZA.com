@@ -1,0 +1,78 @@
+DO NOT implement risky or unsupported Expo Go native modules.
+
+Your task is ONLY UI migration and safe replacement.
+
+────────────────────────────────────
+🎯 GOAL
+────────────────────────────────────
+Replace the current app UI screens with the UI screens extracted from the uploaded Figma ZIP file.
+
+BUT follow strict safety rules below.
+
+────────────────────────────────────
+🧠 SAFE IMPLEMENTATION RULES
+────────────────────────────────────
+
+1. DO NOT USE RISKY NATIVE MODULES
+- No expo-glass-effect
+- No unstable expo-router tabs
+- No custom native keyboard controllers
+- No new native dependencies unless already Expo Go compatible
+
+2. FIRST CLEAN EXISTING UI
+- Delete/replace current screen implementations ONLY inside /app routes
+- Do NOT touch navigation architecture or root app setup
+- Do NOT modify backend/auth logic
+
+3. THEN APPLY FIGMA ZIP UI
+- Extract all screens from the ZIP
+- Identify all UI pages (Home, Auth, Dashboard, etc.)
+- Replace ONLY screen-level UI components
+- Keep existing routing paths the same
+
+4. MATCH ROUTES TO EXISTING STRUCTURE
+- If a route already exists → overwrite UI only
+- If a route does NOT exist → DO NOT create new navigation structure, only reuse existing ones
+
+5. EXPO GO SAFETY
+- Ensure everything runs in Expo Go
+- Only use:
+  - react-native core components
+  - expo-safe libraries
+  - react-navigation / expo-router safe APIs
+
+────────────────────────────────────
+🧱 EXECUTION ORDER
+────────────────────────────────────
+
+Step 1:
+Inspect current /app structure and list all existing screens
+
+Step 2:
+Extract UI screens from ZIP file and map them to existing routes
+
+Step 3:
+Delete ONLY screen UI code (not navigation files)
+
+Step 4:
+Replace with Figma-based UI implementations
+
+Step 5:
+Validate app runs in Expo Go without crashes or missing screens
+
+────────────────────────────────────
+🚫 STRICTLY DO NOT
+────────────────────────────────────
+- Do NOT rebuild project
+- Do NOT change navigation system
+- Do NOT add experimental Expo packages
+- Do NOT redesign UI beyond Figma content
+- Do NOT start new architecture
+
+────────────────────────────────────
+🏁 FINAL OUTPUT
+────────────────────────────────────
+- Updated UI screens only
+- Same routing system preserved
+- Fully working Expo Go app
+- No crashes or missing routes
