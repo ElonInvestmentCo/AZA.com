@@ -1,0 +1,755 @@
+You are a senior fintech product architect, senior full-stack engineer, senior UX architect, and senior QA engineer.
+
+Your task is to perform a complete audit of the existing AZA application and then implement a full fintech ecosystem comparable in functionality to leading gift card, crypto, bill payment, virtual card, airtime, data, and eSIM platforms.
+
+CRITICAL RULES
+
+1. DO NOT redesign the application.
+2. DO NOT modify the existing UI design.
+3. DO NOT modify UI colors.
+4. DO NOT modify typography.
+5. DO NOT modify existing branding.
+6. DO NOT modify spacing or layout unless absolutely required for functionality.
+7. DO NOT change existing texts, labels, wording, or content that already exists.
+8. DO NOT change the project structure unless absolutely necessary.
+9. DO NOT break any existing functionality.
+10. Preserve all existing routes and navigation.
+11. Reuse existing components whenever possible.
+12. Extend functionality within the current architecture.
+
+====================================================
+PHASE 1 — COMPLETE APPLICATION AUDIT
+====================================================
+
+Scan the entire workspace.
+
+Analyze:
+
+- Pages
+- Routes
+- Components
+- Assets
+- Images
+- Icons
+- APIs
+- Database models
+- Services
+- Authentication flows
+- State management
+- Navigation systems
+- User flows
+- Admin flows
+- Permissions
+- Wallet systems
+
+Generate a report identifying:
+
+- Missing fintech features
+- Broken routes
+- Missing pages
+- Dead links
+- Unused components
+- Missing navigation connections
+- Missing user flows
+- Missing API integrations
+- Missing database models
+
+Do not make assumptions.
+
+====================================================
+PHASE 2 — AUTHENTICATION SYSTEM
+====================================================
+
+Implement or complete:
+
+WELCOME PAGE
+
+- App introduction
+- Sign In
+- Create Account
+
+SIGN UP FLOW
+
+- First Name
+- Last Name
+- Username
+- Email
+- Phone Number
+- Country
+- Password
+- Confirm Password
+- Referral Code
+- Terms Acceptance
+
+EMAIL VERIFICATION
+
+- OTP
+- Resend OTP
+- Verification status
+
+PHONE VERIFICATION
+
+- SMS OTP
+- WhatsApp OTP
+
+LOGIN
+
+- Email login
+- Username login
+- Phone login
+- Password login
+
+FORGOT PASSWORD
+
+Flow:
+
+Forgot Password
+→ Enter Email
+→ Send OTP
+→ Verify OTP
+→ New Password
+→ Success
+
+SECURITY
+
+- Device management
+- Session management
+- Login history
+- Two-factor authentication
+- Google Authenticator support
+- Face ID integration
+- Fingerprint integration
+
+====================================================
+PHASE 3 — DASHBOARD
+====================================================
+
+After login:
+
+Dashboard must correctly display:
+
+- Total Balance
+- Wallet Balance
+- Crypto Balance
+- USD Balance
+- Cashback Balance
+- Reward Balance
+
+Quick Actions:
+
+- Buy Gift Card
+- Sell Gift Card
+- Buy Crypto
+- Sell Crypto
+- Airtime
+- Data
+- Bills
+- eSIM
+- Virtual Card
+- Deposit
+- Withdraw
+- Referral
+
+Dashboard widgets:
+
+- Recent Transactions
+- Notifications
+- Market Rates
+- Promotions
+- Featured Services
+
+====================================================
+PHASE 4 — NAVIGATION FLOW
+====================================================
+
+Ensure every page is reachable.
+
+Example navigation:
+
+Splash
+→ Welcome
+→ Login
+→ Dashboard
+
+OR
+
+Splash
+→ Welcome
+→ Signup
+→ Verify OTP
+→ Dashboard
+
+Dashboard
+→ Gift Cards
+→ Gift Card Detail
+→ Trade Submission
+→ Review
+→ Success
+
+Dashboard
+→ Crypto
+→ Buy Crypto
+→ Confirm
+→ Success
+
+Dashboard
+→ Crypto
+→ Sell Crypto
+→ Wallet Credit
+→ Success
+
+Dashboard
+→ Bills
+→ Provider Selection
+→ Confirmation
+→ Success
+
+Dashboard
+→ Airtime
+→ Purchase
+→ Confirmation
+→ Success
+
+Dashboard
+→ Data
+→ Purchase
+→ Confirmation
+→ Success
+
+Dashboard
+→ eSIM
+→ Package Selection
+→ Payment
+→ QR Delivery
+
+Dashboard
+→ Virtual Card
+→ Create Card
+→ Fund Card
+→ Card Management
+
+Dashboard
+→ Wallet
+→ Deposit
+→ Confirmation
+
+Dashboard
+→ Wallet
+→ Withdraw
+→ Confirmation
+
+Dashboard
+→ Settings
+→ Security
+→ KYC
+→ Notifications
+→ Referral
+
+Every flow must:
+
+- Handle success
+- Handle errors
+- Handle cancellations
+- Handle retries
+
+====================================================
+PHASE 5 — GIFT CARD SYSTEM
+====================================================
+
+Implement support for:
+
+SHOPPING
+
+- Amazon
+- Walmart
+- Target
+- Best Buy
+- Costco
+
+GAMING
+
+- Steam
+- PlayStation
+- Xbox
+- Nintendo
+- Razer Gold
+
+ENTERTAINMENT
+
+- Apple
+- iTunes
+- Google Play
+- Spotify
+- Netflix
+
+RETAIL
+
+- eBay
+- Nike
+- Adidas
+- Macy’s
+- Sephora
+
+PAYMENT
+
+- Visa Gift Card
+- Mastercard Gift Card
+- Vanilla Gift Card
+- American Express Gift Card
+
+Gift card trade flow:
+
+Select Category
+→ Select Card
+→ Select Country
+→ Select Amount
+→ Upload Card Images
+→ Validation
+→ Rate Calculation
+→ Review
+→ Submit
+→ Processing
+→ Complete
+
+Include:
+
+- Card image upload
+- Multiple image upload
+- Trade tracking
+- Trade history
+- Rate calculator
+- Transaction receipts
+
+====================================================
+PHASE 6 — CRYPTO SYSTEM
+====================================================
+
+Support:
+
+- BTC
+- ETH
+- USDT
+- USDC
+- BNB
+- SOL
+- XRP
+- DOGE
+- LTC
+- TRX
+
+Networks:
+
+- ERC20
+- TRC20
+- BEP20
+- Polygon
+- Solana
+- Arbitrum
+- Optimism
+
+Features:
+
+Buy Crypto
+
+Sell Crypto
+
+Deposit Crypto
+
+Withdraw Crypto
+
+Wallet Address Generation
+
+QR Codes
+
+Transaction Tracking
+
+Live Rates
+
+History
+
+Flow:
+
+Crypto Home
+→ Asset Selection
+→ Buy/Sell
+→ Confirmation
+→ Success
+
+====================================================
+PHASE 7 — WALLET SYSTEM
+====================================================
+
+Implement:
+
+Naira Wallet
+
+USD Wallet
+
+Crypto Wallet
+
+Rewards Wallet
+
+Cashback Wallet
+
+Features:
+
+- Fund Wallet
+- Withdraw
+- Transfer
+- History
+- Statements
+- Receipts
+
+====================================================
+PHASE 8 — BILL PAYMENTS
+====================================================
+
+Implement categories:
+
+Electricity
+
+Cable TV
+
+Internet
+
+Education
+
+Betting Wallet Funding
+
+Utilities
+
+Each category:
+
+Provider Selection
+→ Customer Validation
+→ Amount
+→ Confirmation
+→ Payment
+→ Success
+
+====================================================
+PHASE 9 — AIRTIME
+====================================================
+
+Networks:
+
+- MTN
+- Airtel
+- Glo
+- 9mobile
+
+Features:
+
+- Self recharge
+- Third-party recharge
+- Bulk purchase
+- Scheduled recharge
+
+Flow:
+
+Network
+→ Number
+→ Amount
+→ Confirmation
+→ Success
+
+====================================================
+PHASE 10 — DATA PURCHASE
+====================================================
+
+Features:
+
+- Daily Plans
+- Weekly Plans
+- Monthly Plans
+- SME Plans
+- Corporate Plans
+
+Flow:
+
+Network
+→ Plan
+→ Number
+→ Confirmation
+→ Success
+
+====================================================
+PHASE 11 — ESIM SYSTEM
+====================================================
+
+Features:
+
+- Global Packages
+- Regional Packages
+- Country Packages
+
+Flow:
+
+Select Region
+→ Select Package
+→ Payment
+→ Generate eSIM
+→ QR Delivery
+→ Install Guide
+
+====================================================
+PHASE 12 — VIRTUAL DOLLAR CARD
+====================================================
+
+Card Types:
+
+Regular Card
+
+Premium Card
+
+Features:
+
+Create Card
+
+Fund Card
+
+Freeze Card
+
+Unfreeze Card
+
+View CVV
+
+View Card Details
+
+Replace Card
+
+Terminate Card
+
+Spending Limits
+
+Transaction History
+
+Flow:
+
+Card Dashboard
+→ Create Card
+→ Fund Card
+→ Manage Card
+
+====================================================
+PHASE 13 — REFERRAL SYSTEM
+====================================================
+
+Features:
+
+- Referral Code
+- Referral Link
+- Referral Earnings
+- Referral History
+- Leaderboards
+
+====================================================
+PHASE 14 — REWARDS SYSTEM
+====================================================
+
+Features:
+
+- Cashback
+- Loyalty Points
+- Trade Rewards
+- Campaign Rewards
+- Achievement Rewards
+
+====================================================
+PHASE 15 — NOTIFICATIONS
+====================================================
+
+Implement:
+
+- Push Notifications
+- Email Notifications
+- SMS Notifications
+- In-App Notifications
+
+====================================================
+PHASE 16 — SUPPORT SYSTEM
+====================================================
+
+Implement:
+
+Support Center
+
+Live Chat
+
+Tickets
+
+FAQs
+
+Categories:
+
+- Gift Card
+- Crypto
+- Wallet
+- Withdrawals
+- Deposits
+- Verification
+- Technical Issues
+
+====================================================
+PHASE 17 — KYC SYSTEM
+====================================================
+
+Tier 1
+
+Basic Information
+
+Tier 2
+
+Government ID
+
+Tier 3
+
+Selfie Verification
+
+Tier 4
+
+Proof of Address
+
+Tier 5
+
+Enhanced Verification
+
+Flow:
+
+Start KYC
+→ Upload Documents
+→ Review
+→ Approved / Rejected
+
+====================================================
+PHASE 18 — SETTINGS
+====================================================
+
+Implement:
+
+Profile
+
+Password
+
+Security
+
+Devices
+
+Sessions
+
+Notification Preferences
+
+Privacy
+
+Language
+
+Referral
+
+KYC
+
+====================================================
+PHASE 19 — TRANSACTION SYSTEM
+====================================================
+
+Every transaction type must support:
+
+Statuses:
+
+- Pending
+- Processing
+- Completed
+- Failed
+- Cancelled
+
+Filters:
+
+- Date
+- Amount
+- Type
+- Status
+
+Receipts:
+
+- Download
+- Share
+- Export
+
+====================================================
+PHASE 20 — SECURITY
+====================================================
+
+Implement:
+
+- Audit Logs
+- Device Fingerprinting
+- Fraud Monitoring
+- AML Monitoring
+- Risk Scoring
+- Withdrawal Locks
+- Login Protection
+- Encryption
+- Secure Storage
+- Rate Limiting
+
+====================================================
+PHASE 21 — ADMIN PANEL
+====================================================
+
+Implement or complete:
+
+User Management
+
+Wallet Management
+
+Gift Card Management
+
+Crypto Management
+
+Bill Payment Management
+
+Virtual Card Management
+
+eSIM Management
+
+Referral Management
+
+Rewards Management
+
+KYC Review
+
+Support Tickets
+
+Notifications
+
+Analytics
+
+Revenue Reports
+
+Transaction Monitoring
+
+Fraud Monitoring
+
+System Configuration
+
+====================================================
+FINAL REQUIREMENTS
+====================================================
+
+1. Preserve all existing UI.
+2. Preserve all existing colors.
+3. Preserve all existing branding.
+4. Preserve all existing layouts.
+5. Preserve all existing text content.
+6. Preserve all existing routes.
+7. Connect all missing navigation paths.
+8. Ensure every button leads somewhere valid.
+9. Ensure every page has proper back navigation.
+10. Ensure every flow reaches a successful completion state.
+11. Ensure every flow has loading, error, empty, success, and retry states.
+12. Ensure all modules are fully integrated.
+13. Ensure all wallet balances synchronize correctly.
+14. Ensure transaction history updates correctly.
+15. Ensure notifications update correctly.
+16. Ensure KYC restrictions are enforced where required.
+17. Ensure permissions and security checks are enforced throughout the application.
+18. Generate a final architecture report showing all implemented modules, routes, page flows, APIs, integrations, navigation maps, dependencies, and remaining gaps.
