@@ -54,10 +54,11 @@ function RunningMan({
   flagRotation: SharedValue<number>;
   motionOpacity: SharedValue<number>;
 }) {
+  /* Flag waves around the top of the pole */
   const flagProps = useAnimatedProps(() => ({
     rotation: flagRotation.value,
-    originX:  88,
-    originY:  7,
+    originX:  58,
+    originY:  9,
   }));
 
   const motionProps = useAnimatedProps(() => ({
@@ -65,61 +66,73 @@ function RunningMan({
   }));
 
   return (
-    <Svg viewBox="0 0 218 158" width={218} height={158}>
+    <Svg viewBox="0 0 275 190" width={275} height={190}>
 
-      {/* ── Motion lines (speed / wind) ─────────────────── */}
+      {/* ── Motion lines – right side, runner trails left so lines are to his right ── */}
       <AnimatedG animatedProps={motionProps}>
-        <Path d="M 160 20 L 200 15" stroke={C.dark} strokeWidth={3.2} strokeLinecap="round"/>
-        <Path d="M 162 32 L 198 28" stroke={C.dark} strokeWidth={2.6} strokeLinecap="round"/>
-        <Path d="M 164 44 L 195 41" stroke={C.dark} strokeWidth={2.0} strokeLinecap="round"/>
+        <Path d="M 172 65 L 228 57" stroke={C.dark} strokeWidth={3.4} strokeLinecap="round"/>
+        <Path d="M 175 80 L 223 74" stroke={C.dark} strokeWidth={2.7} strokeLinecap="round"/>
+        <Path d="M 178 95 L 218 92" stroke={C.dark} strokeWidth={2.0} strokeLinecap="round"/>
       </AnimatedG>
 
-      {/* ── Flag pole ───────────────────────────────────── */}
+      {/* ── Flag pole – from raised-hand to upper-left ──── */}
       <Path
-        d="M 108 36 L 88 7"
-        stroke={C.dark} strokeWidth={3.5} strokeLinecap="round"
+        d="M 84 58 L 58 9"
+        stroke={C.dark} strokeWidth={3.2} strokeLinecap="round"
       />
 
-      {/* ── Flag (animated wave) ────────────────────────── */}
+      {/* ── Flag (animated wave around pole tip) ────────── */}
       <AnimatedG animatedProps={flagProps}>
+        {/* Rectangular flag to the RIGHT of the pole tip */}
         <Path
-          d="M 88 7 L 57 15 Q 59 22 62 24 L 88 19 Z"
+          d="M 58 9 L 96 18 Q 97 26 95 28 L 58 21 Z"
           fill={C.dark}
         />
       </AnimatedG>
 
-      {/* ── Head ────────────────────────────────────────── */}
-      <Circle cx={148} cy={32} r={15} fill={C.dark} />
+      {/* ── Head – LEFT side (leading, runner faces left) ── */}
+      <Circle cx={86} cy={38} r={21} fill={C.dark} />
 
-      {/* ── Torso ───────────────────────────────────────── */}
+      {/* ── Torso – leaning forward ─────────────────────── */}
       <Path
-        d="M 132 46 Q 120 61 117 79 Q 126 84 137 82 Q 148 68 142 46 Z"
+        d="M 78 58 Q 70 76 74 97 Q 86 106 108 102 Q 126 90 120 62 Z"
         fill={C.dark}
       />
 
-      {/* ── Left arm (raised — holds flag pole) ─────────── */}
+      {/* ── Left arm (raised – grips flag pole) ─────────── */}
       <Path
-        d="M 128 52 Q 118 45 108 36"
-        stroke={C.dark} strokeWidth={11} strokeLinecap="round" fill="none"
+        d="M 84 68 Q 82 62 84 58"
+        stroke={C.dark} strokeWidth={13} strokeLinecap="round" fill="none"
       />
 
-      {/* ── Right arm (trailing back) ────────────────────── */}
+      {/* ── Right arm (trailing back-right) ──────────────── */}
       <Path
-        d="M 143 52 Q 158 60 168 70"
-        stroke={C.dark} strokeWidth={11} strokeLinecap="round" fill="none"
+        d="M 116 70 Q 140 82 158 96"
+        stroke={C.dark} strokeWidth={13} strokeLinecap="round" fill="none"
       />
 
-      {/* ── Right leg (stepping forward) ─────────────────── */}
+      {/* ── Left leg (leading – forward/left) ────────────── */}
       <Path
-        d="M 133 79 Q 148 98 162 106 Q 167 103 170 108"
-        stroke={C.dark} strokeWidth={11} strokeLinecap="round" fill="none"
+        d="M 88 102 Q 72 122 60 142 Q 54 154 46 163"
+        stroke={C.dark} strokeWidth={13} strokeLinecap="round" fill="none"
+      />
+      {/* Left shoe */}
+      <Path
+        d="M 46 163 Q 30 168 25 160 L 40 152 Z"
+        fill={C.dark}
       />
 
-      {/* ── Left leg (kicking back / trailing) ───────────── */}
+      {/* ── Right leg (trailing – back/right) ────────────── */}
       <Path
-        d="M 122 79 Q 107 92 95 88 Q 88 79 85 73"
-        stroke={C.dark} strokeWidth={11} strokeLinecap="round" fill="none"
+        d="M 102 102 Q 128 120 146 140 Q 154 152 160 162"
+        stroke={C.dark} strokeWidth={13} strokeLinecap="round" fill="none"
       />
+      {/* Right shoe */}
+      <Path
+        d="M 160 162 Q 170 167 176 160 L 162 152 Z"
+        fill={C.dark}
+      />
+
     </Svg>
   );
 }
