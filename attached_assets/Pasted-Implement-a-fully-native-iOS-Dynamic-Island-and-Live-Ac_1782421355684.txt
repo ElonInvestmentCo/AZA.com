@@ -1,0 +1,247 @@
+Implement a fully native iOS Dynamic Island and Live Activities experience for all supported iPhone models (including all current and future devices that support Dynamic Island), following Apple’s Human Interface Guidelines and ActivityKit best practices.
+
+General Requirements
+
+* Support all Dynamic Island presentation modes:
+    * Minimal
+    * Compact
+    * Expanded
+    * Lock Screen Live Activity
+* Automatically adapt layouts, spacing, typography, animations, and icon sizes for every supported iPhone model and Dynamic Island size.
+* Ensure all UI elements are responsive and scale perfectly across different screen sizes and Dynamic Island dimensions without clipping, truncation, overlap, or misalignment.
+* Respect Safe Areas, Dynamic Type, accessibility settings, and different display zoom modes.
+* Support both Light Mode and Dark Mode using PayVora’s premium fintech design language.
+* Use smooth native iOS animations, haptic feedback, and SF Symbols where appropriate.
+* Ensure Live Activities continue updating correctly while the app is in the background or when the device is locked.
+* Display only active, relevant events and automatically dismiss completed activities after an appropriate delay.
+* If multiple Live Activities exist simultaneously, intelligently prioritize and manage them according to Apple’s system behavior.
+
+⸻
+
+Live Trade Status
+
+Create a real-time Live Activity for every active trade.
+
+Supported states:
+
+* Waiting for payment…
+* Payment received
+* Verifying transaction…
+* Trade completed ✅
+* Trade cancelled
+* Trade expired
+
+Requirements:
+
+* Show a live countdown until automatic cancellation when applicable.
+* Display a progress indicator that updates in real time.
+* Animate transitions smoothly between each state.
+* Immediately update the Dynamic Island whenever the backend changes the trade status.
+
+⸻
+
+Crypto Deposit Monitoring
+
+Implement Live Activities for incoming cryptocurrency deposits.
+
+Display:
+
+* Detect incoming blockchain transactions automatically.
+* Show confirmation progress such as:
+    * 1/6 Confirmations
+    * 2/6 Confirmations
+    * 3/6 Confirmations
+    * 4/6 Confirmations
+    * 5/6 Confirmations
+    * 6/6 Confirmations
+* Deposit credited
+* Wallet updated
+
+Requirements:
+
+* Update confirmation progress in real time.
+* Show estimated remaining confirmation time whenever available.
+* Immediately notify users when funds are credited.
+
+⸻
+
+Gift Card Verification
+
+Display verification progress through Live Activities.
+
+Supported stages:
+
+* Upload received
+* Verification in progress
+* Card approved
+* Card declined
+* Preparing payout
+
+Requirements:
+
+* Update instantly whenever verification progresses.
+* Clearly communicate the current stage using intuitive icons and animations.
+
+⸻
+
+Instant Payout Progress
+
+Display payout progress from start to finish.
+
+States:
+
+* Processing payout
+* Sending bank transfer
+* Bank transfer sent
+* Money delivered
+* Completed ✅
+
+Requirements:
+
+* Show an animated progress indicator.
+* Notify users immediately when payout is successful.
+
+⸻
+
+Price Alerts
+
+Support real-time market alerts for:
+
+* BTC reaches target price
+* ETH reaches target price
+* USDT rate changes
+* Gift card rate increases
+* Gift card rate decreases
+
+Requirements:
+
+* Trigger a Live Activity only when a user-defined alert condition is met.
+* Display concise pricing information without unnecessary text.
+* Allow users to tap the Dynamic Island to open the relevant market screen.
+
+⸻
+
+Support Tickets
+
+Create Live Activities for active customer support conversations.
+
+Supported events:
+
+* Agent joined
+* New message received
+* Agent typing
+* Issue resolved
+
+Requirements:
+
+* Keep updates short and informative.
+* Open directly to the chat screen when tapped.
+
+⸻
+
+Security Alerts
+
+Display security-related Live Activities for important account events.
+
+Supported events:
+
+* Login approved
+* Login verification required
+* Withdrawal awaiting confirmation
+* Face ID verification required
+* New device detected
+* Security review completed
+
+Requirements:
+
+* Use high-priority updates where appropriate.
+* Ensure sensitive information is never displayed on the Lock Screen.
+
+⸻
+
+Referral Rewards
+
+Create Live Activities for referral events.
+
+Supported events:
+
+* New referral signed up
+* Referral verified
+* Commission credited
+* Referral bonus received
+
+Requirements:
+
+* Display earned rewards clearly.
+* Open the referral dashboard when tapped.
+
+⸻
+
+Dynamic Island Layout Requirements
+
+Implement polished layouts for:
+
+Minimal
+
+* Small recognizable icon.
+* Current status indicator.
+
+Compact
+
+* Icon.
+* Short status.
+* Countdown or progress when applicable.
+
+Expanded
+
+Include:
+
+* Activity title.
+* Current status.
+* Progress bar or confirmation progress.
+* Countdown timer where applicable.
+* Estimated completion time.
+* Relevant amount when appropriate.
+* Success or warning indicators.
+* Primary action when tapped.
+
+Lock Screen Live Activity
+
+Display:
+
+* Full title.
+* Progress indicator.
+* Countdown.
+* Current stage.
+* Completion percentage.
+* Timestamp.
+* Appropriate branding consistent with PayVora.
+
+⸻
+
+Technical Requirements
+
+* Implement using ActivityKit and WidgetKit.
+* Follow Apple’s latest Live Activities APIs and best practices.
+* Ensure efficient background updates.
+* Minimize battery consumption.
+* Handle network interruptions gracefully.
+* Automatically recover after app relaunch.
+* Keep Live Activities synchronized with backend state.
+* Support concurrent Live Activities where appropriate.
+* End completed activities cleanly without leaving stale UI.
+
+⸻
+
+Quality Assurance
+
+Verify that every Live Activity:
+
+* Scales perfectly on every supported Dynamic Island iPhone.
+* Displays correctly in portrait and landscape where applicable.
+* Supports Light Mode and Dark Mode.
+* Supports Dynamic Type accessibility settings.
+* Avoids text truncation and clipping.
+* Maintains smooth native animations.
+* Meets Apple’s Human Interface Guidelines.
+* Delivers a polished, premium fintech experience consistent with PayVora’s overall design system.

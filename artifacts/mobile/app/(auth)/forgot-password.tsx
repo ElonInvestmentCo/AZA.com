@@ -33,6 +33,7 @@ const C = {
   primary:     "#35C2C1",
   white:       "#FFFFFF",
   btnBorder:   "#E8ECF4",
+  success:     "#00C48C",
 };
 
 function EmailInput({
@@ -43,8 +44,10 @@ function EmailInput({
   onChangeText: (t: string) => void;
 }) {
   const [focused, setFocused] = useState(false);
+  const isValid = value.includes("@") && value.includes(".");
+
   return (
-    <View style={[inp.row, focused && inp.focused]}>
+    <View style={[inp.row, focused && inp.focused, isValid && inp.valid]}>
       <TextInput
         style={inp.input}
         placeholder="Enter your email"
@@ -54,9 +57,17 @@ function EmailInput({
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
+        textContentType="emailAddress"
+        autoComplete="email"
+        returnKeyType="done"
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
+      {isValid && (
+        <Animated.View entering={FadeIn.duration(200)}>
+          <Ionicons name="checkmark-circle" size={18} color={C.success} style={{ marginLeft: 8 }} />
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -69,10 +80,13 @@ const inp = StyleSheet.create({
     borderColor: C.inputBorder,
     borderRadius: 8,
     paddingHorizontal: 18,
-    justifyContent: "center",
+    flexDirection: "row",
+    alignItems: "center",
   },
   focused: { borderColor: C.inputFocus },
+  valid:   { borderColor: C.success, borderWidth: 1.5 },
   input: {
+    flex: 1,
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
     color: C.dark,
@@ -176,7 +190,7 @@ export default function ForgotPasswordScreen() {
           </Pressable>
         </Animated.View>
 
-        {/* ── Footer: Remember Password? Login ── */}
+        {/* ── Footer ── */}
         <Animated.View
           entering={FadeInUp.duration(380).delay(260).springify()}
           style={s.footer}
@@ -202,88 +216,39 @@ const s = StyleSheet.create({
     marginBottom: 32,
   },
   backBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: C.btnBorder,
+    width: 44, height: 44, borderRadius: 12,
+    borderWidth: 1, borderColor: C.btnBorder,
     backgroundColor: C.white,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "center", justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
+    shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
   },
-  wordmark: {
-    fontSize: 32,
-    fontFamily: "Manrope_700Bold",
-    color: C.dark,
-    letterSpacing: -0.5,
-  },
+  wordmark: { fontSize: 32, fontFamily: "Manrope_700Bold", color: C.dark, letterSpacing: -0.5 },
 
   titleBlock: { marginBottom: 36 },
   heading: {
-    fontSize: 30,
-    fontFamily: "Manrope_700Bold",
-    color: C.dark,
-    letterSpacing: -0.3,
-    marginBottom: 12,
-    lineHeight: 39,
+    fontSize: 30, fontFamily: "Manrope_700Bold", color: C.dark,
+    letterSpacing: -0.3, marginBottom: 12, lineHeight: 39,
   },
-  subText: {
-    fontSize: 16,
-    fontFamily: "Manrope_400Regular",
-    color: C.gray,
-    lineHeight: 24,
-  },
+  subText: { fontSize: 16, fontFamily: "Manrope_400Regular", color: C.gray, lineHeight: 24 },
 
   formBlock: { marginBottom: 20 },
-  errorText: {
-    marginTop: 8,
-    fontSize: 13,
-    fontFamily: "Manrope_400Regular",
-    color: "#E74C3C",
-  },
+  errorText: { marginTop: 8, fontSize: 13, fontFamily: "Manrope_400Regular", color: "#E74C3C" },
 
   btnWrap: { marginBottom: 28 },
   sendBtn: {
-    height: 60,
-    backgroundColor: C.dark,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#1E232C",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
+    height: 60, backgroundColor: C.dark,
+    borderRadius: 14, alignItems: "center", justifyContent: "center",
+    shadowColor: "#1E232C", shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18, shadowRadius: 12, elevation: 6,
   },
-  sendBtnText: {
-    fontSize: 16,
-    fontFamily: "Manrope_700Bold",
-    color: C.white,
-    letterSpacing: 0.2,
-  },
+  sendBtnText: { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.white, letterSpacing: 0.2 },
 
   footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "auto",
-    paddingTop: 24,
+    flexDirection: "row", justifyContent: "center", alignItems: "center",
+    marginTop: "auto", paddingTop: 24,
   },
-  footerText: {
-    fontSize: 15,
-    fontFamily: "Manrope_400Regular",
-    color: C.dark,
-    lineHeight: 21,
-  },
-  footerLink: {
-    fontSize: 15,
-    fontFamily: "Manrope_700Bold",
-    color: C.primary,
-    lineHeight: 21,
-  },
+  footerText: { fontSize: 15, fontFamily: "Manrope_400Regular", color: C.dark, lineHeight: 21 },
+  footerLink: { fontSize: 15, fontFamily: "Manrope_700Bold", color: C.primary, lineHeight: 21 },
 });

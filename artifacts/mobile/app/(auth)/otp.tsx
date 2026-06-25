@@ -68,6 +68,7 @@ function OtpBox({
   onChangeText,
   boxW,
   boxH,
+  smsAutofill,
 }: {
   value: string;
   isFocused: boolean;
@@ -77,6 +78,7 @@ function OtpBox({
   onChangeText: (t: string) => void;
   boxW: number;
   boxH: number;
+  smsAutofill?: boolean;
 }) {
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
@@ -110,6 +112,7 @@ function OtpBox({
           maxLength={1}
           caretHidden
           selectTextOnFocus
+          textContentType={smsAutofill ? "oneTimeCode" : "none"}
         />
       </View>
     </Animated.View>
@@ -296,6 +299,7 @@ export default function OtpScreen() {
               onKeyPress={key => handleKeyPress(i, key)}
               boxW={boxW}
               boxH={boxH}
+              smsAutofill={i === 0}
             />
           ))}
         </Animated.View>

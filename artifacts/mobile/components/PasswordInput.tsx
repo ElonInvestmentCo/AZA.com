@@ -6,13 +6,16 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { EyeIcon } from "@/components/EyeIcon";
+import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
 
 interface PasswordInputProps {
   placeholder?: string;
   value: string;
   onChangeText: (t: string) => void;
   error?: boolean;
+  textContentType?: "password" | "newPassword";
+  returnKeyType?: "next" | "done" | "go";
+  onSubmitEditing?: () => void;
 }
 
 export function PasswordInput({
@@ -20,6 +23,9 @@ export function PasswordInput({
   value,
   onChangeText,
   error,
+  textContentType = "password",
+  returnKeyType = "done",
+  onSubmitEditing,
 }: PasswordInputProps) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -35,15 +41,19 @@ export function PasswordInput({
         secureTextEntry={!showPass}
         autoCapitalize="none"
         autoCorrect={false}
+        textContentType={textContentType}
+        autoComplete={textContentType === "newPassword" ? "new-password" : "current-password"}
+        returnKeyType={returnKeyType}
+        onSubmitEditing={onSubmitEditing}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
       <Pressable
         onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         style={s.eyeBtn}
       >
-        <EyeIcon open={showPass} size={22} color="#8391A1" />
+        <PremiumEyeIcon open={showPass} size={22} color="#8391A1" />
       </Pressable>
     </View>
   );
