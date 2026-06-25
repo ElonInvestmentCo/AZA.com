@@ -1,0 +1,50 @@
+Replicate the attached success-state design with pixel-perfect accuracy using the uploaded image as the single source of truth. Match every detail exactly, including the running-man illustration, flag, motion lines, checkmark badge, spacing, proportions, alignment, sizing, typography hierarchy, padding, and visual balance. Do not redesign, simplify, substitute, reinterpret, or estimate any element.
+
+SUCCESS STATE PLACEMENT
+
+Display this success component immediately after a user successfully submits a trade on the "Sell Gift Card" flow. It should appear as a dedicated success confirmation screen after the API confirms the trade has been submitted successfully.
+
+LAYOUT REQUIREMENTS
+
+* Running illustration centered near the top of the success screen.
+* Verification badge/checkmark centered directly beneath the illustration.
+* "Trade Submitted" heading centered beneath the badge.
+* Success description text centered beneath the heading.
+* Maintain the exact spacing relationships shown in the reference.
+* Ensure perfect responsiveness across iPhone, Android, tablets, iPads, desktop, and all screen sizes.
+
+CHECKMARK ANIMATION (MODERN FINTECH STYLE)
+
+The verification badge should have a premium fintech confirmation animation:
+
+1. Badge scales from 0.8x to 1.0x using a smooth spring animation.
+2. Checkmark draws itself from start to finish.
+3. Subtle success pulse after completion.
+4. Very soft glow or emphasis effect.
+5. Total animation duration: approximately 800–1200ms.
+6. Smooth, professional, production-quality motion.
+7. No exaggerated bouncing or cartoon effects.
+
+RUNNING MAN ANIMATION
+
+Preserve the exact illustration design while adding subtle motion:
+
+1. The flag should gently wave as if a light breeze is blowing.
+2. The flag movement should be minimal and elegant.
+3. Motion should loop seamlessly.
+4. The air streaks behind the runner should subtly animate to reinforce forward movement.
+5. The runner itself should have a very slight floating/running motion (1–3px vertical movement maximum).
+6. Animation should feel premium, modern, and fintech-grade.
+7. Avoid cartoonish or excessive movement.
+
+PERFORMANCE REQUIREMENTS
+
+* Use vector-based animations where possible.
+* Ensure 60fps performance.
+* No layout shifts during animation.
+* Animations must remain smooth on lower-end devices.
+* Support iOS, Android, and Web consistently.
+
+FINAL GOAL
+
+The completed success screen should look visually identical to the reference image while adding refined, modern fintech animations that communicate successful trade completion in a premium, trustworthy, and professional manner.
