@@ -32,13 +32,13 @@ args = "AZA Mobile (Expo Go)"
 name = "API Server"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/api-server run dev"
-waitForPort = 8080
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run build && PORT=8080 NODE_ENV=development node --enable-source-maps artifacts/api-server/dist/index.mjs"
+waitForPort = 8080
 
 [[workflows.workflow]]
 name = "AZA Mobile Web"
