@@ -54,14 +54,11 @@ function SelectField({
 
 const f = StyleSheet.create({
   wrap:  { gap: 4 },
-  label: {
-    fontSize: 12, fontFamily: "Manrope_500Medium",
-    color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24,
-  },
+  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24 },
   input: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between",
     backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
-    borderRadius: 10, paddingHorizontal: 14, height: 46,
+    borderRadius: 10, paddingHorizontal: 14, height: 48,
     shadowColor: "rgba(228,229,231,0.24)", shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1, shadowRadius: 2, elevation: 1,
   },
@@ -110,7 +107,7 @@ function PickerModal({
 }
 
 const pm = StyleSheet.create({
-  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
+  handle:  { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
   title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
   option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
@@ -121,13 +118,21 @@ export default function SellGiftCardScreen() {
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 20 : insets.top;
 
-  const [category, setCategory] = useState("");
-  const [country,  setCountry]  = useState("");
-  const [type,     setType]     = useState("");
-  const [amount,   setAmount]   = useState("");
-  const [picker,   setPicker]   = useState<PickerKey | null>(null);
+  const [category,   setCategory]   = useState("");
+  const [country,    setCountry]    = useState("");
+  const [type,       setType]       = useState("");
+  const [amountRaw,  setAmountRaw]  = useState(""); // raw digit string
+  const [amountFmt,  setAmountFmt]  = useState(""); // formatted with commas
+  const [picker,     setPicker]     = useState<PickerKey | null>(null);
 
-  const total = amount ? parseInt(amount.replace(/,/g, "")) * RATE : RATE * 200;
+  const handleAmountChange = (t: string) => {
+    const raw = t.replace(/\D/g, "");
+    setAmountRaw(raw);
+    setAmountFmt(raw ? parseInt(raw, 10).toLocaleString("en-US") : "");
+  };
+
+  const cardAmountUSD = amountRaw ? parseInt(amountRaw, 10) : 200;
+  const total         = cardAmountUSD * RATE;
 
   return (
     <View style={s.root}>
@@ -177,18 +182,26 @@ export default function SellGiftCardScreen() {
         {/* Amount */}
         <Animated.View entering={FadeInDown.duration(300).springify().delay(150)}>
           <View style={f.wrap}>
-            <Text style={f.label}>amount</Text>
+            <Text style={f.label}>amount (USD)</Text>
             <View style={f.input}>
               <Text style={{ fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.textMuted, marginRight: 4 }}>$</Text>
               <TextInput
                 style={{ flex: 1, fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text }}
-                placeholder="200,400"
+                placeholder="0"
                 placeholderTextColor={C.textMuted}
-                value={amount}
-                onChangeText={t => setAmount(t.replace(/[^0-9,]/g, ""))}
-                keyboardType="numeric"
+                value={amountFmt}
+                onChangeText={handleAmountChange}
+                keyboardType="number-pad"
+                returnKeyType="done"
+                textContentType="none"
+                autoComplete="off"
               />
             </View>
+            {amountRaw && (
+              <Text style={s.rateHint}>
+                ≈ ₦{total.toLocaleString("en-NG")} at ₦{RATE.toLocaleString("en-NG")} / $1
+              </Text>
+            )}
           </View>
         </Animated.View>
 
@@ -213,7 +226,7 @@ export default function SellGiftCardScreen() {
         <Animated.View entering={FadeInUp.duration(300).springify().delay(210)} style={s.summaryBox}>
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Rate</Text>
-            <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")}</Text>
+            <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")} / $1</Text>
           </View>
           <View style={s.summaryLine} />
           <View style={s.summaryRow}>
@@ -262,6 +275,8 @@ const s = StyleSheet.create({
   scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
   subtitle:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, letterSpacing: 0.24 },
 
+  rateHint: { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted, marginTop: 4, paddingLeft: 2 },
+
   uploadSection: { gap: 6 },
   uploadHint:    { fontSize: 6, fontFamily: "Manrope_500Medium", color: C.muted2 },
   uploadRow:     { flexDirection: "row", gap: 10 },
@@ -271,8 +286,8 @@ const s = StyleSheet.create({
     backgroundColor: C.dark, borderRadius: 10,
     paddingHorizontal: 18, paddingVertical: 2,
   },
-  summaryRow:  { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14 },
-  summaryLine: { height: 1, backgroundColor: "#E9E9E9" },
+  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14 },
+  summaryLine:  { height: 1, backgroundColor: "#E9E9E9" },
   summaryLabel: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF", letterSpacing: -0.1 },
   summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 

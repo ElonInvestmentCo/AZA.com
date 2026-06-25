@@ -80,6 +80,10 @@ function ValidatedInput({
   error,
   touched,
   onBlur,
+  textContentType,
+  autoComplete,
+  returnKeyType,
+  onSubmitEditing,
 }: {
   placeholder: string;
   value: string;
@@ -89,6 +93,10 @@ function ValidatedInput({
   error?: string;
   touched?: boolean;
   onBlur?: () => void;
+  textContentType?: "username" | "emailAddress" | "newPassword" | "password" | "name" | "none";
+  autoComplete?: "username" | "email" | "new-password" | "current-password" | "name" | "off";
+  returnKeyType?: "next" | "done" | "go";
+  onSubmitEditing?: () => void;
 }) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -121,7 +129,12 @@ function ValidatedInput({
           onChangeText={onChangeText}
           keyboardType={keyboardType}
           autoCapitalize="none"
+          autoCorrect={false}
           secureTextEntry={secure && !showPass}
+          textContentType={textContentType}
+          autoComplete={autoComplete}
+          returnKeyType={returnKeyType}
+          onSubmitEditing={onSubmitEditing}
           onFocus={() => setFocused(true)}
           onBlur={() => { setFocused(false); onBlur?.(); }}
         />
@@ -369,6 +382,9 @@ export default function RegisterScreen() {
               error={errUsername}
               touched={touchedUsername}
               onBlur={() => setTouchedUsername(true)}
+              textContentType="username"
+              autoComplete="username"
+              returnKeyType="next"
             />
             <ValidatedInput
               placeholder="Email"
@@ -378,6 +394,9 @@ export default function RegisterScreen() {
               error={errEmail}
               touched={touchedEmail}
               onBlur={() => setTouchedEmail(true)}
+              textContentType="emailAddress"
+              autoComplete="email"
+              returnKeyType="next"
             />
             <View>
               <ValidatedInput
@@ -388,6 +407,9 @@ export default function RegisterScreen() {
                 error={errPassword}
                 touched={touchedPassword}
                 onBlur={() => setTouchedPassword(true)}
+                textContentType="newPassword"
+                autoComplete="new-password"
+                returnKeyType="next"
               />
               {touchedPassword && <PasswordStrength value={password} />}
             </View>
@@ -399,6 +421,10 @@ export default function RegisterScreen() {
               error={errConfirm}
               touched={touchedConfirm}
               onBlur={() => setTouchedConfirm(true)}
+              textContentType="newPassword"
+              autoComplete="new-password"
+              returnKeyType="done"
+              onSubmitEditing={handleRegister}
             />
           </Animated.View>
         </Animated.View>

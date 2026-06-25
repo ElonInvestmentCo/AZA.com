@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Platform,
   Pressable,
@@ -13,18 +13,24 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
+import { WaveIcon } from "@/components/WaveIcon";
+import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
 import Animated, {
+  FadeIn,
   FadeInDown,
   FadeInUp,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 const MAX_W = 430;
+const BAL_VIS_KEY = "aza_balance_visible";
 
 const C = {
   bg:        "#FFFFFF",
@@ -38,7 +44,6 @@ const C = {
   actionBar: "#000000",
 };
 
-// Pre-resolve at module level so Metro bundles eagerly
 const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
@@ -156,9 +161,41 @@ export default function HomeScreen() {
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
 
+  /* Persist balance visibility preference */
+  useEffect(() => {
+    AsyncStorage.getItem(BAL_VIS_KEY).then(val => {
+      if (val !== null) setBalanceVisible(val === "true");
+    }).catch(() => {});
+  }, []);
+
+  const toggleBalance = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const next = !balanceVisible;
+    setBalanceVisible(next);
+    AsyncStorage.setItem(BAL_VIS_KEY, String(next)).catch(() => {});
+  };
+
+  /* Balance display */
   const firstName = (user?.name ?? "Dove").split(" ")[0];
   const balance   = user?.balance ?? 200590;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const MASKED    = "₦••••••••";
+
+  /* Balance amount scale animation */
+  const balScale = useSharedValue(1);
+  const balOpacity = useSharedValue(1);
+  const balStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: balScale.value }],
+    opacity: balOpacity.value,
+  }));
+
+  const handleToggle = () => {
+    balOpacity.value = withTiming(0, { duration: 100 }, () => {
+      balScale.value = withSpring(1, { damping: 14 });
+      balOpacity.value = withTiming(1, { duration: 150 });
+    });
+    toggleBalance();
+  };
 
   const press = (fn: () => void) => () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -210,19 +247,23 @@ export default function HomeScreen() {
               cachePolicy="memory-disk"
             />
             <View style={s.greetText}>
-              <Text style={s.hiText}>Hi, {firstName} 👋</Text>
+              <View style={s.hiRow}>
+                <Text style={s.hiText}>Hi, {firstName} </Text>
+                <WaveIcon size={18} color={C.text} />
+              </View>
               <Text style={s.greetSub}>Your available balance</Text>
             </View>
           </View>
           <View style={s.balRow}>
-            <Text style={s.balAmount} numberOfLines={1}>
-              {balanceVisible ? formatted : "₦•••,•••.••"}
-            </Text>
+            <Animated.Text style={[s.balAmount, balStyle]} numberOfLines={1}>
+              {balanceVisible ? formatted : MASKED}
+            </Animated.Text>
             <TouchableOpacity
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setBalanceVisible(v => !v); }}
+              onPress={handleToggle}
               style={s.eyeBtn}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Feather name={balanceVisible ? "eye" : "eye-off"} size={18} color={C.textMuted} />
+              <PremiumEyeIcon open={balanceVisible} size={20} color={C.textMuted} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -406,14 +447,15 @@ const s = StyleSheet.create({
     borderColor: "#EEF0F2",
     gap: 12,
   },
-  greetRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  avatar:   { width: 46, height: 46, borderRadius: 23 },
+  greetRow:  { flexDirection: "row", alignItems: "center", gap: 12 },
+  avatar:    { width: 46, height: 46, borderRadius: 23 },
   greetText: { gap: 2, flex: 1 },
-  hiText:   { fontSize: 15, fontFamily: "Manrope_700Bold", color: C.text },
-  greetSub: { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
-  balRow:   { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  hiRow:     { flexDirection: "row", alignItems: "center" },
+  hiText:    { fontSize: 15, fontFamily: "Manrope_700Bold", color: C.text },
+  greetSub:  { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
+  balRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   balAmount: { fontSize: 24, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, flex: 1 },
-  eyeBtn:    { padding: 6 },
+  eyeBtn:    { padding: 4 },
 
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {

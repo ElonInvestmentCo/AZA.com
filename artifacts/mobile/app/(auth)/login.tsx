@@ -5,7 +5,7 @@ import { PasswordInput } from "@/components/PasswordInput";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -31,7 +31,6 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
-/* ── Design tokens ─────────────────────────────────────────────────────── */
 const C = {
   bg:           "#FFFFFF",
   inputBg:      "#F7F8F9",
@@ -62,14 +61,14 @@ function EmailInput({
   placeholder,
   value,
   onChangeText,
-  keyboardType,
   error,
+  onSubmitEditing,
 }: {
   placeholder: string;
   value: string;
   onChangeText: (t: string) => void;
-  keyboardType?: any;
   error?: boolean;
+  onSubmitEditing?: () => void;
 }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -80,8 +79,13 @@ function EmailInput({
         placeholderTextColor={C.placeholder}
         value={value}
         onChangeText={onChangeText}
-        keyboardType={keyboardType}
+        keyboardType="email-address"
         autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="emailAddress"
+        autoComplete="email"
+        returnKeyType="next"
+        onSubmitEditing={onSubmitEditing}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
@@ -109,7 +113,6 @@ const inp = StyleSheet.create({
     color: C.text,
     height: "100%",
   },
-  eyeBtn: { padding: 2 },
 });
 
 /* ── Animated Pressable link ────────────────────────────────────────────── */
@@ -148,23 +151,19 @@ export default function LoginScreen() {
   const { width } = useWindowDimensions();
   const fingerprintSize = Math.min(Math.round(width * 0.24), 100);
 
+  const passwordRef = useRef<TextInput>(null);
+
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState("");
   const [socialError, setSocialError] = useState("");
 
-  /* login button scale — lives on its OWN Animated.View (no entering prop) */
   const btnSc    = useSharedValue(1);
-  const btnStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: btnSc.value }],
-  }));
+  const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
-  /* form shake on bad login */
   const shakeX     = useSharedValue(0);
-  const shakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shakeX.value }],
-  }));
+  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
   const triggerShake = () => {
     shakeX.value = withSequence(
@@ -245,13 +244,16 @@ export default function LoginScreen() {
               placeholder="Enter your email"
               value={email}
               onChangeText={t => { setEmail(t); setError(""); }}
-              keyboardType="email-address"
               error={!!error}
+              onSubmitEditing={() => passwordRef.current?.focus()}
             />
             <PasswordInput
               value={password}
               onChangeText={t => { setPassword(t); setError(""); }}
               error={!!error}
+              textContentType="password"
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
             />
             {error ? (
               <Animated.Text entering={FadeIn.duration(200)} style={s.errorText}>
@@ -267,7 +269,7 @@ export default function LoginScreen() {
           </Animated.View>
         </Animated.View>
 
-        {/* ── Login button — entering on a wrapper, scale on an inner view ── */}
+        {/* ── Login button ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(180).springify()}
           style={s.btnWrap}
@@ -337,7 +339,6 @@ export default function LoginScreen() {
   );
 }
 
-/* ── Styles ─────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
   root:   { flex: 1, backgroundColor: C.bg },
   scroll: { paddingHorizontal: 24, flexGrow: 1 },
@@ -416,11 +417,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#E8ECF4",
-  },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "#E8ECF4" },
   dividerText: {
     marginHorizontal: 12,
     fontSize: 14,
@@ -428,10 +425,7 @@ const s = StyleSheet.create({
     color: "#6A707C",
   },
 
-  socialWrap: {
-    marginBottom: 24,
-    gap: 10,
-  },
+  socialWrap:  { marginBottom: 24, gap: 10 },
   socialError: {
     fontSize: 13,
     fontFamily: "Manrope_400Regular",
