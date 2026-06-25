@@ -1,10 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -60,20 +60,15 @@ function PickerModal({
   visible, title, onClose, children,
 }: { visible: boolean; title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={pm.overlay} onPress={onClose} />
-      <View style={pm.sheet}>
-        <View style={pm.handle} />
-        <Text style={pm.title}>{title}</Text>
-        <ScrollView showsVerticalScrollIndicator={false}>{children}</ScrollView>
-      </View>
-    </Modal>
+    <AnimatedSheet visible={visible} onClose={onClose} maxHeight="65%">
+      <View style={pm.handle} />
+      <Text style={pm.title}>{title}</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>{children}</ScrollView>
+    </AnimatedSheet>
   );
 }
 
 const pm = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)" },
-  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40, maxHeight: "65%" },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
   title:  { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
 });

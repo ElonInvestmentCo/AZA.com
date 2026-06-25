@@ -4,7 +4,6 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -14,6 +13,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { AnimatedSheet } from "@/components/AnimatedSheet";
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -312,65 +312,60 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* ── Gift Card Modal ── */}
-      <Modal
+      <AnimatedSheet
         visible={giftModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setGiftModalVisible(false)}
+        onClose={() => setGiftModalVisible(false)}
+        sheetStyle={gm.sheet}
       >
-        <Pressable style={gm.overlay} onPress={() => setGiftModalVisible(false)}>
-          <Pressable style={gm.sheet} onPress={() => {}}>
-            <View style={gm.handle} />
-            <View style={gm.sheetHeader}>
-              <Text style={gm.sheetTitle}>I want to?</Text>
-              <TouchableOpacity
-                style={gm.closeBtn}
-                onPress={() => setGiftModalVisible(false)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Feather name="x" size={18} color="#1E232C" />
-              </TouchableOpacity>
+        <View style={gm.handle} />
+        <View style={gm.sheetHeader}>
+          <Text style={gm.sheetTitle}>I want to?</Text>
+          <TouchableOpacity
+            style={gm.closeBtn}
+            onPress={() => setGiftModalVisible(false)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Feather name="x" size={18} color="#1E232C" />
+          </TouchableOpacity>
+        </View>
+        <View style={gm.tilesRow}>
+          <TouchableOpacity
+            style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
+            activeOpacity={0.82}
+            onPress={() => {
+              setGiftModalVisible(false);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/(app)/sell-gift-card" as any);
+            }}
+          >
+            <View style={[gm.tileIcon, { backgroundColor: "rgba(92,64,0,0.12)" }]}>
+              <Feather name="gift" size={24} color="#5C4000" />
             </View>
-            <View style={gm.tilesRow}>
-              <TouchableOpacity
-                style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
-                activeOpacity={0.82}
-                onPress={() => {
-                  setGiftModalVisible(false);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/(app)/sell-gift-card" as any);
-                }}
-              >
-                <View style={[gm.tileIcon, { backgroundColor: "rgba(92,64,0,0.12)" }]}>
-                  <Feather name="gift" size={24} color="#5C4000" />
-                </View>
-                <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
-                <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
-                  Sell local and international gift cards easily and instantly on aza.
-                </Text>
-              </TouchableOpacity>
+            <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
+            <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
+              Sell local and international gift cards easily and instantly on aza.
+            </Text>
+          </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
-                activeOpacity={0.82}
-                onPress={() => {
-                  setGiftModalVisible(false);
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/(app)/card-status" as any);
-                }}
-              >
-                <View style={[gm.tileIcon, { backgroundColor: "rgba(122,21,53,0.12)" }]}>
-                  <Feather name="clock" size={24} color="#7A1535" />
-                </View>
-                <Text style={[gm.tileTitle, { color: "#7A1535" }]}>Check Pending</Text>
-                <Text style={[gm.tileDesc, { color: "#7A153599" }]}>
-                  Check Status of Pending gift card sale.
-                </Text>
-              </TouchableOpacity>
+          <TouchableOpacity
+            style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
+            activeOpacity={0.82}
+            onPress={() => {
+              setGiftModalVisible(false);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/(app)/card-status" as any);
+            }}
+          >
+            <View style={[gm.tileIcon, { backgroundColor: "rgba(122,21,53,0.12)" }]}>
+              <Feather name="clock" size={24} color="#7A1535" />
             </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
+            <Text style={[gm.tileTitle, { color: "#7A1535" }]}>Check Pending</Text>
+            <Text style={[gm.tileDesc, { color: "#7A153599" }]}>
+              Check Status of Pending gift card sale.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </AnimatedSheet>
     </View>
   );
 }
