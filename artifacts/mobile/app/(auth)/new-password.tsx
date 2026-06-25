@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
+import { EyeIcon } from "@/components/EyeIcon";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import Animated, {
@@ -24,38 +23,37 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const eyeOpenImg   = require("../../assets/images/eye-open.svg");
-const eyeClosedImg = require("../../assets/images/eye-closed.svg");
-
 const C = {
-  bg:          "#FFFFFF",
-  dark:        "#1E232C",
-  gray:        "#8391A1",
-  inputBg:     "#F7F8F9",
-  inputBorder: "#DADADA",
-  inputFocus:  "#1E232C",
-  white:       "#FFFFFF",
-  btnBorder:   "#E8ECF4",
-  error:       "#E74C3C",
+  bg:           "#FFFFFF",
+  dark:         "#1E232C",
+  inputBg:      "#F7F8F9",
+  inputBorder:  "#E8ECF4",
+  inputFocus:   "#1E232C",
+  placeholder:  "#8391A1",
+  white:        "#FFFFFF",
+  btnBorder:    "#E8ECF4",
+  error:        "#FF5B7A",
 };
 
 function PasswordInput({
   placeholder,
   value,
   onChangeText,
+  error,
 }: {
   placeholder: string;
   value: string;
   onChangeText: (t: string) => void;
+  error?: boolean;
 }) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
   return (
-    <View style={[inp.row, focused && inp.focused]}>
+    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
       <TextInput
-        style={inp.input}
+        style={inp.field}
         placeholder={placeholder}
-        placeholderTextColor={C.gray}
+        placeholderTextColor={C.placeholder}
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!showPass}
@@ -64,41 +62,38 @@ function PasswordInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      <TouchableOpacity
+      <Pressable
         onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         style={inp.eyeBtn}
       >
-        <Image
-          source={showPass ? eyeOpenImg : eyeClosedImg}
-          style={{ width: 22, height: 22 }}
-          contentFit="contain"
-        />
-      </TouchableOpacity>
+        <EyeIcon open={showPass} size={22} color="#8391A1" />
+      </Pressable>
     </View>
   );
 }
 
 const inp = StyleSheet.create({
-  row: {
-    height: 56,
+  wrap: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: C.inputBg,
     borderWidth: 1,
     borderColor: C.inputBorder,
-    borderRadius: 8,
+    borderRadius: 14,
     paddingHorizontal: 18,
+    height: 58,
   },
-  focused: { borderColor: C.inputFocus },
-  input: {
+  focused:  { borderColor: C.inputFocus },
+  errored:  { borderColor: C.error },
+  field: {
     flex: 1,
     fontSize: 15,
     fontFamily: "Manrope_400Regular",
     color: C.dark,
     height: "100%",
   },
-  eyeBtn: { paddingLeft: 8 },
+  eyeBtn: { padding: 2 },
 });
 
 export default function NewPasswordScreen() {
@@ -172,11 +167,13 @@ export default function NewPasswordScreen() {
             placeholder="New Password"
             value={newPass}
             onChangeText={t => { setNewPass(t); setError(""); }}
+            error={!!error && !newPass}
           />
           <PasswordInput
             placeholder="Confirm Password"
             value={confirm}
             onChangeText={t => { setConfirm(t); setError(""); }}
+            error={!!error && newPass !== confirm}
           />
           {!!error && (
             <Animated.Text entering={FadeIn.duration(220)} style={s.errorText}>
@@ -256,7 +253,7 @@ const s = StyleSheet.create({
   subText: {
     fontSize: 16,
     fontFamily: "Manrope_400Regular",
-    color: C.gray,
+    color: C.placeholder,
     lineHeight: 24,
   },
 

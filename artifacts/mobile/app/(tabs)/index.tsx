@@ -1,9 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Image,
   Modal,
   Platform,
   Pressable,
@@ -37,6 +37,10 @@ const C = {
   danger:    "#EF4444",
   actionBar: "#000000",
 };
+
+// Pre-resolve at module level so Metro bundles eagerly
+const logoSrc   = require("@/assets/images/lkd.png");
+const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
   { id: "gift",  label: "Gift Card",   bg: "#FFF2CF", iconColor: "#5C4000", icon: "gift"            as const, route: null                              },
@@ -177,9 +181,10 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         <Image
-          source={require("@/assets/images/lkd.png")}
+          source={logoSrc}
           style={s.logo}
-          resizeMode="contain"
+          contentFit="contain"
+          cachePolicy="memory-disk"
         />
 
         <TouchableOpacity style={s.hdrBtn}>
@@ -198,11 +203,11 @@ export default function HomeScreen() {
           style={s.greetSection}
         >
           <View style={s.greetRow}>
-            {/* 3D Avatar PNG */}
             <Image
-              source={require("@/assets/images/3d_avatar_16.png")}
+              source={avatarSrc}
               style={s.avatar}
-              resizeMode="cover"
+              contentFit="cover"
+              cachePolicy="memory-disk"
             />
             <View style={s.greetText}>
               <Text style={s.hiText}>Hi, {firstName} 👋</Text>
