@@ -6,6 +6,7 @@ import Animated, {
   Easing,
   FadeInDown,
   FadeInUp,
+  SharedValue,
   useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
@@ -50,8 +51,8 @@ function RunningMan({
   flagRotation,
   motionOpacity,
 }: {
-  flagRotation: Animated.SharedValue<number>;
-  motionOpacity: Animated.SharedValue<number>;
+  flagRotation: SharedValue<number>;
+  motionOpacity: SharedValue<number>;
 }) {
   const flagProps = useAnimatedProps(() => ({
     rotation: flagRotation.value,
@@ -131,11 +132,11 @@ function ScallopBadge({
   pulseScale,
   pulseOpacity,
 }: {
-  badgeScale:   Animated.SharedValue<number>;
-  badgeOpacity: Animated.SharedValue<number>;
-  dashOffset:   Animated.SharedValue<number>;
-  pulseScale:   Animated.SharedValue<number>;
-  pulseOpacity: Animated.SharedValue<number>;
+  badgeScale:   SharedValue<number>;
+  badgeOpacity: SharedValue<number>;
+  dashOffset:   SharedValue<number>;
+  pulseScale:   SharedValue<number>;
+  pulseOpacity: SharedValue<number>;
 }) {
   const badgePath = useMemo(
     () => makeScallopPath(50, 50, 41, 7, 14),
