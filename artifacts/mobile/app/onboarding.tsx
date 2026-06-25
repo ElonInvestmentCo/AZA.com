@@ -18,7 +18,6 @@ import Animated, {
   Easing,
   FadeInUp,
   runOnJS,
-  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -27,6 +26,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Assets ────────────────────────────────────────────────────────────────────

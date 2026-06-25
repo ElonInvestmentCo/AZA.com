@@ -6,7 +6,6 @@ import Animated, {
   Easing,
   FadeInDown,
   FadeInUp,
-  SharedValue,
   useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
@@ -16,6 +15,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 import Svg, { Circle, G, Path } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -210,7 +210,6 @@ function ScallopBadge({
 export default function SubmittedScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const topPad  = Platform.OS === "web" ? 20 : insets.top;
   const botPad  = Platform.OS === "web" ? 32 : insets.bottom + 24;
 
   /* Illustration float */
