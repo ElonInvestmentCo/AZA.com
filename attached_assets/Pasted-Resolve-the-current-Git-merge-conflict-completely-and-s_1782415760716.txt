@@ -1,0 +1,91 @@
+Resolve the current Git merge conflict completely and safely.
+
+Current status:
+
+Conflicting Files:
+
+* new-password.tsx
+* index.tsx
+
+Other Modified Files:
+
+* .replit
+* _layout.tsx
+* web-proxy.mjs
+
+TASK
+
+1. Analyze both sides of every conflict.
+2. Do NOT blindly choose "Accept Current" or "Accept Incoming".
+3. Merge the changes intelligently.
+4. Preserve all working functionality from both branches whenever possible.
+
+MERGE REQUIREMENTS
+
+For new-password.tsx:
+
+* Keep the password visibility toggle update.
+* Reuse the same EyeIcon/password component used in Login and Sign Up screens.
+* Preserve all styling, behavior, validation, and existing functionality.
+* Remove duplicate or conflicting implementations.
+
+For index.tsx:
+
+* Keep all image-loading performance improvements.
+* Preserve existing business logic and navigation.
+* Retain Expo Image optimizations, caching, and prefetching work.
+* Remove duplicate imports and conflicting code paths.
+
+For _layout.tsx:
+
+* Preserve asset preloading and caching improvements.
+* Ensure app startup remains stable.
+* Remove duplicate initialization logic.
+* Keep only the final optimized implementation.
+
+For web-proxy.mjs:
+
+* Preserve Metro conflict resolution logic if it is still required.
+* Verify it does not break Expo, Expo Go, Web, or development workflows.
+
+For .replit:
+
+* Merge configuration changes safely.
+* Keep only valid workspace settings.
+* Remove duplicate or conflicting commands.
+
+AFTER MERGING
+
+* Verify all imports resolve correctly.
+* Remove dead code.
+* Remove duplicate components.
+* Remove duplicate hooks.
+* Remove duplicate asset loaders.
+* Remove duplicate image prefetching logic.
+* Remove duplicate Metro configurations.
+
+THEN RUN A FULL AUDIT
+
+Verify:
+
+* No merge markers remain (<<<<<<< ======= >>>>>>>)
+* No TypeScript errors
+* No ESLint errors
+* No duplicate routes
+* No duplicate layouts
+* No duplicate navigation entries
+* No Expo startup errors
+* No Metro conflicts
+* No broken image loading
+
+FINALLY
+
+Provide a report showing:
+
+1. What conflicts were found.
+2. Which version was kept.
+3. Which changes were merged together.
+4. Any remaining issues.
+5. Files modified.
+
+Do not stop after identifying conflicts. Fully resolve them and leave the repository in a clean, buildable state.
