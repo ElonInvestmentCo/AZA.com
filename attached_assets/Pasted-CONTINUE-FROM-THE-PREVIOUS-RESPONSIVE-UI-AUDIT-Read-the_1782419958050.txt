@@ -1,0 +1,137 @@
+CONTINUE FROM THE PREVIOUS RESPONSIVE UI AUDIT.
+
+Read the existing changes, commits, checkpoints, and modified files first. Do NOT restart the audit from scratch.
+
+The previous work already completed:
+
+✓ Responsive system planning
+✓ Safe-area audit
+✓ Floating pill tab bar audit
+✓ PromoCard responsive improvements
+✓ ServiceItem label improvements
+✓ Success-payment screen responsive sizing
+✓ Typecheck passed for AZA mobile
+✓ Initial responsive cleanup across major screens
+
+The previous agent stopped while:
+
+1. Fixing OTP digit boxes that still use hardcoded sizing (width: 69)
+2. Performing the final application-wide responsive audit
+3. Checking remaining auth screens
+4. Checking remaining shared components
+5. Removing any remaining hardcoded dimensions that can break on small screens, tablets, foldables, desktop, and TV layouts
+
+CONTINUE FROM THAT EXACT STATE.
+
+REQUIREMENTS
+
+Perform a complete final responsive audit of the entire AZA Expo application.
+
+Search the entire codebase for:
+
+- width: fixed values
+- height: fixed values
+- margin values causing overflow
+- negative positioning
+- absolute layouts that break responsiveness
+- hardcoded image sizes
+- hardcoded card sizes
+- fixed modal dimensions
+- fixed bottom sheet heights
+- fixed OTP input widths
+- fixed font sizes that should scale
+- fixed spacing values that cause clipping
+- unsafe use of Dimensions.get()
+- screens not respecting SafeArea
+- content hidden behind tab bars
+- keyboard overlap issues
+- orientation issues
+- foldable device issues
+
+CHECK EVERY SCREEN INCLUDING
+
+Auth
+- Login
+- Register
+- Forgot Password
+- Verify OTP
+- Create New Password
+
+Tabs
+- Home
+- Sell Gift Card
+- Trade Assets
+- Fund Wallet
+- Settings
+- Transactions
+- Wallet
+
+Modals
+- Bottom sheets
+- Action sheets
+- Success screens
+- Confirmation screens
+
+Shared Components
+- Buttons
+- Inputs
+- Cards
+- OTP inputs
+- Navigation
+- Tab bars
+- Headers
+- Banners
+- Empty states
+- Loading states
+
+RESPONSIVE REQUIREMENTS
+
+Replace problematic hardcoded dimensions with:
+
+- flex layouts
+- percentage widths
+- responsive scaling
+- screen-relative sizing
+- adaptive spacing
+- adaptive typography
+- max-width constraints
+- min-width constraints
+- aspectRatio where appropriate
+
+Ensure perfect rendering on:
+
+- Small Android phones
+- Large Android phones
+- iPhone SE
+- iPhone 13/14/15/16 series
+- iPhone Pro Max devices
+- Foldables
+- iPads
+- Android tablets
+- Desktop web
+- Laptops
+- MacBooks
+- Smart TVs
+
+DO NOT CHANGE
+
+- Branding
+- Colors
+- Business logic
+- APIs
+- Navigation
+- Authentication flow
+- Wallet functionality
+- Existing animations
+
+AFTER COMPLETING
+
+Provide:
+
+1. All files changed
+2. All responsive issues fixed
+3. Remaining risks (if any)
+4. Typecheck results
+5. Final responsive readiness report
+
+Continue from the existing responsive work already performed. Do not duplicate previous fixes. Finish the remaining audit and implement all remaining responsive fixes.
