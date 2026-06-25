@@ -147,10 +147,8 @@ async function startMetro(expoPublicDomain, expoPublicReplId) {
   }
 
   metroProcess = spawn(
-    "pnpm",
+    path.join(projectRoot, "node_modules", ".bin", "expo"),
     [
-      "exec",
-      "expo",
       "start",
       "--no-dev",
       "--minify",
