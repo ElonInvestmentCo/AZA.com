@@ -114,7 +114,7 @@ function PromoCard({ item, width: promoW }: { item: (typeof PROMOS)[number]; wid
           <View style={pc.orb2} />
           <Text style={[pc.pct,   { color: item.textColor }]}>{item.pct}</Text>
           <Text style={[pc.title, { color: item.textColor }]}>{item.title}</Text>
-          <Text style={[pc.desc,  { color: item.textColor + "CC" }]}>{item.desc}</Text>
+          <Text style={[pc.desc,  { color: item.textColor + "CC", maxWidth: Math.round(promoW * 0.42) }]}>{item.desc}</Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -457,7 +457,7 @@ const s = StyleSheet.create({
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
   iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: 10, fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: 14, width: 60 },
+  label:   { fontSize: 10, fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: 14, maxWidth: 64, flexShrink: 1 },
 });
 
 const pc = StyleSheet.create({
@@ -475,7 +475,7 @@ const pc = StyleSheet.create({
   },
   pct:   { fontSize: 14, fontFamily: "Manrope_700Bold" },
   title: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
-  desc:  { fontSize: 9.5, fontFamily: "Manrope_400Regular", lineHeight: 14, marginTop: 1, width: 115 },
+  desc:  { fontSize: 9.5, fontFamily: "Manrope_400Regular", lineHeight: 14, marginTop: 1 },
 });
 
 const tx = StyleSheet.create({

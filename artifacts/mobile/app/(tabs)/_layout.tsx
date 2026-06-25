@@ -8,11 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 /* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 
 function PillTabBar({ state, descriptors, navigation }: any) {
+  const insets = useSafeAreaInsets();
+  const barBottom = Math.max(insets.bottom + 10, Platform.OS === "ios" ? 20 : 12);
   return (
-    <View style={pill.outer} pointerEvents="box-none">
+    <View style={[pill.outer, { bottom: barBottom }]} pointerEvents="box-none">
       <View style={pill.bar}>
         {state.routes.map((route: any, i: number) => {
           const focused = state.index === i;
@@ -79,7 +82,6 @@ const pill = StyleSheet.create({
     position:      "absolute",
     left:          20,
     right:         20,
-    bottom:        Platform.OS === "ios" ? 28 : 16,
     alignItems:    "center",
     pointerEvents: "box-none",
   } as any,
