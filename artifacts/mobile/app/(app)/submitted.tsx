@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo } from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import Animated, {
   Easing,
   FadeInDown,
@@ -144,17 +144,21 @@ function ScallopBadge({
   dashOffset,
   pulseScale,
   pulseOpacity,
+  size,
 }: {
   badgeScale:   SharedValue<number>;
   badgeOpacity: SharedValue<number>;
   dashOffset:   SharedValue<number>;
   pulseScale:   SharedValue<number>;
   pulseOpacity: SharedValue<number>;
+  size:         number;
 }) {
   const badgePath = useMemo(
     () => makeScallopPath(50, 50, 41, 7, 14),
     [],
   );
+
+  const pulseSize  = Math.round(size * 1.06);
 
   const badgeWrapAnim = useAnimatedStyle(() => ({
     transform:  [{ scale: badgeScale.value }],
@@ -172,10 +176,10 @@ function ScallopBadge({
   }));
 
   return (
-    <View style={s.badgeContainer}>
+    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
       {/* Pulse ring */}
       <Animated.View style={pulseWrapAnim}>
-        <Svg viewBox="0 0 100 100" width={106} height={106}>
+        <Svg viewBox="0 0 100 100" width={pulseSize} height={pulseSize}>
           <Path
             d={badgePath}
             fill="none"
@@ -187,8 +191,8 @@ function ScallopBadge({
       </Animated.View>
 
       {/* Badge */}
-      <Animated.View style={[badgeWrapAnim]}>
-        <Svg viewBox="0 0 100 100" width={100} height={100}>
+      <Animated.View style={badgeWrapAnim}>
+        <Svg viewBox="0 0 100 100" width={size} height={size}>
           {/* Scalloped background */}
           <Path d={badgePath} fill={C.dark} />
 
@@ -223,7 +227,10 @@ function ScallopBadge({
 export default function SubmittedScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const botPad  = Platform.OS === "web" ? 32 : insets.bottom + 24;
+  /* Badge scales from 80pt on small phones up to 130pt on tablets */
+  const BADGE_SIZE = Math.min(Math.max(Math.round(width * 0.28), 80), 130);
 
   /* Illustration float */
   const floatY = useSharedValue(0);
@@ -321,13 +328,16 @@ export default function SubmittedScreen() {
         </Animated.View>
 
         {/* Scalloped badge */}
-        <ScallopBadge
-          badgeScale={badgeScale}
-          badgeOpacity={badgeOpacity}
-          dashOffset={dashOffset}
-          pulseScale={pulseScale}
-          pulseOpacity={pulseOpacity}
-        />
+        <View style={{ marginBottom: 28 }}>
+          <ScallopBadge
+            badgeScale={badgeScale}
+            badgeOpacity={badgeOpacity}
+            dashOffset={dashOffset}
+            pulseScale={pulseScale}
+            pulseOpacity={pulseOpacity}
+            size={BADGE_SIZE}
+          />
+        </View>
 
         {/* Text */}
         <Animated.View
@@ -382,14 +392,6 @@ const s = StyleSheet.create({
   illustrationWrap: {
     alignItems: "center",
     marginBottom: 6,
-  },
-
-  badgeContainer: {
-    width: 106,
-    height: 106,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 28,
   },
 
   textSection: {

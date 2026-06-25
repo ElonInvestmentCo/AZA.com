@@ -18,12 +18,12 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -213,19 +213,17 @@ function canRunGoogleOnThisPlatform(): boolean {
 }
 
 export default function SocialAuthButtons({ onSuccess, onError }: Props) {
-  const { width } = Dimensions.get("window");
-  const btnW = (width - 48 - 12) / 2;
   const googleEnabled = canRunGoogleOnThisPlatform();
 
   return (
     <View style={ss.row}>
-      <View style={[ss.half, { width: btnW }]}>
+      <View style={ss.half}>
         {googleEnabled
           ? <GoogleSignInActive onSuccess={onSuccess} onError={onError} />
           : <GoogleSignInDisabled />
         }
       </View>
-      <View style={[ss.half, { width: btnW }]}>
+      <View style={ss.half}>
         <AppleSignIn onSuccess={onSuccess} onError={onError} />
       </View>
     </View>

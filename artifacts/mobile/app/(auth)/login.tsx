@@ -16,6 +16,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -144,6 +145,8 @@ export default function LoginScreen() {
   const router    = useRouter();
   const insets    = useSafeAreaInsets();
   const { login } = useAuth();
+  const { width } = useWindowDimensions();
+  const fingerprintSize = Math.min(Math.round(width * 0.24), 100);
 
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
@@ -229,7 +232,7 @@ export default function LoginScreen() {
         >
           <Image
             source={fingerprintImg}
-            style={{ width: 90, height: 90 }}
+            style={{ width: fingerprintSize, height: fingerprintSize }}
             contentFit="contain"
             cachePolicy="memory-disk"
           />

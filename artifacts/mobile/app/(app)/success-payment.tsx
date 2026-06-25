@@ -91,11 +91,10 @@ export default function SuccessPaymentScreen() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg, alignItems: "center", justifyContent: "center", paddingHorizontal: 32 },
 
-  illustrationArea: { width: 200, height: 200, alignItems: "center", justifyContent: "center", marginBottom: 40 },
+  illustrationArea: { alignItems: "center", justifyContent: "center", marginBottom: 40 },
   ring: { position: "absolute", borderWidth: 2 },
 
   checkCircle: {
-    width: 100, height: 100, borderRadius: 50,
     backgroundColor: C.success,
     alignItems: "center", justifyContent: "center",
     shadowColor: C.success, shadowOffset: { width: 0, height: 8 },

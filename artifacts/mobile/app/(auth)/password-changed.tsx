@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -34,6 +35,8 @@ const C = {
 export default function PasswordChangedScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const markSize = Math.min(Math.round(width * 0.27), 120);
 
   const iconSc  = useSharedValue(0);
   const iconOp  = useSharedValue(0);
@@ -77,7 +80,7 @@ export default function PasswordChangedScreen() {
         <Animated.View style={[s.iconWrap, iconStyle]}>
           <Image
             source={successmarkImg}
-            style={s.successmark}
+            style={{ width: markSize, height: markSize }}
             contentFit="contain"
             cachePolicy="memory-disk"
           />
@@ -162,7 +165,7 @@ const s = StyleSheet.create({
   },
 
   iconWrap:    { marginBottom: 8 },
-  successmark: { width: 100, height: 100 },
+  successmark: { },
 
   textBlock: { alignItems: "center", gap: 10 },
   heading: {

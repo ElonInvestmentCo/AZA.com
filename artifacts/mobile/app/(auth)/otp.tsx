@@ -13,6 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -43,6 +44,20 @@ const C = {
 
 const OTP_LENGTH = 4;
 
+/* ── Responsive OTP box sizing ──────────────────────────────────────────────
+ * Box width is derived from the available screen width so it scales on
+ * every device: from iPhone SE (320pt) to iPad / foldable / desktop.
+ * Formula: (screenWidth - horizontalPadding*2 - gap*(boxes-1)) / boxCount
+ * ─────────────────────────────────────────────────────────────────────────── */
+function useOtpBoxSize() {
+  const { width } = useWindowDimensions();
+  const hPad = 24 * 2;      // paddingHorizontal: 24 on both sides
+  const gaps = 10 * 3;      // 10pt gap between 4 boxes
+  const boxW = Math.min((width - hPad - gaps) / OTP_LENGTH, 80);
+  const boxH = Math.round(boxW * 0.87);  // preserve ~69:60 ratio
+  return { boxW, boxH };
+}
+
 /* ── Single OTP digit box — matches CSS spec exactly ─────────────────────── */
 function OtpBox({
   value,
@@ -51,6 +66,8 @@ function OtpBox({
   inputRef,
   onKeyPress,
   onChangeText,
+  boxW,
+  boxH,
 }: {
   value: string;
   isFocused: boolean;
@@ -58,6 +75,8 @@ function OtpBox({
   inputRef: React.RefObject<TextInput | null>;
   onKeyPress: (key: string) => void;
   onChangeText: (t: string) => void;
+  boxW: number;
+  boxH: number;
 }) {
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
@@ -71,8 +90,6 @@ function OtpBox({
     }
   }, [value]);
 
-  /* Filled box: white bg + #35C2C1 border (1.2px) — CSS spec */
-  /* Empty box : #F7F8F9 bg + #E8ECF4 border (1px)  — CSS spec */
   const boxStyle = value
     ? ob.boxFilled
     : isFocused
@@ -80,11 +97,11 @@ function OtpBox({
     : ob.boxEmpty;
 
   return (
-    <Animated.View style={[ob.wrap, animStyle]}>
-      <View style={[ob.box, boxStyle]}>
+    <Animated.View style={animStyle}>
+      <View style={[ob.box, boxStyle, { width: boxW, height: boxH }]}>
         <TextInput
           ref={inputRef}
-          style={ob.digit}
+          style={[ob.digit, { fontSize: Math.round(boxH * 0.38) }]}
           value={value}
           onFocus={onFocus}
           onChangeText={onChangeText}
@@ -100,16 +117,11 @@ function OtpBox({
 }
 
 const ob = StyleSheet.create({
-  wrap:       { },
   box: {
-    /* CSS spec: width 69.13px, height 60px, border-radius 8px */
-    width: 69,
-    height: 60,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
-  /* Filled / focused: white bg, 1.2px #35C2C1 border */
   boxFilled: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.2,
@@ -120,17 +132,14 @@ const ob = StyleSheet.create({
     borderWidth: 1.2,
     borderColor: "#35C2C1",
   },
-  /* Empty: #F7F8F9 bg, 1px #E8ECF4 border */
   boxEmpty: {
     backgroundColor: "#F7F8F9",
     borderWidth: 1,
     borderColor: "#E8ECF4",
   },
   digit: {
-    /* CSS spec: Urbanist 700, 22px, #1E232C → Manrope_700Bold closest match */
     fontFamily: "Manrope_700Bold",
-    fontSize: 22,
-    lineHeight: 26,
+    lineHeight: undefined,
     color: "#1E232C",
     textAlign: "center",
     width: "100%",
@@ -145,6 +154,7 @@ export default function OtpScreen() {
   const insets  = useSafeAreaInsets();
   const params  = useLocalSearchParams<{ email?: string }>();
   const email   = params.email ?? "";
+  const { boxW, boxH } = useOtpBoxSize();
 
   const [digits,   setDigits]   = useState<string[]>(["", "", "", ""]);
   const [focused,  setFocused]  = useState(0);
@@ -284,6 +294,8 @@ export default function OtpScreen() {
               inputRef={refs[i]}
               onChangeText={text => handleChange(i, text)}
               onKeyPress={key => handleKeyPress(i, key)}
+              boxW={boxW}
+              boxH={boxH}
             />
           ))}
         </Animated.View>
@@ -403,10 +415,10 @@ const s = StyleSheet.create({
     lineHeight: 22,
   },
 
-  /* CSS spec: total row 330px, 4 boxes × 69px + gaps */
   otpRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: 10,
     marginBottom: 12,
   },
 
