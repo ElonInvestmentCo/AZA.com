@@ -69,22 +69,36 @@ const f = StyleSheet.create({
   ph:  { color: "#646464", fontSize: 10 },
 });
 
+type PickerKey = "category" | "country" | "type";
+
+const PICKER_CONFIG: Record<PickerKey, { title: string; options: string[] }> = {
+  category: { title: "Select Gift Card Category", options: CATEGORIES },
+  country:  { title: "Select Country",            options: COUNTRIES   },
+  type:     { title: "Select Type",               options: TYPES       },
+};
+
 function PickerModal({
-  visible, title, options, onSelect, onClose,
+  pickerKey, onSelect, onClose,
 }: {
-  visible: boolean; title: string; options: string[];
-  onSelect: (v: string) => void; onClose: () => void;
+  pickerKey: PickerKey | null;
+  onSelect: (key: PickerKey, v: string) => void;
+  onClose: () => void;
 }) {
+  const cfg = pickerKey ? PICKER_CONFIG[pickerKey] : null;
   return (
-    <AnimatedSheet visible={visible} onClose={onClose} maxHeight="60%">
+    <AnimatedSheet visible={pickerKey !== null} onClose={onClose} maxHeight="60%">
       <View style={pm.handle} />
-      <Text style={pm.title}>{title}</Text>
+      <Text style={pm.title}>{cfg?.title ?? ""}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {options.map(o => (
+        {(cfg?.options ?? []).map(o => (
           <TouchableOpacity
             key={o}
             style={pm.option}
-            onPress={() => { Haptics.selectionAsync(); onSelect(o); onClose(); }}
+            onPress={() => {
+              Haptics.selectionAsync();
+              if (pickerKey) onSelect(pickerKey, o);
+              onClose();
+            }}
           >
             <Text style={pm.optText}>{o}</Text>
             <Feather name="check" size={14} color="#7C3AED" />
@@ -111,7 +125,7 @@ export default function SellGiftCardScreen() {
   const [country,  setCountry]  = useState("");
   const [type,     setType]     = useState("");
   const [amount,   setAmount]   = useState("");
-  const [picker,   setPicker]   = useState<"category" | "country" | "type" | null>(null);
+  const [picker,   setPicker]   = useState<PickerKey | null>(null);
 
   const total = amount ? parseInt(amount.replace(/,/g, "")) * RATE : RATE * 200;
 
@@ -226,9 +240,15 @@ export default function SellGiftCardScreen() {
 
       </ScrollView>
 
-      <PickerModal visible={picker === "category"} title="Select Gift Card Category" options={CATEGORIES} onSelect={setCategory} onClose={() => setPicker(null)} />
-      <PickerModal visible={picker === "country"}  title="Select Country"            options={COUNTRIES}   onSelect={setCountry}  onClose={() => setPicker(null)} />
-      <PickerModal visible={picker === "type"}     title="Select Type"               options={TYPES}       onSelect={setType}     onClose={() => setPicker(null)} />
+      <PickerModal
+        pickerKey={picker}
+        onSelect={(key, value) => {
+          if (key === "category") setCategory(value);
+          else if (key === "country") setCountry(value);
+          else if (key === "type") setType(value);
+        }}
+        onClose={() => setPicker(null)}
+      />
     </View>
   );
 }

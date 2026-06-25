@@ -10,7 +10,7 @@
  *   </AnimatedSheet>
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Modal,
@@ -19,6 +19,7 @@ import {
   ViewStyle,
 } from "react-native";
 import Animated, {
+  cancelAnimation,
   Easing,
   interpolate,
   runOnJS,
@@ -49,64 +50,58 @@ export function AnimatedSheet({
   maxHeight = "65%",
   sheetStyle,
 }: AnimatedSheetProps) {
-  /* Internal modal visibility — controlled by animation lifecycle, not
-     directly by the `visible` prop, so we can animate out before unmounting */
   const [mounted, setMounted] = useState(visible);
-  const animating = useRef(false);
+  const isMountedRef = useRef(mounted);
 
   const translateY = useSharedValue(SCREEN_H);
 
-  /* ── Animate in ─────────────────────────────────────────────────────── */
+  /* ── Animate in ──────────────────────────────────────────────────────── */
   const animateIn = useCallback(() => {
-    animating.current = true;
+    cancelAnimation(translateY);
     translateY.value = SCREEN_H;
-    translateY.value = withTiming(0, { duration: OPEN_DURATION, easing: OPEN_EASING }, () => {
-      animating.current = false;
-    });
+    translateY.value = withTiming(0, { duration: OPEN_DURATION, easing: OPEN_EASING });
   }, [translateY]);
 
-  /* ── Animate out ────────────────────────────────────────────────────── */
+  /* ── Animate out ─────────────────────────────────────────────────────── */
   const animateOut = useCallback((callback?: () => void) => {
-    if (animating.current && translateY.value === SCREEN_H) return; // already hidden
-    animating.current = true;
+    cancelAnimation(translateY);
     translateY.value = withTiming(
       SCREEN_H,
       { duration: CLOSE_DURATION, easing: CLOSE_EASING },
       (finished) => {
         if (finished) {
           runOnJS(setMounted)(false);
-          animating.current = false;
           if (callback) runOnJS(callback)();
         }
       },
     );
   }, [translateY]);
 
-  /* ── Sync with parent `visible` prop ────────────────────────────────── */
+  /* ── Sync with parent `visible` prop ─────────────────────────────────── */
   useEffect(() => {
     if (visible) {
+      isMountedRef.current = true;
       setMounted(true);
     } else {
       animateOut();
     }
   }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Kick off the open animation once the modal is actually mounted */
-  useEffect(() => {
+  /* Kick off open animation. useLayoutEffect fires before paint so the very
+     first frame rendered by the Modal already has the animation in progress —
+     this eliminates the frame gap that caused the backdrop flash on web. */
+  useLayoutEffect(() => {
     if (mounted && visible) {
       animateIn();
     }
   }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* ── Backdrop press / back-button handler ───────────────────────────── */
+  /* ── Backdrop press / back-button handler ────────────────────────────── */
   const handleClose = useCallback(() => {
-    /* Animate out, then notify parent so it sets visible=false.
-       The subsequent visible=false → useEffect will be a no-op because
-       mounted will already be false by then. */
     animateOut(onClose);
   }, [animateOut, onClose]);
 
-  /* ── Animated styles ─────────────────────────────────────────────────── */
+  /* ── Animated styles ──────────────────────────────────────────────────── */
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(translateY.value, [0, SCREEN_H], [0.55, 0], "clamp"),
   }));
@@ -125,9 +120,16 @@ export function AnimatedSheet({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* ── Animated backdrop — visual only, pointerEvents="none" ── */}
+      {/* ── Animated backdrop — synced to sheet position, visual only ── */}
       <Animated.View
-        style={[StyleSheet.absoluteFillObject, styles.backdrop, backdropStyle]}
+        style={[
+          StyleSheet.absoluteFillObject,
+          styles.backdrop,
+          /* Explicit initial opacity guards against the pre-Reanimated frame
+             on web where the animated style hasn't been applied yet. */
+          { opacity: 0 },
+          backdropStyle,
+        ]}
         pointerEvents="none"
       />
 
@@ -135,7 +137,17 @@ export function AnimatedSheet({
       <Pressable style={styles.dismissArea} onPress={handleClose} />
 
       {/* ── Animated sheet panel ── */}
-      <Animated.View style={[styles.sheet, { maxHeight }, sheetAnimStyle, sheetStyle]}>
+      <Animated.View
+        style={[
+          styles.sheet,
+          { maxHeight },
+          /* Explicit initial transform keeps the sheet off-screen before
+             Reanimated takes over on the first render frame. */
+          { transform: [{ translateY: SCREEN_H }] },
+          sheetAnimStyle,
+          sheetStyle,
+        ]}
+      >
         {children}
       </Animated.View>
     </Modal>
@@ -150,16 +162,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sheet: {
-    backgroundColor:     "#FFFFFF",
-    borderTopLeftRadius:  24,
-    borderTopRightRadius: 24,
-    paddingHorizontal:    24,
-    paddingTop:           16,
-    paddingBottom:        40,
-    shadowColor:          "#000",
-    shadowOffset:         { width: 0, height: -4 },
-    shadowOpacity:        0.08,
-    shadowRadius:         16,
-    elevation:            12,
+    backgroundColor:      "#FFFFFF",
+    borderTopLeftRadius:   24,
+    borderTopRightRadius:  24,
+    paddingHorizontal:     24,
+    paddingTop:            16,
+    paddingBottom:         40,
+    shadowColor:           "#000",
+    shadowOffset:          { width: 0, height: -4 },
+    shadowOpacity:         0.08,
+    shadowRadius:          16,
+    elevation:             12,
   },
 });
