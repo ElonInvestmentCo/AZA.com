@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
-import { EyeIcon } from "@/components/EyeIcon";
+import { PasswordInput } from "@/components/PasswordInput";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -84,42 +84,6 @@ function EmailInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-    </View>
-  );
-}
-
-/* ── Password input ─────────────────────────────────────────────────────── */
-function PasswordInput({
-  value,
-  onChangeText,
-  error,
-}: {
-  value: string;
-  onChangeText: (t: string) => void;
-  error?: boolean;
-}) {
-  const [focused,  setFocused]  = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  return (
-    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
-      <TextInput
-        style={inp.field}
-        placeholder="Enter your password"
-        placeholderTextColor={C.placeholder}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={!showPass}
-        autoCapitalize="none"
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-      />
-      <Pressable
-        onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        style={inp.eyeBtn}
-      >
-        <EyeIcon open={showPass} size={22} color="#8391A1" />
-      </Pressable>
     </View>
   );
 }

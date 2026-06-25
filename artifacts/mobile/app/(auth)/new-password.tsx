@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { EyeIcon } from "@/components/EyeIcon";
+import { PasswordInput } from "@/components/PasswordInput";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import Animated, {
@@ -35,66 +34,6 @@ const C = {
   error:        "#FF5B7A",
 };
 
-function PasswordInput({
-  placeholder,
-  value,
-  onChangeText,
-  error,
-}: {
-  placeholder: string;
-  value: string;
-  onChangeText: (t: string) => void;
-  error?: boolean;
-}) {
-  const [focused,  setFocused]  = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  return (
-    <View style={[inp.wrap, focused && inp.focused, error && inp.errored]}>
-      <TextInput
-        style={inp.field}
-        placeholder={placeholder}
-        placeholderTextColor={C.placeholder}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={!showPass}
-        autoCapitalize="none"
-        autoCorrect={false}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-      />
-      <Pressable
-        onPress={() => { Haptics.selectionAsync(); setShowPass(v => !v); }}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        style={inp.eyeBtn}
-      >
-        <EyeIcon open={showPass} size={22} color="#8391A1" />
-      </Pressable>
-    </View>
-  );
-}
-
-const inp = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: C.inputBg,
-    borderWidth: 1,
-    borderColor: C.inputBorder,
-    borderRadius: 14,
-    paddingHorizontal: 18,
-    height: 58,
-  },
-  focused:  { borderColor: C.inputFocus },
-  errored:  { borderColor: C.error },
-  field: {
-    flex: 1,
-    fontSize: 15,
-    fontFamily: "Manrope_400Regular",
-    color: C.dark,
-    height: "100%",
-  },
-  eyeBtn: { padding: 2 },
-});
 
 export default function NewPasswordScreen() {
   const router  = useRouter();

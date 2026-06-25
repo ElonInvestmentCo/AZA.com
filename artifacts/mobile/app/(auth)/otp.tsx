@@ -2,9 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
+import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -338,7 +338,8 @@ export default function OtpScreen() {
           <Image
             source={require("../../assets/images/didnt-received-code.png")}
             style={s.resendLabelImg}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
           />
           <TouchableOpacity
             onPress={handleResend}
@@ -352,7 +353,8 @@ export default function OtpScreen() {
               <Image
                 source={require("../../assets/images/resend.png")}
                 style={s.resendImg}
-                resizeMode="contain"
+                contentFit="contain"
+                cachePolicy="memory-disk"
               />
             )}
           </TouchableOpacity>

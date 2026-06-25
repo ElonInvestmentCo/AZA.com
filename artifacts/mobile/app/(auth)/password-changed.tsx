@@ -79,6 +79,7 @@ export default function PasswordChangedScreen() {
             source={successmarkImg}
             style={s.successmark}
             contentFit="contain"
+            cachePolicy="memory-disk"
           />
         </Animated.View>
 
