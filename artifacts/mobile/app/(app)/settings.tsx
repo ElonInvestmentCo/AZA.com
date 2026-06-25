@@ -1,10 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
-  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -93,7 +93,8 @@ export default function SettingsScreen() {
           <Image
             source={require("@/assets/images/3d_avatar_16.png")}
             style={s.avatar}
-            resizeMode="cover"
+            contentFit="cover"
+            cachePolicy="memory-disk"
           />
           <View style={s.profileInfo}>
             <Text style={s.profileName}>{firstName}</Text>
