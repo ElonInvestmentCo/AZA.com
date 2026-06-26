@@ -1,18 +1,19 @@
 import { Feather } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -22,9 +23,9 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AnimatedSheet } from "@/components/AnimatedSheet";
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
 const C = {
@@ -40,7 +41,7 @@ const C = {
   primary: "#135EF2",
 };
 
-/* ─── Transaction data ───────────────────────────────────────────────────── */
+/* ─── Transaction type ───────────────────────────────────────────────────── */
 type TxStatus = "completed" | "pending" | "failed";
 
 interface Transaction {
@@ -48,37 +49,113 @@ interface Transaction {
   name:      string;
   cat:       string;
   date:      string;
-  ts:        number; // unix ms for date comparisons
+  time:      string;
+  ts:        number;
   amount:    string;
+  amountRaw: number;
+  fee:       string;
+  ref:       string;
   positive:  boolean;
   status:    TxStatus;
+  note:      string;
   icon:      React.ComponentProps<typeof Feather>["name"];
   iconBg:    string;
   iconColor: string;
 }
 
+/* ─── Transaction dataset ────────────────────────────────────────────────── */
 const ALL_TX: Transaction[] = [
-  { id:"1",  name:"Amazon Gift Card",    cat:"Gift Card", date:"Apr 28, 2024", ts: new Date("2024-04-28").getTime(), amount:"₦200,040",  positive:true,  status:"completed", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000" },
-  { id:"2",  name:"Bitcoin Sale",        cat:"Crypto",    date:"Jun 23, 2025", ts: new Date("2025-06-23").getTime(), amount:"₦185,000",  positive:true,  status:"completed", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#F7931A" },
-  { id:"3",  name:"Electricity Bill",   cat:"Bills",     date:"Jun 22, 2025", ts: new Date("2025-06-22").getTime(), amount:"₦5,000",    positive:false, status:"completed", icon:"zap",              iconBg:"#FFFBEB", iconColor:"#D97706" },
-  { id:"4",  name:"MTN Airtime",         cat:"Airtime",   date:"Jun 22, 2025", ts: new Date("2025-06-22").getTime(), amount:"₦2,000",    positive:false, status:"completed", icon:"phone",            iconBg:"#FEFCE8", iconColor:"#CA8A04" },
-  { id:"5",  name:"Wallet Withdrawal",  cat:"Wallet",    date:"Jun 21, 2025", ts: new Date("2025-06-21").getTime(), amount:"₦50,000",   positive:false, status:"completed", icon:"arrow-up-circle",  iconBg:"#FFF0F0", iconColor:"#EF4444" },
-  { id:"6",  name:"iTunes Gift Card",   cat:"Gift Card", date:"Jun 20, 2025", ts: new Date("2025-06-20").getTime(), amount:"₦92,400",   positive:true,  status:"pending",   icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000" },
-  { id:"7",  name:"DSTV Subscription",  cat:"Bills",     date:"Jun 19, 2025", ts: new Date("2025-06-19").getTime(), amount:"₦7,900",    positive:false, status:"completed", icon:"tv",               iconBg:"#FFF1F2", iconColor:"#E11D48" },
-  { id:"8",  name:"Wallet Funding",     cat:"Wallet",    date:"Jun 17, 2025", ts: new Date("2025-06-17").getTime(), amount:"₦100,000",  positive:true,  status:"completed", icon:"arrow-down-circle",iconBg:"#F0FFF4", iconColor:"#00B03C" },
-  { id:"9",  name:"Deposit Gift Card",  cat:"Gift Card", date:"Feb 24, 2022", ts: new Date("2022-02-24").getTime(), amount:"₦200,040",  positive:true,  status:"completed", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000" },
-  { id:"10", name:"Withdrawal",         cat:"Wallet",    date:"Feb 24, 2022", ts: new Date("2022-02-24").getTime(), amount:"₦400,000",  positive:false, status:"completed", icon:"arrow-up-right",   iconBg:"#FFF0F0", iconColor:"#EF4444" },
-  { id:"11", name:"Spotify Premium",    cat:"Bills",     date:"Jun 15, 2025", ts: new Date("2025-06-15").getTime(), amount:"₦3,200",    positive:false, status:"completed", icon:"music",            iconBg:"#F5F3FF", iconColor:"#7C3AED" },
-  { id:"12", name:"Steam Gift Card",    cat:"Gift Card", date:"Jun 12, 2025", ts: new Date("2025-06-12").getTime(), amount:"₦45,000",   positive:true,  status:"completed", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000" },
-  { id:"13", name:"Ethereum Sale",      cat:"Crypto",    date:"Jun 10, 2025", ts: new Date("2025-06-10").getTime(), amount:"₦312,000",  positive:true,  status:"completed", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#627EEA" },
-  { id:"14", name:"WAEC Data Bundle",   cat:"Airtime",   date:"Jun 8, 2025",  ts: new Date("2025-06-08").getTime(), amount:"₦1,500",    positive:false, status:"pending",   icon:"wifi",             iconBg:"#EFF6FF", iconColor:"#3B82F6" },
+  {
+    id:"1",  name:"Amazon Gift Card",   cat:"Gift Card", date:"Apr 28, 2024", time:"09:14 AM",
+    ts: new Date("2024-04-28").getTime(), amount:"₦200,040",  amountRaw:200040,
+    fee:"₦200", ref:"TXN-84920-GC", positive:true,  status:"completed",
+    note:"Amazon US $120 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
+  },
+  {
+    id:"2",  name:"Bitcoin Sale",       cat:"Crypto",    date:"Jun 23, 2025", time:"02:47 PM",
+    ts: new Date("2025-06-23").getTime(), amount:"₦185,000",  amountRaw:185000,
+    fee:"₦500", ref:"TXN-29183-CR", positive:true,  status:"completed",
+    note:"0.0021 BTC @ ₦88,095,238/BTC", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#F7931A",
+  },
+  {
+    id:"3",  name:"Electricity Bill",  cat:"Bills",     date:"Jun 22, 2025", time:"11:05 AM",
+    ts: new Date("2025-06-22").getTime(), amount:"₦5,000",    amountRaw:5000,
+    fee:"₦100", ref:"TXN-77641-BL", positive:false, status:"completed",
+    note:"EKEDC prepaid meter top-up", icon:"zap",              iconBg:"#FFFBEB", iconColor:"#D97706",
+  },
+  {
+    id:"4",  name:"MTN Airtime",        cat:"Airtime",   date:"Jun 22, 2025", time:"08:30 AM",
+    ts: new Date("2025-06-22").getTime(), amount:"₦2,000",    amountRaw:2000,
+    fee:"₦0",   ref:"TXN-55302-AT", positive:false, status:"completed",
+    note:"MTN 08012345678", icon:"phone",            iconBg:"#FEFCE8", iconColor:"#CA8A04",
+  },
+  {
+    id:"5",  name:"Wallet Withdrawal", cat:"Wallet",    date:"Jun 21, 2025", time:"04:22 PM",
+    ts: new Date("2025-06-21").getTime(), amount:"₦50,000",   amountRaw:50000,
+    fee:"₦50",  ref:"TXN-66128-WD", positive:false, status:"completed",
+    note:"Withdrawn to GTBank •••• 4821", icon:"arrow-up-circle",  iconBg:"#FFF0F0", iconColor:"#EF4444",
+  },
+  {
+    id:"6",  name:"iTunes Gift Card",  cat:"Gift Card", date:"Jun 20, 2025", time:"01:18 PM",
+    ts: new Date("2025-06-20").getTime(), amount:"₦92,400",   amountRaw:92400,
+    fee:"₦200", ref:"TXN-10293-GC", positive:true,  status:"pending",
+    note:"Apple iTunes US $50 gift card — under review", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
+  },
+  {
+    id:"7",  name:"DSTV Subscription", cat:"Bills",     date:"Jun 19, 2025", time:"10:00 AM",
+    ts: new Date("2025-06-19").getTime(), amount:"₦7,900",    amountRaw:7900,
+    fee:"₦100", ref:"TXN-38841-BL", positive:false, status:"completed",
+    note:"DSTV Premium — IUC 1234567890", icon:"tv",               iconBg:"#FFF1F2", iconColor:"#E11D48",
+  },
+  {
+    id:"8",  name:"Wallet Funding",    cat:"Wallet",    date:"Jun 17, 2025", time:"03:55 PM",
+    ts: new Date("2025-06-17").getTime(), amount:"₦100,000",  amountRaw:100000,
+    fee:"₦0",   ref:"TXN-92011-WF", positive:true,  status:"completed",
+    note:"Funded from GTBank via bank transfer", icon:"arrow-down-circle",iconBg:"#F0FFF4", iconColor:"#00B03C",
+  },
+  {
+    id:"9",  name:"Deposit Gift Card", cat:"Gift Card", date:"Feb 24, 2022", time:"05:40 PM",
+    ts: new Date("2022-02-24").getTime(), amount:"₦200,040",  amountRaw:200040,
+    fee:"₦200", ref:"TXN-40021-GC", positive:true,  status:"completed",
+    note:"Vanilla Visa $120 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
+  },
+  {
+    id:"10", name:"Withdrawal",        cat:"Wallet",    date:"Feb 24, 2022", time:"06:12 PM",
+    ts: new Date("2022-02-24").getTime(), amount:"₦400,000",  amountRaw:400000,
+    fee:"₦50",  ref:"TXN-73950-WD", positive:false, status:"completed",
+    note:"Withdrawn to Access Bank •••• 9934", icon:"arrow-up-right",   iconBg:"#FFF0F0", iconColor:"#EF4444",
+  },
+  {
+    id:"11", name:"Spotify Premium",   cat:"Bills",     date:"Jun 15, 2025", time:"12:00 PM",
+    ts: new Date("2025-06-15").getTime(), amount:"₦3,200",    amountRaw:3200,
+    fee:"₦0",   ref:"TXN-61122-BL", positive:false, status:"completed",
+    note:"Spotify Premium monthly — auto-renew", icon:"music",            iconBg:"#F5F3FF", iconColor:"#7C3AED",
+  },
+  {
+    id:"12", name:"Steam Gift Card",   cat:"Gift Card", date:"Jun 12, 2025", time:"11:31 AM",
+    ts: new Date("2025-06-12").getTime(), amount:"₦45,000",   amountRaw:45000,
+    fee:"₦200", ref:"TXN-58801-GC", positive:true,  status:"completed",
+    note:"Steam Wallet US $25 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
+  },
+  {
+    id:"13", name:"Ethereum Sale",     cat:"Crypto",    date:"Jun 10, 2025", time:"09:03 AM",
+    ts: new Date("2025-06-10").getTime(), amount:"₦312,000",  amountRaw:312000,
+    fee:"₦500", ref:"TXN-14420-CR", positive:true,  status:"completed",
+    note:"0.1 ETH @ ₦3,120,000/ETH", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#627EEA",
+  },
+  {
+    id:"14", name:"WAEC Data Bundle",  cat:"Airtime",   date:"Jun 8, 2025",  time:"07:45 AM",
+    ts: new Date("2025-06-08").getTime(), amount:"₦1,500",    amountRaw:1500,
+    fee:"₦0",   ref:"TXN-33672-AT", positive:false, status:"pending",
+    note:"1GB data — 09087654321", icon:"wifi",             iconBg:"#EFF6FF", iconColor:"#3B82F6",
+  },
 ];
 
 /* ─── Filter types ───────────────────────────────────────────────────────── */
 type TxFilter  = "All" | "Credit" | "Debit" | "Pending";
 type DateRange = "all" | "7d" | "30d" | "3m";
 
-const TX_FILTERS:   TxFilter[]  = ["All", "Credit", "Debit", "Pending"];
+const TX_FILTERS:  TxFilter[]  = ["All", "Credit", "Debit", "Pending"];
 const DATE_RANGES: { key: DateRange; label: string }[] = [
   { key: "all", label: "All time" },
   { key: "7d",  label: "7 days"   },
@@ -86,21 +163,19 @@ const DATE_RANGES: { key: DateRange; label: string }[] = [
   { key: "3m",  label: "3 months" },
 ];
 
-const STATUS_STYLE: Record<TxStatus, { bg: string; color: string }> = {
-  completed: { bg: "#E8F7EF", color: "#00B03C" },
-  pending:   { bg: "#FFFBEB", color: "#D97706" },
-  failed:    { bg: "#FFF0F0", color: "#EF4444" },
+const STATUS_STYLE: Record<TxStatus, { bg: string; color: string; label: string }> = {
+  completed: { bg: "#E8F7EF", color: "#00B03C", label: "Completed" },
+  pending:   { bg: "#FFFBEB", color: "#D97706", label: "Pending"   },
+  failed:    { bg: "#FFF0F0", color: "#EF4444", label: "Failed"    },
 };
 
-/* ─── Highlighted search text ────────────────────────────────────────────── */
+/* ─── Highlight matched search text ─────────────────────────────────────── */
 function HighlightText({ text, query, style }: { text: string; query: string; style: object }) {
   if (!query.trim()) return <Text style={style} numberOfLines={1}>{text}</Text>;
-
-  const lower   = text.toLowerCase();
-  const qLower  = query.toLowerCase().trim();
-  const idx     = lower.indexOf(qLower);
+  const lower  = text.toLowerCase();
+  const qLower = query.toLowerCase().trim();
+  const idx    = lower.indexOf(qLower);
   if (idx === -1) return <Text style={style} numberOfLines={1}>{text}</Text>;
-
   return (
     <Text style={style} numberOfLines={1}>
       {text.slice(0, idx)}
@@ -112,23 +187,258 @@ function HighlightText({ text, query, style }: { text: string; query: string; st
   );
 }
 
+/* ─── Receipt row ────────────────────────────────────────────────────────── */
+function ReceiptRow({ label, value, valueColor, bold }: {
+  label: string; value: string; valueColor?: string; bold?: boolean;
+}) {
+  return (
+    <View style={r.row}>
+      <Text style={r.label}>{label}</Text>
+      <Text style={[r.value, bold && r.valueBold, valueColor ? { color: valueColor } : undefined]}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+const r = StyleSheet.create({
+  row:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 11 },
+  label:     { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
+  value:     { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, textAlign: "right", flex: 1, marginLeft: 12 },
+  valueBold: { fontFamily: "Manrope_700Bold" },
+});
+
+/* ─── Copy chip ──────────────────────────────────────────────────────────── */
+function CopyChip({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  const sc = useSharedValue(1);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(value);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    sc.value = withSpring(0.9, { damping: 10 }, () => { sc.value = withSpring(1); });
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Animated.View style={style}>
+      <TouchableOpacity
+        style={cc.chip}
+        onPress={handleCopy}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Feather name={copied ? "check" : "copy"} size={12} color={copied ? C.success : C.primary} />
+        <Text style={[cc.text, { color: copied ? C.success : C.primary }]}>
+          {copied ? "Copied!" : label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+const cc = StyleSheet.create({
+  chip: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
+  text: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
+});
+
+/* ─── Transaction detail sheet ───────────────────────────────────────────── */
+function TxDetailSheet({ tx, visible, onClose }: {
+  tx: Transaction | null;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+
+  const handleShare = useCallback(async () => {
+    if (!tx) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const sign = tx.positive ? "+" : "-";
+    const feeNum = parseInt(tx.fee.replace(/[₦,]/g, "")) || 0;
+    const totalNum = tx.positive
+      ? tx.amountRaw - feeNum
+      : tx.amountRaw + feeNum;
+    const totalStr = "₦" + totalNum.toLocaleString("en-NG");
+
+    try {
+      await Share.share({
+        message: [
+          `AZA Transaction Receipt`,
+          `──────────────────────`,
+          `${tx.name}`,
+          `Amount:    ${sign}${tx.amount}`,
+          `Fee:       ${tx.fee}`,
+          `Net total: ${sign}${totalStr}`,
+          `Status:    ${STATUS_STYLE[tx.status].label}`,
+          `Date:      ${tx.date} at ${tx.time}`,
+          `Ref:       ${tx.ref}`,
+          `Note:      ${tx.note}`,
+        ].join("\n"),
+        title: `AZA Receipt — ${tx.ref}`,
+      });
+    } catch {}
+  }, [tx]);
+
+  if (!tx) return null;
+
+  const feeNum  = parseInt(tx.fee.replace(/[₦,]/g, "")) || 0;
+  const netNum  = tx.positive ? tx.amountRaw - feeNum : tx.amountRaw + feeNum;
+  const netStr  = "₦" + netNum.toLocaleString("en-NG");
+  const st      = STATUS_STYLE[tx.status];
+  const sign    = tx.positive ? "+" : "-";
+
+  return (
+    <AnimatedSheet
+      visible={visible}
+      onClose={onClose}
+      maxHeight="88%"
+      sheetStyle={{ paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[ds.scroll, { paddingBottom: insets.bottom + 24 }]}
+        bounces={false}
+      >
+        {/* Drag handle */}
+        <View style={ds.handle} />
+
+        {/* ── Hero ── */}
+        <View style={ds.hero}>
+          <View style={[ds.heroIcon, { backgroundColor: tx.iconBg }]}>
+            <Feather name={tx.icon} size={28} color={tx.iconColor} />
+          </View>
+
+          <Text style={[ds.heroAmount, { color: tx.positive ? C.success : C.danger }]}>
+            {sign}{tx.amount}
+          </Text>
+          <Text style={ds.heroName}>{tx.name}</Text>
+
+          <View style={[ds.statusPill, { backgroundColor: st.bg, borderColor: st.color + "33" }]}>
+            <View style={[ds.statusDot, { backgroundColor: st.color }]} />
+            <Text style={[ds.statusText, { color: st.color }]}>{st.label}</Text>
+          </View>
+        </View>
+
+        {/* ── Note ── */}
+        {tx.note ? (
+          <View style={ds.noteBox}>
+            <Feather name="info" size={13} color={C.textMut} />
+            <Text style={ds.noteText}>{tx.note}</Text>
+          </View>
+        ) : null}
+
+        {/* ── Receipt breakdown ── */}
+        <View style={ds.section}>
+          <Text style={ds.sectionTitle}>Receipt</Text>
+          <View style={ds.card}>
+            <ReceiptRow label="Amount"    value={`${sign}${tx.amount}`} valueColor={tx.positive ? C.success : C.danger} />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Fee"       value={tx.fee === "₦0" ? "Free" : `-${tx.fee}`} valueColor={tx.fee === "₦0" ? C.success : undefined} />
+            <View style={[ds.rowDivider, ds.rowDividerStrong]} />
+            <ReceiptRow label="Net total" value={`${sign}${netStr}`} bold valueColor={tx.positive ? C.success : C.danger} />
+          </View>
+        </View>
+
+        {/* ── Transaction details ── */}
+        <View style={ds.section}>
+          <Text style={ds.sectionTitle}>Details</Text>
+          <View style={ds.card}>
+            <ReceiptRow label="Date"      value={tx.date} />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Time"      value={tx.time} />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Category"  value={tx.cat}  />
+            <View style={ds.rowDivider} />
+            <View style={[r.row, { paddingVertical: 11 }]}>
+              <Text style={r.label}>Reference</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "flex-end" }}>
+                <Text style={[r.value, { flex: 0 }]} numberOfLines={1}>{tx.ref}</Text>
+                <CopyChip value={tx.ref} label="Copy" />
+              </View>
+            </View>
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Type"      value={tx.positive ? "Credit" : "Debit"} />
+          </View>
+        </View>
+
+        {/* ── Actions ── */}
+        <View style={ds.actions}>
+          <TouchableOpacity style={ds.shareBtn} onPress={handleShare} activeOpacity={0.82}>
+            <Feather name="share-2" size={16} color="#FFFFFF" />
+            <Text style={ds.shareBtnText}>Share Receipt</Text>
+          </TouchableOpacity>
+
+          {tx.status === "pending" && (
+            <TouchableOpacity
+              style={ds.cancelBtn}
+              activeOpacity={0.82}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onClose(); }}
+            >
+              <Text style={ds.cancelBtnText}>Cancel Transaction</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity style={ds.closeBtn} onPress={onClose} activeOpacity={0.72}>
+            <Text style={ds.closeBtnText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </AnimatedSheet>
+  );
+}
+
+const ds = StyleSheet.create({
+  scroll: { paddingHorizontal: 22 },
+  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginTop: 10, marginBottom: 18 },
+
+  /* Hero */
+  hero:       { alignItems: "center", gap: 8, paddingBottom: 20 },
+  heroIcon:   { width: 68, height: 68, borderRadius: 22, alignItems: "center", justifyContent: "center", marginBottom: 4 },
+  heroAmount: { fontSize: 32, fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.5 },
+  heroName:   { fontSize: 16, fontFamily: "Manrope_600SemiBold", color: C.text },
+  statusPill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1 },
+  statusDot:  { width: 6, height: 6, borderRadius: 3 },
+  statusText: { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
+
+  /* Note */
+  noteBox: { flexDirection: "row", alignItems: "flex-start", gap: 8, backgroundColor: "#F8F9FA", borderRadius: 12, padding: 12, marginBottom: 20, borderWidth: 1, borderColor: C.border },
+  noteText: { flex: 1, fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec, lineHeight: 19 },
+
+  /* Sections */
+  section:      { marginBottom: 18 },
+  sectionTitle: { fontSize: 11, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 },
+  card:         { borderRadius: 16, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg, paddingHorizontal: 16, overflow: "hidden" },
+  rowDivider:        { height: 1, backgroundColor: "#F3F4F6" },
+  rowDividerStrong:  { backgroundColor: "#E5E7EB", marginVertical: 2 },
+
+  /* Actions */
+  actions:       { gap: 10, marginTop: 4 },
+  shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 50, borderRadius: 14, backgroundColor: C.navy },
+  shareBtnText:  { fontSize: 15, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  cancelBtn:     { height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
+  cancelBtnText: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.danger },
+  closeBtn:      { height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  closeBtnText:  { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.textMut },
+});
+
 /* ─── Main screen ────────────────────────────────────────────────────────── */
 export default function HistoryScreen() {
-  const insets  = useSafeAreaInsets();
-  const router  = useRouter();
-  const topPad  = Platform.OS === "web" ? 40 : insets.top;
+  const insets = useSafeAreaInsets();
+  const topPad = Platform.OS === "web" ? 40 : insets.top;
 
   const [txFilter,   setTxFilter]   = useState<TxFilter>("All");
   const [dateRange,  setDateRange]  = useState<DateRange>("all");
   const [searchText, setSearchText] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [selected,   setSelected]   = useState<Transaction | null>(null);
+  const [sheetOpen,  setSheetOpen]  = useState(false);
 
   const searchRef = useRef<TextInput>(null);
 
   /* ─── Search bar animation ── */
-  const searchH    = useSharedValue(0);
-  const searchOp   = useSharedValue(0);
-
+  const searchH  = useSharedValue(0);
+  const searchOp = useSharedValue(0);
   const searchBarStyle = useAnimatedStyle(() => ({
     height:   searchH.value,
     opacity:  searchOp.value,
@@ -138,14 +448,14 @@ export default function HistoryScreen() {
   const toggleSearch = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (searchOpen) {
-      searchH.value  = withTiming(0,  { duration: 220 });
-      searchOp.value = withTiming(0,  { duration: 180 });
+      searchH.value  = withTiming(0, { duration: 220 });
+      searchOp.value = withTiming(0, { duration: 180 });
       setSearchText("");
       setSearchOpen(false);
     } else {
       setSearchOpen(true);
       searchH.value  = withSpring(52, { damping: 18, stiffness: 280 });
-      searchOp.value = withTiming(1,  { duration: 200 });
+      searchOp.value = withTiming(1, { duration: 200 });
       setTimeout(() => searchRef.current?.focus(), 180);
     }
   }, [searchOpen]);
@@ -153,9 +463,9 @@ export default function HistoryScreen() {
   /* ─── Date range cutoff ── */
   const dateFrom = useMemo(() => {
     const now = Date.now();
-    if (dateRange === "7d")  return now - 7  * 24 * 60 * 60 * 1000;
-    if (dateRange === "30d") return now - 30 * 24 * 60 * 60 * 1000;
-    if (dateRange === "3m")  return now - 90 * 24 * 60 * 60 * 1000;
+    if (dateRange === "7d")  return now - 7  * 86400000;
+    if (dateRange === "30d") return now - 30 * 86400000;
+    if (dateRange === "3m")  return now - 90 * 86400000;
     return 0;
   }, [dateRange]);
 
@@ -163,20 +473,19 @@ export default function HistoryScreen() {
   const filtered = useMemo(() => {
     const q = searchText.toLowerCase().trim();
     return ALL_TX.filter(t => {
-      if (txFilter === "Credit"  && !t.positive)             return false;
-      if (txFilter === "Debit"   && t.positive)              return false;
-      if (txFilter === "Pending" && t.status !== "pending")  return false;
-      if (dateFrom > 0 && t.ts < dateFrom)                   return false;
+      if (txFilter === "Credit"  && !t.positive)            return false;
+      if (txFilter === "Debit"   && t.positive)             return false;
+      if (txFilter === "Pending" && t.status !== "pending") return false;
+      if (dateFrom > 0 && t.ts < dateFrom)                  return false;
       if (q && !t.name.toLowerCase().includes(q) && !t.cat.toLowerCase().includes(q)) return false;
       return true;
     });
   }, [txFilter, dateFrom, searchText]);
 
-  /* ─── Summary (filtered totals) ── */
-  const totalIn  = filtered.filter(t =>  t.positive).reduce((s, t) => s + parseInt(t.amount.replace(/[₦,]/g, "")), 0);
-  const totalOut = filtered.filter(t => !t.positive).reduce((s, t) => s + parseInt(t.amount.replace(/[₦,]/g, "")), 0);
+  /* ─── Totals (filtered) ── */
+  const totalIn  = filtered.filter(t =>  t.positive).reduce((s, t) => s + t.amountRaw, 0);
+  const totalOut = filtered.filter(t => !t.positive).reduce((s, t) => s + t.amountRaw, 0);
 
-  /* ─── Active filter count for badge ── */
   const activeFilters = (txFilter !== "All" ? 1 : 0) + (dateRange !== "all" ? 1 : 0) + (searchText ? 1 : 0);
 
   const clearAll = useCallback(() => {
@@ -186,44 +495,46 @@ export default function HistoryScreen() {
     setSearchText("");
   }, []);
 
-  /* ─── Group transactions by period label ── */
+  /* ─── Open detail sheet ── */
+  const openDetail = useCallback((tx: Transaction) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelected(tx);
+    setSheetOpen(true);
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    setSheetOpen(false);
+  }, []);
+
+  /* ─── Group by time period ── */
   const grouped = useMemo(() => {
-    const now     = Date.now();
-    const sections: Array<{ title: string; data: Transaction[] }> = [];
+    const now = Date.now();
     const buckets: Record<string, Transaction[]> = {};
-
     for (const t of filtered) {
-      const diff = now - t.ts;
-      const days = diff / (24 * 60 * 60 * 1000);
-      let bucket: string;
-      if (days < 1)        bucket = "Today";
-      else if (days < 7)   bucket = "This week";
-      else if (days < 30)  bucket = "This month";
-      else if (days < 90)  bucket = "Last 3 months";
-      else                 bucket = "Older";
-      if (!buckets[bucket]) buckets[bucket] = [];
-      buckets[bucket].push(t);
+      const days = (now - t.ts) / 86400000;
+      const key =
+        days < 1  ? "Today" :
+        days < 7  ? "This week" :
+        days < 30 ? "This month" :
+        days < 90 ? "Last 3 months" : "Older";
+      if (!buckets[key]) buckets[key] = [];
+      buckets[key].push(t);
     }
-
     const order = ["Today", "This week", "This month", "Last 3 months", "Older"];
-    for (const key of order) {
-      if (buckets[key]?.length) sections.push({ title: key, data: buckets[key] });
-    }
-    return sections;
+    return order.flatMap(k => buckets[k]?.length ? [{ title: k, data: buckets[k] }] : []);
   }, [filtered]);
 
-  /* Flat list data: interleave section headers */
   type ListItem =
     | { type: "header"; title: string; key: string }
-    | { type: "tx";     tx: Transaction; isLast: boolean; key: string };
+    | { type: "tx"; tx: Transaction; isLast: boolean; key: string };
 
   const listData = useMemo<ListItem[]>(() => {
     const items: ListItem[] = [];
-    for (const section of grouped) {
-      items.push({ type: "header", title: section.title, key: `h-${section.title}` });
-      section.data.forEach((tx, i) => {
-        items.push({ type: "tx", tx, isLast: i === section.data.length - 1, key: `tx-${tx.id}` });
-      });
+    for (const sec of grouped) {
+      items.push({ type: "header", title: sec.title, key: `h-${sec.title}` });
+      sec.data.forEach((tx, i) =>
+        items.push({ type: "tx", tx, isLast: i === sec.data.length - 1, key: `tx-${tx.id}` }),
+      );
     }
     return items;
   }, [grouped]);
@@ -235,7 +546,6 @@ export default function HistoryScreen() {
       <Animated.View entering={FadeInDown.duration(280)} style={s.header}>
         <Text style={s.title}>History</Text>
         <View style={s.headerRight}>
-          {/* Clear all badge */}
           {activeFilters > 0 && (
             <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(140)}>
               <TouchableOpacity style={s.clearBtn} onPress={clearAll}>
@@ -256,7 +566,7 @@ export default function HistoryScreen() {
         </View>
       </Animated.View>
 
-      {/* ── Search bar (animated slide-in) ── */}
+      {/* ── Search bar ── */}
       <Animated.View style={[searchBarStyle, s.searchWrap]}>
         <View style={s.searchBox}>
           <Feather name="search" size={15} color={C.textMut} />
@@ -280,7 +590,7 @@ export default function HistoryScreen() {
         </View>
       </Animated.View>
 
-      {/* ── Summary cards (update in real-time) ── */}
+      {/* ── Summary cards ── */}
       <Animated.View entering={FadeInDown.duration(320).delay(30)} style={s.summaryRow}>
         <View style={[s.summaryCard, { backgroundColor: "#F0FFF4", flex: 1 }]}>
           <View style={s.summaryTop}>
@@ -306,13 +616,9 @@ export default function HistoryScreen() {
         </View>
       </Animated.View>
 
-      {/* ── Type filter chips ── */}
+      {/* ── Filter chips ── */}
       <Animated.View entering={FadeInDown.duration(290).delay(50)}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.chipScroll}
-        >
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipScroll}>
           {TX_FILTERS.map(f => (
             <Pressable
               key={f}
@@ -322,26 +628,17 @@ export default function HistoryScreen() {
               <Text style={[s.chipText, txFilter === f && s.chipTextActive]}>{f}</Text>
             </Pressable>
           ))}
-
-          {/* Divider */}
           <View style={s.chipDivider} />
-
-          {/* Date range chips */}
-          {DATE_RANGES.map(r => (
+          {DATE_RANGES.map(dr => (
             <Pressable
-              key={r.key}
-              style={[s.chip, s.chipDate, dateRange === r.key && s.chipDateActive]}
-              onPress={() => { Haptics.selectionAsync(); setDateRange(r.key); }}
+              key={dr.key}
+              style={[s.chip, s.chipDate, dateRange === dr.key && s.chipDateActive]}
+              onPress={() => { Haptics.selectionAsync(); setDateRange(dr.key); }}
             >
-              {dateRange === r.key && r.key !== "all" && (
-                <Feather name="calendar" size={11} color="#FFFFFF" />
+              {dr.key !== "all" && (
+                <Feather name="calendar" size={11} color={dateRange === dr.key ? "#FFFFFF" : C.primary} />
               )}
-              {dateRange !== r.key && r.key !== "all" && (
-                <Feather name="calendar" size={11} color={C.primary} />
-              )}
-              <Text style={[s.chipText, dateRange === r.key && s.chipDateTextActive]}>
-                {r.label}
-              </Text>
+              <Text style={[s.chipText, dateRange === dr.key && s.chipDateTextActive]}>{dr.label}</Text>
             </Pressable>
           ))}
         </ScrollView>
@@ -356,7 +653,7 @@ export default function HistoryScreen() {
         </Text>
         {filtered.length !== ALL_TX.length && (
           <Animated.View entering={FadeIn.duration(160)}>
-            <Text style={s.resultFiltered}>• filtered</Text>
+            <Text style={s.resultFiltered}>· filtered</Text>
           </Animated.View>
         )}
       </View>
@@ -396,21 +693,16 @@ export default function HistoryScreen() {
           }
 
           const { tx, isLast } = item;
-
           return (
             <Animated.View entering={FadeInDown.duration(240).delay(Math.min(index * 18, 300))}>
               <TouchableOpacity
                 style={s.txRow}
-                activeOpacity={0.75}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push("/(app)/transactions" as any);
-                }}
+                activeOpacity={0.72}
+                onPress={() => openDetail(tx)}
               >
                 <View style={[s.txIcon, { backgroundColor: tx.iconBg }]}>
                   <Feather name={tx.icon} size={20} color={tx.iconColor} />
                 </View>
-
                 <View style={s.txInfo}>
                   <HighlightText text={tx.name} query={searchText} style={s.txName} />
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
@@ -419,14 +711,13 @@ export default function HistoryScreen() {
                     <Text style={[s.txCat, { color: tx.iconColor }]}>{tx.cat}</Text>
                   </View>
                 </View>
-
                 <View style={s.txRight}>
                   <Text style={[s.txAmount, { color: tx.positive ? C.success : C.danger }]}>
                     {tx.positive ? "+" : "-"}{tx.amount}
                   </Text>
                   <View style={[s.statusBadge, { backgroundColor: STATUS_STYLE[tx.status].bg }]}>
                     <Text style={[s.statusText, { color: STATUS_STYLE[tx.status].color }]}>
-                      {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
+                      {STATUS_STYLE[tx.status].label}
                     </Text>
                   </View>
                 </View>
@@ -436,6 +727,9 @@ export default function HistoryScreen() {
           );
         }}
       />
+
+      {/* ── Detail bottom sheet ── */}
+      <TxDetailSheet tx={selected} visible={sheetOpen} onClose={closeDetail} />
     </View>
   );
 }
@@ -444,7 +738,6 @@ export default function HistoryScreen() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
 
-  /* Header */
   header:      { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingBottom: 10, paddingTop: 8 },
   title:       { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.navy },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -452,17 +745,15 @@ const s = StyleSheet.create({
   iconBtn:       { width: 38, height: 38, borderRadius: 10, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: C.border },
   iconBtnActive: { backgroundColor: C.navy, borderColor: C.navy },
 
-  clearBtn:      { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
-  clearBtnText:  { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.danger },
-  clearBadge:    { minWidth: 18, height: 18, borderRadius: 9, backgroundColor: C.danger, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
-  clearBadgeText:{ fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  clearBtn:       { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
+  clearBtnText:   { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.danger },
+  clearBadge:     { minWidth: 18, height: 18, borderRadius: 9, backgroundColor: C.danger, alignItems: "center", justifyContent: "center", paddingHorizontal: 4 },
+  clearBadgeText: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
-  /* Search */
   searchWrap:  { paddingHorizontal: 20, paddingBottom: 4 },
   searchBox:   { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#F8F9FA", borderRadius: 12, borderWidth: 1, borderColor: C.border, paddingHorizontal: 12, height: 44 },
   searchInput: { flex: 1, fontSize: 14, fontFamily: "Manrope_400Regular", color: C.text, paddingVertical: 0 },
 
-  /* Summary */
   summaryRow:   { flexDirection: "row", gap: 12, paddingHorizontal: 20, marginBottom: 10 },
   summaryCard:  { borderRadius: 14, padding: 14, gap: 6 },
   summaryTop:   { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -470,27 +761,22 @@ const s = StyleSheet.create({
   summaryLabel: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
   summaryAmt:   { fontSize: 17, fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"] },
 
-  /* Filter chips */
-  chipScroll:      { paddingHorizontal: 20, gap: 8, paddingBottom: 10, alignItems: "center" },
-  chip:            { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },
-  chipActive:      { backgroundColor: C.navy, borderColor: C.navy },
-  chipText:        { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
-  chipTextActive:  { color: "#FFFFFF" },
-
-  chipDivider: { width: 1, height: 20, backgroundColor: C.border, marginHorizontal: 2 },
-
-  chipDate:         { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" },
-  chipDateActive:   { backgroundColor: C.primary, borderColor: C.primary },
+  chipScroll:         { paddingHorizontal: 20, gap: 8, paddingBottom: 10, alignItems: "center" },
+  chip:               { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },
+  chipActive:         { backgroundColor: C.navy, borderColor: C.navy },
+  chipText:           { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec },
+  chipTextActive:     { color: "#FFFFFF" },
+  chipDivider:        { width: 1, height: 20, backgroundColor: C.border, marginHorizontal: 2 },
+  chipDate:           { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" },
+  chipDateActive:     { backgroundColor: C.primary, borderColor: C.primary },
   chipDateTextActive: { color: "#FFFFFF" },
 
-  /* Result count */
   resultRow:     { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 20, marginBottom: 4 },
   resultText:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMut },
   resultFiltered:{ fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.primary },
 
-  /* List */
-  list:          { paddingHorizontal: 20, paddingTop: 2 },
-  sectionHeader: { fontSize: 12, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.6, marginTop: 14, marginBottom: 6 },
+  list:         { paddingHorizontal: 20, paddingTop: 2 },
+  sectionHeader:{ fontSize: 12, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.6, marginTop: 14, marginBottom: 6 },
 
   txRow:    { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 13 },
   txIcon:   { width: 50, height: 50, borderRadius: 16, alignItems: "center", justifyContent: "center" },
@@ -506,7 +792,6 @@ const s = StyleSheet.create({
   statusText:  { fontSize: 10, fontFamily: "Manrope_600SemiBold" },
   divider:     { height: 1, backgroundColor: C.border },
 
-  /* Empty state */
   empty:        { alignItems: "center", paddingTop: 60, gap: 10 },
   emptyIconWrap:{ width: 60, height: 60, borderRadius: 20, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center", marginBottom: 4 },
   emptyTitle:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text },
