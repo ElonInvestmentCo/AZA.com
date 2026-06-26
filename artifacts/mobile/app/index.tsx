@@ -1,90 +1,74 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
-import {
-  Animated,
+import React, { useRef, useState, useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
   Easing,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+} from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
+import SplashAnimation from "@/components/SplashAnimation";
 
 export default function SplashIndex() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  const isAuthenticatedRef = useRef(isAuthenticated);
+  isAuthenticatedRef.current = isAuthenticated;
 
-  const scaleAnim   = useRef(new Animated.Value(0.80)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const glowAnim    = useRef(new Animated.Value(0)).current;
+  const [animDone,  setAnimDone]  = useState(false);
+  const [authReady, setAuthReady] = useState(!isLoading);
+
+  const wordmarkOpacity = useSharedValue(0);
+  const screenOpacity   = useSharedValue(1);
+
+  const wordmarkStyle = useAnimatedStyle(() => ({ opacity: wordmarkOpacity.value }));
+  const screenStyle   = useAnimatedStyle(() => ({ opacity: screenOpacity.value }));
 
   useEffect(() => {
-    // 1. Scale-in + fade-in simultaneously
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        tension: 55,
-        friction: 9,
-        useNativeDriver: Platform.OS !== "web",
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 1,
-        duration: 750,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: Platform.OS !== "web",
-      }),
-    ]).start(() => {
-      // 2. After logo appears, shimmer glow pulses
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(glowAnim, {
-            toValue: 1,
-            duration: 1400,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: Platform.OS !== "web",
-          }),
-          Animated.timing(glowAnim, {
-            toValue: 0,
-            duration: 1400,
-            easing: Easing.inOut(Easing.sin),
-            useNativeDriver: Platform.OS !== "web",
-          }),
-        ])
-      ).start();
-    });
+    wordmarkOpacity.value = withDelay(
+      300,
+      withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) })
+    );
   }, []);
 
   useEffect(() => {
-    if (isLoading) return;
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
+    if (!isLoading) setAuthReady(true);
+  }, [isLoading]);
+
+  const navigate = () => {
+    screenOpacity.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.cubic) });
+    setTimeout(() => {
+      if (isAuthenticatedRef.current) {
         router.replace("/(tabs)/" as any);
       } else {
         router.replace("/onboarding");
       }
-    }, 2800);
-    return () => clearTimeout(timer);
-  }, [isLoading, isAuthenticated]);
+    }, 320);
+  };
 
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.18],
-  });
+  useEffect(() => {
+    if (animDone && authReady) navigate();
+  }, [animDone, authReady]);
+
+  useEffect(() => {
+    const fallback = setTimeout(() => setAnimDone(true), 2800);
+    return () => clearTimeout(fallback);
+  }, []);
 
   return (
-    <View style={s.container}>
-      <Animated.View
-        style={{
-          opacity: opacityAnim,
-          transform: [{ scale: scaleAnim }],
-          alignItems: "center",
-        }}
-      >
-        {/* AZA wordmark */}
-        <View style={s.logoWrap}>
-          <Text style={s.logo}>AZA.</Text>
-          {/* Shimmer overlay that glows on top of the text */}
-          <Animated.View style={[s.shimmerOverlay, { opacity: glowOpacity }]} />
+    <View style={s.root}>
+      <Animated.View style={[StyleSheet.absoluteFill, s.fill, screenStyle]}>
+        <View style={s.center}>
+          <SplashAnimation
+            size={180}
+            duration={2000}
+            onFinish={() => setAnimDone(true)}
+          />
+          <Animated.Text style={[s.wordmark, wordmarkStyle]}>
+            AZA.
+          </Animated.Text>
         </View>
       </Animated.View>
     </View>
@@ -92,48 +76,28 @@ export default function SplashIndex() {
 }
 
 const s = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: "#080808",
+  },
+  fill: {
+    flex: 1,
+    backgroundColor: "#080808",
+  },
+  center: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
-  logoWrap: {
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logo: {
+  wordmark: {
     fontFamily: "Manrope_700Bold",
-    fontSize: 68,
+    fontSize: 52,
     letterSpacing: 4,
     color: "#FFFFFF",
     textAlign: "center",
-    textShadowColor: "rgba(255,255,255,0.30)",
+    marginTop: 24,
+    textShadowColor: "rgba(255,255,255,0.18)",
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 28,
-  },
-  shimmerOverlay: {
-    position: "absolute",
-    top: 0,
-    left: -16,
-    right: -16,
-    bottom: 0,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 6,
-  },
-  accentLine: {
-    width: 48,
-    height: 1.5,
-    backgroundColor: "rgba(255,255,255,0.20)",
-    marginTop: 18,
-    marginBottom: 14,
-  },
-  tagline: {
-    fontFamily: "Manrope_400Regular",
-    fontSize: 10,
-    letterSpacing: 5,
-    color: "rgba(255,255,255,0.30)",
-    textAlign: "center",
+    textShadowRadius: 20,
   },
 });
