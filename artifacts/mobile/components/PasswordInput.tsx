@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
+import { EyeIcon } from "@/components/EyeIcon";
 
 interface PasswordInputProps {
   placeholder?: string;
@@ -53,7 +53,7 @@ export function PasswordInput({
         hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         style={s.eyeBtn}
       >
-        <PremiumEyeIcon open={showPass} size={22} color="#8391A1" />
+        <EyeIcon open={showPass} size={22} color="#8391A1" />
       </Pressable>
     </View>
   );
