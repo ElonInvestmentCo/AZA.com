@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, View } from "react-native";
+import { Animated, Easing, Platform, View } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
+import * as Haptics from "expo-haptics";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -33,7 +34,15 @@ export default function SplashAnimation({ size = 180, onFinish, duration = 2000 
   });
 
   useEffect(() => {
-    const half = duration * 0.5;
+    if (Platform.OS !== "web") {
+      const hapticTimer = setTimeout(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }, duration * 0.55);
+      return () => clearTimeout(hapticTimer);
+    }
+  }, []);
+
+  useEffect(() => {
     Animated.sequence([
       Animated.parallel([
         Animated.timing(outerProgress, {
