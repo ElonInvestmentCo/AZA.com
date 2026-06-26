@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
+import * as LocalAuthentication from "expo-local-authentication";
+import * as ScreenCapture from "expo-screen-capture";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Platform,
@@ -23,6 +25,8 @@ import Animated, {
   withSpring,
   withTiming,
   interpolate,
+  ZoomIn,
+  ZoomOut,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
@@ -93,7 +97,7 @@ function ActionBtn({ item, onPress }: { item: typeof CARD_ACTIONS[number]; onPre
         }}
         onPressOut={() => { sc.value = withSpring(1, { damping: 12 }); }}
         onPress={onPress}
-        hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
       >
         <Feather name={item.icon} size={20} color={item.color} />
       </Pressable>
@@ -121,9 +125,9 @@ function TabBar({
   onChange: (t: "transactions" | "details") => void;
 }) {
   const [containerW, setContainerW] = useState(0);
-  const indicator    = useSharedValue(0);
-  const PAD          = 4;
-  const tabW         = containerW > 0 ? (containerW - PAD * 2) / TABS.length : 0;
+  const indicator = useSharedValue(0);
+  const PAD       = 4;
+  const tabW      = containerW > 0 ? (containerW - PAD * 2) / TABS.length : 0;
 
   useEffect(() => {
     if (tabW <= 0) return;
@@ -140,7 +144,6 @@ function TabBar({
       style={tb.bar}
       onLayout={e => setContainerW(e.nativeEvent.layout.width)}
     >
-      {/* Sliding pill */}
       {tabW > 0 && (
         <Animated.View
           style={[
@@ -150,7 +153,6 @@ function TabBar({
           ]}
         />
       )}
-
       {TABS.map(t => (
         <Pressable
           key={t.key}
@@ -187,24 +189,24 @@ const tb = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  tab:        { flex: 1, paddingVertical: 10, alignItems: "center", justifyContent: "center", zIndex: 1 },
-  label:      { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: "#9CA3AF" },
+  tab:         { flex: 1, paddingVertical: 10, alignItems: "center", justifyContent: "center", zIndex: 1 },
+  label:       { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: "#9CA3AF" },
   labelActive: { color: C.navy },
 });
 
 /* ─── Responsive virtual card ────────────────────────────────────────────── */
 interface VirtualCardProps {
-  cardW:           number;
-  frozen:          boolean;
-  revealed:        boolean;
-  onToggleReveal:  () => void;
-  balance:         number;
-  name:            string;
-  maskedNum:       string;
-  fullNum:         string;
-  expiry:          string;
-  maskedCvv:       string;
-  fullCvv:         string;
+  cardW:          number;
+  frozen:         boolean;
+  revealed:       boolean;
+  onToggleReveal: () => void;
+  balance:        number;
+  name:           string;
+  maskedNum:      string;
+  fullNum:        string;
+  expiry:         string;
+  maskedCvv:      string;
+  fullCvv:        string;
 }
 
 function VirtualCard({
@@ -216,13 +218,14 @@ function VirtualCard({
   const f     = (n: number) => Math.max(1, Math.round(n * sc));
   const p     = (n: number) => Math.round(n * sc);
 
-  /* Reveal animation for sensitive numbers */
   const revealOp    = useSharedValue(0);
   const revealScale = useSharedValue(0.92);
+
   useEffect(() => {
-    revealOp.value    = withTiming(revealed ? 1 : 0,    { duration: 220 });
+    revealOp.value    = withTiming(revealed ? 1 : 0,    { duration: 280 });
     revealScale.value = withSpring(revealed ? 1 : 0.92, { damping: 16, stiffness: 280 });
   }, [revealed]);
+
   const maskedStyle  = useAnimatedStyle(() => ({
     opacity: interpolate(revealOp.value, [0, 1], [1, 0]),
   }));
@@ -231,99 +234,112 @@ function VirtualCard({
     transform: [{ scale: revealScale.value }],
   }));
 
+  /* Card fade+scale entrance */
+  const cardEnter = useSharedValue(0.94);
+  const cardOp    = useSharedValue(0);
+  useEffect(() => {
+    cardEnter.value = withSpring(1, { damping: 18, stiffness: 240 });
+    cardOp.value    = withTiming(1, { duration: 320 });
+  }, []);
+  const cardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: cardEnter.value }],
+    opacity: cardOp.value,
+  }));
+
   return (
-    <View
-      style={[
-        vc.card,
-        {
-          width: cardW, height: cardH,
-          padding: p(20), borderRadius: p(22),
-          opacity: frozen ? 0.58 : 1,
-        },
-      ]}
-    >
-      {/* Decorative orbs */}
-      <View style={[vc.orb1, { width: p(200), height: p(200), borderRadius: p(100), top: p(-60), left: p(-40) }]} />
-      <View style={[vc.orb2, { width: p(130), height: p(130), borderRadius: p(65),  bottom: p(-28), right: p(-18) }]} />
-      <View style={[vc.orb3, { width: p(90),  height: p(90),  borderRadius: p(45),  top: p(18), right: p(28) }]} />
+    <Animated.View style={cardStyle}>
+      <View
+        style={[
+          vc.card,
+          {
+            width: cardW, height: cardH,
+            padding: p(20), borderRadius: p(22),
+            opacity: frozen ? 0.58 : 1,
+          },
+        ]}
+      >
+        {/* Decorative orbs */}
+        <View style={[vc.orb1, { width: p(200), height: p(200), borderRadius: p(100), top: p(-60), left: p(-40) }]} />
+        <View style={[vc.orb2, { width: p(130), height: p(130), borderRadius: p(65),  bottom: p(-28), right: p(-18) }]} />
+        <View style={[vc.orb3, { width: p(90),  height: p(90),  borderRadius: p(45),  top: p(18), right: p(28) }]} />
 
-      {/* Frozen overlay */}
-      {frozen && (
-        <View style={[vc.frozenOverlay, { borderRadius: p(22) }]}>
-          <Feather name="pause-circle" size={f(34)} color="#FFFFFF" />
-          <Text style={[vc.frozenText, { fontSize: f(15) }]}>Card Frozen</Text>
-        </View>
-      )}
+        {/* Frozen overlay */}
+        {frozen && (
+          <View style={[vc.frozenOverlay, { borderRadius: p(22) }]}>
+            <Feather name="pause-circle" size={f(34)} color="#FFFFFF" />
+            <Text style={[vc.frozenText, { fontSize: f(15) }]}>Card Frozen</Text>
+          </View>
+        )}
 
-      {/* Top row: label + chip */}
-      <View style={vc.cardTop}>
-        <View>
-          <Text style={[vc.cardLabel, { fontSize: f(8), letterSpacing: 1.4 }]}>VIRTUAL CARD</Text>
-          <Text style={[vc.cardBank,  { fontSize: f(12), marginTop: p(2) }]}>AZA / Payvora</Text>
-        </View>
-        {/* Mastercard circles */}
-        <View style={[vc.mastercard]}>
-          <View style={[vc.mcL, { width: p(22), height: p(22), borderRadius: p(11) }]} />
-          <View style={[vc.mcR, { width: p(22), height: p(22), borderRadius: p(11), marginLeft: p(-9) }]} />
-        </View>
-      </View>
-
-      {/* Balance */}
-      <View style={{ marginTop: p(8) }}>
-        <Text style={[vc.cardBalLabel, { fontSize: f(8) }]}>Available Balance</Text>
-        <Text style={[vc.cardBalAmount, { fontSize: f(19) }]}>
-          {"₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </Text>
-      </View>
-
-      {/* Card number — animated swap */}
-      <View style={{ marginTop: p(10), marginBottom: p(10) }}>
-        <Animated.Text
-          style={[vc.cardNumber, { fontSize: f(13), letterSpacing: p(3) }, maskedStyle]}
-          numberOfLines={1}
-        >
-          {maskedNum}
-        </Animated.Text>
-        <Animated.Text
-          style={[vc.cardNumber, { fontSize: f(13), letterSpacing: p(2.5), position: "absolute" }, revealedStyle]}
-          numberOfLines={1}
-        >
-          {fullNum}
-        </Animated.Text>
-      </View>
-
-      {/* Footer: holder / expiry / cvv */}
-      <View style={vc.cardFooter}>
-        <View>
-          <Text style={[vc.cardMeta,    { fontSize: f(7) }]}>CARD HOLDER</Text>
-          <Text style={[vc.cardMetaVal, { fontSize: f(9) }]}>{name.toUpperCase()}</Text>
-        </View>
-        <View>
-          <Text style={[vc.cardMeta,    { fontSize: f(7) }]}>EXPIRES</Text>
-          <Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"] }]}>{expiry}</Text>
-        </View>
-        <View>
-          <Text style={[vc.cardMeta, { fontSize: f(7) }]}>CVV</Text>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: p(4) }}>
-            <Animated.Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"] }, maskedStyle]}>
-              {maskedCvv}
-            </Animated.Text>
-            <Animated.Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"], position: "absolute" }, revealedStyle]}>
-              {fullCvv}
-            </Animated.Text>
+        {/* Top row */}
+        <View style={vc.cardTop}>
+          <View>
+            <Text style={[vc.cardLabel, { fontSize: f(8), letterSpacing: 1.4 }]}>VIRTUAL CARD</Text>
+            <Text style={[vc.cardBank,  { fontSize: f(12), marginTop: p(2) }]}>AZA / Payvora</Text>
+          </View>
+          <View style={vc.mastercard}>
+            <View style={[vc.mcL, { width: p(22), height: p(22), borderRadius: p(11) }]} />
+            <View style={[vc.mcR, { width: p(22), height: p(22), borderRadius: p(11), marginLeft: p(-9) }]} />
           </View>
         </View>
-      </View>
 
-      {/* Reveal toggle button */}
-      <TouchableOpacity
-        style={[vc.visBtn, { bottom: p(16), right: p(16) }]}
-        onPress={onToggleReveal}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-      >
-        <PremiumEyeIcon open={revealed} size={f(18)} color="rgba(255,255,255,0.78)" />
-      </TouchableOpacity>
-    </View>
+        {/* Balance */}
+        <View style={{ marginTop: p(8) }}>
+          <Text style={[vc.cardBalLabel, { fontSize: f(8) }]}>Available Balance</Text>
+          <Text style={[vc.cardBalAmount, { fontSize: f(19) }]}>
+            {"₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </Text>
+        </View>
+
+        {/* Card number — animated swap */}
+        <View style={{ marginTop: p(10), marginBottom: p(10) }}>
+          <Animated.Text
+            style={[vc.cardNumber, { fontSize: f(13), letterSpacing: p(3) }, maskedStyle]}
+            numberOfLines={1}
+          >
+            {maskedNum}
+          </Animated.Text>
+          <Animated.Text
+            style={[vc.cardNumber, { fontSize: f(13), letterSpacing: p(2.5), position: "absolute" }, revealedStyle]}
+            numberOfLines={1}
+          >
+            {fullNum}
+          </Animated.Text>
+        </View>
+
+        {/* Footer */}
+        <View style={vc.cardFooter}>
+          <View>
+            <Text style={[vc.cardMeta,    { fontSize: f(7) }]}>CARD HOLDER</Text>
+            <Text style={[vc.cardMetaVal, { fontSize: f(9) }]}>{name.toUpperCase()}</Text>
+          </View>
+          <View>
+            <Text style={[vc.cardMeta,    { fontSize: f(7) }]}>EXPIRES</Text>
+            <Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"] }]}>{expiry}</Text>
+          </View>
+          <View>
+            <Text style={[vc.cardMeta, { fontSize: f(7) }]}>CVV</Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: p(4) }}>
+              <Animated.Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"] }, maskedStyle]}>
+                {maskedCvv}
+              </Animated.Text>
+              <Animated.Text style={[vc.cardMetaVal, { fontSize: f(9), fontVariant: ["tabular-nums"], position: "absolute" }, revealedStyle]}>
+                {fullCvv}
+              </Animated.Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Reveal toggle */}
+        <TouchableOpacity
+          style={[vc.visBtn, { bottom: p(16), right: p(16) }]}
+          onPress={onToggleReveal}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <PremiumEyeIcon open={revealed} size={f(18)} color="rgba(255,255,255,0.78)" />
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
   );
 }
 
@@ -350,37 +366,27 @@ const vc = StyleSheet.create({
   },
   frozenText: { fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
-  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-  cardLabel: { fontFamily: "Manrope_500Medium", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" },
-  cardBank:  { fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-
-  mastercard: { flexDirection: "row", alignItems: "center" },
-  mcL: { backgroundColor: "#EB001B" },
-  mcR: { backgroundColor: "#F79E1B", opacity: 0.95 },
+  cardTop:     { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
+  cardLabel:   { fontFamily: "Manrope_500Medium", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" },
+  cardBank:    { fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  mastercard:  { flexDirection: "row", alignItems: "center" },
+  mcL:         { backgroundColor: "#EB001B" },
+  mcR:         { backgroundColor: "#F79E1B", opacity: 0.95 },
 
   cardBalLabel:  { fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.48)", letterSpacing: 0.4 },
   cardBalAmount: { fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.5, marginTop: 2 },
-
   cardNumber: {
     fontFamily: "Manrope_500Medium",
     color: "rgba(255,255,255,0.88)",
     fontVariant: ["tabular-nums"],
   },
-
   cardFooter:  { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" },
-  cardMeta:    {
-    fontFamily: "Manrope_400Regular",
-    color: "rgba(255,255,255,0.48)",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 2,
-  },
+  cardMeta:    { fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.48)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 },
   cardMetaVal: { fontFamily: "Manrope_600SemiBold", color: "#FFFFFF" },
-
-  visBtn: { position: "absolute" },
+  visBtn:      { position: "absolute" },
 });
 
-/* ─── Card Details table ─────────────────────────────────────────────────── */
+/* ─── Detail row ─────────────────────────────────────────────────────────── */
 interface DetailRowProps {
   label:     string;
   value:     string;
@@ -389,11 +395,34 @@ interface DetailRowProps {
   copyable?: boolean;
   copiedKey: string;
   onCopy:    (value: string, key: string) => void;
+  revealed:  boolean;
   isLast?:   boolean;
 }
 
-function DetailRow({ label, value, isStatus, isFrozen, copyable, copiedKey, onCopy, isLast }: DetailRowProps) {
+function DetailRow({ label, value, isStatus, isFrozen, copyable, copiedKey, onCopy, revealed, isLast }: DetailRowProps) {
   const wasCopied = copiedKey === label;
+
+  /* Smooth reveal fade for individual value */
+  const valOp    = useSharedValue(1);
+  const valScale = useSharedValue(1);
+  const prevRevealedRef = useRef(revealed);
+
+  useEffect(() => {
+    if (prevRevealedRef.current !== revealed && copyable && (label === "Card Number" || label === "CVV")) {
+      valOp.value    = withTiming(0, { duration: 100 }, () => {
+        valOp.value    = withTiming(1, { duration: 200 });
+        valScale.value = withSpring(1, { damping: 14, stiffness: 300 });
+      });
+      valScale.value = withTiming(0.92, { duration: 100 });
+    }
+    prevRevealedRef.current = revealed;
+  }, [revealed]);
+
+  const valStyle = useAnimatedStyle(() => ({
+    opacity: valOp.value,
+    transform: [{ scale: valScale.value }],
+  }));
+
   return (
     <View>
       <View style={dt.row}>
@@ -407,9 +436,15 @@ function DetailRow({ label, value, isStatus, isFrozen, copyable, copiedKey, onCo
               </Text>
             </View>
           ) : (
-            <Text style={[dt.value, { fontVariant: label !== "Card Holder" && label !== "Card Type" ? ["tabular-nums"] : [] }]}>
+            <Animated.Text
+              style={[
+                dt.value,
+                valStyle,
+                { fontVariant: label !== "Card Holder" && label !== "Card Type" ? ["tabular-nums"] : [] },
+              ]}
+            >
               {value}
-            </Text>
+            </Animated.Text>
           )}
           {copyable && (
             <TouchableOpacity
@@ -417,11 +452,13 @@ function DetailRow({ label, value, isStatus, isFrozen, copyable, copiedKey, onCo
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               style={dt.copyBtn}
             >
-              <Feather
-                name={wasCopied ? "check" : "copy"}
-                size={14}
-                color={wasCopied ? C.success : C.textMut}
-              />
+              <Animated.View entering={ZoomIn.duration(160)} key={wasCopied ? "check" : "copy"}>
+                <Feather
+                  name={wasCopied ? "check" : "copy"}
+                  size={14}
+                  color={wasCopied ? C.success : C.textMut}
+                />
+              </Animated.View>
             </TouchableOpacity>
           )}
         </View>
@@ -434,19 +471,41 @@ function DetailRow({ label, value, isStatus, isFrozen, copyable, copiedKey, onCo
 const LABEL_W = 120;
 
 const dt = StyleSheet.create({
-  row:      { flexDirection: "row", alignItems: "center", paddingVertical: 17, paddingHorizontal: 18 },
+  row:      { flexDirection: "row", alignItems: "center", paddingVertical: 18, paddingHorizontal: 18 },
   label:    { width: LABEL_W, fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
   valueRow: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   value:    { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
-  copyBtn:  { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
+  copyBtn:  { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   divider:  { height: 1, backgroundColor: "#F3F4F6", marginHorizontal: 18 },
 
-  badge:       { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
+  badge:       { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1 },
   badgeActive: { backgroundColor: "#ECFFF3", borderColor: "#A7F3D0" },
   badgeFrozen: { backgroundColor: "#FFF1F1", borderColor: "#FECACA" },
   badgeDot:    { width: 6, height: 6, borderRadius: 3 },
   badgeText:   { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
 });
+
+/* ─── Reveal button with animated fill ──────────────────────────────────── */
+function RevealButton({ revealed, onPress }: { revealed: boolean; onPress: () => void }) {
+  const sc   = useSharedValue(1);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+
+  return (
+    <Animated.View style={[anim, s.revealBtnWrap]}>
+      <Pressable
+        style={[s.revealBtn, revealed && s.revealBtnActive]}
+        onPressIn={() => { sc.value = withSpring(0.96, { damping: 14 }); }}
+        onPressOut={() => { sc.value = withSpring(1,    { damping: 14 }); }}
+        onPress={onPress}
+      >
+        <PremiumEyeIcon open={revealed} size={16} color={revealed ? "#FFFFFF" : C.navy} />
+        <Text style={[s.revealBtnText, revealed && { color: "#FFFFFF" }]}>
+          {revealed ? "Hide Card Details" : "Reveal Card Details"}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
 export default function CardScreen() {
@@ -462,6 +521,7 @@ export default function CardScreen() {
   const [activeTab, setActiveTab] = useState<"transactions" | "details">("transactions");
   const [copiedKey, setCopiedKey] = useState("");
   const [loading,   setLoading]   = useState(true);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
 
   /* Simulate card data load */
   useEffect(() => {
@@ -469,17 +529,38 @@ export default function CardScreen() {
     return () => clearTimeout(t);
   }, []);
 
+  /* Check biometric availability */
+  useEffect(() => {
+    LocalAuthentication.hasHardwareAsync().then(has => {
+      if (has) LocalAuthentication.isEnrolledAsync().then(enrolled => setBiometricAvailable(enrolled));
+    });
+  }, []);
+
+  /* Screen capture prevention when details are revealed */
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      if (revealed) {
+        ScreenCapture.preventScreenCaptureAsync().catch(() => {});
+      } else {
+        ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+      }
+    }
+    return () => {
+      if (Platform.OS !== "web") ScreenCapture.allowScreenCaptureAsync().catch(() => {});
+    };
+  }, [revealed]);
+
   /* Card data */
-  const maskedNum  = "5234  ••••  ••••  8901";
-  const fullNum    = "5234  4892  7712  8901";
-  const expiry     = "08 / 27";
-  const maskedCvv  = "•••";
-  const fullCvv    = "482";
-  const balance    = user?.balance ?? 200590;
-  const name       = user?.name ?? "AZA User";
+  const maskedNum = "5234  ••••  ••••  8901";
+  const fullNum   = "5234  4892  7712  8901";
+  const expiry    = "08 / 27";
+  const maskedCvv = "•••";
+  const fullCvv   = "482";
+  const balance   = user?.balance ?? 200590;
+  const name      = user?.name ?? "AZA User";
 
   /* Copy to clipboard */
-  const handleCopy = async (value: string, key: string) => {
+  const handleCopy = useCallback(async (value: string, key: string) => {
     const clean = value.replace(/•/g, "").trim();
     if (!clean || clean.length < 3) {
       Alert.alert("Reveal first", "Please reveal card details before copying.");
@@ -489,16 +570,40 @@ export default function CardScreen() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(""), 2200);
-  };
+  }, []);
 
-  /* Biometric-style reveal gate */
-  const requestReveal = () => {
+  /* Biometric / alert reveal gate */
+  const requestReveal = useCallback(async () => {
     if (revealed) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setRevealed(false);
       return;
     }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    if (biometricAvailable && Platform.OS !== "web") {
+      try {
+        const result = await LocalAuthentication.authenticateAsync({
+          promptMessage: "Authenticate to reveal card details",
+          fallbackLabel: "Use Passcode",
+          cancelLabel: "Cancel",
+          disableDeviceFallback: false,
+        });
+        if (result.success) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          setRevealed(true);
+        }
+      } catch {
+        /* Fallback to alert if biometric throws */
+        showRevealAlert();
+      }
+    } else {
+      showRevealAlert();
+    }
+  }, [revealed, biometricAvailable]);
+
+  const showRevealAlert = () => {
     Alert.alert(
       "Reveal card details?",
       "Your full card number, expiry and CVV will be shown. Keep them private.",
@@ -516,7 +621,7 @@ export default function CardScreen() {
   };
 
   /* Action handlers */
-  const handleAction = (id: string) => {
+  const handleAction = useCallback((id: string) => {
     if (id === "freeze") {
       Haptics.notificationAsync(
         frozen
@@ -534,15 +639,15 @@ export default function CardScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       Alert.alert("Spending Limit", "Set your card spending limit in card settings.", [{ text: "OK" }]);
     }
-  };
+  }, [frozen]);
 
   const DETAILS = [
-    { label: "Card Number", value: revealed ? fullNum    : maskedNum,  copyable: true  },
-    { label: "Card Holder", value: name.toUpperCase(),                  copyable: true  },
-    { label: "Expiry Date", value: expiry,                              copyable: true  },
-    { label: "CVV",         value: revealed ? fullCvv    : maskedCvv,  copyable: true  },
-    { label: "Card Type",   value: "Virtual Mastercard",                copyable: false },
-    { label: "Status",      value: frozen ? "Frozen" : "Active",        copyable: false, isStatus: true },
+    { label: "Card Number", value: revealed ? fullNum   : maskedNum, copyable: true  },
+    { label: "Card Holder", value: name.toUpperCase(),               copyable: true  },
+    { label: "Expiry Date", value: expiry,                           copyable: true  },
+    { label: "CVV",         value: revealed ? fullCvv   : maskedCvv, copyable: true  },
+    { label: "Card Type",   value: "Virtual Mastercard",             copyable: false },
+    { label: "Status",      value: frozen ? "Frozen" : "Active",     copyable: false, isStatus: true },
   ];
 
   return (
@@ -567,7 +672,7 @@ export default function CardScreen() {
       >
 
         {/* ── Virtual card ── */}
-        <Animated.View entering={FadeIn.duration(420).delay(40)} style={{ alignItems: "center" }}>
+        <View style={{ alignItems: "center" }}>
           {loading ? (
             <SkeletonBox w={CARD_W} h={Math.round(CARD_W * 0.6303)} radius={22} />
           ) : (
@@ -585,7 +690,7 @@ export default function CardScreen() {
               fullCvv={fullCvv}
             />
           )}
-        </Animated.View>
+        </View>
 
         {/* ── Action buttons ── */}
         <Animated.View entering={FadeInUp.duration(300).delay(90)} style={s.actionsRow}>
@@ -654,12 +759,15 @@ export default function CardScreen() {
         {activeTab === "details" && (
           <Animated.View entering={FadeIn.duration(240)} style={s.detailsCard}>
 
-            {/* Reveal banner */}
+            {/* Biometric hint banner when not yet revealed */}
             {!revealed && (
               <Animated.View entering={FadeIn.duration(200)} style={s.revealBanner}>
-                <Feather name="lock" size={14} color="#6B7280" />
+                <Feather name="shield" size={14} color="#6B7280" />
                 <Text style={s.revealBannerText}>
-                  Tap the eye icon on the card or the button below to reveal details
+                  {biometricAvailable
+                    ? "Use Face ID or Touch ID to reveal your full card details"
+                    : "Tap the button below to reveal your card details — keep them private"
+                  }
                 </Text>
               </Animated.View>
             )}
@@ -674,24 +782,12 @@ export default function CardScreen() {
                 copyable={"copyable" in row ? row.copyable : false}
                 copiedKey={copiedKey}
                 onCopy={handleCopy}
+                revealed={revealed}
                 isLast={i === DETAILS.length - 1}
               />
             ))}
 
-            {/* Reveal / Hide button */}
-            <View style={s.revealBtnWrap}>
-              <TouchableOpacity
-                style={[s.revealBtn, revealed && s.revealBtnActive]}
-                onPress={requestReveal}
-                activeOpacity={0.82}
-              >
-                <PremiumEyeIcon open={revealed} size={16} color={revealed ? "#FFFFFF" : C.navy} />
-                <Text style={[s.revealBtnText, revealed && { color: "#FFFFFF" }]}>
-                  {revealed ? "Hide Card Details" : "Reveal Card Details"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
+            <RevealButton revealed={revealed} onPress={requestReveal} />
           </Animated.View>
         )}
 
@@ -720,13 +816,12 @@ const s = StyleSheet.create({
     backgroundColor: "#FF3B30", borderWidth: 1.5, borderColor: C.bg,
   },
 
-  scroll: { paddingHorizontal: 20, paddingTop: 4, gap: 22 },
-
-  actionsRow: { flexDirection: "row", justifyContent: "space-between" },
+  scroll:      { paddingHorizontal: 20, paddingTop: 4, gap: 24 },
+  actionsRow:  { flexDirection: "row", justifyContent: "space-between" },
 
   txCard:        { borderRadius: 16, borderWidth: 1, borderColor: C.border, overflow: "hidden", backgroundColor: C.bg },
   txSkeletonRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16 },
-  txRow:         { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 14, paddingHorizontal: 16 },
+  txRow:         { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 15, paddingHorizontal: 16 },
   txIcon:        { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
   txInfo:        { flex: 1, gap: 4 },
   txName:        { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.text },
@@ -740,16 +835,17 @@ const s = StyleSheet.create({
   },
   revealBanner: {
     flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: "#F9FAFB", paddingHorizontal: 18, paddingVertical: 12,
+    backgroundColor: "#F9FAFB", paddingHorizontal: 18, paddingVertical: 13,
     borderBottomWidth: 1, borderBottomColor: C.border,
   },
   revealBannerText: {
     flex: 1, fontSize: 12, fontFamily: "Manrope_400Regular", color: "#6B7280", lineHeight: 17,
   },
+
   revealBtnWrap: { padding: 16 },
   revealBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    height: 46, borderRadius: 12,
+    height: 48, borderRadius: 12,
     backgroundColor: "#F3F4F6",
     borderWidth: 1, borderColor: C.border,
   },
