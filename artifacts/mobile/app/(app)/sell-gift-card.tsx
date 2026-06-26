@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { rf } from "@/utils/responsive";
 
 const C = {
   bg:        "#FFFFFF",
@@ -108,7 +109,7 @@ function PickerModal({
 
 const pm = StyleSheet.create({
   handle:  { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
-  title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
+  title:   { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
   option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
 });
@@ -278,7 +279,7 @@ const s = StyleSheet.create({
   rateHint: { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted, marginTop: 4, paddingLeft: 2 },
 
   uploadSection: { gap: 6 },
-  uploadHint:    { fontSize: 6, fontFamily: "Manrope_500Medium", color: C.muted2 },
+  uploadHint:    { fontSize: 10, fontFamily: "Manrope_500Medium", color: C.muted2 },
   uploadRow:     { flexDirection: "row", gap: 10 },
   thumb:         { width: 49, height: 49, borderRadius: 24.5, alignItems: "center", justifyContent: "center" },
 
@@ -297,5 +298,5 @@ const s = StyleSheet.create({
     shadowColor: "rgba(37,62,167,0.48)", shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1, shadowRadius: 2, elevation: 4,
   },
-  proceedBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+  proceedBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

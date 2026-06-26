@@ -26,6 +26,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
+import { rf } from "@/utils/responsive";
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
 const C = {
@@ -395,8 +396,8 @@ const ds = StyleSheet.create({
   /* Hero */
   hero:       { alignItems: "center", gap: 8, paddingBottom: 20 },
   heroIcon:   { width: 68, height: 68, borderRadius: 22, alignItems: "center", justifyContent: "center", marginBottom: 4 },
-  heroAmount: { fontSize: 32, fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.5 },
-  heroName:   { fontSize: 16, fontFamily: "Manrope_600SemiBold", color: C.text },
+  heroAmount: { fontSize: rf(32), fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.5 },
+  heroName:   { fontSize: rf(16), fontFamily: "Manrope_600SemiBold", color: C.text },
   statusPill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1 },
   statusDot:  { width: 6, height: 6, borderRadius: 3 },
   statusText: { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
@@ -415,7 +416,7 @@ const ds = StyleSheet.create({
   /* Actions */
   actions:       { gap: 10, marginTop: 4 },
   shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 50, borderRadius: 14, backgroundColor: C.navy },
-  shareBtnText:  { fontSize: 15, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  shareBtnText:  { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
   cancelBtn:     { height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
   cancelBtnText: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.danger },
   closeBtn:      { height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
@@ -739,7 +740,7 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg },
 
   header:      { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingBottom: 10, paddingTop: 8 },
-  title:       { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.navy },
+  title:       { fontSize: rf(22), fontFamily: "Manrope_700Bold", color: C.navy },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 8 },
 
   iconBtn:       { width: 38, height: 38, borderRadius: 10, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: C.border },
@@ -759,7 +760,7 @@ const s = StyleSheet.create({
   summaryTop:   { flexDirection: "row", alignItems: "center", gap: 8 },
   summaryIcon:  { width: 26, height: 26, borderRadius: 8, alignItems: "center", justifyContent: "center" },
   summaryLabel: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
-  summaryAmt:   { fontSize: 17, fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"] },
+  summaryAmt:   { fontSize: rf(17), fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"] },
 
   chipScroll:         { paddingHorizontal: 20, gap: 8, paddingBottom: 10, alignItems: "center" },
   chip:               { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { rf } from "@/utils/responsive";
 
 const C = {
   bg:        "#FFFFFF",
@@ -160,5 +161,5 @@ const s = StyleSheet.create({
   summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 
   submitBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
-  submitBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+  submitBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

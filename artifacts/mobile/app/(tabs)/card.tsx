@@ -30,6 +30,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { rf } from "@/utils/responsive";
 import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
@@ -804,7 +805,7 @@ const s = StyleSheet.create({
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
     paddingHorizontal: 20, paddingBottom: 14, paddingTop: 8,
   },
-  title:    { fontSize: 22, fontFamily: "Manrope_700Bold", color: C.navy },
+  title:    { fontSize: rf(22), fontFamily: "Manrope_700Bold", color: C.navy },
   notifBtn: {
     width: 44, height: 44, borderRadius: 22,
     alignItems: "center", justifyContent: "center",

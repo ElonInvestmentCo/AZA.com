@@ -30,6 +30,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { rf } from "@/utils/responsive";
 
 const C = {
   bg:           "#FFFFFF",
@@ -365,7 +366,7 @@ const s = StyleSheet.create({
     elevation: 1,
   },
   wordmark: {
-    fontSize: 32,
+    fontSize: rf(32),
     fontFamily: "Manrope_700Bold",
     color: C.text,
     letterSpacing: -0.5,
@@ -406,7 +407,7 @@ const s = StyleSheet.create({
     elevation: 6,
   },
   loginBtnText: {
-    fontSize: 16,
+    fontSize: rf(16),
     fontFamily: "Manrope_700Bold",
     color: C.loginBtnText,
     letterSpacing: 0.2,
@@ -440,12 +441,12 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    fontSize: 15,
+    fontSize: rf(15),
     fontFamily: "Manrope_400Regular",
     color: C.footerText,
   },
   footerLink: {
-    fontSize: 15,
+    fontSize: rf(15),
     fontFamily: "Manrope_700Bold",
     color: C.footerLink,
   },

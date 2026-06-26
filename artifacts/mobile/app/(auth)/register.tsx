@@ -27,6 +27,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { rf } from "@/utils/responsive";
 
 /* ── Design tokens ───────────────────────────────────────────────────────── */
 const C = {
@@ -515,7 +516,7 @@ const s = StyleSheet.create({
     alignItems: "center", justifyContent: "center",
   },
   wordmark: {
-    fontSize: 32,
+    fontSize: rf(32),
     fontFamily: "Manrope_700Bold",
     color: C.text,
     letterSpacing: -0.5,
@@ -523,10 +524,10 @@ const s = StyleSheet.create({
 
   headBlock: { marginBottom: 32 },
   heading: {
-    fontSize: 26,
+    fontSize: rf(26),
     fontFamily: "Manrope_700Bold",
     color: C.text,
-    lineHeight: 36,
+    lineHeight: rf(36),
     letterSpacing: -0.3,
   },
 
@@ -546,7 +547,7 @@ const s = StyleSheet.create({
     elevation: 6,
   },
   regBtnText: {
-    fontSize: 16,
+    fontSize: rf(16),
     fontFamily: "Manrope_700Bold",
     color: C.btnText,
     letterSpacing: 0.2,
@@ -583,12 +584,12 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    fontSize: 15,
+    fontSize: rf(15),
     fontFamily: "Manrope_400Regular",
     color: C.text,
   },
   footerLink: {
-    fontSize: 15,
+    fontSize: rf(15),
     fontFamily: "Manrope_700Bold",
     color: C.footerLink,
   },

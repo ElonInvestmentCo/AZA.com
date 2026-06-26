@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { rf } from "@/utils/responsive";
 
 const C = {
   bg:      "#FFFFFF",
@@ -194,7 +195,7 @@ const s = StyleSheet.create({
 
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 12, paddingTop: 8 },
   backBtn: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
-  title: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.navy },
+  title: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: C.navy },
 
   scroll: { paddingHorizontal: 20, paddingTop: 4, gap: 16 },
 
@@ -204,11 +205,11 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: C.border,
   },
   stripItem:    { flex: 1, alignItems: "center", gap: 4 },
-  stripNum:     { fontSize: 24, fontFamily: "Manrope_700Bold" },
-  stripLabel:   { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
+  stripNum:     { fontSize: rf(24), fontFamily: "Manrope_700Bold" },
+  stripLabel:   { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: C.textSec },
   stripDivider: { width: 1, height: 36, backgroundColor: C.border },
 
-  sectionTitle: { fontSize: 14, fontFamily: "Manrope_700Bold", color: C.navy },
+  sectionTitle: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: C.navy },
 
   card: {
     backgroundColor: C.bg, borderRadius: 16,
@@ -220,8 +221,8 @@ const s = StyleSheet.create({
   cardTop:     { flexDirection: "row", alignItems: "center", gap: 12 },
   cardIconWrap:{ width: 44, height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   cardInfo:    { flex: 1, gap: 3 },
-  cardType:    { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text },
-  cardRef:     { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut },
+  cardType:    { fontSize: rf(13), fontFamily: "Manrope_700Bold", color: C.text },
+  cardRef:     { fontSize: rf(11), fontFamily: "Manrope_400Regular", color: C.textMut },
   statusBadge: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   statusText:  { fontSize: 10, fontFamily: "Manrope_600SemiBold" },
 
@@ -234,5 +235,5 @@ const s = StyleSheet.create({
   resubmitText:{ fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.danger },
 
   newBtn:     { backgroundColor: "#000000", height: 52, borderRadius: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
-  newBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  newBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
 });

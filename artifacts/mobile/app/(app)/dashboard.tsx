@@ -18,6 +18,7 @@ import {
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { rf } from "@/utils/responsive";
 
 const C = {
   bg:        "#FFFFFF",
@@ -338,9 +339,9 @@ const s = StyleSheet.create({
   balCard:   { backgroundColor: "#F0F7FF", borderRadius: 16, padding: 20, gap: 8, borderWidth: 1, borderColor: "#C7DFFF" },
   balTop:    { flexDirection: "row", alignItems: "center", gap: 7 },
   balDot:    { width: 8, height: 8, borderRadius: 4 },
-  balTag:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted },
-  balAmount: { fontSize: 30, fontFamily: "Manrope_700Bold", color: C.navy, letterSpacing: -0.5 },
-  balSub:    { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
+  balTag:    { fontSize: rf(12), fontFamily: "Manrope_500Medium", color: C.textMuted },
+  balAmount: { fontSize: rf(30), fontFamily: "Manrope_700Bold", color: C.navy, letterSpacing: -0.5 },
+  balSub:    { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: C.textSec },
 
   inputValid: { borderColor: C.success, borderWidth: 1.5 },
   fieldHint:  { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted, paddingLeft: 2 },
@@ -359,5 +360,5 @@ const s = StyleSheet.create({
   successText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.success },
 
   fundBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
-  fundBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+  fundBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
+import { rf } from "@/utils/responsive";
 import { WaveIcon } from "@/components/WaveIcon";
 import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
 import Animated, {
@@ -451,10 +452,10 @@ const s = StyleSheet.create({
   avatar:    { width: 46, height: 46, borderRadius: 23 },
   greetText: { gap: 2, flex: 1 },
   hiRow:     { flexDirection: "row", alignItems: "center" },
-  hiText:    { fontSize: 15, fontFamily: "Manrope_700Bold", color: C.text },
-  greetSub:  { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
+  hiText:    { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: C.text },
+  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: C.textSec },
   balRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  balAmount: { fontSize: 24, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, flex: 1 },
+  balAmount: { fontSize: rf(24), fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, flex: 1 },
   eyeBtn:    { padding: 4 },
 
   actionsWrap: { paddingHorizontal: 20 },
@@ -471,7 +472,7 @@ const s = StyleSheet.create({
     elevation: 8,
   },
   actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7 },
-  actionLabel:   { fontSize: 11, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: 0.2 },
+  actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: 0.2 },
   actionDivider: { width: 1, height: 34, backgroundColor: "rgba(255,255,255,0.18)" },
 
   servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 8, rowGap: 16 },
@@ -482,8 +483,8 @@ const s = StyleSheet.create({
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
     paddingHorizontal: 20, marginBottom: 10,
   },
-  secTitle: { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text },
-  seeAll:   { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: "#000000" },
+  secTitle: { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text },
+  seeAll:   { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#000000" },
 
   txCard: {
     marginHorizontal: 20,
@@ -499,7 +500,7 @@ const s = StyleSheet.create({
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
   iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: 10, fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: 14, maxWidth: 64, flexShrink: 1 },
+  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: rf(14), maxWidth: 64, flexShrink: 1 },
 });
 
 const pc = StyleSheet.create({
@@ -515,9 +516,9 @@ const pc = StyleSheet.create({
     position: "absolute", width: 60, height: 60, borderRadius: 30,
     backgroundColor: "rgba(255,255,255,0.15)", bottom: -20, right: 40,
   },
-  pct:   { fontSize: 14, fontFamily: "Manrope_700Bold" },
-  title: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
-  desc:  { fontSize: 9.5, fontFamily: "Manrope_400Regular", lineHeight: 14, marginTop: 1 },
+  pct:   { fontSize: rf(14), fontFamily: "Manrope_700Bold" },
+  title: { fontSize: rf(12), fontFamily: "Manrope_600SemiBold" },
+  desc:  { fontSize: rf(9.5), fontFamily: "Manrope_400Regular", lineHeight: rf(14), marginTop: 1 },
 });
 
 const tx = StyleSheet.create({
@@ -527,10 +528,10 @@ const tx = StyleSheet.create({
   },
   iconWrap: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   info:   { flex: 1, gap: 3 },
-  title:  { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.text },
-  ref:    { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted },
+  title:  { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: C.text },
+  ref:    { fontSize: rf(11), fontFamily: "Manrope_400Regular", color: C.textMuted },
   right:  { alignItems: "flex-end", gap: 3 },
-  amount: { fontSize: 13, fontFamily: "Manrope_700Bold" },
+  amount: { fontSize: rf(13), fontFamily: "Manrope_700Bold" },
 });
 
 const gm = StyleSheet.create({
@@ -549,7 +550,7 @@ const gm = StyleSheet.create({
   sheetHeader: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20,
   },
-  sheetTitle: { fontSize: 18, fontFamily: "Manrope_700Bold", color: "#1E232C" },
+  sheetTitle: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: "#1E232C" },
   closeBtn: {
     width: 34, height: 34, borderRadius: 17, backgroundColor: "#F7F8F9",
     alignItems: "center", justifyContent: "center",
@@ -560,6 +561,6 @@ const gm = StyleSheet.create({
     width: 48, height: 48, borderRadius: 14,
     alignItems: "center", justifyContent: "center", marginBottom: 4,
   },
-  tileTitle: { fontSize: 14, fontFamily: "Manrope_700Bold" },
-  tileDesc:  { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 17 },
+  tileTitle: { fontSize: rf(14), fontFamily: "Manrope_700Bold" },
+  tileDesc:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", lineHeight: rf(17) },
 });
