@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
+import { scheduleWalletFunded } from "@/services/notifications";
 import React, { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -304,6 +305,10 @@ export default function DashboardScreen() {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setSuccess(true);
             setTimeout(() => setSuccess(false), 3000);
+            const fmtAmt = totalAmount > 0
+              ? "₦" + totalAmount.toLocaleString("en-NG")
+              : selAmt || "₦0";
+            scheduleWalletFunded(fmtAmt);
           }}
           activeOpacity={0.85}
         >

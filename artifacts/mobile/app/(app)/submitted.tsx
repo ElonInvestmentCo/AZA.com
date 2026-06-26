@@ -1,6 +1,7 @@
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo } from "react";
+import { scheduleTradeSubmitted, scheduleTradeCompleted } from "@/services/notifications";
 import { Platform, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
 import Animated, {
   Easing,
@@ -229,8 +230,12 @@ export default function SubmittedScreen() {
   const insets  = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const botPad  = Platform.OS === "web" ? 32 : insets.bottom + 24;
-  /* Badge scales from 80pt on small phones up to 130pt on tablets */
   const BADGE_SIZE = Math.min(Math.max(Math.round(width * 0.28), 80), 130);
+
+  const params = useLocalSearchParams<{ cardType?: string; amount?: string; naira?: string }>();
+  const cardType = params.cardType ?? "Gift Card";
+  const amount   = params.amount   ?? "$100";
+  const naira    = params.naira    ?? "₦120,000";
 
   /* Illustration float */
   const floatY = useSharedValue(0);
@@ -310,7 +315,11 @@ export default function SubmittedScreen() {
 
     /* Haptic on mount */
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, []);
+
+    /* Push notifications */
+    scheduleTradeSubmitted(cardType, amount);
+    scheduleTradeCompleted(cardType, naira, 30);
+  }, [cardType, amount, naira]);
 
   const floatAnim = useAnimatedStyle(() => ({
     transform: [{ translateY: floatY.value }],

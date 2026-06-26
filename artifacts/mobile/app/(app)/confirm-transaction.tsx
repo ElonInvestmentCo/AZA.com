@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { scheduleTradeSubmitted, scheduleTradeCompleted } from "@/services/notifications";
 import React from "react";
 import {
   Platform,
@@ -118,6 +119,8 @@ export default function ConfirmTransactionScreen() {
             style={s.submitBtn}
             onPress={() => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              scheduleTradeSubmitted("Amazon Gift Card", "$200");
+              scheduleTradeCompleted("Amazon Gift Card", "₦200,040", 30);
               router.push("/(app)/submitted" as any);
             }}
             activeOpacity={0.85}
