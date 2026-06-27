@@ -1,6 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import { View } from "react-native";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const lottieLib = require("lottie-web");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const animationDataRaw = require("@/assets/animations/wallet-lottie.json");
+
+const lottie = (lottieLib && lottieLib.default) ? lottieLib.default : lottieLib;
+const animationData = (animationDataRaw && animationDataRaw.default)
+  ? animationDataRaw.default
+  : animationDataRaw;
+
 export default function LottieWalletSlide({
   slideW,
   slideH,
@@ -16,24 +26,40 @@ export default function LottieWalletSlide({
     const outerEl = outerRef.current as unknown as HTMLElement;
     if (!outerEl) return;
 
+    // Match the exact cardSize + positioning used by the original working placeholder
     const cardSize = Math.round(Math.min(slideW * 0.72, slideH * 0.88));
 
-    // Create a raw unmanaged div and append it
-    const div = document.createElement("div");
-    div.style.cssText = `width:${cardSize}px;height:${cardSize}px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);overflow:visible;z-index:10;`;
+    const container = document.createElement("div");
+    container.style.cssText = [
+      `width:${cardSize}px`,
+      `height:${cardSize}px`,
+      `position:absolute`,
+      `top:50%`,
+      `left:50%`,
+      `transform:translate(-50%,-50%)`,
+      `overflow:visible`,
+      `z-index:10`,
+    ].join(";");
 
-    // Inject a static SVG with bright colours
-    div.innerHTML =
-      `<svg width="${cardSize}" height="${cardSize}" xmlns="http://www.w3.org/2000/svg">` +
-      `<rect width="${cardSize}" height="${cardSize}" fill="#FFD700"/>` +
-      `<circle cx="${cardSize / 2}" cy="${cardSize / 2}" r="${cardSize * 0.35}" fill="white"/>` +
-      `<text x="${cardSize / 2}" y="${cardSize / 2 + 8}" text-anchor="middle" fill="#0B0820" font-size="24" font-weight="bold">LOTTIE</text>` +
-      `</svg>`;
+    outerEl.appendChild(container);
 
-    outerEl.appendChild(div);
-    console.log("[LottieWalletSlide] static SVG injected. outerEl style:", outerEl.getAttribute("style"));
+    let anim: { destroy(): void } | null = null;
+    try {
+      anim = lottie.loadAnimation({
+        container,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        animationData,
+      });
+    } catch (err) {
+      console.error("[LottieWalletSlide] loadAnimation error:", err);
+    }
 
-    return () => { div.remove(); };
+    return () => {
+      anim?.destroy();
+      container.remove();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
