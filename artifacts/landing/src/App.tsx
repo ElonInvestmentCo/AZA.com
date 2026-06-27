@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Dashboard from "./Dashboard";
 
 const NAV_LINKS = ["Features", "How it Works", "App"];
 
@@ -13,7 +14,7 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ background: "#0B0A0A", minHeight: "100vh" }}>
+    <div style={{ background: "#0B0A0A", minHeight: "100vh", color: "#fff" }}>
       {/* ── Nav ── */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
@@ -29,7 +30,6 @@ export default function App() {
           AZA<span style={{ color: "#35C2C1" }}>.</span>
         </span>
 
-        {/* Desktop links */}
         <div style={{ display: "flex", gap: 36, alignItems: "center" }} className="desktop-nav">
           {NAV_LINKS.map(l => (
             <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`}
@@ -48,7 +48,6 @@ export default function App() {
           >Get the App</a>
         </div>
 
-        {/* Hamburger */}
         <button onClick={() => setMenuOpen(o => !o)}
           style={{ display: "none", background: "none", border: "none", cursor: "pointer", padding: 8 }}
           className="hamburger">
@@ -84,73 +83,115 @@ export default function App() {
       <section style={{
         position: "relative", overflow: "hidden",
         minHeight: "100vh",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        padding: "120px 5vw 0",
-        textAlign: "center",
+        display: "flex", alignItems: "center",
+        padding: "100px 5vw 60px",
+        gap: 60,
       }}>
         {/* Glow orbs */}
         <div style={{
-          position: "absolute", top: "-10%", left: "50%", transform: "translateX(-50%)",
-          width: 700, height: 700,
-          background: "radial-gradient(circle, rgba(53,194,193,0.18) 0%, transparent 70%)",
+          position: "absolute", top: "10%", left: "35%",
+          width: 600, height: 600,
+          background: "radial-gradient(circle, rgba(53,194,193,0.14) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+        <div style={{
+          position: "absolute", top: "40%", right: "5%",
+          width: 400, height: 400,
+          background: "radial-gradient(circle, rgba(53,194,193,0.08) 0%, transparent 70%)",
           pointerEvents: "none",
         }} />
 
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          background: "rgba(53,194,193,0.12)", border: "1px solid rgba(53,194,193,0.25)",
-          borderRadius: 50, padding: "7px 18px", marginBottom: 28,
-          fontSize: 13, fontWeight: 600, color: "#35C2C1", letterSpacing: "0.02em",
-        }}>
-          <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#35C2C1", display: "inline-block" }} />
-          Now available on iOS & Android
-        </div>
-
-        <h1 style={{
-          fontSize: "clamp(40px, 7vw, 80px)",
-          fontWeight: 800, lineHeight: 1.1,
-          letterSpacing: "-2px", color: "#fff",
-          maxWidth: 820, margin: "0 auto 24px",
-        }}>
-          Sell Gift Cards.<br />
-          <span style={{ color: "#35C2C1" }}>Pay Bills.</span> Do More.
-        </h1>
-
-        <p style={{
-          fontSize: "clamp(16px, 2vw, 20px)", fontWeight: 400,
-          color: "rgba(255,255,255,0.6)", maxWidth: 560,
-          lineHeight: 1.7, margin: "0 auto 44px",
-        }}>
-          AZA is the fastest way to trade gift cards, fund your wallet, and pay bills — all in one beautifully simple app.
-        </p>
-
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center", marginBottom: 80 }}>
-          <a href="#app" style={{
-            background: "#35C2C1", color: "#0B0A0A", fontWeight: 700,
-            fontSize: 16, padding: "16px 36px", borderRadius: 50,
-            display: "inline-flex", alignItems: "center", gap: 8,
-          }}>
-            Download Free
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="#0B0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </a>
-          <a href="#features" style={{
-            background: "rgba(255,255,255,0.06)", color: "#fff", fontWeight: 600,
-            fontSize: 16, padding: "16px 36px", borderRadius: 50,
-            border: "1px solid rgba(255,255,255,0.12)",
-          }}>See Features</a>
-        </div>
-
-        {/* Hero mockup image */}
-        <div style={{ width: "100%", maxWidth: 1200, position: "relative" }}>
-          <img src="/mockups/mockup-1.svg" alt="AZA App Mockup"
-            style={{ width: "100%", height: "auto", display: "block" }} />
+        {/* Left: Text content */}
+        <div style={{ flex: 1, minWidth: 0, maxWidth: 560 }} className="hero-text">
           <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0, height: "30%",
-            background: "linear-gradient(to top, #0B0A0A, transparent)",
-            pointerEvents: "none",
-          }} />
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(53,194,193,0.12)", border: "1px solid rgba(53,194,193,0.25)",
+            borderRadius: 50, padding: "7px 18px", marginBottom: 28,
+            fontSize: 13, fontWeight: 600, color: "#35C2C1", letterSpacing: "0.02em",
+          }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#35C2C1", display: "inline-block" }} />
+            Now available on iOS & Android
+          </div>
+
+          <h1 style={{
+            fontSize: "clamp(38px, 5vw, 72px)",
+            fontWeight: 800, lineHeight: 1.1,
+            letterSpacing: "-2px", color: "#fff",
+            margin: "0 0 24px",
+          }}>
+            Sell Gift Cards.<br />
+            <span style={{ color: "#35C2C1" }}>Pay Bills.</span> Do More.
+          </h1>
+
+          <p style={{
+            fontSize: "clamp(16px, 1.5vw, 20px)", fontWeight: 400,
+            color: "rgba(255,255,255,0.6)",
+            lineHeight: 1.7, margin: "0 0 44px",
+          }}>
+            AZA is the fastest way to trade gift cards, fund your wallet, and pay bills — all in one beautifully simple app.
+          </p>
+
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <a href="#app" style={{
+              background: "#35C2C1", color: "#0B0A0A", fontWeight: 700,
+              fontSize: 16, padding: "16px 36px", borderRadius: 50,
+              display: "inline-flex", alignItems: "center", gap: 8,
+              transition: "opacity 0.2s",
+            }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+            >
+              Download Free
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="#0B0A0A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </a>
+            <a href="#features" style={{
+              background: "rgba(255,255,255,0.06)", color: "#fff", fontWeight: 600,
+              fontSize: 16, padding: "16px 36px", borderRadius: 50,
+              border: "1px solid rgba(255,255,255,0.12)",
+              transition: "background 0.2s",
+            }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.1)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.06)")}
+            >See Features</a>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: "flex", gap: 40, marginTop: 60, flexWrap: "wrap" }}>
+            {STATS.map(s => (
+              <div key={s.label}>
+                <div style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "#35C2C1", letterSpacing: "-1px" }}>{s.value}</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Phone mockup with Dashboard */}
+        <div className="hero-phone" style={{
+          flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <div style={{
+            transform: "scale(0.72)",
+            transformOrigin: "top center",
+            position: "relative",
+          }}>
+            {/* Subtle glow behind phone */}
+            <div style={{
+              position: "absolute", top: "15%", left: "50%",
+              transform: "translateX(-50%)",
+              width: 300, height: 600,
+              background: "radial-gradient(ellipse, rgba(53,194,193,0.3) 0%, transparent 70%)",
+              filter: "blur(40px)",
+              pointerEvents: "none",
+              zIndex: 0,
+            }} />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <Dashboard />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -199,12 +240,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Mockup section 2 ── */}
-      <section style={{ padding: "0 0 80px", overflow: "hidden" }}>
-        <img src="/mockups/mockup-2.svg" alt="Sell Gift Cards"
-          style={{ width: "100%", height: "auto", display: "block" }} />
-      </section>
-
       {/* ── How it works ── */}
       <section id="how-it-works" style={{ padding: "100px 5vw", background: "rgba(255,255,255,0.02)" }}>
         <div style={{ textAlign: "center", marginBottom: 64 }}>
@@ -237,66 +272,52 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── Mockup section 3 ── */}
-      <section style={{ overflow: "hidden" }}>
-        <img src="/mockups/mockup-3.svg" alt="Fund Wallet"
-          style={{ width: "100%", height: "auto", display: "block" }} />
-      </section>
-
-      {/* ── Stats ── */}
-      <section style={{
-        padding: "80px 5vw",
-        display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 48,
-      }}>
-        {STATS.map(s => (
-          <div key={s.label} style={{ textAlign: "center", minWidth: 160 }}>
-            <div style={{ fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 800, color: "#35C2C1", letterSpacing: "-2px" }}>{s.value}</div>
-            <div style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", marginTop: 6, fontWeight: 500 }}>{s.label}</div>
-          </div>
-        ))}
-      </section>
-
-      {/* ── Mockup section 4 ── */}
-      <section style={{ overflow: "hidden" }}>
-        <img src="/mockups/mockup-4.svg" alt="Bill Payments"
-          style={{ width: "100%", height: "auto", display: "block" }} />
-      </section>
-
-      {/* ── Mockup section 5 ── */}
-      <section style={{ overflow: "hidden" }}>
-        <img src="/mockups/mockup-5.svg" alt="Transaction History"
-          style={{ width: "100%", height: "auto", display: "block" }} />
-      </section>
-
-      {/* ── CTA / App Download ── */}
+      {/* ── Dashboard Showcase ── */}
       <section id="app" style={{
         padding: "100px 5vw 120px",
-        textAlign: "center",
+        display: "flex", flexDirection: "column", alignItems: "center",
         position: "relative", overflow: "hidden",
       }}>
         <div style={{
           position: "absolute", top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 600, height: 600,
-          background: "radial-gradient(circle, rgba(53,194,193,0.15) 0%, transparent 70%)",
+          width: 700, height: 700,
+          background: "radial-gradient(circle, rgba(53,194,193,0.1) 0%, transparent 70%)",
           pointerEvents: "none",
         }} />
 
-        <p style={{ fontSize: 13, fontWeight: 700, color: "#35C2C1", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20 }}>
-          Get started today
+        <p style={{ fontSize: 13, fontWeight: 700, color: "#35C2C1", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 20, position: "relative" }}>
+          Live App Preview
         </p>
         <h2 style={{
-          fontSize: "clamp(32px, 5vw, 64px)", fontWeight: 800,
-          letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 20,
+          fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 800,
+          letterSpacing: "-1px", lineHeight: 1.1, marginBottom: 16,
+          textAlign: "center", position: "relative",
         }}>
-          Download AZA<br />
-          <span style={{ color: "#35C2C1" }}>for free</span>
+          Your wallet, your rules
         </h2>
-        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.55)", maxWidth: 500, margin: "0 auto 48px", lineHeight: 1.65 }}>
-          Join thousands of users trading gift cards and paying bills with ease.
+        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.5)", maxWidth: 480, margin: "0 auto 60px", lineHeight: 1.65, textAlign: "center", position: "relative" }}>
+          Everything you need to trade cards and manage money — in one clean, fast interface.
         </p>
 
-        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+        {/* Dashboard centered, full-size */}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{
+            position: "absolute", top: "20%", left: "50%",
+            transform: "translateX(-50%)",
+            width: 350, height: 600,
+            background: "radial-gradient(ellipse, rgba(53,194,193,0.25) 0%, transparent 70%)",
+            filter: "blur(50px)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }} />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <Dashboard />
+          </div>
+        </div>
+
+        {/* Download buttons below */}
+        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 60, position: "relative" }}>
           <StoreButton store="apple" />
           <StoreButton store="google" />
         </div>
@@ -324,10 +345,19 @@ export default function App() {
       </footer>
 
       <style>{`
-        @media (max-width: 640px) {
+        * { box-sizing: border-box; }
+        @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .hamburger { display: block !important; }
+          .hero-phone { display: none !important; }
+          .hero-text { max-width: 100% !important; }
         }
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .hero-phone div[style*="scale(0.72)"] {
+            transform: scale(0.56) !important;
+          }
+        }
+        ::-webkit-scrollbar { display: none; }
       `}</style>
     </div>
   );
@@ -339,7 +369,7 @@ function StoreButton({ store }: { store: "apple" | "google" }) {
     <a href="#" style={{
       display: "inline-flex", alignItems: "center", gap: 12,
       background: isApple ? "#fff" : "#35C2C1",
-      color: isApple ? "#0B0A0A" : "#0B0A0A",
+      color: "#0B0A0A",
       borderRadius: 16, padding: "14px 28px",
       fontWeight: 700, fontSize: 16,
       transition: "opacity 0.2s",
@@ -381,5 +411,5 @@ const STATS = [
   { value: "50K+", label: "Active Users" },
   { value: "₦2B+", label: "Cards Traded" },
   { value: "99.9%", label: "Uptime" },
-  { value: "< 5min", label: "Average Payout" },
+  { value: "< 5min", label: "Avg Payout" },
 ];
