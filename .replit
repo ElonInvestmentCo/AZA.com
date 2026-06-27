@@ -41,11 +41,12 @@ name = "AZA Mobile (Expo)"
 author = "agent"
 
 [workflows.workflow.metadata]
-outputType = "console"
+outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run dev"
+args = "pnpm --filter @workspace/mobile run qr"
+waitForPort = 5000
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
