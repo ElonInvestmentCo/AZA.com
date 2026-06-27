@@ -119,7 +119,7 @@ export default function ForgotPasswordScreen() {
     setError("");
     setTimeout(() => {
       setLoading(false);
-      router.push("/(auth)/new-password");
+      router.push({ pathname: "/(auth)/otp", params: { email: email.trim(), mode: "reset" } });
     }, 1400);
   };
 

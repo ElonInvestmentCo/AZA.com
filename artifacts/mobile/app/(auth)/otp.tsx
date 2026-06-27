@@ -155,8 +155,9 @@ const ob = StyleSheet.create({
 export default function OtpScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const params  = useLocalSearchParams<{ email?: string }>();
+  const params  = useLocalSearchParams<{ email?: string; mode?: string }>();
   const email   = params.email ?? "";
+  const isReset = params.mode === "reset";
   const { boxW, boxH } = useOtpBoxSize();
 
   const [digits,   setDigits]   = useState<string[]>(["", "", "", ""]);
@@ -226,11 +227,14 @@ export default function OtpScreen() {
     }
     setLoading(true);
     setError("");
-    /* Simulate verification — navigate to main app on success */
     setTimeout(() => {
       setLoading(false);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace("/(tabs)");
+      if (isReset) {
+        router.replace("/(auth)/new-password");
+      } else {
+        router.replace("/(tabs)");
+      }
     }, 1200);
   };
 
