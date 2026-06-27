@@ -1,14 +1,23 @@
 ---
 name: AZA mobile color theme
-description: The AZA mobile app (artifacts/mobile) uses a white/light design system; colors.ts was previously corrupted with dark values and has been restored.
+description: The AZA mobile app (artifacts/mobile) uses a DARK theme. Individual screens define their own inline C constant; colors.ts also stores the dark palette.
 ---
 
-## Rule
-`artifacts/mobile/constants/colors.ts` must use **light/white** theme values:
-- `background: #FFFFFF`, `text: #0B0A0A`, `tint/accent: #35C2C1` (teal)
-- Input bg: `#F7F8F9`, borders: `#E8ECF4`, placeholder: `#8391A1`
-- Destructive: `#FF5B7A`, success: `#00B03C`, warning: `#F59E0B`
+## Current Design: Dark Mode
+The user explicitly switched to dark mode matching a reference screenshot.
 
-**Why:** The AZA brand is white/light. At some point an agent wrote dark values (`#0A0A0F` bg, `#00D9A0` accent) into `colors.light` — this was incorrect and was reverted. The payvora artifact (`artifacts/payvora/`) is a separate dark-branded app and correctly uses its own dark palette.
+`artifacts/mobile/constants/colors.ts`:
+- `background: #0A0A0A`, `text: #FFFFFF`, `tint/accent: #35C2C1` (teal)
+- Surface/card: `#1C1C1E`, borders: `#2A2A2A`, mutedForeground: `#9A9A9A`
+- Success: `#00D88C`, destructive: `#EF4444`
 
-**How to apply:** Any future edits to `constants/colors.ts` in the mobile artifact must stay within the light palette above. Do NOT copy colors from `artifacts/payvora/` into the mobile app. Individual screens define their own inline `C` constant with the same light values — keep them consistent.
+**Home screen (index.tsx) inline `C` constant** matches dark palette:
+- Action bar (Fund/Sell/Withdraw) is **WHITE** (`#FFFFFF`) with black icons — it intentionally inverts against the dark background
+- Tab bar is also **WHITE** floating pill with dark icons; active tab has `#1C1C1E` dark wrapper + white icon
+- Service icon boxes: `#1C1C1E` dark bg with colored icons
+- Wallet/greeting card: `#1C1C1E` dark card (no gradient)
+- Promo cards: `#1C1C1E` with `#35C2C1` teal pct text, white title, `#888888` gray desc
+
+**Why:** User chose the dark UI design as canonical (June 2026). Previous light theme was also valid but this is now the target.
+
+**How to apply:** Keep all screen inline C constants in dark values. The action bar and tab bar remain WHITE as accent elements — do NOT make them dark.

@@ -28,6 +28,7 @@ function PillTabBar({ state, descriptors, navigation }: any) {
           })();
 
           const showBadge = route.name === "history";
+          const iconColor = focused ? "#FFFFFF" : "#555555";
 
           return (
             <TouchableOpacity
@@ -49,23 +50,23 @@ function PillTabBar({ state, descriptors, navigation }: any) {
                 {Platform.OS === "ios" && route.name === "index" ? (
                   <SymbolView
                     name={focused ? "house.fill" : "house"}
-                    tintColor="#FFFFFF"
+                    tintColor={iconColor}
                     size={22}
                   />
                 ) : Platform.OS === "ios" && route.name === "card" ? (
                   <SymbolView
                     name={focused ? "creditcard.fill" : "creditcard"}
-                    tintColor="#FFFFFF"
+                    tintColor={iconColor}
                     size={22}
                   />
                 ) : Platform.OS === "ios" && route.name === "history" ? (
                   <SymbolView
                     name={focused ? "clock.fill" : "clock"}
-                    tintColor="#FFFFFF"
+                    tintColor={iconColor}
                     size={22}
                   />
                 ) : (
-                  <Feather name={icon} size={22} color="#FFFFFF" />
+                  <Feather name={icon} size={22} color={iconColor} />
                 )}
                 {showBadge && <View style={pill.badge} />}
               </View>
@@ -89,14 +90,14 @@ const pill = StyleSheet.create({
     flexDirection:     "row",
     alignItems:        "center",
     justifyContent:    "space-around",
-    backgroundColor:   "#000000",
+    backgroundColor:   "#FFFFFF",
     borderRadius:      40,
     height:            68,
     width:             "100%",
     paddingHorizontal: 20,
-    shadowColor:       "#000",
+    shadowColor:       "#000000",
     shadowOffset:      { width: 0, height: 8 },
-    shadowOpacity:     0.4,
+    shadowOpacity:     0.35,
     shadowRadius:      20,
     elevation:         12,
   },
@@ -114,7 +115,7 @@ const pill = StyleSheet.create({
     justifyContent: "center",
   },
   iconWrapActive: {
-    backgroundColor: "rgba(139,92,246,0.35)",
+    backgroundColor: "#1C1C1E",
   },
   badge: {
     position:        "absolute",
@@ -125,7 +126,7 @@ const pill = StyleSheet.create({
     borderRadius:    4,
     backgroundColor: "#FF3B30",
     borderWidth:     1.5,
-    borderColor:     "#000",
+    borderColor:     "#FFFFFF",
   },
 });
 

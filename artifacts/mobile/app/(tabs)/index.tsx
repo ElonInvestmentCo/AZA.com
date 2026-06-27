@@ -1,7 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -52,47 +51,47 @@ const MAX_W = 430;
 const BAL_VIS_KEY = "aza_balance_visible";
 
 const C = {
-  bg:        "#FFFFFF",
-  text:      "#0B0A0A",
-  navy:      "#061941",
-  textSec:   "#595F67",
-  textMuted: "#AAAFB5",
-  border:    "#F0F0F0",
-  success:   "#00B03C",
+  bg:        "#0A0A0A",
+  text:      "#FFFFFF",
+  navy:      "#1C1C1E",
+  textSec:   "#9A9A9A",
+  textMuted: "#555555",
+  border:    "#2A2A2A",
+  success:   "#00D88C",
   danger:    "#EF4444",
-  actionBar: "#000000",
+  actionBar: "#FFFFFF",
 };
 
 const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
-  { id: "gift",    label: "Gift Card",     bg: "#FFF2CF", iconColor: "#5C4000", route: null                              },
-  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
-  { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/bills"  as const           },
-  { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/bills"  as const           },
-  { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"  as const           },
-  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const     },
-  { id: "bet",     label: "Betting",       bg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
-  { id: "funding", label: "Funding",       bg: "#EBF3FF", iconColor: "#1D6ECC", route: "/(app)/dashboard" as const        },
-  { id: "more",    label: "More",          bg: "#F0EEFF", iconColor: "#7C3AED", route: "/(app)/more"   as const           },
+  { id: "gift",    label: "Gift Card",     bg: "#1C1C1E", iconColor: "#F59E0B", route: null                              },
+  { id: "airtime", label: "Airtime",       bg: "#1C1C1E", iconColor: "#06B6D4", route: "/(app)/bills"  as const           },
+  { id: "elec",    label: "Electricity",   bg: "#1C1C1E", iconColor: "#F97316", route: "/(app)/bills"  as const           },
+  { id: "cable",   label: "Cable TV",      bg: "#1C1C1E", iconColor: "#F43F5E", route: "/(app)/bills"  as const           },
+  { id: "rates",   label: "Rates",         bg: "#1C1C1E", iconColor: "#8B5CF6", route: "/(app)/rates"  as const           },
+  { id: "txn",     label: "Transactions",  bg: "#1C1C1E", iconColor: "#3B82F6", route: "/(app)/transactions" as const     },
+  { id: "bet",     label: "Betting",       bg: "#1C1C1E", iconColor: "#06B6D4", route: "/(app)/bills"  as const           },
+  { id: "funding", label: "Funding",       bg: "#1C1C1E", iconColor: "#2563EB", route: "/(app)/dashboard" as const        },
+  { id: "more",    label: "More",          bg: "#1C1C1E", iconColor: "#8B5CF6", route: "/(app)/more"   as const           },
 ];
 
 const PROMOS = [
   {
     id: "p1", pct: "50% OFF", title: "Summer special deal",
     desc: "Get discount for every transaction this weekend",
-    bg: "#FCB3C5", textColor: "#7A1535",
+    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
   },
   {
     id: "p2", pct: "50% OFF", title: "Black friday deal",
     desc: "Get discount for every top up and payment",
-    bg: "#FFF2CF", textColor: "#5C4000",
+    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
   },
   {
     id: "p3", pct: "Top Rates", title: "Sell Gift Cards",
     desc: "Amazon, iTunes, Steam — paid instantly",
-    bg: "#D6E1FF", textColor: "#1A3070",
+    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
   },
 ];
 
@@ -140,7 +139,8 @@ function ServiceItem({ item, onPress }: { item: (typeof SERVICES)[number]; onPre
   );
 }
 
-function PromoCard({ item, width: promoW }: { item: (typeof PROMOS)[number]; width: number }) {
+type PromoItem = typeof PROMOS[number];
+function PromoCard({ item, width: promoW }: { item: PromoItem; width: number }) {
   const sc   = useSharedValue(1);
   const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
   return (
@@ -152,9 +152,9 @@ function PromoCard({ item, width: promoW }: { item: (typeof PROMOS)[number]; wid
         <View style={[pc.card, { backgroundColor: item.bg }]}>
           <View style={pc.orb1} />
           <View style={pc.orb2} />
-          <Text style={[pc.pct,   { color: item.textColor }]}>{item.pct}</Text>
-          <Text style={[pc.title, { color: item.textColor }]}>{item.title}</Text>
-          <Text style={[pc.desc,  { color: item.textColor + "CC", maxWidth: Math.round(promoW * 0.42) }]}>{item.desc}</Text>
+          <Text style={[pc.pct,   { color: item.pctColor }]}>{item.pct}</Text>
+          <Text style={[pc.title, { color: item.titleColor }]}>{item.title}</Text>
+          <Text style={[pc.desc,  { color: item.descColor, maxWidth: Math.round(promoW * 0.42) }]}>{item.desc}</Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -164,7 +164,7 @@ function PromoCard({ item, width: promoW }: { item: (typeof PROMOS)[number]; wid
 function TxRow({ item, onPress }: { item: (typeof TRANSACTIONS)[number]; onPress: () => void }) {
   return (
     <TouchableOpacity style={tx.row} onPress={onPress} activeOpacity={0.75}>
-      <View style={[tx.iconWrap, { backgroundColor: item.positive ? "#E8F7EF" : "#FFF0F0" }]}>
+      <View style={[tx.iconWrap, { backgroundColor: item.positive ? "#0D2518" : "#2A0E0E" }]}>
         <Feather
           name={item.positive ? "arrow-down-left" : "arrow-up-right"}
           size={14}
@@ -193,10 +193,8 @@ export default function HomeScreen() {
   const PROMO_W  = Math.min(width, MAX_W) - 48;
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
-  // SafeAreaView handles native top inset; only need extra padding on web
   const webTopPad = Platform.OS === "web" ? 40 : 0;
 
-  /* Persist balance visibility preference */
   useEffect(() => {
     AsyncStorage.getItem(BAL_VIS_KEY).then(val => {
       if (val !== null) setBalanceVisible(val === "true");
@@ -210,13 +208,11 @@ export default function HomeScreen() {
     AsyncStorage.setItem(BAL_VIS_KEY, String(next)).catch(() => {});
   };
 
-  /* Balance display */
   const firstName = (user?.name ?? "Dove").split(" ")[0];
   const balance   = user?.balance ?? 200590;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const MASKED    = "₦••••••••";
 
-  /* Balance amount scale animation */
   const balScale = useSharedValue(1);
   const balOpacity = useSharedValue(1);
   const balStyle = useAnimatedStyle(() => ({
@@ -257,6 +253,7 @@ export default function HomeScreen() {
           style={s.logo}
           contentFit="contain"
           cachePolicy="memory-disk"
+          tintColor="#FFFFFF"
         />
 
         <TouchableOpacity style={s.hdrBtn}>
@@ -274,18 +271,6 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(340).springify().delay(50)}
           style={s.greetSection}
         >
-          {/* Glassmorphism background */}
-          <LinearGradient
-            colors={["rgba(68,212,212,0.92)", "rgba(34,162,172,0.88)"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {/* Glass light reflection — top edge shimmer */}
-          <View style={s.glassShimmer} />
-          {/* Decorative orbs for depth */}
-          <View style={s.glassOrb1} />
-          <View style={s.glassOrb2} />
           <View style={s.greetRow}>
             <Image
               source={avatarSrc}
@@ -310,7 +295,7 @@ export default function HomeScreen() {
               style={s.eyeBtn}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <PremiumEyeIcon open={balanceVisible} size={20} color="rgba(255,255,255,0.72)" />
+              <PremiumEyeIcon open={balanceVisible} size={20} color="rgba(255,255,255,0.5)" />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -320,21 +305,11 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(320).springify().delay(90)}
           style={s.actionsWrap}
         >
-          <LinearGradient
-            colors={["#0E1055", "#1C0D6E"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={s.actionsBar}
-          >
-            {/* Navy glass shimmer — top edge */}
-            <View style={s.navyShimmer} />
-            {/* Decorative orbs */}
-            <View style={s.navyOrb1} />
-            <View style={s.navyOrb2} />
+          <View style={s.actionsBar}>
             {([
-              { renderIcon: () => <FundWalletIcon size={20} color="#FFFFFF" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
-              { renderIcon: () => <SellIcon       size={20} color="#FFFFFF" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
-              { renderIcon: () => <WithdrawIcon   size={20} color="#FFFFFF" />, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
+              { renderIcon: () => <FundWalletIcon size={20} color="#000000" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
+              { renderIcon: () => <SellIcon       size={20} color="#000000" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
+              { renderIcon: () => <WithdrawIcon   size={20} color="#000000" />, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
             ]).map((action, i) => (
               <React.Fragment key={action.label}>
                 {i > 0 && <View style={s.actionDivider} />}
@@ -344,7 +319,7 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </React.Fragment>
             ))}
-          </LinearGradient>
+          </View>
         </Animated.View>
 
         {/* ── Services grid ── */}
@@ -386,9 +361,9 @@ export default function HomeScreen() {
         {/* ── Recent Transactions ── */}
         <Animated.View entering={FadeInUp.duration(300).springify().delay(220)}>
           <View style={s.secHdr}>
-            <Text style={s.secTitle}>Recent Transaction</Text>
+            <Text style={s.secTitle}>Recent Transactions</Text>
             <TouchableOpacity onPress={press(() => router.push("/(app)/transactions" as any))}>
-              <Text style={s.seeAll}>See All</Text>
+              <Text style={s.seeAll}>View All</Text>
             </TouchableOpacity>
           </View>
 
@@ -422,12 +397,12 @@ export default function HomeScreen() {
             onPress={() => setGiftModalVisible(false)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Feather name="x" size={18} color="#1E232C" />
+            <Feather name="x" size={18} color="#AAAAAA" />
           </TouchableOpacity>
         </View>
         <View style={gm.tilesRow}>
           <TouchableOpacity
-            style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
+            style={[gm.tile, { backgroundColor: "#1C1C1E" }]}
             activeOpacity={0.82}
             onPress={() => {
               setGiftModalVisible(false);
@@ -435,17 +410,17 @@ export default function HomeScreen() {
               router.push("/(app)/sell-gift-card" as any);
             }}
           >
-            <View style={[gm.tileIcon, { backgroundColor: "rgba(92,64,0,0.12)" }]}>
-              <SellGiftCardIcon size={24} color="#5C4000" />
+            <View style={[gm.tileIcon, { backgroundColor: "rgba(245,158,11,0.15)" }]}>
+              <SellGiftCardIcon size={24} color="#F59E0B" />
             </View>
-            <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
-            <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
+            <Text style={[gm.tileTitle, { color: "#FFFFFF" }]}>Sell Gift Card</Text>
+            <Text style={[gm.tileDesc, { color: "#888888" }]}>
               Sell local and international gift cards easily and instantly on aza.
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
+            style={[gm.tile, { backgroundColor: "#1C1C1E" }]}
             activeOpacity={0.82}
             onPress={() => {
               setGiftModalVisible(false);
@@ -453,11 +428,11 @@ export default function HomeScreen() {
               router.push("/(app)/card-status" as any);
             }}
           >
-            <View style={[gm.tileIcon, { backgroundColor: "rgba(122,21,53,0.12)" }]}>
-              <CheckPendingIcon size={24} color="#7A1535" />
+            <View style={[gm.tileIcon, { backgroundColor: "rgba(244,63,94,0.15)" }]}>
+              <CheckPendingIcon size={24} color="#F43F5E" />
             </View>
-            <Text style={[gm.tileTitle, { color: "#7A1535" }]}>Check Pending</Text>
-            <Text style={[gm.tileDesc, { color: "#7A153599" }]}>
+            <Text style={[gm.tileTitle, { color: "#FFFFFF" }]}>Check Pending</Text>
+            <Text style={[gm.tileDesc, { color: "#888888" }]}>
               Check Status of Pending gift card sale.
             </Text>
           </TouchableOpacity>
@@ -494,39 +469,20 @@ const s = StyleSheet.create({
   logo: { width: 80, height: 28 },
 
   greetSection: {
-    marginHorizontal: 20,
+    marginHorizontal:  20,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.22)",
-    gap: 12,
-    overflow: "hidden",
-    shadowColor: "rgba(34,194,194,0.55)",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-
-  /* Teal glassmorphism decorative layers */
-  glassShimmer: {
-    position: "absolute",
-    top: 0, left: 0, right: 0,
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.38)",
-  },
-  glassOrb1: {
-    position: "absolute",
-    width: 140, height: 140, borderRadius: 70,
-    top: -55, right: -30,
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
-  glassOrb2: {
-    position: "absolute",
-    width: 80, height: 80, borderRadius: 40,
-    bottom: -32, left: 20,
-    backgroundColor: "rgba(255,255,255,0.07)",
+    paddingVertical:   16,
+    borderRadius:      16,
+    borderWidth:       1,
+    borderColor:       "#2A2A2A",
+    gap:               12,
+    overflow:          "hidden",
+    backgroundColor:   "#1C1C1E",
+    shadowColor:       "#000000",
+    shadowOffset:      { width: 0, height: 4 },
+    shadowOpacity:     0.4,
+    shadowRadius:      16,
+    elevation:         8,
   },
 
   greetRow:  { flexDirection: "row", alignItems: "center", gap: 12 },
@@ -534,50 +490,29 @@ const s = StyleSheet.create({
   greetText: { gap: 2, flex: 1 },
   hiRow:     { flexDirection: "row", alignItems: "center" },
   hiText:    { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.72)" },
+  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.5)" },
   balRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   balAmount: { fontSize: rf(24), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.5, flex: 1 },
   eyeBtn:    { padding: 4 },
 
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {
-    borderRadius: 14,
-    flexDirection: "row",
-    alignItems: "center",
+    borderRadius:    14,
+    flexDirection:   "row",
+    alignItems:      "center",
     paddingVertical: 18,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
-    overflow: "hidden",
-    shadowColor: "rgba(14,16,85,0.7)",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 20,
-    elevation: 12,
+    backgroundColor: "#FFFFFF",
+    overflow:        "hidden",
+    shadowColor:     "#000000",
+    shadowOffset:    { width: 0, height: 4 },
+    shadowOpacity:   0.35,
+    shadowRadius:    14,
+    elevation:       10,
   },
 
-  /* Navy-indigo glassmorphism decorative layers */
-  navyShimmer: {
-    position: "absolute",
-    top: 0, left: 0, right: 0,
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.14)",
-  },
-  navyOrb1: {
-    position: "absolute",
-    width: 120, height: 120, borderRadius: 60,
-    top: -48, right: -20,
-    backgroundColor: "rgba(100,80,255,0.12)",
-  },
-  navyOrb2: {
-    position: "absolute",
-    width: 70, height: 70, borderRadius: 35,
-    bottom: -30, left: 30,
-    backgroundColor: "rgba(80,60,220,0.1)",
-  },
-
-  actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7, zIndex: 1 },
-  actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: 0.2 },
-  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(255,255,255,0.14)", zIndex: 1 },
+  actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7 },
+  actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#000000", letterSpacing: 0.2 },
+  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(0,0,0,0.12)" },
 
   servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 8, rowGap: 16 },
 
@@ -588,23 +523,23 @@ const s = StyleSheet.create({
     paddingHorizontal: 20, marginBottom: 10,
   },
   secTitle: { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text },
-  seeAll:   { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#000000" },
+  seeAll:   { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#35C2C1" },
 
   txCard: {
     marginHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#F0F0F0",
-    overflow: "hidden",
-    backgroundColor: "#FFFFFF",
+    borderRadius:     12,
+    borderWidth:      1,
+    borderColor:      "#2A2A2A",
+    overflow:         "hidden",
+    backgroundColor:  "#1C1C1E",
   },
-  txDivider: { height: 1, backgroundColor: "#F5F5F5", marginHorizontal: 14 },
+  txDivider: { height: 1, backgroundColor: "#2A2A2A", marginHorizontal: 14 },
 });
 
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
   iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: rf(14), flexShrink: 1 },
+  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: "#FFFFFF", lineHeight: rf(14), flexShrink: 1 },
 });
 
 const pc = StyleSheet.create({
@@ -614,11 +549,11 @@ const pc = StyleSheet.create({
   },
   orb1: {
     position: "absolute", width: 100, height: 100, borderRadius: 50,
-    backgroundColor: "rgba(255,255,255,0.25)", top: -30, right: -20,
+    backgroundColor: "rgba(255,255,255,0.06)", top: -30, right: -20,
   },
   orb2: {
     position: "absolute", width: 60, height: 60, borderRadius: 30,
-    backgroundColor: "rgba(255,255,255,0.15)", bottom: -20, right: 40,
+    backgroundColor: "rgba(255,255,255,0.04)", bottom: -20, right: 40,
   },
   pct:   { fontSize: rf(14), fontFamily: "Manrope_700Bold" },
   title: { fontSize: rf(12), fontFamily: "Manrope_600SemiBold" },
@@ -628,7 +563,7 @@ const pc = StyleSheet.create({
 const tx = StyleSheet.create({
   row: {
     flexDirection: "row", alignItems: "center", gap: 12,
-    paddingHorizontal: 14, paddingVertical: 13, backgroundColor: "#FFFFFF",
+    paddingHorizontal: 14, paddingVertical: 13, backgroundColor: "#1C1C1E",
   },
   iconWrap: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   info:   { flex: 1, gap: 3 },
@@ -639,20 +574,20 @@ const tx = StyleSheet.create({
 });
 
 const gm = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", justifyContent: "flex-end" },
   sheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#1C1C1E",
     borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40,
     shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12, shadowRadius: 16, elevation: 12,
+    shadowOpacity: 0.4, shadowRadius: 16, elevation: 12,
   },
   sheetHeader: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20,
   },
-  sheetTitle: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: "#1E232C" },
+  sheetTitle: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
   closeBtn: {
-    width: 34, height: 34, borderRadius: 17, backgroundColor: "#F7F8F9",
+    width: 34, height: 34, borderRadius: 17, backgroundColor: "#2A2A2A",
     alignItems: "center", justifyContent: "center",
   },
   tilesRow: { flexDirection: "row", gap: 14 },
