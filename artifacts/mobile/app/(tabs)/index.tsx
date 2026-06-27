@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -273,6 +274,18 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(340).springify().delay(50)}
           style={s.greetSection}
         >
+          {/* Glassmorphism background */}
+          <LinearGradient
+            colors={["rgba(68,212,212,0.92)", "rgba(34,162,172,0.88)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {/* Glass light reflection — top edge shimmer */}
+          <View style={s.glassShimmer} />
+          {/* Decorative orbs for depth */}
+          <View style={s.glassOrb1} />
+          <View style={s.glassOrb2} />
           <View style={s.greetRow}>
             <Image
               source={avatarSrc}
@@ -283,7 +296,7 @@ export default function HomeScreen() {
             <View style={s.greetText}>
               <View style={s.hiRow}>
                 <Text style={s.hiText}>Hi, {firstName} </Text>
-                <WaveIcon size={18} color={C.text} />
+                <WaveIcon size={18} color="rgba(255,255,255,0.9)" />
               </View>
               <Text style={s.greetSub}>Your available balance</Text>
             </View>
@@ -297,7 +310,7 @@ export default function HomeScreen() {
               style={s.eyeBtn}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <PremiumEyeIcon open={balanceVisible} size={20} color={C.textMuted} />
+              <PremiumEyeIcon open={balanceVisible} size={20} color="rgba(255,255,255,0.72)" />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -307,7 +320,17 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(320).springify().delay(90)}
           style={s.actionsWrap}
         >
-          <View style={s.actionsBar}>
+          <LinearGradient
+            colors={["#0E1055", "#1C0D6E"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={s.actionsBar}
+          >
+            {/* Navy glass shimmer — top edge */}
+            <View style={s.navyShimmer} />
+            {/* Decorative orbs */}
+            <View style={s.navyOrb1} />
+            <View style={s.navyOrb2} />
             {([
               { renderIcon: () => <FundWalletIcon size={20} color="#FFFFFF" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
               { renderIcon: () => <SellIcon       size={20} color="#FFFFFF" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
@@ -321,7 +344,7 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               </React.Fragment>
             ))}
-          </View>
+          </LinearGradient>
         </Animated.View>
 
         {/* ── Services grid ── */}
@@ -474,38 +497,87 @@ const s = StyleSheet.create({
     marginHorizontal: 20,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: "#F8FAFB",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#EEF0F2",
+    borderColor: "rgba(255,255,255,0.22)",
     gap: 12,
+    overflow: "hidden",
+    shadowColor: "rgba(34,194,194,0.55)",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 10,
   },
+
+  /* Teal glassmorphism decorative layers */
+  glassShimmer: {
+    position: "absolute",
+    top: 0, left: 0, right: 0,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.38)",
+  },
+  glassOrb1: {
+    position: "absolute",
+    width: 140, height: 140, borderRadius: 70,
+    top: -55, right: -30,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
+  glassOrb2: {
+    position: "absolute",
+    width: 80, height: 80, borderRadius: 40,
+    bottom: -32, left: 20,
+    backgroundColor: "rgba(255,255,255,0.07)",
+  },
+
   greetRow:  { flexDirection: "row", alignItems: "center", gap: 12 },
   avatar:    { width: 46, height: 46, borderRadius: 23 },
   greetText: { gap: 2, flex: 1 },
   hiRow:     { flexDirection: "row", alignItems: "center" },
-  hiText:    { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: C.text },
-  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: C.textSec },
+  hiText:    { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.72)" },
   balRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  balAmount: { fontSize: rf(24), fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: -0.5, flex: 1 },
+  balAmount: { fontSize: rf(24), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.5, flex: 1 },
   eyeBtn:    { padding: 4 },
 
   actionsWrap: { paddingHorizontal: 20 },
   actionsBar: {
-    backgroundColor: C.actionBar,
     borderRadius: 14,
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+    overflow: "hidden",
+    shadowColor: "rgba(14,16,85,0.7)",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 12,
   },
-  actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7 },
+
+  /* Navy-indigo glassmorphism decorative layers */
+  navyShimmer: {
+    position: "absolute",
+    top: 0, left: 0, right: 0,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.14)",
+  },
+  navyOrb1: {
+    position: "absolute",
+    width: 120, height: 120, borderRadius: 60,
+    top: -48, right: -20,
+    backgroundColor: "rgba(100,80,255,0.12)",
+  },
+  navyOrb2: {
+    position: "absolute",
+    width: 70, height: 70, borderRadius: 35,
+    bottom: -30, left: 30,
+    backgroundColor: "rgba(80,60,220,0.1)",
+  },
+
+  actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7, zIndex: 1 },
   actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: 0.2 },
-  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(255,255,255,0.18)" },
+  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(255,255,255,0.14)", zIndex: 1 },
 
   servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 8, rowGap: 16 },
 
