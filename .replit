@@ -40,13 +40,12 @@ waitForPort = 8080
 name = "AZA Mobile (Expo)"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run qr"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
+args = "pnpm --filter @workspace/mobile run dev"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
