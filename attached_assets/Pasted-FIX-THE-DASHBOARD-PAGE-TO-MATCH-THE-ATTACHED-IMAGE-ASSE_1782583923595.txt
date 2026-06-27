@@ -1,0 +1,316 @@
+FIX THE DASHBOARD PAGE TO MATCH THE ATTACHED IMAGE ASSETS ANS USE THE CODES TO BUILD IT.
+
+Replicate it with pixel-perfect accuracy, matching every detail of the original design, including layout, spacing, typography, colors, shadows, transparency effects, animations, and interactions. Ensure the final result is visually indistinguishable from the reference while maintaining responsiveness and high-quality rendering across all screen sizes.
+
+/* Greeting */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 10px;
+
+position: absolute;
+width: 329px;
+height: 44px;
+left: 22px;
+top: 118px;
+
+/* 3D Avatars / 16
+
+A young adult holding a standing grab handle on a light blue backdrop. They have dark skin, dark eyes, are wearing a yellow shirt with blue headphones and a pink head scarf that comes to a knot at the top.
+*/
+
+width: 46px;
+height: 44px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+/* Avatars / 3d_avatar_16 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+background: url(3d_avatar_16);
+
+/* Top */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 1.58px;
+
+width: 126px;
+height: 39.58px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+/* Hi, Dove */
+
+width: 59px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 15.7516px;
+line-height: 120%;
+/* identical to box height, or 19px */
+
+/* Base/Gray 1 */
+color: #1C1C1C;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+/* Your available balance */
+
+width: 126px;
+height: 19px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 12.6013px;
+line-height: 150%;
+/* identical to box height, or 19px */
+
+/* Gray/Gray 1 */
+color: #595F67;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+/* ₦200,590.00 */
+
+width: 157px;
+height: 23px;
+
+font-family: 'IBM Plex Sans';
+font-style: normal;
+font-weight: 600;
+font-size: 18.902px;
+line-height: 120%;
+/* identical to box height, or 23px */
+
+/* Gray/Black */
+color: #0B0A0A;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+/* Top Up */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.94px;
+
+width: 104.4px;
+height: 36.84px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+/* Group 1024 */
+
+width: 18.9px;
+height: 18.9px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+/* Ellipse 17 */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 40.95%;
+right: 40.95%;
+top: 0%;
+bottom: 48.69%;
+
+/* Gray/White */
+border: 1.57516px solid #FFFFFF;
+
+/* Plus / 24 / Outline */
+
+position: absolute;
+width: 12.6px;
+height: 12.6px;
+left: 45.9px;
+top: 3.15px;
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+/* Fund Wallet */
+
+width: 50px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+/* Send */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+/* pointer / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 8.31%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+/* Sell */
+
+width: 16px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+/* Scan */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 1;
+
+/* money withdrawal / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+/* Vector */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 8.33%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+/* Withdraw */
+
+width: 40px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
