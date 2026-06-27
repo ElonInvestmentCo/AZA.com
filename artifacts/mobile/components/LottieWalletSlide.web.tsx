@@ -1,9 +1,5 @@
-import lottie, { AnimationItem } from "lottie-web";
 import React, { useEffect, useRef } from "react";
 import { View } from "react-native";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const animationData = require("../assets/animations/wallet-lottie.json");
 
 export default function LottieWalletSlide({
   slideW,
@@ -14,41 +10,43 @@ export default function LottieWalletSlide({
   illustrationSize?: number;
   isActive?: boolean;
 }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const animRef = useRef<AnimationItem | null>(null);
+  const outerRef = useRef<View>(null);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    animRef.current = lottie.loadAnimation({
-      container: el,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      animationData,
-    });
-    return () => {
-      animRef.current?.destroy();
-      animRef.current = null;
-    };
-  }, []);
+    const outerEl = outerRef.current as unknown as HTMLElement;
+    if (!outerEl) return;
 
-  const size = Math.round(Math.min(slideW, slideH) * 0.88);
+    const cardSize = Math.round(Math.min(slideW * 0.72, slideH * 0.88));
+
+    // Create a raw unmanaged div and append it
+    const div = document.createElement("div");
+    div.style.cssText = `width:${cardSize}px;height:${cardSize}px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);overflow:visible;z-index:10;`;
+
+    // Inject a static SVG with bright colours
+    div.innerHTML =
+      `<svg width="${cardSize}" height="${cardSize}" xmlns="http://www.w3.org/2000/svg">` +
+      `<rect width="${cardSize}" height="${cardSize}" fill="#FFD700"/>` +
+      `<circle cx="${cardSize / 2}" cy="${cardSize / 2}" r="${cardSize * 0.35}" fill="white"/>` +
+      `<text x="${cardSize / 2}" y="${cardSize / 2 + 8}" text-anchor="middle" fill="#0B0820" font-size="24" font-weight="bold">LOTTIE</text>` +
+      `</svg>`;
+
+    outerEl.appendChild(div);
+    console.log("[LottieWalletSlide] static SVG injected. outerEl style:", outerEl.getAttribute("style"));
+
+    return () => { div.remove(); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View
+      // @ts-ignore
+      ref={outerRef}
       style={{
         width: slideW,
         height: slideH,
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: "#0B0820",
+        position: "relative",
       }}
-    >
-      {/* @ts-ignore – valid on web; ref on div not in RN types */}
-      <div
-        ref={containerRef}
-        style={{ width: size, height: size }}
-      />
-    </View>
+    />
   );
 }
