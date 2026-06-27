@@ -261,6 +261,54 @@ export function MoreIcon({ size = 20, color = "#7C3AED" }: IconProps) {
   );
 }
 
+/** Settings — horizontal sliders (3 lines with adjustable knobs) */
+export function SettingsIcon({ size = 20, color = "#444444" }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Path d="M2 5H18" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <Circle cx="6" cy="5" r="2" fill={color} />
+      <Path d="M2 10H18" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <Circle cx="14" cy="10" r="2" fill={color} />
+      <Path d="M2 15H18" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+      <Circle cx="8" cy="15" r="2" fill={color} />
+    </Svg>
+  );
+}
+
+/* ─── Transaction row icons ────────────────────────────────────────────── */
+
+/** GiftcardTxIcon — hollow triangle (matches Figma delta icon for gift card deposits) */
+export function GiftcardTxIcon({ size = 24, color = "#1C1B1F" }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4L3 19H21L12 4ZM12 8.5L6.5 17.5H17.5L12 8.5Z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+/** WithdrawTxIcon — hat silhouette (matches Figma hat icon for withdrawals) */
+export function WithdrawTxIcon({ size = 24, color = "#1C1B1F" }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M4 17H20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <Path
+        d="M6 17C6 17 5 10 12 8C19 10 18 17 18 17"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <Path d="M9 8C9 8 10 5 12 5C14 5 15 8 15 8" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
 /* ─── Gift Card Modal Tile Icons (larger, 24px) ────────────────────────── */
 
 /** Sell Gift Card — gift box with larger rendering */

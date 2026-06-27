@@ -1,0 +1,260 @@
+/* Main Action */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 12.6013px 11.8137px;
+gap: 7.88px;
+
+position: absolute;
+width: 351px;
+height: 61px;
+left: 21px;
+top: 196px;
+
+background: #000000;
+border-radius: 5px;
+
+
+/* Frame 1025 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 7.09px;
+
+width: 327.37px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Top Up */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 3.94px;
+
+width: 104.4px;
+height: 36.84px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Group 1024 */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Ellipse 17 */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 40.95%;
+right: 40.95%;
+top: 0%;
+bottom: 48.69%;
+
+/* Gray/White */
+border: 1.57516px solid #FFFFFF;
+
+
+/* Plus / 24 / Outline */
+
+position: absolute;
+width: 12.6px;
+height: 12.6px;
+left: 45.9px;
+top: 3.15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Fund Wallet */
+
+width: 50px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Send */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 1;
+
+
+/* pointer / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 8.31%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Sell */
+
+width: 16px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Scan */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px;
+gap: 4.73px;
+
+width: 104.4px;
+height: 37.63px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 1;
+
+
+/* money withdrawal / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 8.33%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Withdraw */
+
+width: 40px;
+height: 14px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 700;
+font-size: 9.45098px;
+line-height: 150%;
+/* or 14px */
+text-align: center;
+
+/* Gray/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
