@@ -29,14 +29,16 @@ export default function LottieWalletSlide({
     // Match the exact cardSize + positioning used by the original working placeholder
     const cardSize = Math.round(Math.min(slideW * 0.72, slideH * 0.88));
 
+    const top  = Math.round((slideH - cardSize) / 2);
+    const left = Math.round((slideW - cardSize) / 2);
+
     const container = document.createElement("div");
     container.style.cssText = [
       `width:${cardSize}px`,
       `height:${cardSize}px`,
       `position:absolute`,
-      `top:50%`,
-      `left:50%`,
-      `transform:translate(-50%,-50%)`,
+      `top:${top}px`,
+      `left:${left}px`,
       `overflow:visible`,
       `z-index:10`,
     ].join(";");
