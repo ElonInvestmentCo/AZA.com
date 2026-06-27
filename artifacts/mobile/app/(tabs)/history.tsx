@@ -298,7 +298,8 @@ function TxDetailSheet({ tx, visible, onClose }: {
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[ds.scroll, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[ds.scroll, { paddingBottom: 16 }]}
+        style={{ flex: 1 }}
         bounces={false}
       >
         {/* Drag handle */}
@@ -362,29 +363,29 @@ function TxDetailSheet({ tx, visible, onClose }: {
             <ReceiptRow label="Type"      value={tx.positive ? "Credit" : "Debit"} />
           </View>
         </View>
-
-        {/* ── Actions ── */}
-        <View style={ds.actions}>
-          <TouchableOpacity style={ds.shareBtn} onPress={handleShare} activeOpacity={0.82}>
-            <Feather name="share-2" size={16} color="#FFFFFF" />
-            <Text style={ds.shareBtnText}>Share Receipt</Text>
-          </TouchableOpacity>
-
-          {tx.status === "pending" && (
-            <TouchableOpacity
-              style={ds.cancelBtn}
-              activeOpacity={0.82}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onClose(); }}
-            >
-              <Text style={ds.cancelBtnText}>Cancel Transaction</Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity style={ds.closeBtn} onPress={onClose} activeOpacity={0.72}>
-            <Text style={ds.closeBtnText}>Close</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
+
+      {/* ── Actions pinned above safe-area — never overlaps nav bar ── */}
+      <View style={[ds.actions, { paddingBottom: Math.max(insets.bottom, 12) + 8 }]}>
+        <TouchableOpacity style={ds.shareBtn} onPress={handleShare} activeOpacity={0.82}>
+          <Feather name="share-2" size={16} color="#FFFFFF" />
+          <Text style={ds.shareBtnText}>Share Receipt</Text>
+        </TouchableOpacity>
+
+        {tx.status === "pending" && (
+          <TouchableOpacity
+            style={ds.cancelBtn}
+            activeOpacity={0.82}
+            onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); onClose(); }}
+          >
+            <Text style={ds.cancelBtnText}>Cancel Transaction</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={ds.closeBtn} onPress={onClose} activeOpacity={0.72}>
+          <Text style={ds.closeBtnText}>Close</Text>
+        </TouchableOpacity>
+      </View>
     </AnimatedSheet>
   );
 }
@@ -413,8 +414,8 @@ const ds = StyleSheet.create({
   rowDivider:        { height: 1, backgroundColor: "#F3F4F6" },
   rowDividerStrong:  { backgroundColor: "#E5E7EB", marginVertical: 2 },
 
-  /* Actions */
-  actions:       { gap: 10, marginTop: 4 },
+  /* Actions — pinned below ScrollView, above system nav */
+  actions:       { gap: 10, paddingHorizontal: 22, paddingTop: 14, borderTopWidth: 1, borderTopColor: "#F0F0F0" },
   shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 50, borderRadius: 14, backgroundColor: C.navy },
   shareBtnText:  { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
   cancelBtn:     { height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
@@ -484,8 +485,10 @@ export default function HistoryScreen() {
   }, [txFilter, dateFrom, searchText]);
 
   /* ─── Totals (filtered) ── */
-  const totalIn  = filtered.filter(t =>  t.positive).reduce((s, t) => s + t.amountRaw, 0);
-  const totalOut = filtered.filter(t => !t.positive).reduce((s, t) => s + t.amountRaw, 0);
+  const { totalIn, totalOut } = useMemo(() => ({
+    totalIn:  filtered.filter(t =>  t.positive).reduce((s, t) => s + t.amountRaw, 0),
+    totalOut: filtered.filter(t => !t.positive).reduce((s, t) => s + t.amountRaw, 0),
+  }), [filtered]);
 
   const activeFilters = (txFilter !== "All" ? 1 : 0) + (dateRange !== "all" ? 1 : 0) + (searchText ? 1 : 0);
 

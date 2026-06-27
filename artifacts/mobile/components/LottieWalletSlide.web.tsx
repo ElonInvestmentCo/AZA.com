@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const lottieLib = require("lottie-web");
@@ -23,33 +23,16 @@ export default function LottieWalletSlide({
   const outerRef = useRef<View>(null);
 
   useEffect(() => {
-    const outerEl = outerRef.current as unknown as HTMLElement;
-    if (!outerEl) return;
+    const el = outerRef.current as unknown as HTMLElement | null;
+    if (!el) return;
 
-    // Match the exact cardSize + positioning used by the original working placeholder
-    const cardSize = Math.round(Math.min(slideW * 0.72, slideH * 0.88));
-
-    const top  = Math.round((slideH - cardSize) / 2);
-    const left = Math.round((slideW - cardSize) / 2);
-
-    const container = document.createElement("div");
-    container.style.cssText = [
-      `width:${cardSize}px`,
-      `height:${cardSize}px`,
-      `position:absolute`,
-      `top:${top}px`,
-      `left:${left}px`,
-      `overflow:visible`,
-      `z-index:10`,
-    ].join(";");
-
-    outerEl.appendChild(container);
+    console.log("[LottieWalletSlide] outer el:", el.tagName, el.offsetWidth, "x", el.offsetHeight);
 
     let anim: { destroy(): void } | null = null;
     try {
       anim = lottie.loadAnimation({
-        container,
-        renderer: "svg",
+        container: el,
+        renderer: "canvas",
         loop: true,
         autoplay: true,
         animationData,
@@ -60,21 +43,21 @@ export default function LottieWalletSlide({
 
     return () => {
       anim?.destroy();
-      container.remove();
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <View
-      // @ts-ignore
       ref={outerRef}
-      style={{
-        width: slideW,
-        height: slideH,
-        backgroundColor: "#0B0820",
-        position: "relative",
-      }}
+      style={[styles.outer, { width: slideW, height: slideH }]}
     />
   );
 }
+
+const styles = StyleSheet.create({
+  outer: {
+    backgroundColor: "#0B0820",
+    overflow: "hidden",
+  },
+});
