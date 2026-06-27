@@ -67,7 +67,7 @@ if (process.env.REPL_ID)
 
 const expo = spawn(
   "pnpm",
-  ["exec", "expo", "start", "--tunnel", "--port", "19000", "--clear"],
+  ["exec", "expo", "start", "--tunnel", "--port", "19000"],
   { cwd: __dirname, env: expoEnv, stdio: ["ignore", "pipe", "pipe"] }
 );
 
@@ -116,7 +116,7 @@ function buildPage() {
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>PAYVORA Mobile — Expo Preview</title>
-  ${!tunnelUrl ? `<meta http-equiv="refresh" content="4"/>` : ""}
+  ${!metroReady ? `<meta http-equiv="refresh" content="4"/>` : ""}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -204,7 +204,7 @@ function buildPage() {
     /* iPhone 14 Pro shell */
     .phone-shell {
       width: 290px;
-      height: 590px;
+      height: min(590px, calc(100vh - 100px));
       background: #1a1a1f;
       border: 2.5px solid #2e2e38;
       border-radius: 48px;
@@ -252,7 +252,7 @@ function buildPage() {
       width: 100%;
       height: 100%;
       border-radius: 46px;
-      background: #12121A;
+      background: #FFFFFF;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -540,18 +540,14 @@ function buildPage() {
           <div class="notch-speaker"></div>
         </div>
         <div class="phone-screen">
-          <div class="phone-content">
-            <div class="app-icon">PV</div>
-            <div class="phone-label">PAYVORA</div>
-            <div class="phone-sub">
-              ${tunnelUrl
-                ? "App is running.\nScan the QR code →"
-                : metroReady
-                  ? "Tunnel negotiating…\nScan the QR code soon →"
-                  : "Metro bundler is starting…\nThis takes about 30–60 s"}
-            </div>
-            ${!tunnelUrl ? `<div class="loading-bar-wrap"><div class="loading-bar"></div></div>` : ""}
-          </div>
+          ${metroReady
+            ? `<iframe src="/?frame=1" title="PAYVORA App" style="width:100%;height:100%;border:none;display:block;border-radius:0 0 36px 36px;" allow="accelerometer; camera; geolocation; microphone" loading="lazy"></iframe>`
+            : `<div class="phone-content">
+                <div class="app-icon">PV</div>
+                <div class="phone-label">PAYVORA</div>
+                <div class="phone-sub">Metro bundler is starting…<br>This takes about 30–60 s</div>
+                <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+              </div>`}
         </div>
         <div class="phone-home-bar"></div>
       </div>
@@ -619,19 +615,80 @@ function buildPage() {
 
   </div>
 
+  ${metroReady && !tunnelUrl ? `<script>
+    // Metro is ready but tunnel URL not yet — poll without reloading the page
+    (function poll() {
+      fetch("/api/status").then(r=>r.json()).then(d=>{
+        if (d.tunnelUrl) {
+          const qrBox = document.querySelector(".qr-box");
+          const urlRow = document.querySelector(".url-row");
+          if (qrBox) qrBox.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data='+encodeURIComponent(d.tunnelUrl)+'" alt="Expo QR Code"/>';
+          if (urlRow) urlRow.textContent = d.tunnelUrl;
+        } else { setTimeout(poll, 4000); }
+      }).catch(()=>setTimeout(poll, 4000));
+    })();
+  </script>` : ""}
+
 </body>
 </html>`;
 }
 
-/* ── HTTP server on port 5000 ────────────────────────────────────────────── */
-http.createServer((_req, res) => {
-  res.writeHead(200, {
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "no-cache, no-store, must-revalidate",
+/* ── Reverse proxy helper → Metro on port 19000 ─────────────────────────── */
+function proxyToMetro(req, res, targetPath) {
+  const options = {
+    hostname: "localhost",
+    port: 19000,
+    path: targetPath,
+    method: req.method,
+    headers: { ...req.headers, host: "localhost:19000" },
+  };
+  const proxyReq = http.request(options, (proxyRes) => {
+    // Strip X-Frame-Options so the iframe can embed the app
+    const headers = { ...proxyRes.headers };
+    delete headers["x-frame-options"];
+    delete headers["content-security-policy"];
+    res.writeHead(proxyRes.statusCode, headers);
+    proxyRes.pipe(res, { end: true });
   });
-  res.end(buildPage());
+  proxyReq.on("error", () => {
+    res.writeHead(502, { "Content-Type": "text/plain" });
+    res.end("Metro not ready yet — please wait…");
+  });
+  req.pipe(proxyReq, { end: true });
+}
+
+/* ── HTTP server on port 5000 ────────────────────────────────────────────── */
+http.createServer((req, res) => {
+  const raw = req.url || "/";
+  const qmark = raw.indexOf("?");
+  const pathname = qmark === -1 ? raw : raw.slice(0, qmark);
+  const search   = qmark === -1 ? ""  : raw.slice(qmark);
+  const isFramed = search.includes("frame=1");
+
+  // Status API for JS poller
+  if (pathname === "/api/status") {
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
+    res.end(JSON.stringify({ tunnelUrl, metroReady }));
+    return;
+  }
+
+  // Root without ?frame=1  →  phone mockup wrapper page
+  if (pathname === "/" && !isFramed) {
+    res.writeHead(200, {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+    });
+    res.end(buildPage());
+    return;
+  }
+
+  // Everything else (including /?frame=1 and all deep-link paths) → proxy to Metro
+  // Strip ?frame=1 before forwarding so the app sees a clean URL
+  const forwardSearch = search.replace(/[?&]frame=1/, "").replace(/^&/, "?");
+  const targetPath = pathname + forwardSearch;
+  proxyToMetro(req, res, targetPath);
 }).listen(5000, "0.0.0.0", () => {
-  console.log("[qr-server] QR page live → http://localhost:5000");
+  console.log("[qr-server] Preview live → http://localhost:5000");
 });
 
 process.on("SIGTERM", () => { expo.kill("SIGTERM"); process.exit(0); });
