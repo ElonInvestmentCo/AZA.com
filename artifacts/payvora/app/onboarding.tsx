@@ -263,9 +263,9 @@ function VirtualCardStack() {
           topOffset={0}
         />
 
-        {/* Middle card – light/lavender */}
+        {/* Middle card – dark */}
         <VirtualCard
-          variant="light"
+          variant="dark"
           name="OLIVIA RHYE"
           expiry="06/24"
           showContactless
