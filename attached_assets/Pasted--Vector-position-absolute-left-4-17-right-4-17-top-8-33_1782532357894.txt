@@ -1,0 +1,404 @@
+/* Vector */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 8.33%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 8.31%;
+bottom: 8.33%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Group 1024 */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Ellipse 17 */
+
+box-sizing: border-box;
+
+position: absolute;
+left: 40.95%;
+right: 40.95%;
+top: 0%;
+bottom: 48.69%;
+
+/* Gray/White */
+border: 1.57516px solid #FFFFFF;
+
+
+/* Plus / 24 / Outline */
+
+position: absolute;
+width: 12.6px;
+height: 12.6px;
+left: 45.9px;
+top: 3.15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Plus / 24 / Outline */
+
+position: absolute;
+width: 12.6px;
+height: 12.6px;
+left: 45.9px;
+top: 3.15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 16.67%;
+bottom: 16.67%;
+
+/* Gray/White */
+background: #FFFFFF;
+
+
+/* Group 1316 */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Tv / 24 / Outline */
+
+position: absolute;
+width: 18.9px;
+height: 18.9px;
+left: 18.9px;
+top: 0px;
+
+
+
+/* Rectangle 940 */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 33.33%;
+bottom: 20.83%;
+
+/* Secondary/Fuscia */
+background: #FCB3C5;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.32%;
+bottom: 8.33%;
+
+background: #000000;
+
+
+/* Vector */
+
+position: absolute;
+left: 16.73%;
+right: 16.87%;
+top: 8.33%;
+bottom: 8.32%;
+
+/* Gray/Black */
+background: #0B0A0A;
+
+
+/* Water Drop / 24 / Outline */
+
+position: absolute;
+width: 21px;
+height: 21px;
+left: 17.85px;
+top: 0px;
+
+
+
+/* filter */
+
+position: absolute;
+left: -4.21%;
+right: 4.22%;
+top: 0.28%;
+bottom: -0.27%;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 12.5%;
+bottom: 12.5%;
+
+background: #020202;
+
+
+
+/* icon */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 25%;
+bottom: 25%;
+
+/* M3/ref/neutral/neutral10
+
+token=md.ref.palette.neutral10
+*/
+background: #1C1B1F;
+
+
+/* Icon */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* icon */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 25%;
+bottom: 25%;
+
+/* M3/ref/neutral/neutral10
+
+token=md.ref.palette.neutral10
+*/
+background: #1C1B1F;
+
+
+
+/* bar-chart */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Icon */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+background: #0C0C0C;
+
+
+
+/* Icon */
+
+position: absolute;
+left: 16.67%;
+right: 16.67%;
+top: 25%;
+bottom: 25%;
+
+background: #0B0A0A;
+
+
+/* money / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 941 */
+
+position: absolute;
+left: 15.97%;
+right: 13.19%;
+top: 20.83%;
+bottom: 8.34%;
+
+/* Secondary/Blue */
+background: #BCE2FE;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 12.49%;
+bottom: 12.51%;
+
+background: #000000;
+
+
+/* grid / 24 / Outline */
+
+width: 18.9px;
+height: 18.9px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Rectangle 941 */
+
+position: absolute;
+left: 16.67%;
+right: 12.5%;
+top: 20.83%;
+bottom: 8.34%;
+
+/* Secondary/Purple */
+background: #D6E1FF;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.34%;
+bottom: 8.33%;
+
+background: #000000;
+
+
+
+/* Ellipse 60 */
+
+position: absolute;
+width: 24px;
+height: 24px;
+left: 34px;
+top: 715px;
+
+background: #0D0D0D;
+
+
+/* Rectangle 953 */
+
+position: absolute;
+width: 166px;
+height: 138px;
+left: 21px;
+top: 689px;
+
+background: #FFF2CF;
+border-radius: 15px;
+
+
+
+/* Rectangle 953 */
+
+position: absolute;
+width: 166px;
+height: 138px;
+left: 21px;
+top: 689px;
+
+background: #FFF2CF;
+border-radius: 15px;
+
+
+
+
+/* Rectangle 954 */
+
+position: absolute;
+width: 165px;
+height: 138px;
+left: 207px;
+top: 689px;
+
+background: #FCB3C5;
+border-radius: 15px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 88.3%;
+right: 5.6%;
+top: 12.44%;
+bottom: 84.74%;
+
+background: #0D0D0D;
