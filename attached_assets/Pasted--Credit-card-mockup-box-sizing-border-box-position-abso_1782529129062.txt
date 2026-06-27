@@ -1,0 +1,333 @@
+/* Credit card mockup */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 252.18px;
+height: 151.63px;
+left: calc(50% - 252.18px/2 - 48.8px);
+top: 351.55px;
+
+/* Primary/100 */
+background: #F4EBFF;
+box-shadow: 6.8459px 8.55738px 13.6918px rgba(0, 0, 0, 0.05);
+border-radius: 17.1148px;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Gradient */
+
+position: absolute;
+width: 136.92px;
+height: 136.92px;
+left: 12.74px;
+top: -13.69px;
+
+filter: blur(54.7672px);
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Segment */
+
+position: absolute;
+left: 43.3%;
+right: 6.7%;
+top: 0%;
+bottom: 50%;
+
+/* Pink/500 */
+background: #EE46BC;
+mix-blend-mode: normal;
+opacity: 0.3;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Segment */
+
+position: absolute;
+left: 86.6%;
+right: -36.6%;
+top: 25%;
+bottom: 25%;
+
+/* Orange/500 */
+background: #FB6514;
+mix-blend-mode: normal;
+opacity: 0.3;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Segment */
+
+position: absolute;
+left: 0%;
+right: 50%;
+top: 25%;
+bottom: 25%;
+
+/* Blue/500 */
+background: #2E90FA;
+mix-blend-mode: normal;
+opacity: 0.3;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Segment */
+
+position: absolute;
+left: 43.3%;
+right: 6.7%;
+top: 50%;
+bottom: 0%;
+
+/* Success/500 */
+background: #12B76A;
+mix-blend-mode: normal;
+opacity: 0.3;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Payment method icon */
+
+position: absolute;
+width: 38.79px;
+height: 27.38px;
+left: 191.34px;
+top: 169.86px;
+
+/* White */
+background: #FFFFFF;
+border-radius: 3.42295px;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Mastercard */
+
+position: absolute;
+left: 29.47%;
+right: 4.77%;
+top: 22.98%;
+bottom: 21.19%;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Left */
+
+position: absolute;
+left: 29.47%;
+right: 4.77%;
+top: 22.98%;
+bottom: 21.19%;
+
+background: #ED0006;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval */
+
+position: absolute;
+left: 29.47%;
+right: 30.64%;
+top: 22.98%;
+bottom: 21.19%;
+
+background: #DADADA;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval Copy */
+
+position: absolute;
+left: 51.88%;
+right: 8.24%;
+top: 41.3%;
+bottom: 2.86%;
+
+background: #DADADA;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Right */
+
+position: absolute;
+left: 57.94%;
+right: 9.18%;
+top: 46.27%;
+bottom: -2.1%;
+
+background: #F9A000;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval */
+
+position: absolute;
+left: 51.88%;
+right: 8.24%;
+top: 41.3%;
+bottom: 2.86%;
+
+background: #F9A000;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval */
+
+position: absolute;
+left: 29.47%;
+right: 30.64%;
+top: 22.98%;
+bottom: 21.19%;
+
+background: #6D6DBB;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Middle */
+
+position: absolute;
+left: 55.95%;
+right: 30.03%;
+top: 44.64%;
+bottom: 12.87%;
+
+background: #FF5E00;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval */
+
+position: absolute;
+left: 29.47%;
+right: 30.64%;
+top: 22.98%;
+bottom: 21.19%;
+
+background: #DADADA;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Oval */
+
+position: absolute;
+left: 51.88%;
+right: 8.24%;
+top: 41.3%;
+bottom: 2.86%;
+
+background: #DADADA;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Card number */
+
+position: absolute;
+width: 165px;
+height: 19px;
+left: 14.07px;
+top: 71.87px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 600;
+font-size: 13.6918px;
+line-height: 19px;
+/* identical to box height */
+letter-spacing: 0.15em;
+
+/* Gray/700 */
+color: #344054;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Cardholder */
+
+position: absolute;
+width: 65px;
+height: 14px;
+left: 36.19px;
+top: 61.6px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 600;
+font-size: 10.2689px;
+line-height: 14px;
+/* identical to box height */
+letter-spacing: 0.05em;
+text-transform: uppercase;
+
+/* Gray/700 */
+color: #344054;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Expiry */
+
+position: absolute;
+width: 32px;
+height: 14px;
+left: 150.93px;
+top: 127.85px;
+
+font-family: 'Manrope';
+font-style: normal;
+font-weight: 600;
+font-size: 10.2689px;
+line-height: 14px;
+/* identical to box height */
+text-align: right;
+letter-spacing: 0.05em;
+
+/* Gray/700 */
+color: #344054;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Text */
+
+position: absolute;
+width: 57px;
+height: 17px;
+left: 116.6px;
+top: 17.11px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 13.6918px;
+line-height: 17px;
+/* identical to box height */
+
+/* Gray/700 */
+color: #344054;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* PayPass icon */
+
+position: absolute;
+width: 17.11px;
+height: 20.54px;
+right: -52.24px;
+top: 117.45px;
+
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);
+
+
+/* Vector */
+
+position: absolute;
+left: 11.75%;
+right: 5.32%;
+top: 5.65%;
+bottom: 5.06%;
+
+/* White */
+border: 2.20047px solid #FFFFFF;
+transform: matrix(0.87, 0.5, -0.87, 0.5, 0, 0);

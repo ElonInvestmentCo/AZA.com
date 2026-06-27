@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Platform,
   ScrollView,
   StyleSheet,
@@ -24,23 +25,50 @@ const C = {
   black:     "#000000",
 };
 
-const DETAILS = [
-  { label: "Date & Time",                  value: "Aug 06, 2024 — 6:17 PM",    right: "Total Amount" },
-  { label: "Gift Card Category",           value: "Amazon",                   right: "Australia Amazon" },
-  { label: "Gift card Type/sub-category",  value: "Australia Amazon",         right: null },
-  { label: "Gift card Amount",             value: "Aug 06, 2024 — 6:17 PM",  right: null },
-];
-
 const ROWS = [
   { left: { label: "Date & Time",    value: "Aug 06, 2024 — 6:17 PM"  }, right: { label: "Total Amount",    value: "₦200,040" } },
   { left: { label: "Gift Card Category", value: "Amazon" },               right: { label: "Gift card Type/sub-category", value: "Australia Amazon" } },
   { left: { label: "Gift card Amount",   value: "Aug 06, 2024 — 6:17PM" }, right: null },
 ];
 
+/* Simulates the async trade submission API call.
+   Returns { status: "submitted" | "rejected" }.
+   Replace this with a real API call when available. */
+async function submitTradeAPI(): Promise<{ status: "submitted" | "rejected" }> {
+  return new Promise(resolve =>
+    setTimeout(() => resolve({ status: "submitted" }), 1200)
+  );
+}
+
 export default function ConfirmTransactionScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const topPad = Platform.OS === "web" ? 20 : insets.top;
+  const router  = useRouter();
+  const insets  = useSafeAreaInsets();
+  const topPad  = Platform.OS === "web" ? 20 : insets.top;
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (loading) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setLoading(true);
+
+    const { status } = await submitTradeAPI();
+
+    setLoading(false);
+
+    if (status === "rejected") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      router.push({
+        pathname: "/(app)/rejected" as any,
+        params: { cardType: "Amazon Gift Card", amount: "$200" },
+      });
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: "/(app)/submitted" as any,
+        params: { cardType: "Amazon Gift Card", amount: "$200", naira: "₦200,040" },
+      });
+    }
+  };
 
   return (
     <View style={s.root}>
@@ -116,16 +144,16 @@ export default function ConfirmTransactionScreen() {
         {/* Submit */}
         <Animated.View entering={FadeInUp.duration(300).springify().delay(160)}>
           <TouchableOpacity
-            style={s.submitBtn}
-            onPress={() => {
-              router.push({
-                pathname: "/(app)/submitted" as any,
-                params: { cardType: "Amazon Gift Card", amount: "$200", naira: "₦200,040" },
-              });
-            }}
+            style={[s.submitBtn, loading && { opacity: 0.72 }]}
+            onPress={handleSubmit}
             activeOpacity={0.85}
+            disabled={loading}
           >
-            <Text style={s.submitBtnText}>Submit Trade</Text>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={s.submitBtnText}>Submit Trade</Text>
+            )}
           </TouchableOpacity>
         </Animated.View>
 
