@@ -4,21 +4,24 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  FlatList,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
-  ViewToken,
   useWindowDimensions,
 } from "react-native";
 import LottieWalletSlide from "@/components/LottieWalletSlide";
 import Animated, {
+  Extrapolation,
   cancelAnimation,
   Easing,
   FadeInUp,
+  interpolate,
+  interpolateColor,
   runOnJS,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
