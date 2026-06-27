@@ -37,10 +37,9 @@ const giftCardImg     = require("@/assets/images/gift-card.png");
 const giftCardVisaImg = require("@/assets/images/gift-card-visa.png");
 const manImg          = require("@/assets/images/man-illustration.png");
 const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
-const onboardCard      = require("@/assets/images/onboard-card.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide3Img, giftCardImg, giftCardVisaImg, manImg, onboardPortfolio, onboardCard, onboardEsim]);
+Asset.loadAsync([slide1Img, slide3Img, giftCardImg, giftCardVisaImg, manImg, onboardPortfolio, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -56,7 +55,7 @@ const BTNS_H   = 116;
 // ── Slide definitions ─────────────────────────────────────────────────────────
 type SlideItem = {
   id: string;
-  type: "animated-wallet" | "giftcard" | "image" | "chatgpt-portfolio" | "chatgpt-card" | "chatgpt-esim";
+  type: "animated-wallet" | "giftcard" | "image" | "chatgpt-portfolio" | "virtual-card" | "chatgpt-esim";
   title: string;
   subtitle: string;
   bgColor: string;
@@ -93,7 +92,7 @@ const SLIDES: SlideItem[] = [
   },
   {
     id: "5",
-    type: "chatgpt-card",
+    type: "virtual-card",
     title: "Virtual Card",
     subtitle: "Pay anywhere with your PAYVORA virtual card.",
     bgColor: "#ffffff",
@@ -539,6 +538,221 @@ function ImageSlideStatic({
   );
 }
 
+// ── Slide 5: Virtual Card — three isometric stacked cards ─────────────────────
+//
+// Implements the Figma design: CSS matrix(0.87, 0.5, -0.87, 0.5, 0, 0)
+// converted to React Native 4×4 column-major matrix.
+//
+// CSS 2D matrix(a, b, c, d, e, f) → RN column-major [a,b,0,0, c,d,0,0, 0,0,1,0, e,f,0,1]
+// = [0.87, 0.5, 0, 0,  -0.87, 0.5, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1]
+const ISO_MATRIX_VALS: number[] = [
+  0.87,  0.5,  0, 0,
+ -0.87,  0.5,  0, 0,
+     0,    0,  1, 0,
+     0,    0,  0, 1,
+];
+
+// Mastercard-style two-circle badge
+function CardMCIcon({ colored }: { colored: boolean }) {
+  const d = 17;
+  const overlap = Math.round(d * 0.38);
+  return (
+    <View style={{ width: d * 2 - overlap, height: d, position: "relative" }}>
+      <View style={{
+        position: "absolute", left: 0, top: 0,
+        width: d, height: d, borderRadius: d / 2,
+        backgroundColor: colored ? "#ED0006" : "rgba(255,255,255,0.55)",
+      }} />
+      <View style={{
+        position: "absolute", left: d - overlap, top: 0,
+        width: d, height: d, borderRadius: d / 2,
+        backgroundColor: "#F9A000",
+      }} />
+    </View>
+  );
+}
+
+function VirtualCardSlide({
+  slideW,
+  slideH,
+  isActive,
+}: {
+  slideW: number;
+  slideH: number;
+  isActive: boolean;
+}) {
+  const op = useSharedValue(0);
+  const sc = useSharedValue(0.88);
+
+  useEffect(() => {
+    if (!isActive) {
+      cancelAnimation(op);
+      cancelAnimation(sc);
+      op.value = 0;
+      sc.value = 0.88;
+      return;
+    }
+    op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
+    sc.value = withSpring(1, { damping: 18, stiffness: 140 });
+  }, [isActive]);
+
+  // Figma card dimensions (reference scale)
+  const CW = 252.18;
+  const CH = 151.63;
+  const CR = 17.11;
+  const VSTEP = 43.06; // vertical offset between card tops (394.61-351.55 = 351.55-308.49)
+
+  // Approximate visual bounds after isometric shear:
+  //   visual width  ≈ 351px  (card W * 0.87 + card H * 0.87 ≈ 351)
+  //   visual height ≈ 290px  (3 cards stacked with shear)
+  const VISUAL_W = 351;
+  const VISUAL_H = 290;
+  const layoutScale = clamp(
+    Math.min((slideW * 0.88) / VISUAL_W, (slideH * 0.65) / VISUAL_H),
+    0.55,
+    1.2,
+  );
+
+  // Combine entrance animation + layout scale into one transform
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: op.value,
+    transform: [{ scale: sc.value * layoutScale }],
+  }));
+
+  // The container is exactly wide/tall enough to hold all 3 cards (pre-transform coords).
+  // Flex centering puts its center at (slideW/2, slideH/2).
+  // Average visual center of the 3 cards ≈ container center — layout is balanced.
+  const containerH = CH + VSTEP * 2;
+
+  // Shared base style for each card (absolute within container, with isometric matrix)
+  const isoTransform = [{ matrix: ISO_MATRIX_VALS }] as any;
+
+  const cardBase = {
+    position: "absolute" as const,
+    width: CW,
+    height: CH,
+    borderRadius: CR,
+    overflow: "hidden" as const,
+    transform: isoTransform,
+  };
+
+  const textWhite = "rgba(255,255,255,0.95)" as const;
+  const textDark  = "#344054" as const;
+
+  return (
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: CW, height: containerH }]}>
+
+        {/* ── Card 3 — back, glass ── */}
+        <View style={[cardBase, {
+          top: 0, left: 0,
+          backgroundColor: "rgba(228, 218, 255, 0.32)",
+          borderWidth: 1,
+          borderColor: "rgba(180, 160, 240, 0.35)",
+          shadowColor: "#4B2EC0",
+          shadowOffset: { width: 6.85, height: 8.56 },
+          shadowOpacity: 0.06,
+          shadowRadius: 13.7,
+          elevation: 2,
+        }]}>
+          <Text style={{
+            position: "absolute", right: 14, top: 14,
+            fontSize: 9, fontFamily: "Manrope_700Bold",
+            color: "rgba(255,255,255,0.5)", letterSpacing: 0.5,
+          }}>PAYVORA</Text>
+        </View>
+
+        {/* ── Card 2 — middle, light purple #F4EBFF ── */}
+        <View style={[cardBase, {
+          top: VSTEP, left: 0,
+          backgroundColor: "#F4EBFF",
+          shadowColor: "#7B4BD0",
+          shadowOffset: { width: 6.85, height: 8.56 },
+          shadowOpacity: 0.14,
+          shadowRadius: 13.7,
+          elevation: 6,
+        }]}>
+          {/* Figma gradient blobs: Pink/500 0.3, Blue/500 0.3, Success/500 0.3, Orange/500 0.3 */}
+          <View style={{ position: "absolute", left: "43.3%", top: 0, right: "6.7%", bottom: "50%",
+            backgroundColor: "#EE46BC", opacity: 0.3, borderRadius: 60 }} />
+          <View style={{ position: "absolute", left: 0, right: "50%", top: "25%", bottom: "25%",
+            backgroundColor: "#2E90FA", opacity: 0.3, borderRadius: 60 }} />
+          <View style={{ position: "absolute", left: "43.3%", right: "6.7%", top: "50%", bottom: 0,
+            backgroundColor: "#12B76A", opacity: 0.3, borderRadius: 60 }} />
+          <View style={{ position: "absolute", left: "86.6%", right: "-36.6%", top: "25%", bottom: "25%",
+            backgroundColor: "#FB6514", opacity: 0.3, borderRadius: 60 }} />
+
+          {/* Brand — top-right area (Figma: left:116.6, top:17.11) */}
+          <Text style={{
+            position: "absolute", left: 116, top: 14,
+            fontSize: 10, fontFamily: "Manrope_700Bold",
+            color: textDark, letterSpacing: 0.3,
+          }}>PAYVORA</Text>
+
+          {/* Mastercard badge — white bg (Figma: payment method icon, bottom-right) */}
+          <View style={{
+            position: "absolute", right: 10, bottom: 10,
+            backgroundColor: "#fff", borderRadius: 4, padding: 3,
+          }}>
+            <CardMCIcon colored />
+          </View>
+        </View>
+
+        {/* ── Card 1 — front, glass with card details ── */}
+        <View style={[cardBase, {
+          top: VSTEP * 2, left: 0,
+          backgroundColor: "rgba(220, 210, 255, 0.45)",
+          borderWidth: 1,
+          borderColor: "rgba(180, 160, 240, 0.5)",
+          shadowColor: "#4B2EC0",
+          shadowOffset: { width: 6.85, height: 8.56 },
+          shadowOpacity: 0.12,
+          shadowRadius: 13.7,
+          elevation: 10,
+        }]}>
+          {/* Brand — Figma: left:116.6, top:17.11 */}
+          <Text style={{
+            position: "absolute", left: 116, top: 14,
+            fontSize: 10, fontFamily: "Manrope_700Bold",
+            color: textWhite, letterSpacing: 0.5,
+          }}>PAYVORA</Text>
+
+          {/* Cardholder — Figma: left:36.19, top:61.6 */}
+          <Text style={{
+            position: "absolute", left: 14, top: 50,
+            fontSize: 8, fontFamily: "Manrope_600SemiBold",
+            color: "rgba(255,255,255,0.75)", letterSpacing: 0.8,
+            textTransform: "uppercase",
+          }}>JOHN DOE</Text>
+
+          {/* Card number — Figma: left:14.07, top:71.87, letterSpacing:0.15em */}
+          <Text style={{
+            position: "absolute", left: 14, top: 63,
+            fontSize: 10, fontFamily: "Manrope_600SemiBold",
+            color: textWhite, letterSpacing: 2,
+          }}>{"•••• •••• •••• 4521"}</Text>
+
+          {/* Expiry — Figma: left:150.93, top:127.85 */}
+          <Text style={{
+            position: "absolute", left: 150, top: 125,
+            fontSize: 8, fontFamily: "Manrope_600SemiBold",
+            color: "rgba(255,255,255,0.85)",
+          }}>12/28</Text>
+
+          {/* Mastercard badge — semi-transparent bg */}
+          <View style={{
+            position: "absolute", right: 10, bottom: 10,
+            backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 4, padding: 3,
+          }}>
+            <CardMCIcon colored={false} />
+          </View>
+        </View>
+
+      </Animated.View>
+    </View>
+  );
+}
+
 // ── Main screen ───────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
   const router  = useRouter();
@@ -627,13 +841,11 @@ export default function OnboardingScreen() {
                   parallaxFactor={index - activeIndex}
                 />
               )}
-              {item.type === "chatgpt-card" && (
-                <ImageSlideStatic
-                  source={onboardCard}
+              {item.type === "virtual-card" && (
+                <VirtualCardSlide
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
-                  parallaxFactor={index - activeIndex}
                 />
               )}
               {item.type === "chatgpt-esim" && (
