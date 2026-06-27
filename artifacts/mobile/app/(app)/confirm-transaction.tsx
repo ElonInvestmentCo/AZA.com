@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -25,11 +25,7 @@ const C = {
   black:     "#000000",
 };
 
-const ROWS = [
-  { left: { label: "Date & Time",    value: "Aug 06, 2024 — 6:17 PM"  }, right: { label: "Total Amount",    value: "₦200,040" } },
-  { left: { label: "Gift Card Category", value: "Amazon" },               right: { label: "Gift card Type/sub-category", value: "Australia Amazon" } },
-  { left: { label: "Gift card Amount",   value: "Aug 06, 2024 — 6:17PM" }, right: null },
-];
+const RATE = 1200;
 
 /* Simulates the async trade submission API call.
    Returns { status: "submitted" | "rejected" }.
@@ -46,6 +42,45 @@ export default function ConfirmTransactionScreen() {
   const topPad  = Platform.OS === "web" ? 20 : insets.top;
   const [loading, setLoading] = useState(false);
 
+  const params = useLocalSearchParams<{
+    category:  string;
+    country:   string;
+    type:      string;
+    amountUSD: string;
+    total:     string;
+  }>();
+
+  const category  = params.category  || "Amazon";
+  const country   = params.country   || "";
+  const cardType  = params.type      || "";
+  const amountUSD = params.amountUSD || "200";
+  const totalNGN  = params.total     ? Number(params.total) : Number(amountUSD) * RATE;
+
+  const amountLabel  = `$${Number(amountUSD).toLocaleString("en-US")}`;
+  const totalLabel   = `₦${totalNGN.toLocaleString("en-NG")}`;
+  const subtypeLabel = [country, cardType].filter(Boolean).join(" — ") || "—";
+
+  const now     = new Date();
+  const dateStr = now.toLocaleString("en-US", {
+    month: "short", day: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+
+  const ROWS = [
+    {
+      left:  { label: "Date & Time",           value: dateStr      },
+      right: { label: "Total Amount",           value: totalLabel   },
+    },
+    {
+      left:  { label: "Gift Card Category",     value: category     },
+      right: { label: "Gift Card Type / Origin", value: subtypeLabel },
+    },
+    {
+      left:  { label: "Gift Card Amount",       value: amountLabel  },
+      right: null,
+    },
+  ];
+
   const handleSubmit = async () => {
     if (loading) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -59,13 +94,13 @@ export default function ConfirmTransactionScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       router.push({
         pathname: "/(app)/rejected" as any,
-        params: { cardType: "Amazon Gift Card", amount: "$200" },
+        params: { cardType: `${category} Gift Card`, amount: amountLabel },
       });
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.push({
         pathname: "/(app)/submitted" as any,
-        params: { cardType: "Amazon Gift Card", amount: "$200", naira: "₦200,040" },
+        params: { cardType: `${category} Gift Card`, amount: amountLabel, naira: totalLabel },
       });
     }
   };
@@ -132,12 +167,14 @@ export default function ConfirmTransactionScreen() {
         <Animated.View entering={FadeInUp.duration(300).springify().delay(120)} style={s.summaryBox}>
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Rate</Text>
-            <Text style={s.summaryValue}>₦1200</Text>
+            <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")} / $1</Text>
           </View>
           <View style={s.summaryLine} />
           <View style={s.summaryRow}>
             <Text style={s.summaryLabel}>Total:</Text>
-            <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>₦200,400</Text>
+            <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>
+              {totalLabel}
+            </Text>
           </View>
         </Animated.View>
 

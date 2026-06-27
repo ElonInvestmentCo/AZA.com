@@ -244,7 +244,16 @@ export default function SellGiftCardScreen() {
             style={s.proceedBtn}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push("/(app)/confirm-transaction" as any);
+              router.push({
+                pathname: "/(app)/confirm-transaction" as any,
+                params: {
+                  category: category || "Amazon",
+                  country:  country  || "",
+                  type:     type     || "",
+                  amountUSD: amountRaw || "200",
+                  total:    String(total),
+                },
+              });
             }}
             activeOpacity={0.85}
           >

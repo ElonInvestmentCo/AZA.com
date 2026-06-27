@@ -13,6 +13,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   FundWalletIcon,
   SellIcon,
@@ -189,10 +190,10 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { width } = useWindowDimensions();
   const PROMO_W  = Math.min(width, MAX_W) - 48;
-  const topPad   = Platform.OS === "web" ? 40 : insets.top;
-
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
+  // SafeAreaView handles native top inset; only need extra padding on web
+  const webTopPad = Platform.OS === "web" ? 40 : 0;
 
   /* Persist balance visibility preference */
   useEffect(() => {
@@ -236,12 +237,12 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[s.root]}>
+    <SafeAreaView style={[s.root]} edges={["top"]}>
 
       {/* ── Top header ── */}
       <Animated.View
         entering={FadeInDown.duration(300).springify()}
-        style={[s.header, { paddingTop: topPad + 8 }]}
+        style={[s.header, { paddingTop: webTopPad + 8 }]}
       >
         <TouchableOpacity
           onPress={press(() => router.push("/(app)/settings" as any))}
@@ -391,6 +392,7 @@ export default function HomeScreen() {
         onClose={() => setGiftModalVisible(false)}
         sheetStyle={gm.sheet}
       >
+
         <View style={gm.handle} />
         <View style={gm.sheetHeader}>
           <Text style={gm.sheetTitle}>I want to?</Text>
@@ -440,7 +442,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </AnimatedSheet>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -532,7 +534,7 @@ const s = StyleSheet.create({
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
   iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: rf(14), maxWidth: 64, flexShrink: 1 },
+  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: rf(14), flexShrink: 1 },
 });
 
 const pc = StyleSheet.create({

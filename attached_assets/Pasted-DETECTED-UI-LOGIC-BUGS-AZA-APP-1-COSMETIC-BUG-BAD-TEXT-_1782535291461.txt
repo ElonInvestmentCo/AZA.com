@@ -1,0 +1,32 @@
+DETECTED UI / LOGIC BUGS (AZA APP)
+
+[1] COSMETIC BUG: BAD TEXT BREAKING & WRAPPING
+• Timestamp: 00:00 (Dashboard Main Menu)
+• Symptom: Text labels underneath several main feature icons are wrapping mid-word or breaking onto a second line awkwardly. For instance, the "Electricity" option breaks text boundaries, and the "Transaction" label splits down into "Transacti" on the top line and "on" directly underneath it.
+• Root Cause: The container box widths housing the grid components are locked to a small fixed structural width without text autoscaling configuration or padding allowances.
+
+[2] FUNCTIONAL BUG: BROKEN DATE FILTERING & BALANCE UPDATE LAG
+• Timestamp: 00:48 - 00:59
+• Symptom: Toggling between date filters (e.g., clicking "All time", "7 days", "30 days") dynamically updates the card counts and displays "No results found" correctly, but the large top balance metrics ("Income" and "Expense") remain static or fail to update relative to the filtered dataset. Furthermore, when clear filters are applied, the historical balance elements lag behind the text list refresh.
+• Root Cause: The state triggers for the graphical summary cards are likely unhooked from the active filter functions, or the parent filter state isn't passing down an updated summation array to the tracking cards.
+
+
+                         AI FIXING PROMPTS FOR PASTE
+
+Prompt 1: Fixing Grid Layout Text Wrapping and Status Bar Clipping
+Fix text clipping, irregular word wrapping inside the home grid cells, and navigation header layout collisions.
+
+Instructions:
+1. Locate the dashboard feature grid container. Currently, labels underneath icons split text mid-word (e.g., "Transaction" wraps as "Transacti" and "on"). Adjust the label container styling to expand its flex boundaries, decrease horizontal padding slightly, or implement an adjustments property like adjustingFontSizeToFit with a minimum font scale so text strings remain unified on a single line.
+2. Review the top logo bar containing the "AZA." text layout. It currently sits dangerously close to the physical device notch and status bar. Wrap the primary view component inside a proper SafeAreaView context wrapper or apply dynamic top insets using a library such as react-native-safe-area-context to ensure clean visual clearance.
+
+
+Prompt 2: Fixing Filter Hook Balance Lag
+Fix an issue in the Transaction History filtering mechanism where the balance overview cards do not reflect current filter mutations.
+
+When a user selects a date filter badge (e.g., changing from "All time" to "7 days"), the screen list displays "No results found" correctly, but the "Income" and "Expense" metric summaries at the top of the viewport do not re-calculate or update their text values.
+
+Instructions:
+1. Ensure that the logic driving the calculation of the top total income and expense states hooks directly into the filtered transaction array rather than the base, unfiltered transaction array.
+2. If using a state management wrapper or custom React hooks, wrap the calculation of total income and total expense balances inside a useMemo dependency block tracking changes made to the filtered list state.
+3. Verify that running the "Clear all filters" trigger seamlessly recalibrates both the transaction list array and the text balances concurrently without visual delay.
