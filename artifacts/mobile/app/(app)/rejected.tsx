@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { scheduleTradeSubmitted, scheduleTradeCompleted } from "@/services/notifications";
 import {
   Image,
   StatusBar,
@@ -15,19 +14,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const CANVAS_W = 393;
 const CANVAS_H = 852;
 
-export default function SubmittedScreen() {
+export default function RejectedScreen() {
   const router = useRouter();
 
-  const params   = useLocalSearchParams<{ cardType?: string; amount?: string; naira?: string }>();
-  const cardType = params.cardType ?? "Gift Card";
-  const amount   = params.amount   ?? "$100";
-  const naira    = params.naira    ?? "₦120,000";
+  const params   = useLocalSearchParams<{ cardType?: string; amount?: string; reason?: string }>();
 
   useEffect(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    scheduleTradeSubmitted(cardType, amount);
-    scheduleTradeCompleted(cardType, naira, 30);
-  }, [cardType, amount, naira]);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
@@ -35,21 +29,21 @@ export default function SubmittedScreen() {
       <View style={styles.canvasWrap}>
         <View style={styles.canvas}>
           <Image
-            source={require("@/assets/images/replica/success-illustration.png")}
+            source={require("@/assets/images/replica/rejected-illustration.png")}
             style={styles.illustration}
             resizeMode="contain"
           />
 
           <Image
-            source={require("@/assets/images/replica/badge-success.png")}
+            source={require("@/assets/images/replica/badge-rejected.png")}
             style={styles.badge}
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Trade Submitted</Text>
+          <Text style={styles.title}>Trade Rejected</Text>
 
           <Text style={styles.subtitle}>
-            Your trade has been submitted{"\n"}successfully
+            Your trade has been Decline{"\n"}card not Available
           </Text>
 
           <TouchableOpacity
@@ -57,10 +51,10 @@ export default function SubmittedScreen() {
             style={styles.button}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace("/(tabs)" as any);
+              router.replace("/(app)/card-status" as any);
             }}
           >
-            <Text style={styles.buttonText}>Done</Text>
+            <Text style={styles.buttonText}>Check trades</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -88,10 +82,10 @@ const styles = StyleSheet.create({
   },
   illustration: {
     position: "absolute",
-    left: 29,
-    top: 55,
-    width: 295.7,
-    height: 232.34,
+    left: 0,
+    top: 60,
+    width: 393,
+    height: 215,
   },
   badge: {
     position: "absolute",
