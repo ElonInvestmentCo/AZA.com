@@ -22,7 +22,7 @@ args = "Start application"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Web Preview"
+args = "AZA Mobile Preview"
 
 [[workflows.workflow]]
 name = "Start application"
@@ -37,16 +37,16 @@ waitForPort = 8080
 outputType = "console"
 
 [[workflows.workflow]]
-name = "AZA Web Preview"
+name = "AZA Mobile Preview"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run web"
-waitForPort = 5000
+args = "pnpm --filter @workspace/mobile run dev"
+waitForPort = 19000
 
 [workflows.workflow.metadata]
-outputType = "webview"
+outputType = "console"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
