@@ -1,5 +1,6 @@
 import lottie, { AnimationItem } from "lottie-web";
 import React, { useEffect, useRef } from "react";
+import { View } from "react-native";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const animationData = require("../assets/animations/wallet-lottie.json");
@@ -18,23 +19,14 @@ export default function LottieWalletSlide({
 
   useEffect(() => {
     const el = containerRef.current;
-    if (!el) {
-      console.warn("[LottieWalletSlide] container ref is null");
-      return;
-    }
-    console.log("[LottieWalletSlide] mounting lottie, el:", el);
-    try {
-      animRef.current = lottie.loadAnimation({
-        container: el,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        animationData,
-      });
-      console.log("[LottieWalletSlide] lottie loaded:", animRef.current);
-    } catch (err) {
-      console.error("[LottieWalletSlide] lottie error:", err);
-    }
+    if (!el) return;
+    animRef.current = lottie.loadAnimation({
+      container: el,
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      animationData,
+    });
     return () => {
       animRef.current?.destroy();
       animRef.current = null;
@@ -44,24 +36,19 @@ export default function LottieWalletSlide({
   const size = Math.round(Math.min(slideW, slideH) * 0.88);
 
   return (
-    <div
+    <View
       style={{
         width: slideW,
         height: slideH,
-        display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "transparent",
       }}
     >
+      {/* @ts-ignore – valid on web; ref on div not in RN types */}
       <div
         ref={containerRef}
-        style={{
-          width: size,
-          height: size,
-          border: "2px solid red",
-        }}
+        style={{ width: size, height: size }}
       />
-    </div>
+    </View>
   );
 }
