@@ -19,7 +19,10 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 
-SplashScreen.preventAutoHideAsync();
+// Splash screen is only managed on native — skip entirely on web
+if (Platform.OS !== "web") {
+  SplashScreen.preventAutoHideAsync();
+}
 
 const queryClient = new QueryClient();
 
@@ -85,7 +88,9 @@ export default function RootLayout() {
 
   const onLayoutReady = useCallback(async () => {
     if ((fontsLoaded || fontError) && assetsReady) {
-      await SplashScreen.hideAsync();
+      if (Platform.OS !== "web") {
+        await SplashScreen.hideAsync();
+      }
     }
   }, [fontsLoaded, fontError, assetsReady]);
 
@@ -98,7 +103,7 @@ export default function RootLayout() {
           <GestureHandlerRootView
             style={[
               { flex: 1 },
-              Platform.OS === "web" && { backgroundColor: "#F0F2F8" } as any,
+              Platform.OS === "web" && webOuterStyle as any,
             ]}
             onLayout={onLayoutReady}
           >
@@ -118,6 +123,15 @@ export default function RootLayout() {
   );
 }
 
+/* ── Web outer background (fills the space around the phone frame) ── */
+const webOuterStyle = {
+  backgroundColor: "#D8DCE8",
+  backgroundImage: "radial-gradient(ellipse at 30% 20%, #E2E6F0 0%, #CDD2E2 100%)",
+  alignItems: "center" as const,
+  justifyContent: "center" as const,
+};
+
+/* ── Web phone frame container ─────────────────────────────────────── */
 const webContainerStyle = Platform.select({
   web: {
     flex: 1,
@@ -125,10 +139,7 @@ const webContainerStyle = Platform.select({
     width: "100%" as const,
     alignSelf: "center" as const,
     overflow: "hidden" as const,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.08,
-    shadowRadius: 40,
-  },
+    boxShadow: "0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06)",
+  } as any,
   default: { flex: 1 },
 });
