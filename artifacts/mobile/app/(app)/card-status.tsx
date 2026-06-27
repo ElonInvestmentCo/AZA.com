@@ -120,7 +120,15 @@ export default function CardStatusScreen() {
               <TouchableOpacity
                 style={s.card}
                 activeOpacity={0.82}
-                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  if (card.status === "rejected") {
+                    router.push({
+                      pathname: "/(app)/rejected" as any,
+                      params: { cardType: card.type, amount: card.amount },
+                    });
+                  }
+                }}
               >
                 {/* Card top */}
                 <View style={s.cardTop}>
