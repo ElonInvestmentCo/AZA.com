@@ -296,21 +296,24 @@ function AnimatedWalletSlide({
 
 // ── QR code placeholder (decorative) ──────────────────────────────────────────
 function QRPlaceholder({ size }: { size: number }) {
-  const cell = size / 10;
+  const COLS = 11;
+  const PAD  = Math.round(size * 0.06);
+  const cell = (size - PAD * 2) / COLS;
   const pattern = [
-    [1,1,1,1,1,1,1,0,1,0],
-    [1,0,0,0,0,0,1,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0],
-    [1,0,1,1,1,0,1,1,1,1],
-    [1,0,1,1,1,0,1,0,0,0],
-    [1,0,0,0,0,0,1,0,1,1],
-    [1,1,1,1,1,1,1,0,1,0],
-    [0,1,0,0,1,0,0,0,0,1],
-    [1,0,1,1,0,1,1,1,0,1],
-    [0,1,0,1,0,0,1,0,1,1],
+    [1,1,1,1,1,1,1,0,0,1,0],
+    [1,0,0,0,0,0,1,0,1,0,0],
+    [1,0,1,1,1,0,1,0,0,1,0],
+    [1,0,1,1,1,0,1,0,1,0,1],
+    [1,0,1,1,1,0,1,0,0,0,1],
+    [1,0,0,0,0,0,1,0,1,1,0],
+    [1,1,1,1,1,1,1,0,0,1,0],
+    [0,0,0,1,0,0,0,1,0,0,1],
+    [1,1,0,1,0,1,1,0,1,1,0],
+    [0,0,1,0,1,1,0,1,0,1,1],
+    [1,0,0,1,0,0,1,0,1,0,0],
   ];
   return (
-    <View style={{ width: size, height: size, backgroundColor: "#fff", padding: cell * 0.4 }}>
+    <View style={{ width: size, height: size, backgroundColor: "#fff", borderRadius: 4, padding: PAD }}>
       {pattern.map((row, r) => (
         <View key={r} style={{ flexDirection: "row" }}>
           {row.map((filled, c) => (
@@ -319,7 +322,7 @@ function QRPlaceholder({ size }: { size: number }) {
               style={{
                 width: cell,
                 height: cell,
-                backgroundColor: filled ? "#000" : "#fff",
+                backgroundColor: filled ? "#111" : "#fff",
               }}
             />
           ))}
@@ -662,37 +665,27 @@ function VirtualCardSlide({
           }}>PAYVORA</Text>
         </View>
 
-        {/* ── Card 2 — middle, light purple #F4EBFF ── */}
+        {/* ── Card 2 — middle, black ── */}
         <View style={[cardBase, {
           top: VSTEP, left: 0,
-          backgroundColor: "#F4EBFF",
-          shadowColor: "#7B4BD0",
+          backgroundColor: "#0A0A0A",
+          shadowColor: "#000",
           shadowOffset: { width: 6.85, height: 8.56 },
-          shadowOpacity: 0.14,
+          shadowOpacity: 0.28,
           shadowRadius: 13.7,
           elevation: 6,
         }]}>
-          {/* Figma gradient blobs: Pink/500 0.3, Blue/500 0.3, Success/500 0.3, Orange/500 0.3 */}
-          <View style={{ position: "absolute", left: "43.3%", top: 0, right: "6.7%", bottom: "50%",
-            backgroundColor: "#EE46BC", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: 0, right: "50%", top: "25%", bottom: "25%",
-            backgroundColor: "#2E90FA", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: "43.3%", right: "6.7%", top: "50%", bottom: 0,
-            backgroundColor: "#12B76A", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: "86.6%", right: "-36.6%", top: "25%", bottom: "25%",
-            backgroundColor: "#FB6514", opacity: 0.3, borderRadius: 60 }} />
-
-          {/* Brand — top-right area (Figma: left:116.6, top:17.11) */}
+          {/* Brand — top-right */}
           <Text style={{
             position: "absolute", left: 116, top: 14,
             fontSize: 10, fontFamily: "Manrope_700Bold",
-            color: textDark, letterSpacing: 0.3,
+            color: textWhite, letterSpacing: 0.3,
           }}>PAYVORA</Text>
 
-          {/* Mastercard badge — white bg (Figma: payment method icon, bottom-right) */}
+          {/* Mastercard badge */}
           <View style={{
             position: "absolute", right: 10, bottom: 10,
-            backgroundColor: "#fff", borderRadius: 4, padding: 3,
+            backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 4, padding: 3,
           }}>
             <CardMCIcon colored />
           </View>
