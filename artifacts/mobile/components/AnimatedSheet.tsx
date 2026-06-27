@@ -1,13 +1,13 @@
 /**
- * AnimatedSheet — reusable bottom sheet with a backdrop whose opacity is
- * derived directly from the sheet's translateY position. This eliminates
- * the flash/snap of a static overlay by keeping both animations in
- * perfect sync on the UI thread via Reanimated interpolation.
+ * AnimatedSheet — reusable bottom sheet with:
+ *   • Backdrop opacity synced to sheet position (no flash/snap)
+ *   • Swipe-to-dismiss via a drag handle at the top of the sheet
+ *   • Spring snap-back when the drag doesn't meet the dismiss threshold
+ *   • Scroll-safe: gesture is isolated to the handle bar so internal
+ *     ScrollViews and FlatLists work normally
  *
  * Responsive: uses useWindowDimensions so the off-screen position is always
- * correct regardless of orientation or screen size. The sheet's bottom padding
- * accounts for the device's safe-area inset (home indicator on iPhone, gesture
- * nav bar on Android) so content is never clipped behind system UI.
+ * correct regardless of orientation or screen size.
  *
  * Usage:
  *   <AnimatedSheet visible={open} onClose={() => setOpen(false)}>
@@ -30,38 +30,53 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+/* ── Timing constants ────────────────────────────────────────────────────── */
 const OPEN_DURATION  = 340;
-const CLOSE_DURATION = 280;
+const CLOSE_DURATION = 260;
 const OPEN_EASING    = Easing.out(Easing.cubic);
 const CLOSE_EASING   = Easing.in(Easing.quad);
 
+/* ── Dismiss thresholds ──────────────────────────────────────────────────── */
+const DISMISS_DISTANCE = 120;   // px — drag this far down → dismiss
+const DISMISS_VELOCITY = 800;   // px/s — flick this fast → dismiss
+
+/* ── Spring config for snap-back ─────────────────────────────────────────── */
+const SNAP_SPRING = { damping: 20, stiffness: 260, mass: 0.8 };
+
 interface AnimatedSheetProps {
-  visible:     boolean;
-  onClose:     () => void;
-  children:    React.ReactNode;
-  maxHeight?:  number | `${number}%`;
-  sheetStyle?: ViewStyle;
+  visible:       boolean;
+  onClose:       () => void;
+  children:      React.ReactNode;
+  maxHeight?:    number | `${number}%`;
+  sheetStyle?:   ViewStyle;
+  /** Show the grey drag-handle pill (default: true). */
+  showHandle?:   boolean;
 }
 
 export function AnimatedSheet({
   visible,
   onClose,
   children,
-  maxHeight = "65%",
+  maxHeight  = "65%",
   sheetStyle,
+  showHandle = true,
 }: AnimatedSheetProps) {
   const { height: screenH } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
   const [mounted, setMounted] = useState(visible);
-  const isMountedRef = useRef(mounted);
 
-  const screenHSV   = useSharedValue(screenH);
-  const translateY  = useSharedValue(screenH);
+  const screenHSV  = useSharedValue(screenH);
+  /** Master vertical position of the sheet (0 = fully open). */
+  const translateY = useSharedValue(screenH);
+  /** Extra offset added by an in-flight pan gesture. */
+  const dragOffset = useSharedValue(0);
 
   useEffect(() => {
     screenHSV.value = screenH;
@@ -70,13 +85,15 @@ export function AnimatedSheet({
   /* ── Animate in ──────────────────────────────────────────────────────── */
   const animateIn = useCallback(() => {
     cancelAnimation(translateY);
+    dragOffset.value = 0;
     translateY.value = screenHSV.value;
     translateY.value = withTiming(0, { duration: OPEN_DURATION, easing: OPEN_EASING });
-  }, [translateY, screenHSV]);
+  }, [translateY, dragOffset, screenHSV]);
 
   /* ── Animate out ─────────────────────────────────────────────────────── */
   const animateOut = useCallback((callback?: () => void) => {
     cancelAnimation(translateY);
+    dragOffset.value = 0;
     translateY.value = withTiming(
       screenHSV.value,
       { duration: CLOSE_DURATION, easing: CLOSE_EASING },
@@ -87,31 +104,58 @@ export function AnimatedSheet({
         }
       },
     );
-  }, [translateY, screenHSV]);
+  }, [translateY, dragOffset, screenHSV]);
 
   /* ── Sync with parent `visible` prop ─────────────────────────────────── */
   useEffect(() => {
     if (visible) {
-      isMountedRef.current = true;
       setMounted(true);
     } else {
       animateOut();
     }
   }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Kick off open animation. useLayoutEffect fires before paint so the very
-     first frame rendered by the Modal already has the animation in progress —
-     this eliminates the frame gap that caused the backdrop flash on web. */
   useLayoutEffect(() => {
-    if (mounted && visible) {
-      animateIn();
-    }
+    if (mounted && visible) animateIn();
   }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Backdrop press / back-button handler ────────────────────────────── */
   const handleClose = useCallback(() => {
     animateOut(onClose);
   }, [animateOut, onClose]);
+
+  /* ── Pan gesture — isolated to the drag handle ───────────────────────── */
+  const panGesture = Gesture.Pan()
+    .activeOffsetY([0, Infinity])   // only activate on downward movement
+    .onUpdate((e) => {
+      // Only allow dragging downward; prevent pulling the sheet upward
+      dragOffset.value = Math.max(0, e.translationY);
+      translateY.value = dragOffset.value;
+    })
+    .onEnd((e) => {
+      const shouldDismiss =
+        e.translationY > DISMISS_DISTANCE ||
+        e.velocityY     > DISMISS_VELOCITY;
+
+      if (shouldDismiss) {
+        // Hand off to the close animation, then fire onClose on JS thread
+        translateY.value = withTiming(
+          screenHSV.value,
+          { duration: CLOSE_DURATION, easing: CLOSE_EASING },
+          (finished) => {
+            if (finished) {
+              dragOffset.value = 0;
+              runOnJS(setMounted)(false);
+              runOnJS(onClose)();
+            }
+          },
+        );
+      } else {
+        // Snap back to fully-open position with a spring
+        dragOffset.value = 0;
+        translateY.value = withSpring(0, SNAP_SPRING);
+      }
+    });
 
   /* ── Animated styles ──────────────────────────────────────────────────── */
   const backdropStyle = useAnimatedStyle(() => ({
@@ -139,13 +183,11 @@ export function AnimatedSheet({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* ── Animated backdrop — synced to sheet position, visual only ── */}
+      {/* ── Animated backdrop — synced to sheet position ── */}
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
           styles.backdrop,
-          /* Explicit initial opacity guards against the pre-Reanimated frame
-             on web where the animated style hasn't been applied yet. */
           { opacity: 0 },
           backdropStyle,
         ]}
@@ -160,13 +202,19 @@ export function AnimatedSheet({
         style={[
           styles.sheet,
           { maxHeight, paddingBottom: sheetBottomPad },
-          /* Explicit initial transform keeps the sheet off-screen before
-             Reanimated takes over on the first render frame. */
           { transform: [{ translateY: screenH }] },
           sheetAnimStyle,
           sheetStyle,
         ]}
       >
+        {/* ── Drag handle — gesture is scoped here so scrollable
+              content inside children is never blocked ── */}
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={styles.handleArea}>
+            {showHandle && <Animated.View style={styles.handlePill} />}
+          </Animated.View>
+        </GestureDetector>
+
         {children}
       </Animated.View>
     </Modal>
@@ -181,15 +229,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sheet: {
-    backgroundColor:      "#FFFFFF",
-    borderTopLeftRadius:   24,
-    borderTopRightRadius:  24,
-    paddingHorizontal:     24,
-    paddingTop:            16,
-    shadowColor:           "#000",
-    shadowOffset:          { width: 0, height: -4 },
-    shadowOpacity:         0.08,
-    shadowRadius:          16,
-    elevation:             12,
+    backgroundColor:     "#FFFFFF",
+    borderTopLeftRadius:  24,
+    borderTopRightRadius: 24,
+    paddingHorizontal:    24,
+    paddingTop:           0,
+    shadowColor:          "#000",
+    shadowOffset:         { width: 0, height: -4 },
+    shadowOpacity:        0.08,
+    shadowRadius:         16,
+    elevation:            12,
+  },
+  /* Taller hit area so the gesture is easy to trigger */
+  handleArea: {
+    width:          "100%",
+    height:          36,
+    alignItems:     "center",
+    justifyContent: "center",
+    paddingTop:      10,
+  },
+  handlePill: {
+    width:           36,
+    height:           4,
+    borderRadius:     2,
+    backgroundColor: "#D1D5DB",
   },
 });

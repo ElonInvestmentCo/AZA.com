@@ -392,8 +392,6 @@ export default function HomeScreen() {
         onClose={() => setGiftModalVisible(false)}
         sheetStyle={gm.sheet}
       >
-
-        <View style={gm.handle} />
         <View style={gm.sheetHeader}>
           <Text style={gm.sheetTitle}>I want to?</Text>
           <TouchableOpacity
@@ -576,10 +574,6 @@ const gm = StyleSheet.create({
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40,
     shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.12, shadowRadius: 16, elevation: 12,
-  },
-  handle: {
-    width: 36, height: 4, borderRadius: 2,
-    backgroundColor: "#D0D5DD", alignSelf: "center", marginBottom: 20,
   },
   sheetHeader: {
     flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20,

@@ -85,7 +85,6 @@ function PickerModal({
   const cfg = pickerKey ? PICKER_CONFIG[pickerKey] : null;
   return (
     <AnimatedSheet visible={pickerKey !== null} onClose={onClose} maxHeight="60%">
-      <View style={pm.handle} />
       <Text style={pm.title}>{cfg?.title ?? ""}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         {(cfg?.options ?? []).map(o => (
@@ -108,7 +107,6 @@ function PickerModal({
 }
 
 const pm = StyleSheet.create({
-  handle:  { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
   title:   { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
   option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },

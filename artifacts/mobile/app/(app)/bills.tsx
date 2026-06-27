@@ -72,7 +72,6 @@ const f = StyleSheet.create({
 function PickerModal({ visible, title, options, onSelect, onClose }: { visible: boolean; title: string; options: string[]; onSelect: (v: string) => void; onClose: () => void }) {
   return (
     <AnimatedSheet visible={visible} onClose={onClose} maxHeight="60%">
-      <View style={pm.handle} />
       <Text style={pm.title}>{title}</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         {options.map(o => (
@@ -87,7 +86,6 @@ function PickerModal({ visible, title, options, onSelect, onClose }: { visible: 
 }
 
 const pm = StyleSheet.create({
-  handle:  { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
   title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
   option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },

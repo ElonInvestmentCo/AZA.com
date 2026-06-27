@@ -302,9 +302,6 @@ function TxDetailSheet({ tx, visible, onClose }: {
         style={{ flex: 1 }}
         bounces={false}
       >
-        {/* Drag handle */}
-        <View style={ds.handle} />
-
         {/* ── Hero ── */}
         <View style={ds.hero}>
           <View style={[ds.heroIcon, { backgroundColor: tx.iconBg }]}>
@@ -392,7 +389,6 @@ function TxDetailSheet({ tx, visible, onClose }: {
 
 const ds = StyleSheet.create({
   scroll: { paddingHorizontal: 22 },
-  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginTop: 10, marginBottom: 18 },
 
   /* Hero */
   hero:       { alignItems: "center", gap: 8, paddingBottom: 20 },
