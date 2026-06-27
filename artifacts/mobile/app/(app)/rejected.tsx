@@ -25,7 +25,7 @@ export default function RejectedScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="default" />
       <View style={styles.canvasWrap}>
         <View style={styles.canvas}>
           <Image

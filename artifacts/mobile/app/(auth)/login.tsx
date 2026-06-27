@@ -202,7 +202,7 @@ export default function LoginScreen() {
       style={s.root}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <StatusBar style="dark" />
+      <StatusBar style="auto" />
 
       <ScrollView
         contentContainerStyle={[
