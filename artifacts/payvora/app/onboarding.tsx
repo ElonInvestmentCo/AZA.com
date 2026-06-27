@@ -20,6 +20,273 @@ import { useAuth } from "@/context/AuthContext";
 const { width } = Dimensions.get("window");
 const PARALLAX_FACTOR = 0.28;
 
+/* ─── Card dimensions ───────────────────────────────────────────────────── */
+const CW = 248;   // card width
+const CH = 150;   // card height
+const STACK_GAP = 52; // vertical gap per card in the stack
+
+/* ─── Contactless / NFC icon ────────────────────────────────────────────── */
+function ContactlessIcon({ color = "#FFFFFF" }: { color?: string }) {
+  return (
+    <View style={{ alignItems: "center", justifyContent: "center", width: 20, height: 20 }}>
+      {/* Three arcs — innermost smallest */}
+      {[10, 14, 18].map((r, i) => (
+        <View
+          key={i}
+          style={{
+            position: "absolute",
+            width: r,
+            height: r,
+            borderRadius: r / 2,
+            borderWidth: 1.5,
+            borderColor: color,
+            borderLeftColor: "transparent",
+            borderBottomColor: "transparent",
+            transform: [{ rotate: "-45deg" }],
+            opacity: 0.55 + i * 0.22,
+          }}
+        />
+      ))}
+    </View>
+  );
+}
+
+/* ─── Mastercard logo (two overlapping circles) ─────────────────────────── */
+function MastercardIcon() {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View
+        style={{
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          backgroundColor: "#EB001B",
+          opacity: 0.92,
+        }}
+      />
+      <View
+        style={{
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          backgroundColor: "#F79E1B",
+          marginLeft: -9,
+          opacity: 0.88,
+        }}
+      />
+    </View>
+  );
+}
+
+/* ─── Single card ───────────────────────────────────────────────────────── */
+interface CardProps {
+  variant: "dark" | "light";
+  brand?: boolean;        // shows "PayVora" top-left
+  name: string;
+  expiry?: string;
+  showMastercard?: boolean;
+  showContactless?: boolean;
+  topOffset: number;
+}
+
+function VirtualCard({
+  variant,
+  brand,
+  name,
+  expiry,
+  showMastercard,
+  showContactless,
+  topOffset,
+}: CardProps) {
+  const isDark = variant === "dark";
+
+  return (
+    <View
+      style={[
+        cs.card,
+        {
+          top: topOffset,
+          backgroundColor: isDark ? "#101010" : "rgba(215,212,238,0.88)",
+          borderColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.55)",
+          shadowColor: isDark ? "#000000" : "#6b5fc4",
+        },
+      ]}
+    >
+      {/* Inner glare blob for depth */}
+      {isDark && (
+        <View style={cs.glare} />
+      )}
+
+      {/* ── Top row: brand / chip  +  contactless ── */}
+      <View style={cs.topRow}>
+        <View style={{ gap: 2 }}>
+          {brand && (
+            <Text style={[cs.brandText, { color: isDark ? "#FFFFFF" : "#1a1a2e" }]}>
+              PayVora
+            </Text>
+          )}
+          {/* Chip */}
+          <View style={[cs.chip, { backgroundColor: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.12)" }]} />
+        </View>
+        {showContactless && (
+          <ContactlessIcon color={isDark ? "#FFFFFF" : "#1a1a2e"} />
+        )}
+      </View>
+
+      {/* ── Card number ── */}
+      <Text style={[cs.cardNum, { color: isDark ? "rgba(255,255,255,0.9)" : "rgba(20,20,40,0.85)" }]}>
+        1234  1234  1234  1234
+      </Text>
+
+      {/* ── Bottom row: name + expiry/logo ── */}
+      <View style={cs.bottomRow}>
+        <View style={{ gap: 1 }}>
+          {expiry && (
+            <Text style={[cs.expiryLabel, { color: isDark ? "rgba(255,255,255,0.45)" : "rgba(20,20,40,0.45)" }]}>
+              EXPIRES
+            </Text>
+          )}
+          <Text style={[cs.nameText, { color: isDark ? "rgba(255,255,255,0.85)" : "rgba(20,20,40,0.8)" }]}>
+            {name}
+          </Text>
+        </View>
+        <View style={cs.bottomRight}>
+          {expiry && (
+            <Text style={[cs.expiryText, { color: isDark ? "rgba(255,255,255,0.6)" : "rgba(20,20,40,0.6)" }]}>
+              {expiry}
+            </Text>
+          )}
+          {showMastercard ? <MastercardIcon /> : null}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const cs = StyleSheet.create({
+  card: {
+    position: "absolute",
+    width: CW,
+    height: CH,
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 18,
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.45,
+    shadowRadius: 24,
+    elevation: 16,
+    justifyContent: "space-between",
+  },
+  glare: {
+    position: "absolute",
+    width: CW * 0.65,
+    height: CH * 1.1,
+    borderRadius: CW * 0.5,
+    backgroundColor: "rgba(255,255,255,0.055)",
+    top: -CH * 0.25,
+    left: CW * 0.22,
+    transform: [{ rotate: "-20deg" }],
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  brandText: {
+    fontSize: 13,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.2,
+    marginBottom: 6,
+  },
+  chip: {
+    width: 28,
+    height: 20,
+    borderRadius: 4,
+  },
+  cardNum: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    letterSpacing: 2.5,
+    marginTop: 2,
+  },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+  },
+  expiryLabel: {
+    fontSize: 7,
+    fontFamily: "Inter_400Regular",
+    letterSpacing: 0.8,
+  },
+  nameText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+  },
+  bottomRight: {
+    alignItems: "flex-end",
+    gap: 4,
+  },
+  expiryText: {
+    fontSize: 11,
+    fontFamily: "Inter_500Medium",
+    letterSpacing: 0.5,
+  },
+});
+
+/* ─── Stacked card group with 3-D perspective ───────────────────────────── */
+function VirtualCardStack() {
+  const totalH = CH + STACK_GAP * 2;
+
+  return (
+    <View style={{ width: CW + 20, height: totalH + 24, alignItems: "center", justifyContent: "center" }}>
+      {/* 3-D tilt wrapper */}
+      <View
+        style={{
+          width: CW,
+          height: totalH,
+          transform: [
+            { perspective: 960 },
+            { rotateX: "28deg" },
+            { rotateZ: "-6deg" },
+          ],
+        }}
+      >
+        {/* Back card – dark, PayVora brand */}
+        <VirtualCard
+          variant="dark"
+          brand
+          name="LANA STEINER"
+          topOffset={0}
+        />
+
+        {/* Middle card – light/lavender */}
+        <VirtualCard
+          variant="light"
+          name="OLIVIA RHYE"
+          expiry="06/24"
+          showContactless
+          topOffset={STACK_GAP}
+        />
+
+        {/* Front card – dark, Mastercard */}
+        <VirtualCard
+          variant="dark"
+          name="PHOENIX BAKER"
+          expiry="06/24"
+          showMastercard
+          showContactless
+          topOffset={STACK_GAP * 2}
+        />
+      </View>
+    </View>
+  );
+}
+
+/* ─── Slide types / data ────────────────────────────────────────────────── */
 interface Slide {
   id: string;
   icon: string;
@@ -56,6 +323,7 @@ const SLIDES: Slide[] = [
   },
 ];
 
+/* ─── Parallax slide ────────────────────────────────────────────────────── */
 function ParallaxSlide({
   slide,
   index,
@@ -106,32 +374,36 @@ function ParallaxSlide({
 
   return (
     <View style={[styles.slide, { width }]}>
-      {/* Floating depth rings — move at different rates for parallax */}
-      <Animated.View
-        style={[
-          styles.depthRing1,
-          { borderColor: slide.accentColor + "18", transform: [{ translateX: iconTranslateX }, { scale: ring1Scale }] },
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.depthRing2,
-          {
-            borderColor: slide.accentColor + "10",
-            transform: [
+      {/* Depth rings for non-card slides */}
+      {slide.id !== "1" && (
+        <>
+          <Animated.View
+            style={[
+              styles.depthRing1,
+              { borderColor: slide.accentColor + "18", transform: [{ translateX: iconTranslateX }, { scale: ring1Scale }] },
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.depthRing2,
               {
-                translateX: scrollX.interpolate({
-                  inputRange,
-                  outputRange: [width * 0.14, 0, -width * 0.14],
-                  extrapolate: "clamp",
-                }),
+                borderColor: slide.accentColor + "10",
+                transform: [
+                  {
+                    translateX: scrollX.interpolate({
+                      inputRange,
+                      outputRange: [width * 0.14, 0, -width * 0.14],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ],
               },
-            ],
-          },
-        ]}
-      />
+            ]}
+          />
+        </>
+      )}
 
-      {/* Icon container — parallax layer */}
+      {/* ── Illustration area ── */}
       <Animated.View
         style={[
           styles.iconParallaxWrap,
@@ -141,19 +413,25 @@ function ParallaxSlide({
           },
         ]}
       >
-        <View
-          style={[
-            styles.iconOuter,
-            { backgroundColor: slide.accentColor + "18", borderColor: slide.accentColor + "38" },
-          ]}
-        >
-          <View style={[styles.iconInner, { backgroundColor: slide.accentColor + "28" }]}>
-            <Feather name={slide.icon as any} size={58} color={slide.accentColor} />
+        {slide.id === "1" ? (
+          /* Slide 1: 3-D stacked virtual cards */
+          <VirtualCardStack />
+        ) : (
+          /* Slides 2 & 3: circle icon */
+          <View
+            style={[
+              styles.iconOuter,
+              { backgroundColor: slide.accentColor + "18", borderColor: slide.accentColor + "38" },
+            ]}
+          >
+            <View style={[styles.iconInner, { backgroundColor: slide.accentColor + "28" }]}>
+              <Feather name={slide.icon as any} size={58} color={slide.accentColor} />
+            </View>
           </View>
-        </View>
+        )}
       </Animated.View>
 
-      {/* Text — shallower parallax layer */}
+      {/* Text block */}
       <Animated.View
         style={[
           styles.textBlock,
@@ -167,6 +445,7 @@ function ParallaxSlide({
   );
 }
 
+/* ─── Screen ────────────────────────────────────────────────────────────── */
 export default function OnboardingScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -310,7 +589,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  // Depth rings — different parallax layers for 3D feel
   depthRing1: {
     position: "absolute",
     width: 260,
