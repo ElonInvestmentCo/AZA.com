@@ -13,6 +13,22 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import {
+  FundWalletIcon,
+  SellIcon,
+  WithdrawIcon,
+  GiftCardIcon,
+  AirtimeIcon,
+  ElectricityIcon,
+  CableTVIcon,
+  RatesIcon,
+  TransactionsIcon,
+  BettingIcon,
+  FundingIcon,
+  MoreIcon,
+  SellGiftCardIcon,
+  CheckPendingIcon,
+} from "@/components/DashboardIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { rf } from "@/utils/responsive";
@@ -49,15 +65,16 @@ const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
-  { id: "gift",  label: "Gift Card",   bg: "#FFF2CF", iconColor: "#5C4000", icon: "gift"            as const, route: null                              },
-  { id: "water", label: "Water",       bg: "#EEF9FF", iconColor: "#0891B2", icon: "droplet"         as const, route: "/(app)/bills"  as const           },
-  { id: "elec",  label: "Electricity", bg: "#FFF7ED", iconColor: "#D97706", icon: "zap"             as const, route: "/(app)/bills"  as const           },
-  { id: "cable", label: "Cable TV",    bg: "#FFF1F2", iconColor: "#E11D48", icon: "tv"              as const, route: "/(app)/bills"  as const           },
-  { id: "rates", label: "Rates",       bg: "#F5F3FF", iconColor: "#7C3AED", icon: "bar-chart-2"     as const, route: "/(app)/rates"  as const           },
-  { id: "txn",   label: "Transaction", bg: "#EFF6FF", iconColor: "#2563EB", icon: "list"            as const, route: "/(app)/transactions" as const     },
-  { id: "bet",   label: "Bet Funding", bg: "#ECFEFF", iconColor: "#0891B2", icon: "dollar-sign"     as const, route: "/(app)/bills"  as const           },
-  { id: "more",  label: "More",        bg: "#F0FFF4", iconColor: "#059669", icon: "more-horizontal"  as const, route: "/(app)/more"   as const           },
-] as const;
+  { id: "gift",    label: "Gift Card",     bg: "#FFF2CF", iconColor: "#5C4000", route: null                              },
+  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
+  { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/bills"  as const           },
+  { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/bills"  as const           },
+  { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"  as const           },
+  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const     },
+  { id: "bet",     label: "Betting",       bg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
+  { id: "funding", label: "Funding",       bg: "#EBF3FF", iconColor: "#1D6ECC", route: "/(app)/dashboard" as const        },
+  { id: "more",    label: "More",          bg: "#F0EEFF", iconColor: "#7C3AED", route: "/(app)/more"   as const           },
+];
 
 const PROMOS = [
   {
@@ -83,6 +100,21 @@ const TRANSACTIONS = [
   { id: "t3", title: "Deposit Giftcard", ref: "5621AB-1122", date: "February 24, 2022", amount: "₦200,040.00",  positive: true  },
 ];
 
+function ServiceIconRenderer({ id, color, size = 20 }: { id: string; color: string; size?: number }) {
+  switch (id) {
+    case "gift":    return <GiftCardIcon size={size} color={color} />;
+    case "airtime": return <AirtimeIcon size={size} color={color} />;
+    case "elec":    return <ElectricityIcon size={size} color={color} />;
+    case "cable":   return <CableTVIcon size={size} color={color} />;
+    case "rates":   return <RatesIcon size={size} color={color} />;
+    case "txn":     return <TransactionsIcon size={size} color={color} />;
+    case "bet":     return <BettingIcon size={size} color={color} />;
+    case "funding": return <FundingIcon size={size} color={color} />;
+    case "more":    return <MoreIcon size={size} color={color} />;
+    default:        return <MoreIcon size={size} color={color} />;
+  }
+}
+
 function ServiceItem({ item, onPress }: { item: (typeof SERVICES)[number]; onPress: () => void }) {
   const { width } = useWindowDimensions();
   const ITEM_W = (Math.min(width, MAX_W) - 32) / 4;
@@ -98,7 +130,7 @@ function ServiceItem({ item, onPress }: { item: (typeof SERVICES)[number]; onPre
         style={sv.wrap}
       >
         <View style={[sv.iconBox, { backgroundColor: item.bg }]}>
-          <Feather name={item.icon} size={18} color={item.iconColor} />
+          <ServiceIconRenderer id={item.id} color={item.iconColor} size={20} />
         </View>
         <Text style={sv.label} numberOfLines={2}>{item.label}</Text>
       </Pressable>
@@ -276,14 +308,14 @@ export default function HomeScreen() {
         >
           <View style={s.actionsBar}>
             {([
-              { icon: "plus-circle" as const, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
-              { icon: "send"        as const, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
-              { icon: "arrow-up"    as const, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
-            ] as const).map((action, i) => (
+              { renderIcon: () => <FundWalletIcon size={20} color="#FFFFFF" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
+              { renderIcon: () => <SellIcon       size={20} color="#FFFFFF" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
+              { renderIcon: () => <WithdrawIcon   size={20} color="#FFFFFF" />, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
+            ]).map((action, i) => (
               <React.Fragment key={action.label}>
                 {i > 0 && <View style={s.actionDivider} />}
                 <TouchableOpacity style={s.actionBtn} onPress={action.onPress} activeOpacity={0.72}>
-                  <Feather name={action.icon} size={18} color="#FFFFFF" />
+                  {action.renderIcon()}
                   <Text style={s.actionLabel}>{action.label}</Text>
                 </TouchableOpacity>
               </React.Fragment>
@@ -381,7 +413,7 @@ export default function HomeScreen() {
             }}
           >
             <View style={[gm.tileIcon, { backgroundColor: "rgba(92,64,0,0.12)" }]}>
-              <Feather name="gift" size={24} color="#5C4000" />
+              <SellGiftCardIcon size={24} color="#5C4000" />
             </View>
             <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
             <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
@@ -399,7 +431,7 @@ export default function HomeScreen() {
             }}
           >
             <View style={[gm.tileIcon, { backgroundColor: "rgba(122,21,53,0.12)" }]}>
-              <Feather name="clock" size={24} color="#7A1535" />
+              <CheckPendingIcon size={24} color="#7A1535" />
             </View>
             <Text style={[gm.tileTitle, { color: "#7A1535" }]}>Check Pending</Text>
             <Text style={[gm.tileDesc, { color: "#7A153599" }]}>
