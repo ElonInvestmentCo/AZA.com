@@ -123,23 +123,17 @@ export default function RootLayout() {
   );
 }
 
-/* ── Web outer background (fills the space around the phone frame) ── */
+/* ── Web outer background ── */
 const webOuterStyle = {
-  backgroundColor: "#D8DCE8",
-  backgroundImage: "radial-gradient(ellipse at 30% 20%, #E2E6F0 0%, #CDD2E2 100%)",
-  alignItems: "center" as const,
-  justifyContent: "center" as const,
+  backgroundColor: "#FFFFFF",
 };
 
-/* ── Web phone frame container ─────────────────────────────────────── */
+/* ── Web container (full width, no phone frame) ── */
 const webContainerStyle = Platform.select({
   web: {
     flex: 1,
-    maxWidth: 430,
     width: "100%" as const,
-    alignSelf: "center" as const,
     overflow: "hidden" as const,
-    boxShadow: "0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06)",
   } as any,
   default: { flex: 1 },
 });
