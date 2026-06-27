@@ -67,7 +67,7 @@ export default function SplashIndex() {
             onFinish={() => setAnimDone(true)}
           />
           <Animated.Text style={[s.wordmark, wordmarkStyle]}>
-            PayVora.
+            AZA.
           </Animated.Text>
         </View>
       </Animated.View>
