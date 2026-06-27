@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -19,21 +18,21 @@ import {
   SellIcon,
   WithdrawIcon,
   GiftCardIcon,
-  AirtimeIcon,
+  SettingsIcon,
   ElectricityIcon,
   CableTVIcon,
   RatesIcon,
   TransactionsIcon,
   BettingIcon,
-  FundingIcon,
   MoreIcon,
   SellGiftCardIcon,
   CheckPendingIcon,
+  GiftcardTxIcon,
+  WithdrawTxIcon,
 } from "@/components/DashboardIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { rf } from "@/utils/responsive";
-import { WaveIcon } from "@/components/WaveIcon";
 import { PremiumEyeIcon } from "@/components/PremiumEyeIcon";
 import Animated, {
   FadeIn,
@@ -50,69 +49,49 @@ import { useAuth } from "@/context/AuthContext";
 const MAX_W = 430;
 const BAL_VIS_KEY = "aza_balance_visible";
 
-const C = {
-  bg:        "#0A0A0A",
-  text:      "#FFFFFF",
-  navy:      "#1C1C1E",
-  textSec:   "#9A9A9A",
-  textMuted: "#555555",
-  border:    "#2A2A2A",
-  success:   "#00D88C",
-  danger:    "#EF4444",
-  actionBar: "#FFFFFF",
-};
-
 const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
-  { id: "gift",    label: "Gift Card",     bg: "#1C1C1E", iconColor: "#F59E0B", route: null                              },
-  { id: "airtime", label: "Airtime",       bg: "#1C1C1E", iconColor: "#06B6D4", route: "/(app)/bills"  as const           },
-  { id: "elec",    label: "Electricity",   bg: "#1C1C1E", iconColor: "#F97316", route: "/(app)/bills"  as const           },
-  { id: "cable",   label: "Cable TV",      bg: "#1C1C1E", iconColor: "#F43F5E", route: "/(app)/bills"  as const           },
-  { id: "rates",   label: "Rates",         bg: "#1C1C1E", iconColor: "#8B5CF6", route: "/(app)/rates"  as const           },
-  { id: "txn",     label: "Transactions",  bg: "#1C1C1E", iconColor: "#3B82F6", route: "/(app)/transactions" as const     },
-  { id: "bet",     label: "Betting",       bg: "#1C1C1E", iconColor: "#06B6D4", route: "/(app)/bills"  as const           },
-  { id: "funding", label: "Funding",       bg: "#1C1C1E", iconColor: "#2563EB", route: "/(app)/dashboard" as const        },
-  { id: "more",    label: "More",          bg: "#1C1C1E", iconColor: "#8B5CF6", route: "/(app)/more"   as const           },
+  { id: "gift",     label: "Gift Card",   iconBg: "#FFF8ED", iconColor: "#C27C0E", route: null },
+  { id: "settings", label: "Settings",    iconBg: "#EFF6FF", iconColor: "#3B82F6", route: "/(app)/settings" as const },
+  { id: "elec",     label: "Electricity", iconBg: "#FFFBEB", iconColor: "#D97706", route: "/(app)/bills" as const },
+  { id: "cable",    label: "Cable TV",    iconBg: "#FEF2F2", iconColor: "#E11D48", route: "/(app)/bills" as const },
+  { id: "rates",    label: "Rates",       iconBg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates" as const },
+  { id: "txn",      label: "Transaction", iconBg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const },
+  { id: "bet",      label: "Bet Funding", iconBg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/bills" as const },
+  { id: "more",     label: "More",        iconBg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/more" as const },
 ];
 
 const PROMOS = [
   {
     id: "p1", pct: "50% OFF", title: "Summer special deal",
     desc: "Get discount for every transaction this weekend",
-    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
+    bg: "#FCB3C5", pctColor: "#000000", titleColor: "#000000", descColor: "#3D0010",
   },
   {
     id: "p2", pct: "50% OFF", title: "Black friday deal",
     desc: "Get discount for every top up and payment",
-    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
-  },
-  {
-    id: "p3", pct: "Top Rates", title: "Sell Gift Cards",
-    desc: "Amazon, iTunes, Steam — paid instantly",
-    bg: "#1C1C1E", pctColor: "#35C2C1", titleColor: "#FFFFFF", descColor: "#888888",
+    bg: "#FFF2CF", pctColor: "#000000", titleColor: "#000000", descColor: "#5C4000",
   },
 ];
 
 const TRANSACTIONS = [
-  { id: "t1", title: "Amazon card",      ref: "3289HF-4378", date: "April 28, 2024",    amount: "₦200,040.00",  positive: true  },
-  { id: "t2", title: "Withdraws",        ref: "7812KJ-2901", date: "February 24, 2022", amount: "₦400,000.00",  positive: false },
-  { id: "t3", title: "Deposit Giftcard", ref: "5621AB-1122", date: "February 24, 2022", amount: "₦200,040.00",  positive: true  },
+  { id: "t1", icon: "gift",     title: "Deposit Giftcard", date: "February 24,2022", amount: "₦200,40.00",   positive: true  },
+  { id: "t2", icon: "withdraw", title: "Withdraws",        date: "February 24,2022", amount: "₦400,000.00",  positive: false },
 ];
 
 function ServiceIconRenderer({ id, color, size = 20 }: { id: string; color: string; size?: number }) {
   switch (id) {
-    case "gift":    return <GiftCardIcon size={size} color={color} />;
-    case "airtime": return <AirtimeIcon size={size} color={color} />;
-    case "elec":    return <ElectricityIcon size={size} color={color} />;
-    case "cable":   return <CableTVIcon size={size} color={color} />;
-    case "rates":   return <RatesIcon size={size} color={color} />;
-    case "txn":     return <TransactionsIcon size={size} color={color} />;
-    case "bet":     return <BettingIcon size={size} color={color} />;
-    case "funding": return <FundingIcon size={size} color={color} />;
-    case "more":    return <MoreIcon size={size} color={color} />;
-    default:        return <MoreIcon size={size} color={color} />;
+    case "gift":     return <GiftCardIcon    size={size} color={color} />;
+    case "settings": return <SettingsIcon    size={size} color={color} />;
+    case "elec":     return <ElectricityIcon size={size} color={color} />;
+    case "cable":    return <CableTVIcon     size={size} color={color} />;
+    case "rates":    return <RatesIcon       size={size} color={color} />;
+    case "txn":      return <TransactionsIcon size={size} color={color} />;
+    case "bet":      return <BettingIcon     size={size} color={color} />;
+    case "more":     return <MoreIcon        size={size} color={color} />;
+    default:         return <MoreIcon        size={size} color={color} />;
   }
 }
 
@@ -130,7 +109,7 @@ function ServiceItem({ item, onPress }: { item: (typeof SERVICES)[number]; onPre
         onPressOut={() => { sc.value = withSpring(1, { damping: 12 }); }}
         style={sv.wrap}
       >
-        <View style={[sv.iconBox, { backgroundColor: item.bg }]}>
+        <View style={[sv.iconBox, { backgroundColor: item.iconBg }]}>
           <ServiceIconRenderer id={item.id} color={item.iconColor} size={20} />
         </View>
         <Text style={sv.label} numberOfLines={2}>{item.label}</Text>
@@ -150,11 +129,9 @@ function PromoCard({ item, width: promoW }: { item: PromoItem; width: number }) 
         onPressOut={() => { sc.value = withSpring(1, { damping: 14 }); }}
       >
         <View style={[pc.card, { backgroundColor: item.bg }]}>
-          <View style={pc.orb1} />
-          <View style={pc.orb2} />
           <Text style={[pc.pct,   { color: item.pctColor }]}>{item.pct}</Text>
           <Text style={[pc.title, { color: item.titleColor }]}>{item.title}</Text>
-          <Text style={[pc.desc,  { color: item.descColor, maxWidth: Math.round(promoW * 0.42) }]}>{item.desc}</Text>
+          <Text style={[pc.desc,  { color: item.descColor }]}>{item.desc}</Text>
         </View>
       </Pressable>
     </Animated.View>
@@ -164,23 +141,19 @@ function PromoCard({ item, width: promoW }: { item: PromoItem; width: number }) 
 function TxRow({ item, onPress }: { item: (typeof TRANSACTIONS)[number]; onPress: () => void }) {
   return (
     <TouchableOpacity style={tx.row} onPress={onPress} activeOpacity={0.75}>
-      <View style={[tx.iconWrap, { backgroundColor: item.positive ? "#0D2518" : "#2A0E0E" }]}>
-        <Feather
-          name={item.positive ? "arrow-down-left" : "arrow-up-right"}
-          size={14}
-          color={item.positive ? C.success : C.danger}
-        />
+      <View style={tx.iconWrap}>
+        {item.icon === "gift"
+          ? <GiftcardTxIcon size={22} color="#1C1B1F" />
+          : <WithdrawTxIcon size={22} color="#1C1B1F" />
+        }
       </View>
       <View style={tx.info}>
         <Text style={tx.title} numberOfLines={1}>{item.title}</Text>
-        <Text style={tx.ref}>{item.date}</Text>
+        <Text style={tx.date}>{item.date}</Text>
       </View>
-      <View style={tx.right}>
-        <Text style={[tx.amount, { color: item.positive ? C.success : C.danger }]}>
-          {item.positive ? "" : "-"}{item.amount}
-        </Text>
-        <Text style={tx.ref}>{item.ref}</Text>
-      </View>
+      <Text style={[tx.amount, { color: item.positive ? "#00B03C" : "#FF0000" }]}>
+        {item.amount}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -190,7 +163,7 @@ export default function HomeScreen() {
   const insets   = useSafeAreaInsets();
   const { user } = useAuth();
   const { width } = useWindowDimensions();
-  const PROMO_W  = Math.min(width, MAX_W) - 48;
+  const PROMO_W  = Math.min(width, MAX_W) * 0.72;
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
   const webTopPad = Platform.OS === "web" ? 40 : 0;
@@ -213,9 +186,9 @@ export default function HomeScreen() {
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const MASKED    = "₦••••••••";
 
-  const balScale = useSharedValue(1);
   const balOpacity = useSharedValue(1);
-  const balStyle = useAnimatedStyle(() => ({
+  const balScale   = useSharedValue(1);
+  const balStyle   = useAnimatedStyle(() => ({
     transform: [{ scale: balScale.value }],
     opacity: balOpacity.value,
   }));
@@ -234,32 +207,20 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={[s.root]} edges={["top"]}>
+    <SafeAreaView style={s.root} edges={["top"]}>
 
-      {/* ── Top header ── */}
+      {/* ── Header: centered AZA logo ── */}
       <Animated.View
-        entering={FadeInDown.duration(300).springify()}
-        style={[s.header, { paddingTop: webTopPad + 8 }]}
+        entering={FadeIn.duration(300)}
+        style={[s.header, { paddingTop: webTopPad + 4 }]}
       >
-        <TouchableOpacity
-          onPress={press(() => router.push("/(app)/settings" as any))}
-          style={s.hdrBtn}
-        >
-          <Feather name="menu" size={22} color={C.text} />
-        </TouchableOpacity>
-
         <Image
           source={logoSrc}
           style={s.logo}
           contentFit="contain"
           cachePolicy="memory-disk"
-          tintColor="#FFFFFF"
+          tintColor="#000000"
         />
-
-        <TouchableOpacity style={s.hdrBtn}>
-          <Feather name="bell" size={22} color={C.text} />
-          <View style={s.notifDot} />
-        </TouchableOpacity>
       </Animated.View>
 
       <ScrollView
@@ -268,10 +229,11 @@ export default function HomeScreen() {
       >
         {/* ── Greeting + Balance ── */}
         <Animated.View
-          entering={FadeInDown.duration(340).springify().delay(50)}
+          entering={FadeInDown.duration(300).springify().delay(40)}
           style={s.greetSection}
         >
-          <View style={s.greetRow}>
+          {/* Left: avatar + name/subtitle */}
+          <View style={s.greetLeft}>
             <Image
               source={avatarSrc}
               style={s.avatar}
@@ -279,37 +241,36 @@ export default function HomeScreen() {
               cachePolicy="memory-disk"
             />
             <View style={s.greetText}>
-              <View style={s.hiRow}>
-                <Text style={s.hiText}>Hi, {firstName} </Text>
-                <WaveIcon size={18} color="rgba(255,255,255,0.9)" />
-              </View>
+              <Text style={s.hiText}>Hi, {firstName}</Text>
               <Text style={s.greetSub}>Your available balance</Text>
             </View>
           </View>
-          <View style={s.balRow}>
-            <Animated.Text style={[s.balAmount, balStyle]} numberOfLines={1}>
-              {balanceVisible ? formatted : MASKED}
-            </Animated.Text>
+
+          {/* Right: eye + balance */}
+          <View style={s.balRight}>
             <TouchableOpacity
               onPress={handleToggle}
-              style={s.eyeBtn}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              style={s.eyeBtn}
             >
-              <PremiumEyeIcon open={balanceVisible} size={20} color="rgba(255,255,255,0.5)" />
+              <PremiumEyeIcon open={balanceVisible} size={20} color="#AAAAAA" />
             </TouchableOpacity>
+            <Animated.Text style={[s.balAmount, balStyle]} numberOfLines={1} adjustsFontSizeToFit>
+              {balanceVisible ? formatted : MASKED}
+            </Animated.Text>
           </View>
         </Animated.View>
 
-        {/* ── Quick actions ── */}
+        {/* ── Quick action bar ── */}
         <Animated.View
-          entering={FadeInDown.duration(320).springify().delay(90)}
+          entering={FadeInDown.duration(300).springify().delay(80)}
           style={s.actionsWrap}
         >
           <View style={s.actionsBar}>
             {([
-              { renderIcon: () => <FundWalletIcon size={20} color="#000000" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
-              { renderIcon: () => <SellIcon       size={20} color="#000000" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
-              { renderIcon: () => <WithdrawIcon   size={20} color="#000000" />, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
+              { renderIcon: () => <FundWalletIcon size={20} color="#FFFFFF" />, label: "Fund Wallet", onPress: press(() => router.push("/(app)/dashboard" as any)) },
+              { renderIcon: () => <SellIcon       size={20} color="#FFFFFF" />, label: "Sell",        onPress: press(() => router.push("/(app)/trade-asset" as any)) },
+              { renderIcon: () => <WithdrawIcon   size={20} color="#FFFFFF" />, label: "Withdraw",    onPress: press(() => router.push("/(app)/withdraw" as any)) },
             ]).map((action, i) => (
               <React.Fragment key={action.label}>
                 {i > 0 && <View style={s.actionDivider} />}
@@ -324,13 +285,13 @@ export default function HomeScreen() {
 
         {/* ── Services grid ── */}
         <Animated.View
-          entering={FadeInUp.duration(320).springify().delay(120)}
+          entering={FadeInUp.duration(300).springify().delay(120)}
           style={s.servicesGrid}
         >
           {SERVICES.map((item, i) => (
             <Animated.View
               key={item.id}
-              entering={FadeInUp.duration(280).springify().delay(120 + i * 25)}
+              entering={FadeInUp.duration(260).springify().delay(120 + i * 20)}
             >
               <ServiceItem
                 item={item}
@@ -344,7 +305,7 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* ── Promo banners ── */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(180)}>
+        <Animated.View entering={FadeInUp.duration(280).springify().delay(170)}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -359,26 +320,23 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* ── Recent Transactions ── */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(220)}>
+        <Animated.View entering={FadeInUp.duration(280).springify().delay(210)}>
           <View style={s.secHdr}>
-            <Text style={s.secTitle}>Recent Transactions</Text>
+            <Text style={s.secTitle}>Recent Transaction</Text>
             <TouchableOpacity onPress={press(() => router.push("/(app)/transactions" as any))}>
-              <Text style={s.seeAll}>View All</Text>
+              <Text style={s.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
 
           <View style={s.txCard}>
             {TRANSACTIONS.map((item, i) => (
-              <Animated.View
-                key={item.id}
-                entering={FadeInUp.duration(260).springify().delay(220 + i * 35)}
-              >
+              <React.Fragment key={item.id}>
                 <TxRow
                   item={item}
                   onPress={press(() => router.push("/(app)/transactions" as any))}
                 />
                 {i < TRANSACTIONS.length - 1 && <View style={s.txDivider} />}
-              </Animated.View>
+              </React.Fragment>
             ))}
           </View>
         </Animated.View>
@@ -397,12 +355,14 @@ export default function HomeScreen() {
             onPress={() => setGiftModalVisible(false)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Feather name="x" size={18} color="#AAAAAA" />
+            <Text style={gm.closeBtnText}>✕</Text>
           </TouchableOpacity>
         </View>
+
         <View style={gm.tilesRow}>
+          {/* Sell Gift Card tile */}
           <TouchableOpacity
-            style={[gm.tile, { backgroundColor: "#1C1C1E" }]}
+            style={[gm.tile, { backgroundColor: "#FFF2CF" }]}
             activeOpacity={0.82}
             onPress={() => {
               setGiftModalVisible(false);
@@ -410,17 +370,18 @@ export default function HomeScreen() {
               router.push("/(app)/sell-gift-card" as any);
             }}
           >
-            <View style={[gm.tileIcon, { backgroundColor: "rgba(245,158,11,0.15)" }]}>
-              <SellGiftCardIcon size={24} color="#F59E0B" />
+            <View style={gm.tileIconWrap}>
+              <SellGiftCardIcon size={20} color="#FFFFFF" />
             </View>
-            <Text style={[gm.tileTitle, { color: "#FFFFFF" }]}>Sell Gift Card</Text>
-            <Text style={[gm.tileDesc, { color: "#888888" }]}>
+            <Text style={gm.tileTitle}>Sell Gift Card</Text>
+            <Text style={gm.tileDesc}>
               Sell local and international gift cards easily and instantly on aza.
             </Text>
           </TouchableOpacity>
 
+          {/* Check Pending tile */}
           <TouchableOpacity
-            style={[gm.tile, { backgroundColor: "#1C1C1E" }]}
+            style={[gm.tile, { backgroundColor: "#FCB3C5" }]}
             activeOpacity={0.82}
             onPress={() => {
               setGiftModalVisible(false);
@@ -428,11 +389,11 @@ export default function HomeScreen() {
               router.push("/(app)/card-status" as any);
             }}
           >
-            <View style={[gm.tileIcon, { backgroundColor: "rgba(244,63,94,0.15)" }]}>
-              <CheckPendingIcon size={24} color="#F43F5E" />
+            <View style={gm.tileIconWrap}>
+              <CheckPendingIcon size={20} color="#FFFFFF" />
             </View>
-            <Text style={[gm.tileTitle, { color: "#FFFFFF" }]}>Check Pending</Text>
-            <Text style={[gm.tileDesc, { color: "#888888" }]}>
+            <Text style={gm.tileTitle}>Check Pending</Text>
+            <Text style={gm.tileDesc}>
               Check Status of Pending gift card sale.
             </Text>
           </TouchableOpacity>
@@ -442,160 +403,141 @@ export default function HomeScreen() {
   );
 }
 
+/* ─── Root + Header ──────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
+  root:   { flex: 1, backgroundColor: "#FFFFFF" },
   scroll: { paddingTop: 4, gap: 20 },
 
   header: {
-    flexDirection:     "row",
     alignItems:        "center",
-    justifyContent:    "space-between",
+    justifyContent:    "center",
     paddingHorizontal: 20,
-    paddingBottom:     12,
-    backgroundColor:   C.bg,
+    paddingBottom:     10,
+    backgroundColor:   "#FFFFFF",
   },
-  hdrBtn: {
-    width: 38, height: 38,
-    borderRadius: 19,
-    alignItems: "center", justifyContent: "center",
-    position: "relative",
-  },
-  notifDot: {
-    position: "absolute", top: 7, right: 7,
-    width: 7, height: 7, borderRadius: 3.5,
-    backgroundColor: "#FF3B30",
-    borderWidth: 1.5, borderColor: C.bg,
-  },
-  logo: { width: 80, height: 28 },
+  logo: { width: 72, height: 26 },
 
+  /* ─── Greeting ──────────────────────────────────────────────────────── */
   greetSection: {
-    marginHorizontal:  20,
-    paddingHorizontal: 16,
-    paddingVertical:   16,
-    borderRadius:      16,
-    borderWidth:       1,
-    borderColor:       "#2A2A2A",
-    gap:               12,
-    overflow:          "hidden",
-    backgroundColor:   "#1C1C1E",
-    shadowColor:       "#000000",
-    shadowOffset:      { width: 0, height: 4 },
-    shadowOpacity:     0.4,
-    shadowRadius:      16,
-    elevation:         8,
+    marginHorizontal: 20,
+    flexDirection:    "row",
+    alignItems:       "center",
+    justifyContent:   "space-between",
+    gap:              8,
+  },
+  greetLeft:  { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
+  avatar:     { width: 46, height: 46, borderRadius: 23 },
+  greetText:  { gap: 2 },
+  hiText:     { fontSize: rf(15), fontFamily: "Manrope_700Bold",     color: "#000000" },
+  greetSub:   { fontSize: rf(12), fontFamily: "Manrope_400Regular",  color: "#888888" },
+
+  balRight:   { alignItems: "flex-end", gap: 4 },
+  eyeBtn:     { padding: 2 },
+  balAmount:  {
+    fontSize: rf(20), fontFamily: "Manrope_700Bold", color: "#000000",
+    letterSpacing: -0.5, textAlign: "right",
   },
 
-  greetRow:  { flexDirection: "row", alignItems: "center", gap: 12 },
-  avatar:    { width: 46, height: 46, borderRadius: 23 },
-  greetText: { gap: 2, flex: 1 },
-  hiRow:     { flexDirection: "row", alignItems: "center" },
-  hiText:    { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-  greetSub:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.5)" },
-  balRow:    { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  balAmount: { fontSize: rf(24), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.5, flex: 1 },
-  eyeBtn:    { padding: 4 },
-
+  /* ─── Actions bar ────────────────────────────────────────────────────── */
   actionsWrap: { paddingHorizontal: 20 },
-  actionsBar: {
+  actionsBar:  {
     borderRadius:    14,
     flexDirection:   "row",
     alignItems:      "center",
     paddingVertical: 18,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#000000",
     overflow:        "hidden",
-    shadowColor:     "#000000",
-    shadowOffset:    { width: 0, height: 4 },
-    shadowOpacity:   0.35,
-    shadowRadius:    14,
-    elevation:       10,
   },
-
   actionBtn:     { flex: 1, alignItems: "center", justifyContent: "center", gap: 7 },
-  actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#000000", letterSpacing: 0.2 },
-  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(0,0,0,0.12)" },
+  actionLabel:   { fontSize: rf(11), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: 0.2 },
+  actionDivider: { width: 1, height: 34, backgroundColor: "rgba(255,255,255,0.15)" },
 
+  /* ─── Services ───────────────────────────────────────────────────────── */
   servicesGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 8, rowGap: 16 },
 
+  /* ─── Promos ─────────────────────────────────────────────────────────── */
   promoScroll: { paddingHorizontal: 20 },
 
+  /* ─── Recent Transactions ────────────────────────────────────────────── */
   secHdr: {
     flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-    paddingHorizontal: 20, marginBottom: 10,
+    paddingHorizontal: 20, marginBottom: 8,
   },
-  secTitle: { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text },
-  seeAll:   { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#35C2C1" },
+  secTitle: { fontSize: rf(17), fontFamily: "Manrope_700Bold",    color: "#0B0A0A" },
+  seeAll:   { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#000000" },
 
   txCard: {
     marginHorizontal: 20,
-    borderRadius:     12,
-    borderWidth:      1,
-    borderColor:      "#2A2A2A",
+    borderRadius:     4,
     overflow:         "hidden",
-    backgroundColor:  "#1C1C1E",
+    backgroundColor:  "#FFFFFF",
   },
-  txDivider: { height: 1, backgroundColor: "#2A2A2A", marginHorizontal: 14 },
+  txDivider: { height: 1, backgroundColor: "#F0F0F0", marginHorizontal: 14 },
 });
 
+/* ─── Service item ───────────────────────────────────────────────────────── */
 const sv = StyleSheet.create({
-  wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
-  iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: "#FFFFFF", lineHeight: rf(14), flexShrink: 1 },
+  wrap:    { alignItems: "center", gap: 6, paddingVertical: 4 },
+  iconBox: { width: 50, height: 50, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: "#000000", lineHeight: rf(14), flexShrink: 1 },
 });
 
+/* ─── Promo card ─────────────────────────────────────────────────────────── */
 const pc = StyleSheet.create({
   card: {
-    borderRadius: 10, padding: 14, paddingBottom: 18,
-    overflow: "hidden", gap: 5, height: 108, justifyContent: "center",
+    borderRadius: 8, paddingHorizontal: 14, paddingVertical: 16,
+    overflow: "hidden", gap: 4, minHeight: 100,
   },
-  orb1: {
-    position: "absolute", width: 100, height: 100, borderRadius: 50,
-    backgroundColor: "rgba(255,255,255,0.06)", top: -30, right: -20,
-  },
-  orb2: {
-    position: "absolute", width: 60, height: 60, borderRadius: 30,
-    backgroundColor: "rgba(255,255,255,0.04)", bottom: -20, right: 40,
-  },
-  pct:   { fontSize: rf(14), fontFamily: "Manrope_700Bold" },
-  title: { fontSize: rf(12), fontFamily: "Manrope_600SemiBold" },
-  desc:  { fontSize: rf(9.5), fontFamily: "Manrope_400Regular", lineHeight: rf(14), marginTop: 1 },
+  pct:   { fontSize: rf(15), fontFamily: "Manrope_700Bold" },
+  title: { fontSize: rf(13), fontFamily: "Manrope_700Bold" },
+  desc:  { fontSize: rf(10), fontFamily: "Manrope_400Regular", lineHeight: rf(14), marginTop: 2 },
 });
 
+/* ─── Transaction row ────────────────────────────────────────────────────── */
 const tx = StyleSheet.create({
   row: {
-    flexDirection: "row", alignItems: "center", gap: 12,
-    paddingHorizontal: 14, paddingVertical: 13, backgroundColor: "#1C1C1E",
+    flexDirection: "row", alignItems: "center", gap: 10,
+    paddingHorizontal: 14, paddingVertical: 12, backgroundColor: "#FFFFFF",
   },
-  iconWrap: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
-  info:   { flex: 1, gap: 3 },
-  title:  { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: C.text },
-  ref:    { fontSize: rf(11), fontFamily: "Manrope_400Regular", color: C.textMuted },
-  right:  { alignItems: "flex-end", gap: 3 },
-  amount: { fontSize: rf(13), fontFamily: "Manrope_700Bold" },
+  iconWrap: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
+  info:     { flex: 1, gap: 2 },
+  title:    { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#595F67" },
+  date:     { fontSize: rf(11), fontFamily: "Manrope_400Regular",  color: "#AAAFB5" },
+  amount:   { fontSize: rf(13), fontFamily: "Manrope_700Bold", textAlign: "right" },
 });
 
+/* ─── Gift Card Modal ────────────────────────────────────────────────────── */
 const gm = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.7)", justifyContent: "flex-end" },
   sheet: {
-    backgroundColor: "#1C1C1E",
-    borderTopLeftRadius: 28, borderTopRightRadius: 28,
-    paddingHorizontal: 20, paddingTop: 12, paddingBottom: 40,
-    shadowColor: "#000", shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.4, shadowRadius: 16, elevation: 12,
+    backgroundColor:     "#FFFFFF",
+    borderTopLeftRadius:  28,
+    borderTopRightRadius: 28,
+    paddingHorizontal:    20,
+    paddingTop:           4,
+    paddingBottom:        40,
   },
   sheetHeader: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20,
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    marginBottom: 20,
   },
-  sheetTitle: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-  closeBtn: {
-    width: 34, height: 34, borderRadius: 17, backgroundColor: "#2A2A2A",
+  sheetTitle:   { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: "#000000" },
+  closeBtn:     {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: "#F0F0F0",
     alignItems: "center", justifyContent: "center",
   },
-  tilesRow: { flexDirection: "row", gap: 14 },
-  tile:     { flex: 1, borderRadius: 16, padding: 16, gap: 10, minHeight: 164 },
-  tileIcon: {
-    width: 48, height: 48, borderRadius: 14,
-    alignItems: "center", justifyContent: "center", marginBottom: 4,
+  closeBtnText: { fontSize: 14, color: "#555555", lineHeight: 16 },
+
+  tilesRow: { flexDirection: "row", gap: 12 },
+  tile: {
+    flex: 1, borderRadius: 14, padding: 14, gap: 8, minHeight: 150,
   },
-  tileTitle: { fontSize: rf(14), fontFamily: "Manrope_700Bold" },
-  tileDesc:  { fontSize: rf(12), fontFamily: "Manrope_400Regular", lineHeight: rf(17) },
+  tileIconWrap: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: "#333333",
+    alignItems: "center", justifyContent: "center",
+    marginBottom: 4,
+  },
+  tileTitle: { fontSize: rf(13), fontFamily: "Manrope_700Bold",    color: "#000000" },
+  tileDesc:  { fontSize: rf(9),  fontFamily: "Manrope_400Regular",  color: "#555555", lineHeight: rf(13) },
 });
