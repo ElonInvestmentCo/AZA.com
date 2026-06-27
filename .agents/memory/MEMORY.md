@@ -2,3 +2,4 @@
 - [Payvora production config](payvora-production-config.md) — Railway + www.payvora.org wiring: app.config.js, CORS, API URL resolution, OAuth redirect URIs.
 - [Expo package versions](expo-package-versions.md) — expo 54 requires expo-auth-session ~7.0.11, expo-crypto ~15.0.9, expo-apple-authentication ~8.0.8; ^56.x versions break with "Cannot find native module ExpoCryptoAES".
 - [Lottie web incompatibility](lottie-web-compat.md) — lottie-react-native v7.x web shim uses DotLottieReact which only supports .lottie format, not JSON; use react-native-svg for cross-platform animations instead.
+- [DotLottie web rendering](dotlottie-web-rendering.md) — DotLottieReact from @lottiefiles/dotlottie-react renders correctly inside RN Web views via .web.tsx files using remote URLs; use lottie-react-native for native and DotLottieReact for web.
