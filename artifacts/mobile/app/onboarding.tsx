@@ -295,39 +295,100 @@ function AnimatedWalletSlide({
 }
 
 // ── QR code placeholder (decorative) ──────────────────────────────────────────
+// Real QR-code anatomy (Version 1, 21×21):
+//   • Three 7×7 finder patterns at TL, TR, BL corners
+//   • Separator rows/cols (all 0) around each finder
+//   • Horizontal + vertical timing strips (row 6 / col 6, alternating 1-0)
+//   • Dark module at (13,8)
+//   • Dense data modules in the remaining area
+const QR_MATRIX: number[][] = [
+  [1,1,1,1,1,1,1, 0, 1,0,1,1,0, 0, 1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,1, 0, 0,1,0,0,1, 0, 1,0,0,0,0,0,1],
+  [1,0,1,1,1,0,1, 0, 1,1,1,0,0, 0, 1,0,1,1,1,0,1],
+  [1,0,1,1,1,0,1, 0, 0,0,1,1,0, 0, 1,0,1,1,1,0,1],
+  [1,0,1,1,1,0,1, 0, 1,0,0,0,1, 0, 1,0,1,1,1,0,1],
+  [1,0,0,0,0,0,1, 0, 0,1,1,0,0, 0, 1,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1, 0, 1,0,1,0,1, 0, 1,1,1,1,1,1,1],
+  [0,0,0,0,0,0,0, 0, 0,1,0,0,1, 0, 0,0,0,0,0,0,0],
+  [1,1,0,1,0,1,1, 1, 1,0,1,0,0, 0, 1,0,1,1,0,0,1],
+  [0,0,1,0,1,0,0, 0, 0,1,0,1,1, 0, 0,1,0,0,1,1,0],
+  [1,1,0,1,1,0,1, 0, 1,0,0,0,1, 0, 1,0,1,0,0,1,1],
+  [0,1,1,0,0,1,0, 1, 0,1,1,0,0, 1, 0,1,1,0,1,0,0],
+  [1,0,1,1,0,0,1, 0, 1,0,0,1,1, 0, 1,0,0,1,0,1,0],
+  [0,0,0,0,0,0,0, 0, 1,0,1,0,0, 1, 0,0,1,0,0,0,1],
+  [1,1,1,1,1,1,1, 0, 1,1,0,0,1, 0, 0,1,1,0,1,0,1],
+  [1,0,0,0,0,0,1, 0, 0,0,1,1,0, 0, 1,0,0,1,0,1,0],
+  [1,0,1,1,1,0,1, 0, 1,0,0,0,1, 1, 0,1,0,0,1,0,1],
+  [1,0,1,1,1,0,1, 0, 0,1,1,0,0, 0, 1,0,1,1,0,0,0],
+  [1,0,1,1,1,0,1, 0, 1,0,0,1,0, 1, 0,1,0,0,1,1,0],
+  [1,0,0,0,0,0,1, 0, 0,1,1,0,1, 0, 1,0,0,1,0,0,1],
+  [1,1,1,1,1,1,1, 0, 1,0,0,1,0, 1, 0,0,1,0,1,1,0],
+];
+
 function QRPlaceholder({ size }: { size: number }) {
-  const COLS = 11;
-  const PAD  = Math.round(size * 0.06);
-  const cell = (size - PAD * 2) / COLS;
-  const pattern = [
-    [1,1,1,1,1,1,1,0,0,1,0],
-    [1,0,0,0,0,0,1,0,1,0,0],
-    [1,0,1,1,1,0,1,0,0,1,0],
-    [1,0,1,1,1,0,1,0,1,0,1],
-    [1,0,1,1,1,0,1,0,0,0,1],
-    [1,0,0,0,0,0,1,0,1,1,0],
-    [1,1,1,1,1,1,1,0,0,1,0],
-    [0,0,0,1,0,0,0,1,0,0,1],
-    [1,1,0,1,0,1,1,0,1,1,0],
-    [0,0,1,0,1,1,0,1,0,1,1],
-    [1,0,0,1,0,0,1,0,1,0,0],
-  ];
+  const COLS   = 21;
+  const PAD    = Math.round(size * 0.05);
+  const cell   = (size - PAD * 2) / COLS;
+  const r      = Math.max(1, cell * 0.28);          // module corner radius
+  const logoSz = Math.round(cell * 5);              // centre logo ~5 cells wide
+
+  // Finder-pattern border cells get a larger corner radius for the modern look
+  const finderOuter = (row: number, col: number) =>
+    (row < 7 && col < 7) ||
+    (row < 7 && col >= 14) ||
+    (row >= 14 && col < 7);
+
   return (
-    <View style={{ width: size, height: size, backgroundColor: "#fff", borderRadius: 4, padding: PAD }}>
-      {pattern.map((row, r) => (
-        <View key={r} style={{ flexDirection: "row" }}>
-          {row.map((filled, c) => (
-            <View
-              key={c}
-              style={{
-                width: cell,
-                height: cell,
-                backgroundColor: filled ? "#111" : "#fff",
-              }}
-            />
-          ))}
+    <View style={{
+      width: size, height: size,
+      backgroundColor: "#fff",
+      borderRadius: Math.round(size * 0.06),
+      padding: PAD,
+      overflow: "hidden",
+    }}>
+      {QR_MATRIX.map((row, ri) => (
+        <View key={ri} style={{ flexDirection: "row" }}>
+          {row.map((filled, ci) => {
+            const isFinder = finderOuter(ri, ci);
+            return (
+              <View
+                key={ci}
+                style={{
+                  width: cell,
+                  height: cell,
+                  backgroundColor: filled ? "#0D0D0D" : "#fff",
+                  borderRadius: filled ? (isFinder ? r * 1.6 : r) : 0,
+                }}
+              />
+            );
+          })}
         </View>
       ))}
+
+      {/* Centre brand mark — white circle with ₦ glyph */}
+      <View style={{
+        position: "absolute",
+        left: (size - logoSz) / 2,
+        top:  (size - logoSz) / 2,
+        width: logoSz,
+        height: logoSz,
+        borderRadius: logoSz / 2,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 3,
+        elevation: 2,
+      }}>
+        <Text style={{
+          fontSize: Math.round(logoSz * 0.42),
+          fontFamily: "Manrope_700Bold",
+          color: "#0D0D0D",
+          lineHeight: Math.round(logoSz * 0.5),
+        }}>₦</Text>
+      </View>
     </View>
   );
 }
