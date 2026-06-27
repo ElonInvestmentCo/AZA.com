@@ -127,7 +127,6 @@ export default function DashboardScreen() {
   const [amountFmt,  setAmountFmt]  = useState(""); // formatted with commas
   const [selAmt,     setSelAmt]     = useState("");
   const [picker,     setPicker]     = useState(false);
-  const [success,    setSuccess]    = useState(false);
 
   const firstName = (user?.name ?? "User").split(" ")[0];
   const balance   = user?.balance ?? 200590;
@@ -290,24 +289,23 @@ export default function DashboardScreen() {
           </Animated.View>
         )}
 
-        {success && (
-          <Animated.View entering={FadeInDown.duration(280).springify()} style={s.successBox}>
-            <Feather name="check-circle" size={18} color={C.success} />
-            <Text style={s.successText}>Funding initiated successfully!</Text>
-          </Animated.View>
-        )}
-
         <TouchableOpacity
           style={[s.fundBtn, !canProceed && { opacity: 0.45 }]}
           onPress={() => {
             if (!canProceed) return;
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            setSuccess(true);
-            setTimeout(() => setSuccess(false), 3000);
             const fmtAmt = totalAmount > 0
               ? "₦" + totalAmount.toLocaleString("en-NG")
               : selAmt || "₦0";
             scheduleWalletFunded(fmtAmt);
+            const now = new Date();
+            const ref = "TXN-" + Math.random().toString(36).slice(2, 7).toUpperCase() + "-FW";
+            const date = now.toLocaleDateString("en-NG", { day: "2-digit", month: "short", year: "numeric" });
+            const time = now.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit", hour12: true }).toUpperCase();
+            router.push({
+              pathname: "/(app)/funding-success",
+              params: { amount: fmtAmt, ref, date, time, bank },
+            } as any);
           }}
           activeOpacity={0.85}
         >
@@ -353,9 +351,6 @@ const s = StyleSheet.create({
   summaryLine:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
   summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
   summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
-
-  successBox:  { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F0FFF4", borderRadius: 10, padding: 14, borderWidth: 1, borderColor: "#BBF7D0" },
-  successText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.success },
 
   fundBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
   fundBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
