@@ -361,7 +361,7 @@ export default function RegisterScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
           </Pressable>
-          <Text style={s.wordmark}>AZA.</Text>
+          <Text style={s.wordmark}>PAYVORA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 

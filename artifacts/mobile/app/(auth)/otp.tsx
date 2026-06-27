@@ -272,7 +272,7 @@ export default function OtpScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.text} />
           </TouchableOpacity>
-          <Text style={s.wordmark}>AZA.</Text>
+          <Text style={s.wordmark}>PAYVORA.</Text>
           <View style={{ width: 44 }} />
         </Animated.View>
 

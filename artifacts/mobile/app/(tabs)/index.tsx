@@ -1,5 +1,4 @@
 import * as Haptics from "expo-haptics";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -47,9 +46,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 const MAX_W = 430;
-const BAL_VIS_KEY = "aza_balance_visible";
+const BAL_VIS_KEY = "payvora_balance_visible";
 
-const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
@@ -209,18 +207,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={s.root} edges={["top"]}>
 
-      {/* ── Header: centered AZA logo ── */}
+      {/* ── Header: centered PAYVORA wordmark ── */}
       <Animated.View
         entering={FadeIn.duration(300)}
         style={[s.header, { paddingTop: webTopPad + 4 }]}
       >
-        <Image
-          source={logoSrc}
-          style={s.logo}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          tintColor="#000000"
-        />
+        <Text style={s.wordmark}>PAYVORA.</Text>
       </Animated.View>
 
       <ScrollView
@@ -375,7 +367,7 @@ export default function HomeScreen() {
             </View>
             <Text style={gm.tileTitle}>Sell Gift Card</Text>
             <Text style={gm.tileDesc}>
-              Sell local and international gift cards easily and instantly on aza.
+              Sell local and international gift cards easily and instantly on Payvora.
             </Text>
           </TouchableOpacity>
 
@@ -415,7 +407,7 @@ const s = StyleSheet.create({
     paddingBottom:     10,
     backgroundColor:   "#FFFFFF",
   },
-  logo: { width: 72, height: 26 },
+  wordmark: { fontSize: rf(18), fontFamily: "Manrope_700Bold", color: "#000000", letterSpacing: -0.5 },
 
   /* ─── Greeting ──────────────────────────────────────────────────────── */
   greetSection: {

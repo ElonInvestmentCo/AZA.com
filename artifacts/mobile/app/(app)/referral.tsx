@@ -60,8 +60,8 @@ export default function ReferralScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `Join AZA and start earning! Use my referral code: ${referralCode}. Download the app and get started today.`,
-        title: "Join AZA — Earn ₦5,000",
+        message: `Join PAYVORA and start earning! Use my referral code: ${referralCode}. Download the app and get started today.`,
+        title: "Join PAYVORA — Earn ₦5,000",
       });
     } catch {}
   };
@@ -89,7 +89,7 @@ export default function ReferralScreen() {
           <View style={s.heroOrb2} />
           <Text style={s.heroEmoji}>🎁</Text>
           <Text style={s.heroTitle}>Earn ₦5,000 per referral</Text>
-          <Text style={s.heroDesc}>Invite your friends to join AZA. Both of you earn ₦5,000 when they complete their first transaction.</Text>
+          <Text style={s.heroDesc}>Invite your friends to join PAYVORA. Both of you earn ₦5,000 when they complete their first transaction.</Text>
           <View style={s.heroDivider} />
           <View style={s.heroStats}>
             <View style={s.heroStat}>

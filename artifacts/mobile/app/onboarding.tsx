@@ -571,7 +571,7 @@ export default function OnboardingScreen() {
 
       {/* ── Header ── */}
       <Animated.View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset }, bgStyle]}>
-        <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
+        <Text style={[styles.logo, { fontSize: logoSize }]}>PAYVORA.</Text>
       </Animated.View>
 
       {/* ── Carousel — exactly viewport-width, hard-clipped ── */}

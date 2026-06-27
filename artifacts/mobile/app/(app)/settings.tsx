@@ -47,7 +47,7 @@ export default function SettingsScreen() {
   const [query, setQuery] = useState("");
 
   const firstName = (user?.name ?? "User").split(" ")[0];
-  const email = user?.email ?? "user@aza.app";
+  const email = user?.email ?? "user@payvora.app";
 
   const filteredRows = ROWS.filter(r =>
     query === "" || r.label.toLowerCase().includes(query.toLowerCase())
