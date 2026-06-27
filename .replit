@@ -33,7 +33,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run web"
+args = "pnpm --filter @workspace/mobile run qr"
 waitForPort = 5000
 
 [[workflows.workflow]]
@@ -59,10 +59,6 @@ timeoutMs = 20000
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 19000
-externalPort = 3002
 
 [[ports]]
 localPort = 19001
