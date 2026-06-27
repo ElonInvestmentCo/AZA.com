@@ -707,22 +707,34 @@ function VirtualCardSlide({
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
       <Animated.View style={[animStyle, { width: CW, height: containerH }]}>
 
-        {/* ── Card 3 — back, glass ── */}
+        {/* ── Card 3 — back, teal #34c2c2 glassmorphism ── */}
         <View style={[cardBase, {
           top: 0, left: 0,
-          backgroundColor: "rgba(228, 218, 255, 0.32)",
+          backgroundColor: "rgba(52, 194, 194, 0.18)",
           borderWidth: 1,
-          borderColor: "rgba(180, 160, 240, 0.35)",
-          shadowColor: "#4B2EC0",
-          shadowOffset: { width: 6.85, height: 8.56 },
-          shadowOpacity: 0.06,
-          shadowRadius: 13.7,
+          borderColor: "rgba(52, 194, 194, 0.42)",
+          shadowColor: "#34c2c2",
+          shadowOffset: { width: 6.85, height: 10 },
+          shadowOpacity: 0.38,
+          shadowRadius: 18,
           elevation: 2,
         }]}>
+          {/* Top shimmer highlight */}
+          <View style={{
+            position: "absolute", top: 0, left: 0, right: 0, height: CH * 0.38,
+            backgroundColor: "rgba(255,255,255,0.12)",
+            borderTopLeftRadius: CR, borderTopRightRadius: CR,
+          }} />
+          {/* Teal inner glow dot */}
+          <View style={{
+            position: "absolute", left: "20%", top: "-30%",
+            width: CW * 0.55, height: CW * 0.55, borderRadius: CW * 0.28,
+            backgroundColor: "rgba(52,194,194,0.22)",
+          }} />
           <Text style={{
             position: "absolute", right: 14, top: 14,
             fontSize: 9, fontFamily: "Manrope_700Bold",
-            color: "rgba(255,255,255,0.5)", letterSpacing: 0.5,
+            color: "rgba(255,255,255,0.72)", letterSpacing: 0.5,
           }}>PAYVORA</Text>
         </View>
 
