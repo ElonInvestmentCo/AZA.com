@@ -56,7 +56,7 @@ export default function TradeRejectedReplica() {
             testID="rejected-check-trades-button"
             activeOpacity={0.85}
             style={styles.button}
-            onPress={() => router.back()}
+            onPress={() => router.replace("/replica-launcher")}
           >
             <Text style={styles.buttonText}>Check trades</Text>
           </TouchableOpacity>

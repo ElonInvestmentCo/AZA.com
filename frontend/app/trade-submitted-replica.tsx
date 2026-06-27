@@ -56,7 +56,7 @@ export default function TradeSubmittedReplica() {
             testID="success-done-button"
             activeOpacity={0.85}
             style={styles.button}
-            onPress={() => router.back()}
+            onPress={() => router.replace("/replica-launcher")}
           >
             <Text style={styles.buttonText}>Done</Text>
           </TouchableOpacity>
