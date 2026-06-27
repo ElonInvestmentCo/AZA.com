@@ -47,7 +47,7 @@ export default function ReferralScreen() {
   const topPad = Platform.OS === "web" ? 48 : insets.top;
 
   const [copied, setCopied] = useState(false);
-  const referralCode = "AZA-" + (user?.name ?? "USER").toUpperCase().replace(/\s/g, "").slice(0, 5) + "2024";
+  const referralCode = "PV-" + (user?.name ?? "USER").toUpperCase().replace(/\s/g, "").slice(0, 5) + "2024";
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(referralCode);
@@ -60,8 +60,8 @@ export default function ReferralScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `Join AZA and start earning! Use my referral code: ${referralCode}. Download the app and get started today.`,
-        title: "Join AZA — Earn ₦5,000",
+        message: `Join PayVora and start earning! Use my referral code: ${referralCode}. Download the app and get started today.`,
+        title: "Join PayVora — Earn ₦5,000",
       });
     } catch {}
   };
@@ -89,7 +89,7 @@ export default function ReferralScreen() {
           <View style={s.heroOrb2} />
           <Text style={s.heroEmoji}>🎁</Text>
           <Text style={s.heroTitle}>Earn ₦5,000 per referral</Text>
-          <Text style={s.heroDesc}>Invite your friends to join AZA. Both of you earn ₦5,000 when they complete their first transaction.</Text>
+          <Text style={s.heroDesc}>Invite your friends to join PayVora. Both of you earn ₦5,000 when they complete their first transaction.</Text>
           <View style={s.heroDivider} />
           <View style={s.heroStats}>
             <View style={s.heroStat}>

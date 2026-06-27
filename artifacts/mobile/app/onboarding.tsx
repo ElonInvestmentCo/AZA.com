@@ -854,7 +854,7 @@ export default function OnboardingScreen() {
 
       {/* Header — transparent so slide bg bleeds through under status bar */}
       <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: activeSlide.bgColor }]}>
-        <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
+        <Text style={[styles.logo, { fontSize: logoSize }]}>PayVora.</Text>
       </View>
 
       {/* Slide carousel — scroll drives the parallax depth on image slides */}

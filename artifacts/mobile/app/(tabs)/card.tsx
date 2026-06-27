@@ -276,7 +276,7 @@ function VirtualCard({
         <View style={vc.cardTop}>
           <View>
             <Text style={[vc.cardLabel, { fontSize: f(8), letterSpacing: 1.4 }]}>VIRTUAL CARD</Text>
-            <Text style={[vc.cardBank,  { fontSize: f(12), marginTop: p(2) }]}>AZA / Payvora</Text>
+            <Text style={[vc.cardBank,  { fontSize: f(12), marginTop: p(2) }]}>PayVora</Text>
           </View>
           <View style={vc.mastercard}>
             <View style={[vc.mcL, { width: p(22), height: p(22), borderRadius: p(11) }]} />
@@ -558,7 +558,7 @@ export default function CardScreen() {
   const maskedCvv = "•••";
   const fullCvv   = "482";
   const balance   = user?.balance ?? 200590;
-  const name      = user?.name ?? "AZA User";
+  const name      = user?.name ?? "PayVora User";
 
   /* Copy to clipboard */
   const handleCopy = useCallback(async (value: string, key: string) => {

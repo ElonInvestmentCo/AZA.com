@@ -115,7 +115,7 @@ function buildPage() {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>AZA Mobile — Expo Preview</title>
+  <title>PayVora Mobile — Expo Preview</title>
   ${!tunnelUrl ? `<meta http-equiv="refresh" content="4"/>` : ""}
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -518,7 +518,7 @@ function buildPage() {
   <!-- top bar -->
   <div class="topbar">
     <div class="topbar-left">
-      <div class="app-name">AZA Mobile App</div>
+      <div class="app-name">PayVora Mobile App</div>
       <div class="status-pill">
         <div class="pulse"></div>
         ${esc(statusLabel)}
@@ -541,8 +541,8 @@ function buildPage() {
         </div>
         <div class="phone-screen">
           <div class="phone-content">
-            <div class="app-icon">AZA</div>
-            <div class="phone-label">AZA</div>
+            <div class="app-icon">PV</div>
+            <div class="phone-label">PayVora</div>
             <div class="phone-sub">
               ${tunnelUrl
                 ? "App is running.\nScan the QR code →"

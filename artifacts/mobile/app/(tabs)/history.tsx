@@ -265,7 +265,7 @@ function TxDetailSheet({ tx, visible, onClose }: {
     try {
       await Share.share({
         message: [
-          `AZA Transaction Receipt`,
+          `PayVora Transaction Receipt`,
           `──────────────────────`,
           `${tx.name}`,
           `Amount:    ${sign}${tx.amount}`,
@@ -276,7 +276,7 @@ function TxDetailSheet({ tx, visible, onClose }: {
           `Ref:       ${tx.ref}`,
           `Note:      ${tx.note}`,
         ].join("\n"),
-        title: `AZA Receipt — ${tx.ref}`,
+        title: `PayVora Receipt — ${tx.ref}`,
       });
     } catch {}
   }, [tx]);

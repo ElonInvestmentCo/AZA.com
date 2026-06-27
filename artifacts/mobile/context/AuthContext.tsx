@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const restore = async () => {
       try {
-        const stored = await AsyncStorage.getItem("aza_user");
+        const stored = await AsyncStorage.getItem("payvora_user");
         if (stored) setUser(JSON.parse(stored));
       } catch {}
       setIsLoading(false);
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, _password: string) => {
     const u: User = { name: "Dove", email, balance: 200590 };
     setUser(u);
-    await AsyncStorage.setItem("aza_user", JSON.stringify(u));
+    await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
     return true;
   }, []);
 
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (name: string, email: string, _password: string) => {
       const u: User = { name, email, balance: 0 };
       setUser(u);
-      await AsyncStorage.setItem("aza_user", JSON.stringify(u));
+      await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
       return true;
     },
     []
@@ -71,14 +71,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string, name: string, _provider: string) => {
       const u: User = { name: name || email.split("@")[0], email, balance: 200590 };
       setUser(u);
-      await AsyncStorage.setItem("aza_user", JSON.stringify(u));
+      await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
     },
     []
   );
 
   const logout = useCallback(async () => {
     setUser(null);
-    await AsyncStorage.removeItem("aza_user");
+    await AsyncStorage.removeItem("payvora_user");
   }, []);
 
   const updateBalance = useCallback(
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user) return;
       const updated = { ...user, balance: user.balance + amount };
       setUser(updated);
-      await AsyncStorage.setItem("aza_user", JSON.stringify(updated));
+      await AsyncStorage.setItem("payvora_user", JSON.stringify(updated));
     },
     [user]
   );

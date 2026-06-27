@@ -26,5 +26,5 @@ server.on("upgrade", (req, socket, head) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[web-proxy] AZA Mobile Web → ${TARGET} on :${PORT}`);
+  console.log(`[web-proxy] PayVora Mobile Web → ${TARGET} on :${PORT}`);
 });

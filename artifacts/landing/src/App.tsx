@@ -27,7 +27,7 @@ export default function App() {
         borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
       }}>
         <span style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.5px", color: "#fff" }}>
-          AZA<span style={{ color: "#35C2C1" }}>.</span>
+          PayVora<span style={{ color: "#35C2C1" }}>.</span>
         </span>
 
         <div style={{ display: "flex", gap: 36, alignItems: "center" }} className="desktop-nav">
@@ -128,7 +128,7 @@ export default function App() {
             color: "rgba(255,255,255,0.6)",
             lineHeight: 1.7, margin: "0 0 44px",
           }}>
-            AZA is the fastest way to trade gift cards, fund your wallet, and pay bills — all in one beautifully simple app.
+            PayVora is the fastest way to trade gift cards, fund your wallet, and pay bills — all in one beautifully simple app.
           </p>
 
           <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -247,7 +247,7 @@ export default function App() {
             Simple & fast
           </p>
           <h2 style={{ fontSize: "clamp(28px, 4vw, 52px)", fontWeight: 800, letterSpacing: "-1px" }}>
-            How AZA works
+            How PayVora works
           </h2>
         </div>
 
@@ -330,9 +330,9 @@ export default function App() {
         display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center",
         gap: 16,
       }}>
-        <span style={{ fontSize: 20, fontWeight: 800 }}>AZA<span style={{ color: "#35C2C1" }}>.</span></span>
+        <span style={{ fontSize: 20, fontWeight: 800 }}>PayVora<span style={{ color: "#35C2C1" }}>.</span></span>
         <p style={{ fontSize: 14, color: "rgba(255,255,255,0.35)" }}>
-          © {new Date().getFullYear()} AZA. All rights reserved.
+          © {new Date().getFullYear()} PayVora. All rights reserved.
         </p>
         <div style={{ display: "flex", gap: 28 }}>
           {["Privacy", "Terms", "Contact"].map(l => (
@@ -393,7 +393,7 @@ function StoreButton({ store }: { store: "apple" | "google" }) {
 
 const FEATURES = [
   { icon: "🎁", title: "Sell Gift Cards", desc: "Trade Amazon, iTunes, Steam and 50+ gift card brands instantly at the best rates." },
-  { icon: "💳", title: "Fund Your Wallet", desc: "Top up your AZA wallet via bank transfer and manage your balance with ease." },
+  { icon: "💳", title: "Fund Your Wallet", desc: "Top up your PayVora wallet via bank transfer and manage your balance with ease." },
   { icon: "⚡", title: "Pay Bills", desc: "Airtime, data, electricity, cable TV — pay any bill in seconds from one place." },
   { icon: "📊", title: "Track Transactions", desc: "Full history of every trade, deposit, and payment with detailed receipts." },
   { icon: "🔒", title: "Bank-level Security", desc: "Your funds are protected with end-to-end encryption and two-factor authentication." },
@@ -403,7 +403,7 @@ const FEATURES = [
 const STEPS = [
   { title: "Create Account", desc: "Sign up in under 2 minutes with just your email address." },
   { title: "Upload Your Card", desc: "Select your gift card brand, enter the details, and submit." },
-  { title: "Get Paid Instantly", desc: "Funds hit your AZA wallet the moment your card is verified." },
+  { title: "Get Paid Instantly", desc: "Funds hit your PayVora wallet the moment your card is verified." },
   { title: "Spend or Withdraw", desc: "Pay bills directly or withdraw to your bank account anytime." },
 ];
 

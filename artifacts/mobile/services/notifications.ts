@@ -74,7 +74,7 @@ export async function scheduleWalletFunded(amount: string): Promise<void> {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Wallet Funded 💰",
-        body: `${amount} has been successfully added to your AZA wallet.`,
+        body: `${amount} has been successfully added to your PayVora wallet.`,
         data: { type: "wallet_funded", amount },
       },
       trigger: null,

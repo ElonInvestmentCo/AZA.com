@@ -1,5 +1,5 @@
 /**
- * SocialAuthButtons — Google OAuth + Apple Sign-In for AZA.
+ * SocialAuthButtons — Google OAuth + Apple Sign-In for PayVora.
  *
  * Google auth is isolated to its own inner component so it can be
  * conditionally rendered. On iOS, it requires a dedicated iOS OAuth

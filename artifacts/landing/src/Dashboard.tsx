@@ -292,7 +292,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Top Bar: AZA Title ──────────────────────────────────────────────── */}
+      {/* ── Top Bar: PayVora Title ──────────────────────────────────────────── */}
       <div style={{
         position: "absolute", top: 50, left: 0, right: 0,
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -300,7 +300,7 @@ export default function Dashboard() {
         <span style={{
           fontFamily: "Roboto, sans-serif", fontWeight: 800,
           fontSize: 20, color: "#0B0A0A", letterSpacing: "0.5px",
-        }}>AZA</span>
+        }}>PayVora</span>
       </div>
 
       {/* ── Greeting Row ───────────────────────────────────────────────────── */}
