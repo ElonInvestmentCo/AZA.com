@@ -18,34 +18,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Mobile"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "AZA Web Preview"
+args = "Start application"
 
 [[workflows.workflow]]
-name = "AZA Mobile"
+name = "Start application"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run dev"
+args = "pnpm --filter @workspace/api-server run dev"
+waitForPort = 8080
 
 [workflows.workflow.metadata]
 outputType = "console"
-
-[[workflows.workflow]]
-name = "AZA Web Preview"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run web"
-waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -86,6 +71,10 @@ externalPort = 5000
 [[ports]]
 localPort = 19665
 externalPort = 3003
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
 
 [nix]
 channel = "stable-25_05"
