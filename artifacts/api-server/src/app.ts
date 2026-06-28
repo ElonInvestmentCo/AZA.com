@@ -74,11 +74,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 app.get("/", async (_req: Request, res: Response) => {
-  const [azaUrl, payvoraUrl] = await Promise.all([
+  const [mobileUrl, payvoraUrl] = await Promise.all([
     getExpoUrl(19000),
     getExpoUrl(19001),
   ]);
-  const html = await buildQrPage(azaUrl, payvoraUrl);
+  const html = await buildQrPage(mobileUrl, payvoraUrl);
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.send(html);
 });

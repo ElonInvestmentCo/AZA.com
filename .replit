@@ -22,7 +22,7 @@ args = "API Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Mobile (Expo)"
+args = "Payvora Mobile (Expo)"
 
 [[workflows.workflow]]
 name = "API Server"
@@ -37,16 +37,16 @@ args = "node --enable-source-maps artifacts/api-server/dist/index.mjs"
 waitForPort = 8080
 
 [[workflows.workflow]]
-name = "AZA Mobile (Expo)"
+name = "Payvora Mobile (Expo)"
 author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/mobile run qr"
 waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"

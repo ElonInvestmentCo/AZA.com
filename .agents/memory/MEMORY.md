@@ -1,5 +1,6 @@
-- [AZA mobile color theme](aza-light-theme.md) — AZA mobile app uses white/light theme; colors.ts accent is #35C2C1 teal, bg #FFFFFF; payvora app is a separate dark-branded artifact.
+- [Payvora mobile color theme](aza-light-theme.md) — Payvora mobile app (artifacts/mobile) uses a DARK theme; accent #35C2C1 teal, bg #0A0A0F; rebrand from AZA to Payvora fully complete as of 2025-06-28.
 - [Payvora production config](payvora-production-config.md) — Railway + www.payvora.org wiring: app.config.js, CORS, API URL resolution, OAuth redirect URIs.
 - [Expo package versions](expo-package-versions.md) — expo 54 requires expo-auth-session ~7.0.11, expo-crypto ~15.0.9, expo-apple-authentication ~8.0.8; ^56.x versions break with "Cannot find native module ExpoCryptoAES".
 - [Lottie web incompatibility](lottie-web-compat.md) — lottie-react-native v7.x web shim uses DotLottieReact which only supports .lottie format, not JSON; use react-native-svg for cross-platform animations instead.
 - [DotLottie web rendering](dotlottie-web-rendering.md) — DotLottieReact from @lottiefiles/dotlottie-react renders correctly inside RN Web views via .web.tsx files using remote URLs; use lottie-react-native for native and DotLottieReact for web.
+- [API Server workflow startup](api-server-workflow.md) — API Server build takes ~30s before port 8080 opens; workflow restart tool always times out but server IS running (confirmed via logs). Workflow command is "node --enable-source-maps artifacts/api-server/dist/index.mjs" — build separately first with bash, then restart.
