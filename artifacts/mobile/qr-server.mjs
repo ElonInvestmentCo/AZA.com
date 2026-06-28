@@ -66,8 +66,8 @@ if (process.env.REPL_ID)
   expoEnv.EXPO_PUBLIC_REPL_ID = process.env.REPL_ID;
 
 const expo = spawn(
-  "pnpm",
-  ["exec", "expo", "start", "--tunnel", "--port", "19000"],
+  path.join(__dirname, "node_modules", ".bin", "expo"),
+  ["start", "--tunnel", "--port", "19000"],
   { cwd: __dirname, env: expoEnv, stdio: ["ignore", "pipe", "pipe"] }
 );
 
