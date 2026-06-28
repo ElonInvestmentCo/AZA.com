@@ -7,49 +7,37 @@ const monorepoRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(projectRoot);
 
-/* ── pnpm monorepo: watch only the workspace lib packages mobile uses ─
-   Watching the entire monorepoRoot would cause Metro to crawl all of
-   root node_modules (~1000 packages) and stall. We target only the
-   lib packages this app actually imports.                              */
+/* ── pnpm monorepo: watch workspace lib packages this app imports ────────
+   Do NOT add the full monorepoRoot — that causes Metro to crawl all of
+   root/node_modules (~1000 packages) and stall.                          */
 const workspaceLibs = [
   path.resolve(monorepoRoot, "lib/api-client-react"),
   path.resolve(monorepoRoot, "lib/api-spec"),
   path.resolve(monorepoRoot, "lib/api-zod"),
   path.resolve(monorepoRoot, "lib/db"),
-];
-config.watchFolders = workspaceLibs.filter((p) => fs.existsSync(p));
+].filter((p) => fs.existsSync(p));
 
+config.watchFolders = workspaceLibs;
+
+/* ── Resolve packages from both project and root node_modules ────────── */
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(monorepoRoot, "node_modules"),
 ];
 
-/* ── pnpm stores real packages in .pnpm; enable symlink resolution ── */
-config.resolver.unstable_enableSymlinks = true;
+/* ── CRITICAL for pnpm: do NOT follow symlinks ───────────────────────────
+   pnpm stores real files in root/node_modules/.pnpm (the virtual store).
+   Package folders like artifacts/mobile/node_modules/expo-router are
+   symlinks into that store. With unstable_enableSymlinks=true, Metro
+   follows them to .pnpm which is NOT in watchFolders → "unable to resolve"
+   from workspace root. With symlinks disabled, Metro treats the symlink
+   path as the canonical directory (within projectRoot) and resolves
+   normally without ever leaving the watched tree.                         */
+config.resolver.unstable_enableSymlinks = false;
 
-// Fix for pnpm + Metro: Metro's FallbackWatcher crashes when it tries to watch
-// node_modules subdirectories inside pnpm packages that don't exist.
-const originalWatch = fs.watch;
-fs.watch = function (filename, options, listener) {
-  try {
-    return originalWatch(filename, options, listener);
-  } catch (e) {
-    if (e.code === "ENOENT") {
-      return { close: () => {} };
-    }
-    throw e;
-  }
-};
-
-/* ── Allow all hosts so Replit's proxy can reach the dev server ───── */
-config.server = {
-  ...config.server,
-  enhanceMiddleware: (middleware) => {
-    return (req, res, next) => {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      return middleware(req, res, next);
-    };
-  },
-};
+/* ── Prevent Metro walking up past projectRoot to find modules ─────────
+   Ensures packages are only resolved from the nodeModulesPaths above,
+   not from accidental ancestor directories.                               */
+config.resolver.disableHierarchicalLookup = true;
 
 module.exports = config;
