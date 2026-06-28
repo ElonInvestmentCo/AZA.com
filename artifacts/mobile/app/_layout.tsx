@@ -18,6 +18,14 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/context/AuthContext";
 import { NotificationsProvider } from "@/context/NotificationsContext";
 
+/* ── Keyboard controller availability (checked once at module load) ───────── */
+let KeyboardProviderComponent: React.ComponentType<{ children: React.ReactNode }> | null = null;
+try {
+  KeyboardProviderComponent = require("react-native-keyboard-controller").KeyboardProvider;
+} catch {
+  KeyboardProviderComponent = null;
+}
+
 // Splash screen is only managed on native — skip entirely on web
 if (Platform.OS !== "web") {
   SplashScreen.preventAutoHideAsync();
@@ -61,15 +69,13 @@ async function preloadAssets() {
 
 /* ── Safe KeyboardProvider wrapper ─────────────────────────────────────────
    react-native-keyboard-controller may not be available in all environments.
-   If it fails to load or render, we silently fall back to a plain View.      */
+   The module availability is checked once at module load (above), never
+   inside the render path, so React's reconciler sees a stable component tree. */
 function SafeKeyboardProvider({ children }: { children: React.ReactNode }) {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { KeyboardProvider } = require("react-native-keyboard-controller");
-    return <KeyboardProvider>{children}</KeyboardProvider>;
-  } catch {
-    return <>{children}</>;
+  if (KeyboardProviderComponent) {
+    return <KeyboardProviderComponent>{children}</KeyboardProviderComponent>;
   }
+  return <>{children}</>;
 }
 
 function RootLayoutNav() {

@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";

@@ -40,10 +40,14 @@ export default function SplashIndex() {
   const navigate = () => {
     screenOpacity.value = withTiming(0, { duration: 300, easing: Easing.in(Easing.cubic) });
     setTimeout(() => {
-      if (isAuthenticatedRef.current) {
-        router.replace("/(tabs)/" as any);
-      } else {
-        router.replace("/onboarding");
+      try {
+        if (isAuthenticatedRef.current) {
+          router.replace("/(tabs)" as any);
+        } else {
+          router.replace("/onboarding");
+        }
+      } catch (e) {
+        console.error("[SplashIndex] navigation failed:", e);
       }
     }, 320);
   };
