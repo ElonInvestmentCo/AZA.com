@@ -5,6 +5,9 @@ import * as LocalAuthentication from "expo-local-authentication";
 import * as ScreenCapture from "expo-screen-capture";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CardErrorFallback } from "@/components/CardErrorFallback";
 import {
   Alert,
   Platform,
@@ -509,7 +512,7 @@ function RevealButton({ revealed, onPress }: { revealed: boolean; onPress: () =>
 }
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
-export default function CardScreen() {
+function CardScreenInner() {
   const router    = useRouter();
   const insets    = useSafeAreaInsets();
   const { user }  = useAuth();
@@ -857,3 +860,12 @@ const s = StyleSheet.create({
     fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.navy,
   },
 });
+
+/* ─── Exported screen with error boundary ────────────────────────────────── */
+export default function CardScreen() {
+  return (
+    <ErrorBoundary FallbackComponent={CardErrorFallback}>
+      <CardScreenInner />
+    </ErrorBoundary>
+  );
+}
