@@ -1,0 +1,113 @@
+We've already spent hours debugging this and I need you to continue from here without repeating previous guesses.
+
+CURRENT STATUS
+
+• The app builds successfully.
+• Metro starts normally.
+• There are no obvious JavaScript errors.
+• Originally the app worked.
+• The crash first started only after navigating to the "My Card" screen.
+• Now the app crashes immediately during startup in Expo Go before I can even use it.
+
+Another AI previously claimed it fixed:
+- Missing expo-image import
+- SafeKeyboardProvider issue
+- Expo notifications plugin
+- Router navigation
+- Startup initialization
+
+Despite those fixes, the crash still exists.
+
+YOUR TASK
+
+Do NOT guess.
+
+Perform a real runtime investigation.
+
+1. Reproduce the crash.
+- Run the app in Expo Go.
+- Capture the COMPLETE Metro logs.
+- Capture every warning and error from startup until the crash.
+
+2. Find the exact failing component.
+The crash originally started when opening the "My Card" screen.
+
+Inspect everything rendered by that screen, including:
+- Every imported component
+- Every hook
+- Every provider
+- Every image
+- Every animation
+- Every icon library
+- Every context
+- Every API call
+- Every native module
+
+Use binary isolation (comment out sections one by one) until the crash disappears and identify the exact component causing it.
+
+3. Verify Expo Go compatibility.
+Audit every dependency, especially:
+- react-native-reanimated
+- react-native-gesture-handler
+- expo-image
+- expo-router
+- expo-blur
+- expo-haptics
+- expo-web-browser
+- react-native-keyboard-controller
+- vector icons
+- splash screen
+- any native library
+
+If any dependency is unsupported or incorrectly configured for Expo Go, replace it with an Expo-compatible implementation or temporarily disable it to confirm the root cause.
+
+4. Inspect startup.
+Carefully inspect:
+- App.tsx
+- app/_layout.tsx
+- RootLayout
+- AuthProvider
+- Navigation initialization
+- Splash screen logic
+- Startup hooks
+- Session restoration
+- AsyncStorage restoration
+
+5. Verify every asset.
+Check every imported:
+- PNG
+- SVG
+- Font
+- JSON
+- Animation
+- Image
+
+Confirm every path exists and every asset loads correctly.
+
+6. Run diagnostics.
+Run:
+- expo-doctor
+- Dependency compatibility checks
+- Package version validation
+
+Fix every incompatibility.
+
+IMPORTANT
+
+Do NOT stop after making one change.
+
+Continue testing after every fix until:
+- The app launches successfully.
+- The app no longer crashes.
+- Navigation to the "My Card" screen works correctly.
+- The app remains stable after reopening.
+
+When finished, report:
+
+1. The exact root cause.
+2. The exact file.
+3. The exact line number.
+4. Why it crashed.
+5. The exact code you changed.
+6. Why the fix resolved the crash.
+7. Confirmation that you personally tested it in Expo Go and verified that both startup and the "My Card" screen no longer crash.

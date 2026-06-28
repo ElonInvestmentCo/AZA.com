@@ -18,15 +18,32 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "PayVora Mobile (Expo)"
+args = "QR Preview Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "API Server"
 
 [[workflows.workflow]]
-name = "PayVora Mobile (Expo)"
+name = "QR Preview Server"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run dev"
+args = "pnpm --filter @workspace/mobile run qr"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow]]
+name = "API Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run dev"
+waitForPort = 8080
 
 [workflows.workflow.metadata]
 outputType = "console"
