@@ -19,7 +19,6 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
-  loginWithSocial: (email: string, name: string, provider: string) => Promise<void>;
   logout: () => void;
   updateBalance: (amount: number) => void;
 }
@@ -30,7 +29,6 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => false,
   register: async () => false,
-  loginWithSocial: async () => {},
   logout: () => {},
   updateBalance: () => {},
 });
@@ -42,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const restore = async () => {
       try {
-        const stored = await AsyncStorage.getItem("payvora_user");
+        const stored = await AsyncStorage.getItem("aza_user");
         if (stored) setUser(JSON.parse(stored));
       } catch {}
       setIsLoading(false);
@@ -53,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, _password: string) => {
     const u: User = { name: "Dove", email, balance: 200590 };
     setUser(u);
-    await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
+    await AsyncStorage.setItem("aza_user", JSON.stringify(u));
     return true;
   }, []);
 
@@ -61,24 +59,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (name: string, email: string, _password: string) => {
       const u: User = { name, email, balance: 0 };
       setUser(u);
-      await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
+      await AsyncStorage.setItem("aza_user", JSON.stringify(u));
       return true;
-    },
-    []
-  );
-
-  const loginWithSocial = useCallback(
-    async (email: string, name: string, _provider: string) => {
-      const u: User = { name: name || email.split("@")[0], email, balance: 200590 };
-      setUser(u);
-      await AsyncStorage.setItem("payvora_user", JSON.stringify(u));
     },
     []
   );
 
   const logout = useCallback(async () => {
     setUser(null);
-    await AsyncStorage.removeItem("payvora_user");
+    await AsyncStorage.removeItem("aza_user");
   }, []);
 
   const updateBalance = useCallback(
@@ -86,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!user) return;
       const updated = { ...user, balance: user.balance + amount };
       setUser(updated);
-      await AsyncStorage.setItem("payvora_user", JSON.stringify(updated));
+      await AsyncStorage.setItem("aza_user", JSON.stringify(updated));
     },
     [user]
   );
@@ -99,7 +88,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         register,
-        loginWithSocial,
         logout,
         updateBalance,
       }}

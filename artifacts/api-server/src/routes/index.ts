@@ -1,10 +1,8 @@
 import { Router, type IRouter } from "express";
-import healthRouter from "./health.js";
-import esimRouter from "./esim.js";
+import healthRouter from "./health";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
-router.use(esimRouter);
 
 export default router;

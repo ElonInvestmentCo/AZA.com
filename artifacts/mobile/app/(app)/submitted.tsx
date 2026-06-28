@@ -1,144 +1,94 @@
-import * as Haptics from "expo-haptics";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { scheduleTradeSubmitted, scheduleTradeCompleted } from "@/services/notifications";
-import {
-  Image,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const CANVAS_W = 393;
-const CANVAS_H = 852;
+import { StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AZAButton } from "@/components/AZAButton";
+import { useColors } from "@/hooks/useColors";
+import * as Haptics from "expo-haptics";
 
 export default function SubmittedScreen() {
   const router = useRouter();
-
-  const params   = useLocalSearchParams<{ cardType?: string; amount?: string; naira?: string }>();
-  const cardType = params.cardType ?? "Gift Card";
-  const amount   = params.amount   ?? "$100";
-  const naira    = params.naira    ?? "₦120,000";
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    scheduleTradeSubmitted(cardType, amount);
-    scheduleTradeCompleted(cardType, naira, 30);
-  }, [cardType, amount, naira]);
+  }, []);
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
-      <StatusBar barStyle="default" />
-      <View style={styles.canvasWrap}>
-        <View style={styles.canvas}>
-          <Image
-            source={require("@/assets/images/replica/success-illustration.png")}
-            style={styles.illustration}
-            resizeMode="contain"
-          />
-
-          <Image
-            source={require("@/assets/images/replica/badge-success.png")}
-            style={styles.badge}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.title}>Trade Submitted</Text>
-
-          <Text style={styles.subtitle}>
-            Your trade has been submitted{"\n"}successfully
-          </Text>
-
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.button}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace("/(tabs)" as any);
-            }}
-          >
-            <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
-        </View>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          paddingTop: insets.top + 40,
+          paddingBottom: insets.bottom + 24,
+        },
+      ]}
+    >
+      <View style={[styles.icon, { backgroundColor: colors.successLight }]}>
+        <Feather name="check-circle" size={52} color={colors.success} />
       </View>
-    </SafeAreaView>
+      <Text style={[styles.heading, { color: colors.text }]}>Submitted!</Text>
+      <Text style={[styles.sub, { color: colors.mutedForeground }]}>
+        Your gift card has been submitted for verification. You'll receive your payment shortly.
+      </Text>
+
+      <View style={styles.statusRow}>
+        {["Submitted", "Verifying", "Paid"].map((step, i) => (
+          <View key={step} style={styles.step}>
+            <View
+              style={[
+                styles.stepDot,
+                { backgroundColor: i === 0 ? colors.success : colors.border },
+              ]}
+            />
+            <Text
+              style={[
+                styles.stepLabel,
+                { color: i === 0 ? colors.text : colors.mutedForeground },
+              ]}
+            >
+              {step}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.actions}>
+        <AZAButton title="Go to Dashboard" onPress={() => router.replace("/(app)/dashboard")} />
+        <AZAButton
+          title="View Transactions"
+          onPress={() => router.replace("/(app)/transactions")}
+          variant="outline"
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  canvasWrap: {
+  container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
-    backgroundColor: "#FFFFFF",
-  },
-  canvas: {
-    width: CANVAS_W,
-    height: CANVAS_H,
-    maxWidth: "100%",
-    position: "relative",
-    backgroundColor: "#FFFFFF",
-  },
-  illustration: {
-    position: "absolute",
-    left: 29,
-    top: 55,
-    width: 295.7,
-    height: 232.34,
-  },
-  badge: {
-    position: "absolute",
-    left: 144,
-    top: 275,
-    width: 100,
-    height: 100,
-  },
-  title: {
-    position: "absolute",
-    top: 408,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#1F232C",
-    letterSpacing: 0.2,
-    fontFamily: "Manrope_700Bold",
-  },
-  subtitle: {
-    position: "absolute",
-    top: 452,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#8E94A5",
-    fontWeight: "400",
-    fontFamily: "Manrope_400Regular",
-  },
-  button: {
-    position: "absolute",
-    left: 24,
-    right: 24,
-    top: 520,
-    height: 56,
-    backgroundColor: "#1F232C",
-    borderRadius: 12,
-    alignItems: "center",
+    paddingHorizontal: 28,
+    gap: 20,
     justifyContent: "center",
   },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: "Manrope_600SemiBold",
+  icon: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
+  heading: { fontSize: 28, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
+  sub: { fontSize: 15, fontFamily: "Manrope_400Regular", textAlign: "center", lineHeight: 22 },
+  statusRow: { flexDirection: "row", gap: 32, alignItems: "center", marginVertical: 8 },
+  step: { alignItems: "center", gap: 6 },
+  stepDot: { width: 12, height: 12, borderRadius: 6 },
+  stepLabel: { fontSize: 12, fontFamily: "Manrope_500Medium" },
+  actions: { width: "100%", gap: 12 },
 });

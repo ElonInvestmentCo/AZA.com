@@ -1,357 +1,228 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
-import { scheduleWalletFunded } from "@/services/notifications";
-import React, { useRef, useState } from "react";
+import React from "react";
 import {
-  KeyboardAvoidingView,
+  FlatList,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import { rf } from "@/utils/responsive";
+import { useColors } from "@/hooks/useColors";
 
-const C = {
-  bg:        "#FFFFFF",
-  text:      "#0B0A0A",
-  navy:      "#061941",
-  textSec:   "#595F67",
-  textMuted: "#6C7278",
-  inputBg:   "#F0F0F0",
-  border:    "#EDF1F3",
-  success:   "#00B03C",
-  dark:      "#010101",
-  black:     "#000000",
-};
-
-const BANKS = [
-  "Access Bank", "First Bank", "GTBank", "UBA", "Zenith Bank",
-  "Fidelity Bank", "Union Bank", "Sterling Bank", "FCMB", "Polaris Bank",
+const TRANSACTIONS = [
+  { id: "1", title: "Amazon Gift Card", sub: "Sold • April 28, 2024", amount: "+₦200,040", positive: true },
+  { id: "2", title: "MTN Data Service", sub: "Withdraw • April 25, 2024", amount: "-₦15,000", positive: false },
+  { id: "3", title: "iTunes Gift Card", sub: "Sold • April 22, 2024", amount: "+₦89,500", positive: true },
+  { id: "4", title: "Steam Gift Card", sub: "Sold • April 20, 2024", amount: "+₦45,200", positive: true },
 ];
 
-const AMOUNTS = ["₦5,000", "₦10,000", "₦20,000", "₦50,000", "₦100,000"];
-
-/* ── Currency formatting helpers ──────────────────────────────────────────── */
-function formatWithCommas(raw: string): string {
-  const digits = raw.replace(/\D/g, "");
-  if (!digits) return "";
-  return parseInt(digits, 10).toLocaleString("en-NG");
-}
-
-function stripCommas(formatted: string): string {
-  return formatted.replace(/,/g, "");
-}
-
-function FieldLabel({ text }: { text: string }) {
-  return <Text style={f.label}>{text}</Text>;
-}
-
-function SelectField({
-  label, value, placeholder, onPress,
-}: {
-  label: string; value: string; placeholder: string; onPress: () => void;
-}) {
+function ActionBtn({ icon, label, onPress }: { icon: keyof typeof Feather.glyphMap; label: string; onPress: () => void }) {
+  const colors = useColors();
   return (
-    <View style={{ gap: 4 }}>
-      <FieldLabel text={label} />
-      <TouchableOpacity style={f.input} onPress={onPress} activeOpacity={0.8}>
-        <Text style={[f.val, !value && f.ph]}>{value || placeholder}</Text>
-        <Feather name="chevron-down" size={16} color={C.textMuted} />
-      </TouchableOpacity>
+    <TouchableOpacity style={styles.actionItem} onPress={onPress} activeOpacity={0.8}>
+      <View style={[styles.actionIcon, { backgroundColor: "rgba(255,255,255,0.15)" }]}>
+        <Feather name={icon} size={20} color="#fff" />
+      </View>
+      <Text style={styles.actionLabel}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
+export default function DashboardScreen() {
+  const router = useRouter();
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const { user, logout } = useAuth();
+
+  const topPad = Platform.OS === "web" ? 67 : insets.top;
+
+  const formatBalance = (n: number) =>
+    "₦" + n.toLocaleString("en-NG");
+
+  return (
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      {/* Header card */}
+      <View style={[styles.header, { paddingTop: topPad + 16 }]}>
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.greeting}>Hi, {user?.name ?? "User"} 👋</Text>
+            <Text style={styles.balanceLabel}>Available balance</Text>
+          </View>
+          <TouchableOpacity onPress={logout} activeOpacity={0.7}>
+            <Feather name="log-out" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.balance}>{formatBalance(user?.balance ?? 0)}</Text>
+
+        {/* Action row */}
+        <View style={styles.actions}>
+          <ActionBtn
+            icon="arrow-up"
+            label="Top Up"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
+          />
+          <ActionBtn
+            icon="send"
+            label="Send"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
+          />
+          <ActionBtn
+            icon="gift"
+            label="Gift Cards"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push("/(app)/gift-cards");
+            }}
+          />
+          <ActionBtn
+            icon="refresh-cw"
+            label="Withdraw"
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }}
+          />
+        </View>
+      </View>
+
+      {/* Content */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Quick sell card */}
+        <TouchableOpacity
+          style={[styles.sellCard, { backgroundColor: "#061941" }]}
+          onPress={() => router.push("/(app)/gift-cards")}
+          activeOpacity={0.9}
+        >
+          <View>
+            <Text style={styles.sellCardTitle}>Sell a Gift Card</Text>
+            <Text style={styles.sellCardSub}>Amazon, iTunes, Steam & more</Text>
+          </View>
+          <View style={[styles.sellCardBtn, { backgroundColor: "#fff" }]}>
+            <Feather name="arrow-right" size={18} color="#061941" />
+          </View>
+        </TouchableOpacity>
+
+        {/* Transactions */}
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Transactions</Text>
+          <TouchableOpacity onPress={() => router.push("/(app)/transactions")}>
+            <Text style={[styles.seeAll, { color: colors.mutedForeground }]}>See All</Text>
+          </TouchableOpacity>
+        </View>
+
+        {TRANSACTIONS.map((tx) => (
+          <View key={tx.id} style={[styles.txRow, { borderBottomColor: colors.border }]}>
+            <View style={[styles.txIcon, { backgroundColor: tx.positive ? colors.successLight : "#fff5f5" }]}>
+              <Feather
+                name={tx.positive ? "arrow-down-left" : "arrow-up-right"}
+                size={16}
+                color={tx.positive ? colors.success : colors.destructive}
+              />
+            </View>
+            <View style={styles.txMid}>
+              <Text style={[styles.txTitle, { color: colors.text }]}>{tx.title}</Text>
+              <Text style={[styles.txSub, { color: colors.mutedForeground }]}>{tx.sub}</Text>
+            </View>
+            <Text style={[styles.txAmount, { color: tx.positive ? colors.success : colors.destructive }]}>
+              {tx.amount}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
 
-const f = StyleSheet.create({
-  label: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24 },
-  input: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
-    backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border,
-    borderRadius: 10, paddingHorizontal: 14, height: 48,
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  header: {
+    backgroundColor: "#000",
+    paddingHorizontal: 24,
+    paddingBottom: 28,
   },
-  val: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
-  ph:  { color: "#646464", fontSize: 10 },
-});
-
-function PickerModal({
-  visible, title, options, onSelect, onClose,
-}: {
-  visible: boolean; title: string; options: string[];
-  onSelect: (v: string) => void; onClose: () => void;
-}) {
-  return (
-    <AnimatedSheet visible={visible} onClose={onClose} maxHeight="60%">
-      <Text style={pm.title}>{title}</Text>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {options.map(o => (
-          <TouchableOpacity
-            key={o}
-            style={pm.option}
-            onPress={() => { Haptics.selectionAsync(); onSelect(o); onClose(); }}
-          >
-            <Text style={pm.optText}>{o}</Text>
-            <Feather name="chevron-right" size={16} color={C.textMuted} />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    </AnimatedSheet>
-  );
-}
-
-const pm = StyleSheet.create({
-  title:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
-  option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
-  optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
-});
-
-export default function DashboardScreen() {
-  const router  = useRouter();
-  const insets  = useSafeAreaInsets();
-  const { user } = useAuth();
-  const topPad  = Platform.OS === "web" ? 20 : insets.top;
-
-  const amountRef = useRef<TextInput>(null);
-
-  const [bank,       setBank]       = useState("");
-  const [acctNum,    setAcctNum]    = useState("");
-  const [amountRaw,  setAmountRaw]  = useState(""); // raw digits only
-  const [amountFmt,  setAmountFmt]  = useState(""); // formatted with commas
-  const [selAmt,     setSelAmt]     = useState("");
-  const [picker,     setPicker]     = useState(false);
-
-  const firstName = (user?.name ?? "User").split(" ")[0];
-  const balance   = user?.balance ?? 200590;
-  const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const canProceed = !!bank && acctNum.length === 10 && (!!amountRaw || !!selAmt);
-
-  const handleAmtChip = (a: string) => {
-    setSelAmt(a);
-    const raw = a.replace("₦", "").replace(/,/g, "");
-    setAmountRaw(raw);
-    setAmountFmt(parseInt(raw, 10).toLocaleString("en-NG"));
-  };
-
-  const handleAmountChange = (t: string) => {
-    const raw = t.replace(/\D/g, "");
-    setAmountRaw(raw);
-    setAmountFmt(raw ? parseInt(raw, 10).toLocaleString("en-NG") : "");
-    setSelAmt("");
-  };
-
-  const totalAmount = amountRaw
-    ? parseInt(amountRaw, 10)
-    : selAmt
-    ? parseInt(selAmt.replace("₦", "").replace(/,/g, ""), 10)
-    : 0;
-
-  return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: C.bg }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-
-      <Animated.View
-        entering={FadeInDown.duration(280).springify()}
-        style={[s.header, { paddingTop: topPad + 10 }]}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={s.backBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Feather name="arrow-left" size={22} color="#1E232C" />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>Fund Wallet</Text>
-        <View style={{ width: 44 }} />
-      </Animated.View>
-      <View style={s.divider} />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 48 }]}
-      >
-
-        {/* Balance card */}
-        <Animated.View entering={FadeInDown.duration(320).springify().delay(40)} style={s.balCard}>
-          <View style={s.balTop}>
-            <View style={[s.balDot, { backgroundColor: C.success }]} />
-            <Text style={s.balTag}>Wallet Balance</Text>
-          </View>
-          <Text style={s.balAmount}>{formatted}</Text>
-          <Text style={s.balSub}>Hi, {firstName} — fund your wallet below</Text>
-        </Animated.View>
-
-        {/* Bank selector */}
-        <Animated.View entering={FadeInDown.duration(300).springify().delay(70)}>
-          <SelectField
-            label="select bank"
-            value={bank}
-            placeholder="   Choose your bank"
-            onPress={() => setPicker(true)}
-          />
-        </Animated.View>
-
-        {/* Account number */}
-        <Animated.View entering={FadeInDown.duration(300).springify().delay(100)}>
-          <View style={{ gap: 4 }}>
-            <Text style={f.label}>account number</Text>
-            <View style={[f.input, acctNum.length === 10 && s.inputValid]}>
-              <TextInput
-                style={[f.val, { flex: 1 }]}
-                placeholder="   Enter 10-digit account number"
-                placeholderTextColor="#646464"
-                value={acctNum}
-                onChangeText={t => setAcctNum(t.replace(/\D/g, "").slice(0, 10))}
-                keyboardType="number-pad"
-                maxLength={10}
-                returnKeyType="next"
-                textContentType="none"
-                autoComplete="off"
-                onSubmitEditing={() => amountRef.current?.focus()}
-              />
-              {acctNum.length === 10 && (
-                <Feather name="check-circle" size={18} color={C.success} />
-              )}
-            </View>
-            {acctNum.length > 0 && acctNum.length < 10 && (
-              <Text style={s.fieldHint}>{acctNum.length}/10 digits</Text>
-            )}
-          </View>
-        </Animated.View>
-
-        {/* Quick amounts */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(130)}>
-          <Text style={[f.label, { marginBottom: 8 }]}>quick amount</Text>
-          <View style={s.quickRow}>
-            {AMOUNTS.map(a => (
-              <TouchableOpacity
-                key={a}
-                style={[s.quickChip, selAmt === a && { backgroundColor: C.black, borderColor: C.black }]}
-                onPress={() => { Haptics.selectionAsync(); handleAmtChip(a); }}
-              >
-                <Text style={[s.quickText, selAmt === a && { color: "#FFFFFF" }]}>{a}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Animated.View>
-
-        {/* Custom amount */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(155)}>
-          <View style={{ gap: 4 }}>
-            <Text style={f.label}>or enter custom amount</Text>
-            <View style={f.input}>
-              <Text style={{ fontSize: 14, fontFamily: "Manrope_700Bold", color: C.textMuted, marginRight: 4 }}>₦</Text>
-              <TextInput
-                ref={amountRef}
-                style={[f.val, { flex: 1 }]}
-                placeholder="0"
-                placeholderTextColor="#646464"
-                value={amountFmt}
-                onChangeText={handleAmountChange}
-                keyboardType="number-pad"
-                returnKeyType="done"
-                textContentType="none"
-                autoComplete="off"
-              />
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* Summary */}
-        {totalAmount > 0 && (
-          <Animated.View entering={FadeInUp.duration(260).springify()} style={s.summaryBox}>
-            <View style={s.summaryRow}>
-              <Text style={s.summaryLabel}>Amount</Text>
-              <Text style={s.summaryValue}>₦{totalAmount.toLocaleString("en-NG")}</Text>
-            </View>
-            <View style={s.summaryLine} />
-            <View style={s.summaryRow}>
-              <Text style={s.summaryLabel}>Fee</Text>
-              <Text style={s.summaryValue}>₦0.00</Text>
-            </View>
-            <View style={s.summaryLine} />
-            <View style={s.summaryRow}>
-              <Text style={s.summaryLabel}>Total</Text>
-              <Text style={[s.summaryValue, { fontFamily: "Manrope_700Bold", fontSize: 12 }]}>
-                ₦{totalAmount.toLocaleString("en-NG")}
-              </Text>
-            </View>
-          </Animated.View>
-        )}
-
-        <TouchableOpacity
-          style={[s.fundBtn, !canProceed && { opacity: 0.45 }]}
-          onPress={() => {
-            if (!canProceed) return;
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            const fmtAmt = totalAmount > 0
-              ? "₦" + totalAmount.toLocaleString("en-NG")
-              : selAmt || "₦0";
-            scheduleWalletFunded(fmtAmt);
-            const now = new Date();
-            const ref = "TXN-" + Math.random().toString(36).slice(2, 7).toUpperCase() + "-FW";
-            const date = now.toLocaleDateString("en-NG", { day: "2-digit", month: "short", year: "numeric" });
-            const time = now.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit", hour12: true }).toUpperCase();
-            router.push({
-              pathname: "/(app)/funding-success",
-              params: { amount: fmtAmt, ref, date, time, bank },
-            } as any);
-          }}
-          activeOpacity={0.85}
-        >
-          <Text style={s.fundBtnText}>Fund Wallet</Text>
-        </TouchableOpacity>
-
-      </ScrollView>
-
-      <PickerModal
-        visible={picker}
-        title="Select Bank"
-        options={BANKS}
-        onSelect={setBank}
-        onClose={() => setPicker(false)}
-      />
-    </KeyboardAvoidingView>
-  );
-}
-
-const s = StyleSheet.create({
-  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14, backgroundColor: C.bg },
-  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
-  divider:     { height: 1, backgroundColor: "#D1D1D1" },
-  scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
-
-  balCard:   { backgroundColor: "#F0F7FF", borderRadius: 16, padding: 20, gap: 8, borderWidth: 1, borderColor: "#C7DFFF" },
-  balTop:    { flexDirection: "row", alignItems: "center", gap: 7 },
-  balDot:    { width: 8, height: 8, borderRadius: 4 },
-  balTag:    { fontSize: rf(12), fontFamily: "Manrope_500Medium", color: C.textMuted },
-  balAmount: { fontSize: rf(30), fontFamily: "Manrope_700Bold", color: C.navy, letterSpacing: -0.5 },
-  balSub:    { fontSize: rf(12), fontFamily: "Manrope_400Regular", color: C.textSec },
-
-  inputValid: { borderColor: C.success, borderWidth: 1.5 },
-  fieldHint:  { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMuted, paddingLeft: 2 },
-
-  quickRow:  { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  quickChip: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA" },
-  quickText: { fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.textSec },
-
-  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
-  summaryRow:   { flexDirection: "row", justifyContent: "space-between", paddingVertical: 12 },
-  summaryLine:  { height: 1, backgroundColor: "rgba(255,255,255,0.1)" },
-  summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
-  summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
-
-  fundBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
-  fundBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+  greeting: { color: "#fff", fontSize: 14, fontFamily: "Manrope_400Regular", opacity: 0.7 },
+  balanceLabel: { color: "#fff", fontSize: 13, fontFamily: "Manrope_400Regular", opacity: 0.6, marginTop: 2 },
+  balance: {
+    color: "#fff",
+    fontSize: 34,
+    fontFamily: "Manrope_700Bold",
+    letterSpacing: -1,
+    marginBottom: 24,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  actionItem: { alignItems: "center", gap: 6 },
+  actionIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionLabel: { color: "#fff", fontSize: 11, fontFamily: "Manrope_500Medium", opacity: 0.85 },
+  content: { paddingHorizontal: 20, paddingTop: 20, gap: 0 },
+  sellCard: {
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 28,
+  },
+  sellCardTitle: { color: "#fff", fontSize: 16, fontFamily: "Manrope_700Bold", marginBottom: 4 },
+  sellCardSub: { color: "rgba(255,255,255,0.6)", fontSize: 13, fontFamily: "Manrope_400Regular" },
+  sellCardBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  sectionTitle: { fontSize: 17, fontFamily: "Manrope_700Bold" },
+  seeAll: { fontSize: 13, fontFamily: "Manrope_500Medium" },
+  txRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 12,
+  },
+  txIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  txMid: { flex: 1 },
+  txTitle: { fontSize: 14, fontFamily: "Manrope_600SemiBold", marginBottom: 2 },
+  txSub: { fontSize: 12, fontFamily: "Manrope_400Regular" },
+  txAmount: { fontSize: 14, fontFamily: "Manrope_700Bold" },
 });

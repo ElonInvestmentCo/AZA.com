@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 
@@ -11,52 +11,40 @@ interface ScreenHeaderProps {
   rightAction?: React.ReactNode;
 }
 
-export function ScreenHeader({
-  title,
-  showBack = true,
-  rightAction,
-}: ScreenHeaderProps) {
+export function ScreenHeader({ title, showBack = true, rightAction }: ScreenHeaderProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const topPad = Platform.OS === "web" ? 16 : insets.top + 8;
 
   return (
     <View
       style={[
-        s.container,
+        styles.container,
         {
-          paddingTop: topPad,
-          backgroundColor: colors.background,
+          paddingTop: insets.top + 8,
           borderBottomColor: colors.border,
+          backgroundColor: colors.background,
         },
       ]}
     >
-      <View style={s.row}>
+      <View style={styles.row}>
         {showBack ? (
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={[
-              s.backBtn,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-            activeOpacity={0.75}
-          >
-            <Feather name="chevron-left" size={20} color={colors.text} />
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+            <Feather name="arrow-left" size={22} color={colors.text} />
           </TouchableOpacity>
         ) : (
-          <View style={s.spacer} />
+          <View style={styles.spacer} />
         )}
         {title ? (
-          <Text style={[s.title, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         ) : null}
-        <View style={s.spacer}>{rightAction}</View>
+        <View style={styles.spacer}>{rightAction}</View>
       </View>
     </View>
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingBottom: 12,
@@ -70,14 +58,12 @@ const s = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: 12,
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
-    borderWidth: 1,
   },
   title: {
     fontSize: 17,
-    fontFamily: "Manrope_700Bold",
+    fontWeight: "600" as const,
     letterSpacing: -0.3,
   },
   spacer: {

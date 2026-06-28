@@ -1,229 +1,112 @@
 import { Feather } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { rf } from "@/utils/responsive";
+import { AZAButton } from "@/components/AZAButton";
+import { ScreenHeader } from "@/components/ScreenHeader";
+import { useAuth } from "@/context/AuthContext";
+import { useColors } from "@/hooks/useColors";
 
-const C = {
-  bg:        "#FFFFFF",
-  text:      "#1B1B1B",
-  textSec:   "#6C7278",
-  border:    "#D1D1D1",
-  borderSoft:"#E9E9E9",
-  dark:      "#010101",
-  black:     "#000000",
-};
-
-const RATE = 1200;
-
-/* Simulates the async trade submission API call.
-   Returns { status: "submitted" | "rejected" }.
-   Replace this with a real API call when available. */
-async function submitTradeAPI(): Promise<{ status: "submitted" | "rejected" }> {
-  return new Promise(resolve =>
-    setTimeout(() => resolve({ status: "submitted" }), 1200)
-  );
-}
+const DETAILS = [
+  { label: "Gift Card", value: "Amazon — $100" },
+  { label: "Rate", value: "₦780/$1" },
+  { label: "You Receive", value: "₦78,000" },
+  { label: "Processing Fee", value: "₦0" },
+  { label: "Settlement Time", value: "Instant" },
+];
 
 export default function ConfirmTransactionScreen() {
-  const router  = useRouter();
-  const insets  = useSafeAreaInsets();
-  const topPad  = Platform.OS === "web" ? 20 : insets.top;
+  const router = useRouter();
+  const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const { updateBalance } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const params = useLocalSearchParams<{
-    category:  string;
-    country:   string;
-    type:      string;
-    amountUSD: string;
-    total:     string;
-  }>();
-
-  const category  = params.category  || "Amazon";
-  const country   = params.country   || "";
-  const cardType  = params.type      || "";
-  const amountUSD = params.amountUSD || "200";
-  const totalNGN  = params.total     ? Number(params.total) : Number(amountUSD) * RATE;
-
-  const amountLabel  = `$${Number(amountUSD).toLocaleString("en-US")}`;
-  const totalLabel   = `₦${totalNGN.toLocaleString("en-NG")}`;
-  const subtypeLabel = [country, cardType].filter(Boolean).join(" — ") || "—";
-
-  const now     = new Date();
-  const dateStr = now.toLocaleString("en-US", {
-    month: "short", day: "2-digit", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  });
-
-  const ROWS = [
-    {
-      left:  { label: "Date & Time",           value: dateStr      },
-      right: { label: "Total Amount",           value: totalLabel   },
-    },
-    {
-      left:  { label: "Gift Card Category",     value: category     },
-      right: { label: "Gift Card Type / Origin", value: subtypeLabel },
-    },
-    {
-      left:  { label: "Gift Card Amount",       value: amountLabel  },
-      right: null,
-    },
-  ];
-
-  const handleSubmit = async () => {
-    if (loading) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const handleConfirm = () => {
     setLoading(true);
-
-    const { status } = await submitTradeAPI();
-
-    setLoading(false);
-
-    if (status === "rejected") {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      router.push({
-        pathname: "/(app)/rejected" as any,
-        params: { cardType: `${category} Gift Card`, amount: amountLabel },
-      });
-    } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.push({
-        pathname: "/(app)/submitted" as any,
-        params: { cardType: `${category} Gift Card`, amount: amountLabel, naira: totalLabel },
-      });
-    }
+    setTimeout(() => {
+      updateBalance(78000);
+      setLoading(false);
+      router.replace("/(app)/submitted");
+    }, 1500);
   };
 
   return (
-    <View style={s.root}>
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <ScreenHeader title="Confirm Transaction" />
+      <View style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.cardIconBg, { backgroundColor: "#e8f4ff" }]}>
+            <Feather name="gift" size={28} color="#0066cc" />
+          </View>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Transaction Summary</Text>
 
-      {/* Header */}
-      <Animated.View
-        entering={FadeInDown.duration(280).springify()}
-        style={[s.header, { paddingTop: topPad + 10 }]}
-      >
-        <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-          <Feather name="arrow-left" size={22} color="#1E232C" />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>Confirm transaction Details</Text>
-        <View style={{ width: 44 }} />
-      </Animated.View>
-      <View style={s.topDivider} />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}
-      >
-
-        {/* Detail rows */}
-        <Animated.View entering={FadeInDown.duration(320).springify().delay(40)} style={s.detailCard}>
-          {ROWS.map((row, i) => (
-            <View key={i}>
-              <View style={s.pairRow}>
-                <View style={s.pairCell}>
-                  <Text style={s.detailLabel}>{row.left.label}</Text>
-                  <Text style={s.detailValue}>{row.left.value}</Text>
-                </View>
-                {row.right && (
-                  <View style={[s.pairCell, { alignItems: "flex-end" }]}>
-                    <Text style={s.detailLabel}>{row.right.label}</Text>
-                    <Text style={[s.detailValue, { textAlign: "right" }]}>{row.right.value}</Text>
-                  </View>
-                )}
-              </View>
-              {i < ROWS.length - 1 && <View style={s.rowDivider} />}
+          {DETAILS.map((d, i) => (
+            <View
+              key={i}
+              style={[
+                styles.detailRow,
+                { borderBottomColor: colors.border },
+                i === DETAILS.length - 1 ? { borderBottomWidth: 0 } : {},
+              ]}
+            >
+              <Text style={[styles.detailLabel, { color: colors.mutedForeground }]}>{d.label}</Text>
+              <Text
+                style={[
+                  styles.detailValue,
+                  { color: d.label === "You Receive" ? colors.success : colors.text },
+                  d.label === "You Receive" ? { fontFamily: "Manrope_700Bold" } : {},
+                ]}
+              >
+                {d.value}
+              </Text>
             </View>
           ))}
-        </Animated.View>
+        </View>
 
-        {/* Gift card image */}
-        <Animated.View entering={FadeInDown.duration(300).springify().delay(80)}>
-          <Text style={s.imgLabel}>gift card image</Text>
-          <View style={s.imgRow}>
-            <View style={[s.imgThumb, { backgroundColor: "#FFB6C1" }]}>
-              <Feather name="image" size={18} color="#C0392B" />
-            </View>
-            <View style={[s.imgThumb, { backgroundColor: "#AED6F1" }]}>
-              <Feather name="image" size={18} color="#2980B9" />
-            </View>
-            <View style={[s.imgThumb, { backgroundColor: "#BBBBBB" }]}>
-              <Feather name="plus" size={16} color="#fff" />
-            </View>
-          </View>
-        </Animated.View>
+        <Text style={[styles.disclaimer, { color: colors.mutedForeground }]}>
+          By confirming, you agree that the gift card details are correct and valid.
+        </Text>
 
-        {/* Summary */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(120)} style={s.summaryBox}>
-          <View style={s.summaryRow}>
-            <Text style={s.summaryLabel}>Rate</Text>
-            <Text style={s.summaryValue}>₦{RATE.toLocaleString("en-NG")} / $1</Text>
-          </View>
-          <View style={s.summaryLine} />
-          <View style={s.summaryRow}>
-            <Text style={s.summaryLabel}>Total:</Text>
-            <Text style={[s.summaryValue, { fontSize: 15, fontFamily: "Manrope_700Bold" }]}>
-              {totalLabel}
-            </Text>
-          </View>
-        </Animated.View>
-
-        {/* Submit */}
-        <Animated.View entering={FadeInUp.duration(300).springify().delay(160)}>
-          <TouchableOpacity
-            style={[s.submitBtn, loading && { opacity: 0.72 }]}
-            onPress={handleSubmit}
-            activeOpacity={0.85}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <Text style={s.submitBtnText}>Submit Trade</Text>
-            )}
-          </TouchableOpacity>
-        </Animated.View>
-
-      </ScrollView>
+        <AZAButton title="Confirm & Submit" onPress={handleConfirm} loading={loading} />
+        <AZAButton
+          title="Cancel"
+          onPress={() => router.back()}
+          variant="outline"
+        />
+      </View>
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  root:        { flex: 1, backgroundColor: C.bg },
-  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 14 },
-  backBtn:     { width: 44, height: 44, alignItems: "center", justifyContent: "center" },
-  headerTitle: { fontSize: 13, fontFamily: "Manrope_700Bold", color: C.text, textTransform: "capitalize" },
-  topDivider:  { height: 1, backgroundColor: C.border },
-  scroll:      { paddingHorizontal: 20, paddingTop: 24, gap: 20 },
-
-  detailCard:  { borderRadius: 12, borderWidth: 1, borderColor: "#EEEEEE", backgroundColor: C.bg, overflow: "hidden" },
-  pairRow:     { paddingHorizontal: 16, paddingVertical: 14, flexDirection: "row", justifyContent: "space-between" },
-  pairCell:    { flex: 1, gap: 4 },
-  rowDivider:  { height: 1, backgroundColor: "#F5F5F5" },
-  detailLabel: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec, letterSpacing: 0.24 },
-  detailValue: { fontSize: 12, fontFamily: "Manrope_700Bold", color: C.text, letterSpacing: 0.24 },
-
-  imgLabel: { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textSec, textTransform: "capitalize", letterSpacing: 0.24, marginBottom: 10 },
-  imgRow:   { flexDirection: "row", gap: 10 },
-  imgThumb: { width: 49, height: 49, borderRadius: 24.5, alignItems: "center", justifyContent: "center" },
-
-  summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
-  summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 14 },
-  summaryLine:  { height: 1, backgroundColor: C.borderSoft },
-  summaryLabel: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF", letterSpacing: -0.1 },
-  summaryValue: { fontSize: 10, fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-
-  submitBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
-  submitBtnText: { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  content: { flex: 1, paddingHorizontal: 20, paddingTop: 20, gap: 16 },
+  card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 20,
+    gap: 0,
+  },
+  cardIconBg: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  cardTitle: { fontSize: 17, fontFamily: "Manrope_700Bold", textAlign: "center", marginBottom: 16 },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  detailLabel: { fontSize: 14, fontFamily: "Manrope_400Regular" },
+  detailValue: { fontSize: 14, fontFamily: "Manrope_600SemiBold" },
+  disclaimer: { fontSize: 12, fontFamily: "Manrope_400Regular", lineHeight: 18, textAlign: "center" },
 });
