@@ -12,7 +12,6 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useState } from "react";
 import { Image as RNImage, Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -57,6 +56,19 @@ async function preloadAssets() {
     }
   } catch {
     // Non-fatal — app works fine without pre-warming
+  }
+}
+
+/* ── Safe KeyboardProvider wrapper ─────────────────────────────────────────
+   react-native-keyboard-controller may not be available in all environments.
+   If it fails to load or render, we silently fall back to a plain View.      */
+function SafeKeyboardProvider({ children }: { children: React.ReactNode }) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { KeyboardProvider } = require("react-native-keyboard-controller");
+    return <KeyboardProvider>{children}</KeyboardProvider>;
+  } catch {
+    return <>{children}</>;
   }
 }
 
@@ -108,13 +120,13 @@ export default function RootLayout() {
             onLayout={onLayoutReady}
           >
             <View style={webContainerStyle}>
-              <KeyboardProvider>
+              <SafeKeyboardProvider>
                 <AuthProvider>
                   <NotificationsProvider>
                     <RootLayoutNav />
                   </NotificationsProvider>
                 </AuthProvider>
-              </KeyboardProvider>
+              </SafeKeyboardProvider>
             </View>
           </GestureHandlerRootView>
         </QueryClientProvider>

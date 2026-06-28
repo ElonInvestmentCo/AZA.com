@@ -1,14 +1,27 @@
 import { Platform } from "react-native";
 
-let Notifications: typeof import("expo-notifications") | null = null;
-
-function getNotifications() {
-  if (Platform.OS === "web") return null;
-  if (Notifications) return Notifications;
+// Detect Expo Go — notifications crash in Expo Go (SDK 53+)
+function isExpoGo(): boolean {
   try {
-    Notifications = require("expo-notifications");
+    const Constants = require("expo-constants").default;
+    return Constants?.appOwnership === "expo";
+  } catch {
+    return false;
+  }
+}
+
+const SKIP_NOTIFICATIONS = Platform.OS === "web" || isExpoGo();
+
+type NotificationsModule = typeof import("expo-notifications");
+let _N: NotificationsModule | null = null;
+
+function getN(): NotificationsModule | null {
+  if (SKIP_NOTIFICATIONS) return null;
+  if (_N) return _N;
+  try {
+    _N = require("expo-notifications") as NotificationsModule;
     try {
-      Notifications?.setNotificationHandler({
+      _N?.setNotificationHandler({
         handleNotification: async () => ({
           shouldShowAlert: true,
           shouldPlaySound: true,
@@ -18,16 +31,15 @@ function getNotifications() {
         }),
       });
     } catch {}
-    return Notifications;
+    return _N;
   } catch {
     return null;
   }
 }
 
 export async function requestNotificationPermissions(): Promise<boolean> {
-  if (Platform.OS === "web") return false;
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return false;
     const existing = await N.getPermissionsAsync() as unknown as { status: string };
     if (existing.status === "granted") return true;
@@ -39,9 +51,8 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 }
 
 export async function getExpoPushToken(): Promise<string | null> {
-  if (Platform.OS === "web") return null;
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return null;
     const granted = await requestNotificationPermissions();
     if (!granted) return null;
@@ -52,18 +63,14 @@ export async function getExpoPushToken(): Promise<string | null> {
   }
 }
 
-export async function scheduleTradeSubmitted(
-  cardType: string,
-  amount: string,
-): Promise<void> {
-  if (Platform.OS === "web") return;
+export async function scheduleTradeSubmitted(cardType: string, amount: string): Promise<void> {
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return;
     await N.scheduleNotificationAsync({
       content: {
         title: "Trade Submitted 🎉",
-        body: `Your ${cardType} trade for ${amount} is under review. We'll notify you once it's processed.`,
+        body: `Your ${cardType} trade for ${amount} is under review.`,
         data: { type: "trade_submitted", cardType, amount },
       },
       trigger: null,
@@ -71,19 +78,14 @@ export async function scheduleTradeSubmitted(
   } catch {}
 }
 
-export async function scheduleTradeCompleted(
-  cardType: string,
-  nairaAmount: string,
-  delaySeconds = 30,
-): Promise<void> {
-  if (Platform.OS === "web") return;
+export async function scheduleTradeCompleted(cardType: string, nairaAmount: string, delaySeconds = 30): Promise<void> {
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return;
     await N.scheduleNotificationAsync({
       content: {
         title: "Trade Completed ✅",
-        body: `Your ${cardType} trade has been approved! ${nairaAmount} has been credited to your wallet.`,
+        body: `Your ${cardType} trade has been approved! ${nairaAmount} credited to your wallet.`,
         data: { type: "trade_completed", cardType, nairaAmount },
       },
       trigger: { type: (N as any).SchedulableTriggerInputTypes?.TIME_INTERVAL ?? "timeInterval", seconds: delaySeconds },
@@ -92,9 +94,8 @@ export async function scheduleTradeCompleted(
 }
 
 export async function scheduleWalletFunded(amount: string): Promise<void> {
-  if (Platform.OS === "web") return;
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return;
     await N.scheduleNotificationAsync({
       content: {
@@ -107,14 +108,9 @@ export async function scheduleWalletFunded(amount: string): Promise<void> {
   } catch {}
 }
 
-export async function scheduleStatusUpdate(
-  cardType: string,
-  ref: string,
-  newStatus: "approved" | "rejected",
-): Promise<void> {
-  if (Platform.OS === "web") return;
+export async function scheduleStatusUpdate(cardType: string, ref: string, newStatus: "approved" | "rejected"): Promise<void> {
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return;
     const approved = newStatus === "approved";
     await N.scheduleNotificationAsync({
@@ -131,9 +127,8 @@ export async function scheduleStatusUpdate(
 }
 
 export async function cancelAllNotifications(): Promise<void> {
-  if (Platform.OS === "web") return;
   try {
-    const N = getNotifications();
+    const N = getN();
     if (!N) return;
     await N.cancelAllScheduledNotificationsAsync();
   } catch {}
