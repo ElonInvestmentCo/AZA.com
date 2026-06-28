@@ -16,7 +16,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /* ── State ───────────────────────────────────────────────────────────────── */
-let tunnelUrl = null;
+// Use Replit's built-in Expo proxy domain instead of ngrok tunnel
+const replitExpoDomain = process.env.REPLIT_EXPO_DEV_DOMAIN;
+let tunnelUrl = replitExpoDomain ? `exp://${replitExpoDomain}` : null;
 let metroReady = false;
 let expoLogs   = [];
 
@@ -67,7 +69,7 @@ if (process.env.REPL_ID)
 
 const expo = spawn(
   path.join(__dirname, "node_modules", ".bin", "expo"),
-  ["start", "--tunnel", "--port", "19000"],
+  ["start", "--port", "19000", "--clear"],
   { cwd: __dirname, env: expoEnv, stdio: ["ignore", "pipe", "pipe"] }
 );
 
@@ -80,14 +82,11 @@ function onData(chunk) {
     if (expoLogs.length > 80) expoLogs.shift();
     if (
       line.includes("Metro waiting on") ||
-      line.includes("Tunnel ready") ||
-      line.includes("Tunnel connected") ||
-      line.includes("Waiting on http://localhost")
+      line.includes("Waiting on http://localhost") ||
+      line.includes("Starting Metro Bundler") ||
+      line.includes("Web is waiting") ||
+      line.includes("› Metro")
     ) metroReady = true;
-    if (!tunnelUrl) {
-      const m = line.match(/exp:\/\/[^\s\]"']+/);
-      if (m) { tunnelUrl = m[0]; console.log("[qr-server] URL from stdout:", tunnelUrl); }
-    }
   }
   process.stdout.write(chunk);
 }
