@@ -295,39 +295,31 @@ function AnimatedWalletSlide({
 
 // ── Free Card — rebuilt from Figma CSS specs (237×150 reference) ──────────────
 //
-// Layers (bottom → top):
-//   1. Base fill  #272A38
-//   2. Green gradient blob  linear-gradient(216.89deg, #009B6E → #99E200)
-//   3. Blue  gradient blob  linear-gradient(216.89deg, #009DCA → #0047BB)
-//   4. White vector elements (name, card-type, card-number, balance,
-//      amazon-logo strokes, mastercard circles)
+// All text content matches the card image exactly:
+//   John Smith / amazon wordmark / Amazon Platimun / 4756 •••• •••• 9018 / $3,469.52
 //
-// All positions are Figma percentages → multiplied by the rendered W / H.
-// Gradient angle 216.89° (CSS) ≈ start{x:0.80,y:0.10} → end{x:0.20,y:0.90} in RN.
+// Positions: Figma left/top percentages × rendered W/H.
+// Gradient angle 216.89° → start{x:0.80,y:0.10} end{x:0.20,y:0.90} in RN.
 function FreeCard({ cardW }: { cardW: number }) {
   const W = cardW;
-  const H = W * (150 / 237);   // Figma aspect ratio
-  const R = W * (18 / 237);    // corner radius scaled from reference
-
-  // ── helper: convert Figma left/right/top/bottom % to absolute layout ──
-  function box(l: number, r: number, t: number, b: number) {
-    return {
-      position: "absolute" as const,
-      left:   l * W,
-      top:    t * H,
-      width:  (1 - l - r) * W,
-      height: (1 - t - b) * H,
-    };
-  }
-
-  // Gradient blobs extend outside the card bounds — overflow:hidden clips them
-  const greenTop    = -0.1297 * H;
-  const greenHeight = (1 + 0.1297 - 0.3627) * H;   // 76.7% of H
-  const blueTop     =  0.3842 * H;
-  const blueHeight  = (1 + 0.1512 - 0.3842) * H;   // 76.7% of H
+  const H = W * (150 / 237);
+  const R = W * (18 / 237);
+  const s = W / 237;            // uniform scale factor from 237px reference
 
   const GRAD_START = { x: 0.80, y: 0.10 };
   const GRAD_END   = { x: 0.20, y: 0.90 };
+
+  const greenTop    = -0.1297 * H;
+  const greenHeight = (1 + 0.1297 - 0.3627) * H;
+  const blueTop     =  0.3842 * H;
+  const blueHeight  = (1 + 0.1512 - 0.3842) * H;
+
+  // Font sizes scaled from the Figma bounding-box heights at 237×150 reference
+  const nameFz     = s * 11.2;   // "John Smith"       — Figma top:11.6% bottom:80.95%
+  const brandFz    = s *  7.5;   // "Amazon Platimun"  — Figma top:48.57% bottom:46.47%
+  const numFz      = s *  8.0;   // card number        — Figma top:63.53%
+  const balanceFz  = s * 13.5;   // "$3,469.52"        — Figma top:77.58%
+  const amazonFz   = s *  6.5;   // "amazon" wordmark  — Figma top-right cluster
 
   return (
     <View style={{
@@ -367,48 +359,102 @@ function FreeCard({ cardW }: { cardW: number }) {
         }}
       />
 
-      {/* ── White vectors ────────────────────────────────────────────────── */}
+      {/* ── Text content ─────────────────────────────────────────────────── */}
 
-      {/* Name strip — "John Smith" (top-left, tallest left element) */}
-      <View style={[box(0.0731, 0.6164, 0.1160, 0.8095), { backgroundColor: "#fff", borderRadius: 2 }]} />
+      {/* "John Smith" — top-left, bold white */}
+      <Text style={{
+        position: "absolute",
+        left: 0.0731 * W,
+        top:  0.1160 * H,
+        color: "#FFFFFF",
+        fontSize: nameFz,
+        fontFamily: "Manrope_700Bold",
+        letterSpacing: 0.1,
+      }}>
+        John Smith
+      </Text>
 
-      {/* Card-type strip — "Amazon Platimun" */}
-      <View style={[box(0.0721, 0.5933, 0.4857, 0.4647), { backgroundColor: "#fff", borderRadius: 1 }]} />
+      {/* "amazon" wordmark — top-right, white */}
+      <View style={{ position: "absolute", right: 0.065 * W, top: 0.105 * H }}>
+        <Text style={{
+          color: "#FFFFFF",
+          fontSize: amazonFz,
+          fontFamily: "Manrope_700Bold",
+          letterSpacing: 0.5,
+        }}>
+          amazon
+        </Text>
+        {/* Curved-arrow underline — approximated as a bottom-rounded bar */}
+        <View style={{
+          height: s * 1.2,
+          marginTop: s * 0.8,
+          marginHorizontal: s * 1,
+          backgroundColor: "#FFFFFF",
+          borderRadius: s * 1,
+        }} />
+      </View>
 
-      {/* Card number — left segment */}
-      <View style={[box(0.0730, 0.8179, 0.6353, 0.3079), { backgroundColor: "#fff", borderRadius: 1 }]} />
+      {/* "Amazon Platimun" — mid-left, dimmed white */}
+      <Text style={{
+        position: "absolute",
+        left: 0.0721 * W,
+        top:  0.4857 * H,
+        color: "rgba(255,255,255,0.80)",
+        fontSize: brandFz,
+        fontFamily: "Manrope_400Regular",
+        letterSpacing: 0.1,
+      }}>
+        Amazon Platimun
+      </Text>
 
-      {/* Card number — right segment */}
-      <View style={[box(0.4703, 0.4220, 0.6348, 0.3079), { backgroundColor: "#fff", borderRadius: 1 }]} />
+      {/* Card number — "4756  ····  ····  9018" */}
+      <Text style={{
+        position: "absolute",
+        left: 0.0731 * W,
+        top:  0.6220 * H,
+        color: "#FFFFFF",
+        fontSize: numFz,
+        fontFamily: "Manrope_600SemiBold",
+        letterSpacing: s * 0.8,
+      }}>
+        {"4756  \u2022\u2022\u2022\u2022  \u2022\u2022\u2022\u2022  9018"}
+      </Text>
 
-      {/* Card number dot separators */}
-      <View style={[box(0.2363, 0.7012, 0.6620, 0.3201), { backgroundColor: "#fff", borderRadius: 1 }]} />
-      <View style={[box(0.3563, 0.5811, 0.6604, 0.3217), { backgroundColor: "#fff", borderRadius: 1 }]} />
+      {/* "$3,469.52" — bottom-left, bold */}
+      <Text style={{
+        position: "absolute",
+        left: 0.0748 * W,
+        top:  0.7400 * H,
+        color: "#FFFFFF",
+        fontSize: balanceFz,
+        fontFamily: "Manrope_700Bold",
+        letterSpacing: -0.3,
+      }}>
+        $3,469.52
+      </Text>
 
-      {/* Balance — "$3,469.52" (bottom-left) */}
-      <View style={[box(0.0748, 0.6501, 0.7758, 0.1332), { backgroundColor: "#fff", borderRadius: 2 }]} />
-
-      {/* Amazon logo strokes (top-right cluster) */}
-      <View style={[box(0.7920, 0.1303, 0.1705, 0.8024), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.8614, 0.1232, 0.1678, 0.8080), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.8614, 0.1195, 0.1237, 0.8350), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.7986, 0.1687, 0.1232, 0.8338), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.8830, 0.0951, 0.1230, 0.8332), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.9086, 0.0716, 0.1232, 0.8338), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.8352, 0.1414, 0.1226, 0.8337), { backgroundColor: "#fff" }]} />
-      <View style={[box(0.7720, 0.2051, 0.1226, 0.8337), { backgroundColor: "#fff" }]} />
-
-      {/* Mastercard circles (bottom-right) */}
-      {/* Left circle — full opacity */}
-      <View style={[
-        box(0.7796, 0.1279, 0.7311, 0.1222),
-        { backgroundColor: "#fff", borderRadius: 999 },
-      ]} />
+      {/* ── Mastercard circles (bottom-right) ────────────────────────────── */}
+      {/* Left circle — full white */}
+      <View style={{
+        position: "absolute",
+        left:   0.7796 * W,
+        top:    0.7311 * H,
+        width:  (1 - 0.7796 - 0.1279) * W,
+        height: (1 - 0.7311 - 0.1222) * H,
+        borderRadius: 999,
+        backgroundColor: "#FFFFFF",
+      }} />
       {/* Right circle — 50% opacity */}
-      <View style={[
-        box(0.8359, 0.0716, 0.7311, 0.1222),
-        { backgroundColor: "#fff", borderRadius: 999, opacity: 0.5 },
-      ]} />
+      <View style={{
+        position: "absolute",
+        left:   0.8359 * W,
+        top:    0.7311 * H,
+        width:  (1 - 0.8359 - 0.0716) * W,
+        height: (1 - 0.7311 - 0.1222) * H,
+        borderRadius: 999,
+        backgroundColor: "#FFFFFF",
+        opacity: 0.5,
+      }} />
 
     </View>
   );
