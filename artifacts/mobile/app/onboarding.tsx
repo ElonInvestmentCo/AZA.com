@@ -414,7 +414,7 @@ function FreeCard({ cardW }: { cardW: number }) {
   );
 }
 
-// ── Slide 2: Gift card — Figma card + fade + spring in ────────────────────────
+// ── Slide 2: Gift card — Figma card + fade/spring entrance + float loop ────────
 function GiftCardSlide({
   slideW,
   slideH,
@@ -428,22 +428,46 @@ function GiftCardSlide({
 
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
+  // Float: gentle ±7px vertical oscillation
+  const floatY = useSharedValue(0);
+
+  const startFloat = useCallback(() => {
+    floatY.value = withRepeat(
+      withSequence(
+        withTiming(-7, { duration: 1600, easing: Easing.inOut(Easing.sin) }),
+        withTiming( 7, { duration: 1600, easing: Easing.inOut(Easing.sin) }),
+      ),
+      -1,   // infinite
+      false,
+    );
+  }, []);
 
   useEffect(() => {
     if (!isActive) {
       cancelAnimation(cardOp);
       cancelAnimation(cardSc);
+      cancelAnimation(floatY);
       cardOp.value = 0;
       cardSc.value = 0.88;
+      floatY.value = 0;
       return;
     }
+    // Entrance
     cardOp.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    cardSc.value = withSpring(1, { damping: 18, stiffness: 140 });
+    cardSc.value = withSpring(1, { damping: 18, stiffness: 140 },
+      (finished) => {
+        "worklet";
+        if (finished) runOnJS(startFloat)();
+      },
+    );
   }, [isActive]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: cardOp.value,
-    transform: [{ scale: cardSc.value }],
+    transform: [
+      { scale: cardSc.value },
+      { translateY: floatY.value },
+    ],
   }));
 
   return (
