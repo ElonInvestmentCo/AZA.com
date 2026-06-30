@@ -34,12 +34,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 // ── Assets ────────────────────────────────────────────────────────────────────
 const slide1Img        = require("@/assets/images/slide1.png");
 const slide3Img        = require("@/assets/images/slide3.png");
-const freeCardImg      = require("@/assets/images/free-card.png");
 const manImg           = require("@/assets/images/man-illustration.png");
 const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide3Img, freeCardImg, manImg, onboardPortfolio, onboardEsim]);
+Asset.loadAsync([slide1Img, slide3Img, manImg, onboardPortfolio, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
