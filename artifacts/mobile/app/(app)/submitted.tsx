@@ -1,7 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { scheduleTradeSubmitted, scheduleTradeCompleted } from "@/services/notifications";
 import {
   Image,
   StatusBar,
@@ -25,8 +24,6 @@ export default function SubmittedScreen() {
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    scheduleTradeSubmitted(cardType, amount);
-    scheduleTradeCompleted(cardType, naira, 30);
   }, [cardType, amount, naira]);
 
   return (
