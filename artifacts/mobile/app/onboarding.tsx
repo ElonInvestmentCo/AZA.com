@@ -1,5 +1,6 @@
 // @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
+import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -293,7 +294,128 @@ function AnimatedWalletSlide({
   );
 }
 
-// ── Slide 2: Gift card — provided asset, fade + spring in ─────────────────────
+// ── Free Card — rebuilt from Figma CSS specs (237×150 reference) ──────────────
+//
+// Layers (bottom → top):
+//   1. Base fill  #272A38
+//   2. Green gradient blob  linear-gradient(216.89deg, #009B6E → #99E200)
+//   3. Blue  gradient blob  linear-gradient(216.89deg, #009DCA → #0047BB)
+//   4. White vector elements (name, card-type, card-number, balance,
+//      amazon-logo strokes, mastercard circles)
+//
+// All positions are Figma percentages → multiplied by the rendered W / H.
+// Gradient angle 216.89° (CSS) ≈ start{x:0.80,y:0.10} → end{x:0.20,y:0.90} in RN.
+function FreeCard({ cardW }: { cardW: number }) {
+  const W = cardW;
+  const H = W * (150 / 237);   // Figma aspect ratio
+  const R = W * (18 / 237);    // corner radius scaled from reference
+
+  // ── helper: convert Figma left/right/top/bottom % to absolute layout ──
+  function box(l: number, r: number, t: number, b: number) {
+    return {
+      position: "absolute" as const,
+      left:   l * W,
+      top:    t * H,
+      width:  (1 - l - r) * W,
+      height: (1 - t - b) * H,
+    };
+  }
+
+  // Gradient blobs extend outside the card bounds — overflow:hidden clips them
+  const greenTop    = -0.1297 * H;
+  const greenHeight = (1 + 0.1297 - 0.3627) * H;   // 76.7% of H
+  const blueTop     =  0.3842 * H;
+  const blueHeight  = (1 + 0.1512 - 0.3842) * H;   // 76.7% of H
+
+  const GRAD_START = { x: 0.80, y: 0.10 };
+  const GRAD_END   = { x: 0.20, y: 0.90 };
+
+  return (
+    <View style={{
+      width: W, height: H,
+      borderRadius: R,
+      overflow: "hidden",
+      backgroundColor: "#272A38",
+    }}>
+
+      {/* ── Green gradient blob ── */}
+      <LinearGradient
+        colors={["#009B6E", "#99E200"]}
+        start={GRAD_START}
+        end={GRAD_END}
+        style={{
+          position: "absolute",
+          left:   0.2398 * W,
+          top:    greenTop,
+          width:  (1 - 0.2398 - 0.3230) * W,
+          height: greenHeight,
+          borderRadius: (1 - 0.2398 - 0.3230) * W * 0.5,
+        }}
+      />
+
+      {/* ── Blue gradient blob ── */}
+      <LinearGradient
+        colors={["#009DCA", "#0047BB"]}
+        start={GRAD_START}
+        end={GRAD_END}
+        style={{
+          position: "absolute",
+          left:   0.3391 * W,
+          top:    blueTop,
+          width:  (1 - 0.3391 - 0.2238) * W,
+          height: blueHeight,
+          borderRadius: (1 - 0.3391 - 0.2238) * W * 0.5,
+        }}
+      />
+
+      {/* ── White vectors ────────────────────────────────────────────────── */}
+
+      {/* Name strip — "John Smith" (top-left, tallest left element) */}
+      <View style={[box(0.0731, 0.6164, 0.1160, 0.8095), { backgroundColor: "#fff", borderRadius: 2 }]} />
+
+      {/* Card-type strip — "Amazon Platimun" */}
+      <View style={[box(0.0721, 0.5933, 0.4857, 0.4647), { backgroundColor: "#fff", borderRadius: 1 }]} />
+
+      {/* Card number — left segment */}
+      <View style={[box(0.0730, 0.8179, 0.6353, 0.3079), { backgroundColor: "#fff", borderRadius: 1 }]} />
+
+      {/* Card number — right segment */}
+      <View style={[box(0.4703, 0.4220, 0.6348, 0.3079), { backgroundColor: "#fff", borderRadius: 1 }]} />
+
+      {/* Card number dot separators */}
+      <View style={[box(0.2363, 0.7012, 0.6620, 0.3201), { backgroundColor: "#fff", borderRadius: 1 }]} />
+      <View style={[box(0.3563, 0.5811, 0.6604, 0.3217), { backgroundColor: "#fff", borderRadius: 1 }]} />
+
+      {/* Balance — "$3,469.52" (bottom-left) */}
+      <View style={[box(0.0748, 0.6501, 0.7758, 0.1332), { backgroundColor: "#fff", borderRadius: 2 }]} />
+
+      {/* Amazon logo strokes (top-right cluster) */}
+      <View style={[box(0.7920, 0.1303, 0.1705, 0.8024), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.8614, 0.1232, 0.1678, 0.8080), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.8614, 0.1195, 0.1237, 0.8350), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.7986, 0.1687, 0.1232, 0.8338), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.8830, 0.0951, 0.1230, 0.8332), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.9086, 0.0716, 0.1232, 0.8338), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.8352, 0.1414, 0.1226, 0.8337), { backgroundColor: "#fff" }]} />
+      <View style={[box(0.7720, 0.2051, 0.1226, 0.8337), { backgroundColor: "#fff" }]} />
+
+      {/* Mastercard circles (bottom-right) */}
+      {/* Left circle — full opacity */}
+      <View style={[
+        box(0.7796, 0.1279, 0.7311, 0.1222),
+        { backgroundColor: "#fff", borderRadius: 999 },
+      ]} />
+      {/* Right circle — 50% opacity */}
+      <View style={[
+        box(0.8359, 0.0716, 0.7311, 0.1222),
+        { backgroundColor: "#fff", borderRadius: 999, opacity: 0.5 },
+      ]} />
+
+    </View>
+  );
+}
+
+// ── Slide 2: Gift card — Figma card + fade + spring in ────────────────────────
 function GiftCardSlide({
   slideW,
   slideH,
@@ -303,10 +425,7 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // The free-card asset is 237×150px (from Figma spec).
-  // Scale it to fill ~82% of slide width while preserving aspect ratio.
-  const imgW = clamp(slideW * 0.82, 240, 380);
-  const imgH = imgW * (150 / 237);
+  const cardW = clamp(slideW * 0.82, 240, 380);
 
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
@@ -335,20 +454,14 @@ function GiftCardSlide({
           {
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 16 },
-            shadowOpacity: 0.35,
+            shadowOpacity: 0.38,
             shadowRadius: 28,
             elevation: 18,
           },
           cardStyle,
         ]}
       >
-        <Image
-          source={freeCardImg}
-          style={{ width: imgW, height: imgH, borderRadius: 16 }}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
+        <FreeCard cardW={cardW} />
       </Animated.View>
     </View>
   );
