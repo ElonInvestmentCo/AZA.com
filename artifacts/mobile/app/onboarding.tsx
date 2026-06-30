@@ -329,7 +329,7 @@ function QRPlaceholder({ size }: { size: number }) {
   );
 }
 
-// ── Slide 2: Gift card — fade + spring in ─────────────────────────────────────
+// ── Slide 2: Gift card — fade + spring in (matches Figma design exactly) ──────
 function GiftCardSlide({
   slideW,
   slideH,
@@ -339,13 +339,15 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const blackCardW    = clamp(slideW * 0.88, 280, 420);
-  const blackCardH    = blackCardW / 1.586;
-  const blackCardLeft = (slideW - blackCardW) / 2;
-  const blackCardTop  = (slideH - blackCardH) / 2;
+  // Card dimensions — standard credit-card ratio 1.586
+  const cardW    = clamp(slideW * 0.86, 270, 400);
+  const cardH    = cardW / 1.586;
+  const cardLeft = (slideW - cardW) / 2;
+  // Vertically centered, nudged slightly above center to match design
+  const cardTop  = (slideH - cardH) / 2 - cardH * 0.04;
 
-  const qrSize = blackCardH * 0.50;
-  const pad    = blackCardW * 0.06;
+  const pad    = cardW * 0.065;
+  const qrSize = cardH * 0.48;
 
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
@@ -367,58 +369,97 @@ function GiftCardSlide({
     transform: [{ scale: cardSc.value }],
   }));
 
+  const titleFontSize    = cardW * 0.052;
+  const subtitleFontSize = cardW * 0.035;
+  const amountFontSize   = cardW * 0.145;
+
   return (
     <View style={{ width: slideW, height: slideH }}>
       <Animated.View
         style={[
           {
             position: "absolute",
-            top: blackCardTop,
-            left: blackCardLeft,
-            width: blackCardW,
-            height: blackCardH,
-            backgroundColor: "#0A0A0A",
-            borderRadius: 22,
+            top: cardTop,
+            left: cardLeft,
+            width: cardW,
+            height: cardH,
+            backgroundColor: "#111116",
+            borderRadius: 20,
             overflow: "hidden",
             shadowColor: "#000",
-            shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: 0.45,
-            shadowRadius: 28,
-            elevation: 16,
+            shadowOffset: { width: 0, height: 16 },
+            shadowOpacity: 0.40,
+            shadowRadius: 32,
+            elevation: 18,
             padding: pad,
           },
           cardStyle,
         ]}
       >
-        {/* Top row: title + ID */}
+        {/* ── Top row: card name left · ID right ── */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <View>
-            <Text style={{ color: "#fff", fontSize: blackCardW * 0.048, fontFamily: "Manrope_700Bold", letterSpacing: -0.3 }}>
+          <View style={{ flex: 1, marginRight: 8 }}>
+            <Text
+              style={{
+                color: "#FFFFFF",
+                fontSize: titleFontSize,
+                fontFamily: "Manrope_700Bold",
+                letterSpacing: -0.2,
+              }}
+              numberOfLines={1}
+            >
               Visa Gift Card
             </Text>
-            <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular", marginTop: 3 }}>
+            <Text
+              style={{
+                color: "rgba(255,255,255,0.65)",
+                fontSize: subtitleFontSize,
+                fontFamily: "Manrope_400Regular",
+                marginTop: cardH * 0.03,
+              }}
+            >
               {"United States 🇺🇸"}
             </Text>
           </View>
-          <Text style={{ color: "rgba(255,255,255,0.75)", fontSize: blackCardW * 0.033, fontFamily: "Manrope_400Regular" }}>
+          <Text
+            style={{
+              color: "rgba(255,255,255,0.65)",
+              fontSize: subtitleFontSize,
+              fontFamily: "Manrope_400Regular",
+              marginTop: 2,
+            }}
+          >
             {"ID: 12345678"}
           </Text>
         </View>
 
-        {/* Bottom row: amount + QR */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end", flex: 1, marginTop: 8 }}>
-          <Text style={{ color: "#fff", fontSize: blackCardW * 0.13, fontFamily: "Manrope_700Bold", letterSpacing: -1 }}>
+        {/* ── Bottom row: amount left · QR right ── */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            flex: 1,
+          }}
+        >
+          <Text
+            style={{
+              color: "#FFFFFF",
+              fontSize: amountFontSize,
+              fontFamily: "Manrope_700Bold",
+              letterSpacing: -1.5,
+              lineHeight: amountFontSize * 1.05,
+            }}
+          >
             $100
           </Text>
-          <View style={{
-            borderRadius: 6,
-            overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.18,
-            shadowRadius: 6,
-            elevation: 4,
-          }}>
+          <View
+            style={{
+              borderRadius: 6,
+              overflow: "hidden",
+              backgroundColor: "#fff",
+            }}
+          >
             <QRPlaceholder size={qrSize} />
           </View>
         </View>
