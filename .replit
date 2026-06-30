@@ -22,11 +22,11 @@ args = "API Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Mobile Web"
+args = "AZA Mobile (Expo Go)"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "AZA Mobile (Expo Go)"
+args = "PayVora Website"
 
 [[workflows.workflow]]
 name = "API Server"
@@ -40,18 +40,6 @@ task = "shell.exec"
 args = "pnpm --filter @workspace/api-server run build && PORT=8080 NODE_ENV=development node --enable-source-maps artifacts/api-server/dist/index.mjs"
 
 [[workflows.workflow]]
-name = "AZA Mobile Web"
-author = "agent"
-
-[workflows.workflow.metadata]
-outputType = "webview"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "pnpm --filter @workspace/mobile run web"
-waitForPort = 5000
-
-[[workflows.workflow]]
 name = "AZA Mobile (Expo Go)"
 author = "agent"
 
@@ -61,6 +49,18 @@ outputType = "console"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/mobile run dev"
+
+[[workflows.workflow]]
+name = "PayVora Website"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/website run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -72,10 +72,6 @@ timeoutMs = 20000
 
 [[ports]]
 localPort = 5000
-externalPort = 80
-
-[[ports]]
-localPort = 8081
 externalPort = 80
 
 [[ports]]

@@ -2,3 +2,5 @@
 - [Payvora production config](payvora-production-config.md) — Railway + www.payvora.org wiring: app.config.js, CORS, API URL resolution, OAuth redirect URIs.
 - [Expo package versions](expo-package-versions.md) — expo 54 requires expo-auth-session ~7.0.11, expo-crypto ~15.0.9, expo-apple-authentication ~8.0.8; ^56.x versions break with "Cannot find native module ExpoCryptoAES".
 - [Lottie web incompatibility](lottie-web-compat.md) — lottie-react-native v7.x web shim uses DotLottieReact which only supports .lottie format, not JSON; use react-native-svg for cross-platform animations instead.
+- [Metro pnpm monorepo fix](metro-pnpm-fix.md) — metro.config.js needs watchFolders+nodeModulesPaths for pnpm; fs.watch ENOENT patch must return noopWatcher with .on/.off/.addListener/.removeListener/.once/.emit — bare {close} stub breaks FallbackWatcher.
+- [Monorepo website architecture](monorepo-website-arch.md) — artifacts/website is Next.js 15 + Tailwind v4 + @tailwindcss/postcss on port 5000; replaces "AZA Mobile Web" workflow; all legacy Expo web files (server/, static-build/, web-proxy.mjs) preserved — audit before removal.
