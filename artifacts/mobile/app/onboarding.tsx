@@ -293,42 +293,7 @@ function AnimatedWalletSlide({
   );
 }
 
-// ── QR code placeholder (decorative) ──────────────────────────────────────────
-function QRPlaceholder({ size }: { size: number }) {
-  const cell = size / 10;
-  const pattern = [
-    [1,1,1,1,1,1,1,0,1,0],
-    [1,0,0,0,0,0,1,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0],
-    [1,0,1,1,1,0,1,1,1,1],
-    [1,0,1,1,1,0,1,0,0,0],
-    [1,0,0,0,0,0,1,0,1,1],
-    [1,1,1,1,1,1,1,0,1,0],
-    [0,1,0,0,1,0,0,0,0,1],
-    [1,0,1,1,0,1,1,1,0,1],
-    [0,1,0,1,0,0,1,0,1,1],
-  ];
-  return (
-    <View style={{ width: size, height: size, backgroundColor: "#fff", padding: cell * 0.4 }}>
-      {pattern.map((row, r) => (
-        <View key={r} style={{ flexDirection: "row" }}>
-          {row.map((filled, c) => (
-            <View
-              key={c}
-              style={{
-                width: cell,
-                height: cell,
-                backgroundColor: filled ? "#000" : "#fff",
-              }}
-            />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
-
-// ── Slide 2: Gift card — fade + spring in (matches Figma design exactly) ──────
+// ── Slide 2: Gift card — provided asset, fade + spring in ─────────────────────
 function GiftCardSlide({
   slideW,
   slideH,
@@ -338,15 +303,10 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Card dimensions — standard credit-card ratio 1.586
-  const cardW    = clamp(slideW * 0.86, 270, 400);
-  const cardH    = cardW / 1.586;
-  const cardLeft = (slideW - cardW) / 2;
-  // Vertically centered, nudged slightly above center to match design
-  const cardTop  = (slideH - cardH) / 2 - cardH * 0.04;
-
-  const pad    = cardW * 0.065;
-  const qrSize = cardH * 0.48;
+  // The free-card asset is 237×150px (from Figma spec).
+  // Scale it to fill ~82% of slide width while preserving aspect ratio.
+  const imgW = clamp(slideW * 0.82, 240, 380);
+  const imgH = imgW * (150 / 237);
 
   const cardOp = useSharedValue(0);
   const cardSc = useSharedValue(0.88);
@@ -368,100 +328,27 @@ function GiftCardSlide({
     transform: [{ scale: cardSc.value }],
   }));
 
-  const titleFontSize    = cardW * 0.052;
-  const subtitleFontSize = cardW * 0.035;
-  const amountFontSize   = cardW * 0.145;
-
   return (
-    <View style={{ width: slideW, height: slideH }}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
       <Animated.View
         style={[
           {
-            position: "absolute",
-            top: cardTop,
-            left: cardLeft,
-            width: cardW,
-            height: cardH,
-            backgroundColor: "#111116",
-            borderRadius: 20,
-            overflow: "hidden",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 16 },
-            shadowOpacity: 0.40,
-            shadowRadius: 32,
+            shadowOpacity: 0.35,
+            shadowRadius: 28,
             elevation: 18,
-            padding: pad,
           },
           cardStyle,
         ]}
       >
-        {/* ── Top row: card name left · ID right ── */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <View style={{ flex: 1, marginRight: 8 }}>
-            <Text
-              style={{
-                color: "#FFFFFF",
-                fontSize: titleFontSize,
-                fontFamily: "Manrope_700Bold",
-                letterSpacing: -0.2,
-              }}
-              numberOfLines={1}
-            >
-              Visa Gift Card
-            </Text>
-            <Text
-              style={{
-                color: "rgba(255,255,255,0.65)",
-                fontSize: subtitleFontSize,
-                fontFamily: "Manrope_400Regular",
-                marginTop: cardH * 0.03,
-              }}
-            >
-              {"United States 🇺🇸"}
-            </Text>
-          </View>
-          <Text
-            style={{
-              color: "rgba(255,255,255,0.65)",
-              fontSize: subtitleFontSize,
-              fontFamily: "Manrope_400Regular",
-              marginTop: 2,
-            }}
-          >
-            {"ID: 12345678"}
-          </Text>
-        </View>
-
-        {/* ── Bottom row: amount left · QR right ── */}
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            flex: 1,
-          }}
-        >
-          <Text
-            style={{
-              color: "#FFFFFF",
-              fontSize: amountFontSize,
-              fontFamily: "Manrope_700Bold",
-              letterSpacing: -1.5,
-              lineHeight: amountFontSize * 1.05,
-            }}
-          >
-            $100
-          </Text>
-          <View
-            style={{
-              borderRadius: 6,
-              overflow: "hidden",
-              backgroundColor: "#fff",
-            }}
-          >
-            <QRPlaceholder size={qrSize} />
-          </View>
-        </View>
+        <Image
+          source={freeCardImg}
+          style={{ width: imgW, height: imgH, borderRadius: 16 }}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          priority="high"
+        />
       </Animated.View>
     </View>
   );
