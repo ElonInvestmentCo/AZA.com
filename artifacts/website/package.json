@@ -9,6 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@payvora/icons": "workspace:*",
+    "@payvora/shared": "workspace:*",
+    "@payvora/theme": "workspace:*",
+    "@payvora/ui": "workspace:*",
     "framer-motion": "catalog:",
     "lucide-react": "catalog:",
     "next": "^15.3.4",

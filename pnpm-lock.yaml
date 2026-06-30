@@ -724,6 +724,18 @@ importers:
 
   artifacts/website:
     dependencies:
+      '@payvora/icons':
+        specifier: workspace:*
+        version: link:../../packages/icons
+      '@payvora/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@payvora/theme':
+        specifier: workspace:*
+        version: link:../../packages/theme
+      '@payvora/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       framer-motion:
         specifier: 'catalog:'
         version: 12.38.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -801,6 +813,36 @@ importers:
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
+
+  packages/icons:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+
+  packages/shared:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+
+  packages/theme:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+
+  packages/ui:
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.2.3(@types/react@19.2.14)
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
 
   scripts:
     devDependencies:
