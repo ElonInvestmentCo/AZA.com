@@ -1,16 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/features/page": "app/features/page.js",
-  "/security/page": "app/security/page.js",
-  "/virtual-cards/page": "app/virtual-cards/page.js",
-  "/gift-cards/page": "app/gift-cards/page.js",
-  "/bill-payments/page": "app/bill-payments/page.js",
-  "/airtime-data/page": "app/airtime-data/page.js",
-  "/faq/page": "app/faq/page.js",
-  "/contact/page": "app/contact/page.js",
-  "/download/page": "app/download/page.js",
-  "/privacy-policy/page": "app/privacy-policy/page.js",
-  "/terms/page": "app/terms/page.js",
-  "/aml-kyc/page": "app/aml-kyc/page.js",
-  "/refund-policy/page": "app/refund-policy/page.js"
+  "/page": "app/page.js"
 }
