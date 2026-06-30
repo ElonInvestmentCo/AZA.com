@@ -1,56 +1,180 @@
 # REPLIT_STATUS.md
 
-# Current Development Baseline
+# AZA.com / PayVora Development Status
 
-## Active Development Branch
+This file is the authoritative project guide for future Replit AI sessions.
 
-restore-4d365e3
+It exists to prevent incorrect assumptions about the active branch, startup procedure, or development workflow.
 
-## Repository
+--------------------------------------------------
+PROJECT
+--------------------------------------------------
 
+Repository:
 ElonInvestmentCo/AZA.com
 
-## Mobile App
+Primary mobile application:
 
 artifacts/mobile
 
-## Before Doing Anything
+--------------------------------------------------
+ACTIVE DEVELOPMENT BRANCH
+--------------------------------------------------
 
-Always verify the current repository state first by running:
+restore-4d365e3
+
+Unless the user explicitly instructs otherwise, ALL development should continue on this branch.
+
+Do NOT assume `main` is the active development branch.
+
+--------------------------------------------------
+SOURCE OF TRUTH
+--------------------------------------------------
+
+Git is always the source of truth.
+
+Before making ANY assumptions, ALWAYS execute:
 
 git fetch --all --prune
+
 git branch --show-current
+
 git rev-parse --short HEAD
-git log --oneline -5
 
-The output of these commands is the source of truth.
+git log --oneline -10
 
-Do NOT assume that `main` is the active development branch.
+These commands determine:
 
-## Startup
+• current branch
+
+• current HEAD commit
+
+• latest history
+
+• whether new commits exist
+
+Never rely on an older conversation or a hardcoded commit hash.
+
+--------------------------------------------------
+GITHUB ACCESS
+--------------------------------------------------
+
+If GitHub authentication is required:
+
+Use the GitHub Personal Access Token stored in Replit Secrets.
+
+Do not ask the user for the token.
+
+Use the existing authenticated repository whenever possible.
+
+--------------------------------------------------
+STARTUP PROCEDURE
+--------------------------------------------------
+
+Always launch the mobile application from:
 
 cd artifacts/mobile
+
+Install dependencies:
+
 pnpm install
+
+Start Expo:
+
 pnpm exec expo start --clear
 
-Always preview using Expo Go (native mobile QR code).
+--------------------------------------------------
+PREVIEW POLICY
+--------------------------------------------------
 
-Do not default to the web preview unless explicitly requested.
+Default preview:
 
-## Git Rules
+✅ Native Expo Go
 
-- Always work on the `restore-4d365e3` branch unless explicitly instructed otherwise.
-- Always fetch before making assumptions.
-- Always verify the current HEAD before making changes.
-- Do not switch to `main` unless explicitly instructed.
-- Use GitHub as the source of truth.
-- If GitHub authentication is required, use the GitHub token stored in Replit Secrets.
+Use the generated QR code for Android or iPhone.
 
-## Important
+Do NOT default to Web Preview.
 
-This document intentionally does **not** hardcode a commit hash because the latest commit changes over time.
+Do NOT start:
 
-Always determine the current commit by running:
+expo start --web
+
+unless the user explicitly requests a web build.
+
+The web configuration should remain intact but is not the default development environment.
+
+--------------------------------------------------
+WORKFLOW
+--------------------------------------------------
+
+Before changing code:
+
+1. Verify current Git status.
+
+2. Verify current branch.
+
+3. Verify current HEAD.
+
+4. Read recent commit history.
+
+5. Preserve existing UI unless instructed otherwise.
+
+6. Fix only verified issues.
+
+7. Keep changes minimal.
+
+8. Do not introduce unrelated refactoring.
+
+--------------------------------------------------
+GIT RULES
+--------------------------------------------------
+
+Always fetch before making assumptions.
+
+Always verify HEAD.
+
+Always verify the active branch.
+
+Never switch branches unless the user explicitly requests it.
+
+Never reset or rewrite history without explicit permission.
+
+Never assume `main` is where active development occurs.
+
+--------------------------------------------------
+REPLIT AI RULES
+--------------------------------------------------
+
+Future Replit AI sessions should:
+
+• Read this file first.
+
+• Verify Git state before making assumptions.
+
+• Continue development from the current HEAD of the active branch.
+
+• Use GitHub as the source of truth.
+
+• Use Replit Secrets for GitHub authentication when needed.
+
+• Preserve existing project structure.
+
+• Preserve application behavior unless instructed otherwise.
+
+--------------------------------------------------
+IMPORTANT
+--------------------------------------------------
+
+This document intentionally DOES NOT contain a fixed commit hash.
+
+The active commit changes over time.
+
+Always determine the latest commit dynamically by running:
 
 git rev-parse --short HEAD
-git log --oneline -5
+
+git log --oneline -10
+
+Those commands always override any previous documentation, conversations, comments, or assumptions.
+
+End of file.
