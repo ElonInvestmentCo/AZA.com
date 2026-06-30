@@ -176,9 +176,6 @@ importers:
       '@expo-google-fonts/manrope':
         specifier: ^0.4.2
         version: 0.4.2
-      '@lottiefiles/dotlottie-react':
-        specifier: ^0.6.5
-        version: 0.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       expo-apple-authentication:
         specifier: ~8.0.8
         version: 8.0.8(expo@54.0.35)(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))
@@ -199,7 +196,7 @@ importers:
         version: 8.0.9(expo@54.0.35)(react@19.1.0)
       lottie-react-native:
         specifier: 7.3.1
-        version: 7.3.1(@lottiefiles/dotlottie-react@0.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
+        version: 7.3.1(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       lottie-web:
         specifier: ^5.13.0
         version: 5.13.0
@@ -7643,8 +7640,10 @@ snapshots:
       debounce: 2.2.0
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
+    optional: true
 
-  '@lottiefiles/dotlottie-web@0.25.0': {}
+  '@lottiefiles/dotlottie-web@0.25.0':
+    optional: true
 
   '@next/env@15.5.19': {}
 
@@ -9824,7 +9823,8 @@ snapshots:
 
   dateformat@4.6.3: {}
 
-  debounce@2.2.0: {}
+  debounce@2.2.0:
+    optional: true
 
   debug@2.6.9:
     dependencies:
@@ -10901,6 +10901,11 @@ snapshots:
       react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
     optionalDependencies:
       '@lottiefiles/dotlottie-react': 0.6.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
+  lottie-react-native@7.3.1(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-native: 0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0)
 
   lottie-web@5.13.0: {}
 
