@@ -68,86 +68,44 @@ const SLIDES: SlideItem[] = [
     type: "animated-wallet",
     title: "Withdraw like a Boss",
     subtitle: "Fast, secure withdrawals made simple.",
-    bgColor: "#EEF7FF",   // Ice Blue — used for glow orb only
+    bgColor: "#ffffff",
   },
   {
     id: "2",
     type: "giftcard",
     title: "Sell your gift card",
     subtitle: "Sell smarter. Get paid faster.",
-    bgColor: "#FFF6E8",   // Warm Cream — used for glow orb only
+    bgColor: "#EDE7F6",
   },
   {
     id: "3",
     type: "image",
     title: "Bill payments",
     subtitle: "Pay your bills seamlessly in one place",
-    bgColor: "#EAF8F2",   // Soft Mint — used for glow orb only
+    bgColor: "#ffffff",
   },
   {
     id: "4",
     type: "chatgpt-portfolio",
     title: "Track Your Portfolio",
     subtitle: "Monitor your crypto assets in real time.",
-    bgColor: "#F5F5F7",   // Light Silver — used for glow orb only
+    bgColor: "#ffffff",
   },
   {
     id: "5",
     type: "virtual-card",
     title: "Virtual Card",
     subtitle: "Pay anywhere with your PAYVORA virtual card.",
-    bgColor: "#F2EFFB",   // Soft Lavender — used for glow orb only
+    bgColor: "#ffffff",
   },
   {
     id: "6",
     type: "chatgpt-esim",
     title: "Global eSIM",
     subtitle: "Stay connected wherever you go.",
-    bgColor: "#EAF5FF",   // Sky Blue — used for glow orb only
+    bgColor: "#ffffff",
   },
 ];
-
-// ── Soft radial glow orb — layered circles that simulate a radial gradient ────
-// Stays within the slide container; never bleeds into header/dots/buttons.
-function GlowOrb({ color, size }: { color: string; size: number }) {
-  // 4 concentric circles: outermost faintest → innermost slightly stronger.
-  // The pastels are already very close to white, so these opacities read
-  // as a barely-there ambient bloom rather than a solid fill.
-  const layers: { scale: number; opacity: number }[] = [
-    { scale: 1.00, opacity: 0.22 },
-    { scale: 0.68, opacity: 0.28 },
-    { scale: 0.42, opacity: 0.32 },
-    { scale: 0.20, opacity: 0.30 },
-  ];
-  return (
-    <View
-      pointerEvents="none"
-      style={{
-        position: "absolute",
-        top: 0, left: 0, right: 0, bottom: 0,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {layers.map(({ scale, opacity }, i) => {
-        const d = size * scale;
-        return (
-          <View
-            key={i}
-            style={{
-              position: "absolute",
-              width: d,
-              height: d,
-              borderRadius: d / 2,
-              backgroundColor: color,
-              opacity,
-            }}
-          />
-        );
-      })}
-    </View>
-  );
-}
 
 // ── Animated pressable button ─────────────────────────────────────────────────
 function ScaleBtn({
@@ -220,7 +178,7 @@ function AnimatedWalletSlide({
         <Image
           source={slide1Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -270,7 +228,7 @@ function GiftCardSlide({
         <Image
           source={slide2Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -325,7 +283,7 @@ function ImageSlide({
         <Image
           source={slide3Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -381,7 +339,7 @@ function ImageSlideStatic({
         <Image
           source={source}
           style={{ width: slideW, height: slideH }}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -460,7 +418,7 @@ function VirtualCardSlide({
         <Image
           source={slide5Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="contain"
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -523,9 +481,7 @@ export default function OnboardingScreen() {
         renderItem={({ item, index }) => {
           const isActive = index === activeIndex;
           return (
-            <View style={{ width, height: slideAreaH, backgroundColor: "#FFFFFF" }}>
-              {/* Soft ambient glow — centered in illustration area only */}
-              <GlowOrb color={item.bgColor} size={Math.min(slideAreaH, width) * 1.15} />
+            <View style={{ width, height: slideAreaH, backgroundColor: item.bgColor }}>
               {item.type === "animated-wallet" && (
                 Platform.OS === "web" ? (
                   <LottieWalletSlide slideW={width} slideH={slideAreaH} />
@@ -580,7 +536,7 @@ export default function OnboardingScreen() {
         }}
       />
 
-      {/* Bottom section — pure white, always */}
+      {/* Bottom section */}
       <View
         style={[
           styles.bottom,
@@ -645,10 +601,10 @@ export default function OnboardingScreen() {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  root:          { flex: 1, backgroundColor: "#FFFFFF" },
-  header:        { alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  root:          { flex: 1, backgroundColor: "#fff" },
+  header:        { alignItems: "center", justifyContent: "center" },
   logo:          { fontFamily: "Manrope_700Bold", letterSpacing: 1.5, color: "#0b0a0a" },
-  bottom:        { backgroundColor: "#FFFFFF" },
+  bottom:        { backgroundColor: "#fff" },
   dots:          { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
   dot:           { width: 8, height: 8, borderRadius: 2 },
   dotActive:     { backgroundColor: "transparent", borderWidth: 1.5, borderColor: "#0b0a0a" },
