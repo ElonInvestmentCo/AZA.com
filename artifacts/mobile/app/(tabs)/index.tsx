@@ -65,7 +65,7 @@ const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
   { id: "gift",    label: "Gift Card",     bg: "#FFF2CF", iconColor: "#5C4000", route: null                              },
-  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
+  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/airtime" as const          },
   { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/bills"  as const           },
   { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/bills"  as const           },
   { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"  as const           },
@@ -251,7 +251,11 @@ export default function HomeScreen() {
 
         <Text style={s.logo}>PAYVORA.</Text>
 
-        <TouchableOpacity style={s.hdrBtn}>
+        <TouchableOpacity
+          style={s.hdrBtn}
+          onPress={press(() => router.push("/(tabs)/history" as any))}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Feather name="bell" size={22} color={C.text} />
           <View style={s.notifDot} />
         </TouchableOpacity>

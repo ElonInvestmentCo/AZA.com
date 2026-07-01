@@ -9,20 +9,24 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 /* ─── Custom pill tab bar ───────────────────────────────────────────────────── */
 
 function PillTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
   const barBottom = Math.max(insets.bottom + 10, Platform.OS === "ios" ? 20 : 12);
+
   return (
     <View style={[pill.outer, { bottom: barBottom }]} pointerEvents="box-none">
       <View style={pill.bar}>
         {state.routes.map((route: any, i: number) => {
           const focused = state.index === i;
+          const isCards = route.name === "cards";
 
           const icon = (() => {
-            if (route.name === "index")   return "home"  as const;
-            if (route.name === "history") return "clock" as const;
+            if (route.name === "index")   return "home"        as const;
+            if (route.name === "cards")   return "credit-card" as const;
+            if (route.name === "history") return "clock"       as const;
             return "circle" as const;
           })();
 
@@ -31,7 +35,7 @@ function PillTabBar({ state, descriptors, navigation }: any) {
           return (
             <TouchableOpacity
               key={route.key}
-              style={pill.item}
+              style={[pill.item, isCards && pill.itemCenter]}
               onPress={() => {
                 const event = navigation.emit({
                   type: "tabPress",
@@ -54,6 +58,12 @@ function PillTabBar({ state, descriptors, navigation }: any) {
                 ) : Platform.OS === "ios" && route.name === "history" ? (
                   <SymbolView
                     name={focused ? "clock.fill" : "clock"}
+                    tintColor="#FFFFFF"
+                    size={22}
+                  />
+                ) : Platform.OS === "ios" && route.name === "cards" ? (
+                  <SymbolView
+                    name={focused ? "creditcard.fill" : "creditcard"}
                     tintColor="#FFFFFF"
                     size={22}
                   />
@@ -99,6 +109,9 @@ const pill = StyleSheet.create({
     justifyContent: "center",
     height:         68,
   },
+  itemCenter: {
+    flex: 1,
+  },
   iconWrap: {
     width:          44,
     height:         44,
@@ -131,6 +144,7 @@ export default function TabLayout() {
       tabBar={(props) => <PillTabBar {...props} />}
     >
       <Tabs.Screen name="index"   options={{ title: "Home"    }} />
+      <Tabs.Screen name="cards"   options={{ title: "Cards"   }} />
       <Tabs.Screen name="history" options={{ title: "History" }} />
     </Tabs>
   );
