@@ -7,42 +7,52 @@ const monorepoRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(projectRoot);
 
-// ─── Fix 1: pnpm FallbackWatcher ENOENT crash ────────────────────────────────
-// Metro's FallbackWatcher calls fs.watch() on dirs that may not exist inside
-// pnpm's virtual store, then immediately calls .on() on the returned object.
-// We intercept ENOENT errors and return a full no-op EventEmitter-shaped stub.
-const _fsWatch = fs.watch;
+// ────────────────────────────────────────────────────────────────
+// Fix 1: pnpm FallbackWatcher ENOENT crash
+// ────────────────────────────────────────────────────────────────
+const originalFsWatch = fs.watch;
+
 const noopWatcher = {
   close: () => {},
   on: () => noopWatcher,
   off: () => noopWatcher,
-  addListener: () => noopWatcher,
-  removeListener: () => noopWatcher,
   once: () => noopWatcher,
   emit: () => false,
+  addListener: () => noopWatcher,
+  removeListener: () => noopWatcher,
 };
+
 fs.watch = function (filename, options, listener) {
   try {
-    return _fsWatch.call(this, filename, options, listener);
-  } catch (e) {
-    if (e.code === "ENOENT") return noopWatcher;
-    throw e;
+    return originalFsWatch.call(this, filename, options, listener);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return noopWatcher;
+    }
+    throw error;
   }
 };
 
-// ─── Fix 2: pnpm monorepo module resolution ───────────────────────────────────
-// Without this, Metro only looks in artifacts/mobile/node_modules and misses
-// packages hoisted to the workspace root — including expo-router/entry.
-config.watchFolders = [monorepoRoot];
+// ────────────────────────────────────────────────────────────────
+// Fix 2: pnpm monorepo support
+// Keep Expo defaults and ADD the workspace root.
+// ────────────────────────────────────────────────────────────────
+config.watchFolders = [
+  ...(config.watchFolders || []),
+  monorepoRoot,
+];
+
 config.resolver = {
   ...config.resolver,
   nodeModulesPaths: [
-    path.resolve(projectRoot, "node_modules"),
-    path.resolve(monorepoRoot, "node_modules"),
+    path.join(projectRoot, "node_modules"),
+    path.join(monorepoRoot, "node_modules"),
   ],
 };
 
-// ─── Fix 3: Allow Replit's proxy to reach Metro ───────────────────────────────
+// ────────────────────────────────────────────────────────────────
+// Fix 3: Replit CORS support
+// ────────────────────────────────────────────────────────────────
 config.server = {
   ...config.server,
   enhanceMiddleware: (middleware) => {
