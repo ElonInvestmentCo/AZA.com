@@ -21,9 +21,8 @@ function PillTabBar({ state, descriptors, navigation }: any) {
           const focused = state.index === i;
 
           const icon = (() => {
-            if (route.name === "index")   return "home"        as const;
-            if (route.name === "card")    return "credit-card" as const;
-            if (route.name === "history") return "clock"       as const;
+            if (route.name === "index")   return "home"  as const;
+            if (route.name === "history") return "clock" as const;
             return "circle" as const;
           })();
 
@@ -49,12 +48,6 @@ function PillTabBar({ state, descriptors, navigation }: any) {
                 {Platform.OS === "ios" && route.name === "index" ? (
                   <SymbolView
                     name={focused ? "house.fill" : "house"}
-                    tintColor="#FFFFFF"
-                    size={22}
-                  />
-                ) : Platform.OS === "ios" && route.name === "card" ? (
-                  <SymbolView
-                    name={focused ? "creditcard.fill" : "creditcard"}
                     tintColor="#FFFFFF"
                     size={22}
                   />
@@ -138,7 +131,6 @@ export default function TabLayout() {
       tabBar={(props) => <PillTabBar {...props} />}
     >
       <Tabs.Screen name="index"   options={{ title: "Home"    }} />
-      <Tabs.Screen name="card"    options={{ title: "Card"    }} />
       <Tabs.Screen name="history" options={{ title: "History" }} />
     </Tabs>
   );
