@@ -46,10 +46,12 @@ function clamp(val: number, min: number, max: number) {
 }
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const HEADER_H = 56;
-const DOTS_H   = 28;
-const TEXT_H   = 72;
-const BTNS_H   = 116;
+const HEADER_H  = 44;   // tighter — illustration starts closer to logo
+const DOTS_H    = 28;
+const TEXT_H    = 72;
+const BTNS_H    = 116;
+// Proportion of slideAreaH the hero image fills — same on every slide
+const HERO_FILL = 0.94;
 
 // ── Slide definitions ─────────────────────────────────────────────────────────
 type SlideItem = {
@@ -150,10 +152,10 @@ function AnimatedWalletSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Fill most of the slide area; image is portrait (≈695×850 px natural size)
-  // so cap by both width AND height to ensure it never overflows.
-  const imgH = Math.min(slideH * 0.92, slideW * 1.15);
-  const imgW = imgH * (695 / 850);
+  // Unified hero sizing — HERO_FILL of slide height, full slide width.
+  // expo-image contentFit="contain" handles aspect ratio automatically.
+  const imgH = slideH * HERO_FILL;
+  const imgW = slideW;
 
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -205,10 +207,9 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Image is portrait (≈685×950 px natural size — gift cards stacked collage).
-  // Fill as much of the slide as possible without overflow on any screen size.
-  const imgH = Math.min(slideH * 0.92, slideW * 1.25);
-  const imgW = imgH * (685 / 950);
+  // Unified hero sizing — same visual height as every other slide.
+  const imgH = slideH * HERO_FILL;
+  const imgW = slideW;
 
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -286,11 +287,11 @@ function ImageSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={animStyle}>
         <Image
           source={slide3Img}
-          style={{ width: slideW * 1.3, height: slideH }}
+          style={{ width: slideW, height: slideH * HERO_FILL }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -342,11 +343,11 @@ function ImageSlideStatic({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={[animStyle, { width: slideW * 1.3, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={animStyle}>
         <Image
           source={source}
-          style={{ width: slideW * 1.3, height: slideH }}
+          style={{ width: slideW, height: slideH * HERO_FILL }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -400,10 +401,9 @@ function VirtualCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Image is portrait (≈685×950 px natural size).
-  // Fill as much of the slide as possible without overflow.
-  const imgH = Math.min(slideH * 0.92, slideW * 1.25);
-  const imgW = imgH * (685 / 950);
+  // Unified hero sizing — same visual height as every other slide.
+  const imgH = slideH * HERO_FILL;
+  const imgW = slideW;
 
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -451,7 +451,7 @@ export default function OnboardingScreen() {
   const topInset    = Platform.OS === "web" ? 0 : insets.top;
   const bottomInset = Platform.OS === "web" ? 0 : insets.bottom;
 
-  const bottomSectionH   = DOTS_H + TEXT_H + BTNS_H + 40 + bottomInset;
+  const bottomSectionH   = DOTS_H + TEXT_H + BTNS_H + 16 + bottomInset;
   const slideAreaH       = Math.max(height - topInset - HEADER_H - bottomSectionH, 160);
   const illustrationSize = clamp(Math.min(slideAreaH * 1.0, width * 0.98), 240, 700);
   const contentMaxW      = Math.min(width, 500);
