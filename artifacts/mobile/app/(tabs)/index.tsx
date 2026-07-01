@@ -171,23 +171,30 @@ function ServiceIconRenderer({ id, color, size = 20 }: { id: string; color: stri
   }
 }
 
-function ServiceItem({ item, onPress }: { item: (typeof SERVICES)[number]; onPress: () => void }) {
-  const { width } = useWindowDimensions();
-  const ITEM_W = (Math.min(width, MAX_W) - 32) / 4;
-  const sc   = useSharedValue(1);
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: sc.value }] }));
+function ServiceItem({ item, onPress, cardW }: { item: (typeof SERVICES)[number]; onPress: () => void; cardW: number }) {
+  const sc         = useSharedValue(1);
+  const shadowOpPrimary = useSharedValue(0.07);
+
+  const cardAnim = useAnimatedStyle(() => ({
+    transform:     [{ scale: sc.value }],
+    shadowOpacity: shadowOpPrimary.value,
+  }));
 
   return (
-    <Animated.View style={[anim, { width: ITEM_W, alignItems: "center" }]}>
+    <Animated.View style={[sv.card, { width: cardW }, cardAnim]}>
       <Pressable
         onPress={onPress}
-        onPressIn={() => { sc.value = withSpring(0.88, { damping: 12 }); }}
-        onPressOut={() => { sc.value = withSpring(1, { damping: 12 }); }}
-        style={sv.wrap}
+        onPressIn={() => {
+          sc.value = withSpring(0.97, { damping: 18, stiffness: 320 });
+          shadowOpPrimary.value = withTiming(0.03, { duration: 120 });
+        }}
+        onPressOut={() => {
+          sc.value = withSpring(1, { damping: 18, stiffness: 320 });
+          shadowOpPrimary.value = withTiming(0.07, { duration: 200 });
+        }}
+        style={sv.inner}
       >
-        <View style={sv.iconBox}>
-          <ServiceIconRenderer id={item.id} color="#0B0A0A" size={20} />
-        </View>
+        <ServiceIconRenderer id={item.id} color="#1A1A1A" size={22} />
         <Text style={sv.label} numberOfLines={2}>{item.label}</Text>
       </Pressable>
     </Animated.View>
@@ -369,25 +376,31 @@ export default function HomeScreen() {
         </Animated.View>
 
         {/* ── Services Grid ── */}
-        <Animated.View
-          entering={FadeInUp.duration(320).springify().delay(120)}
-          style={s.servicesGrid}
-        >
-          {SERVICES.map((item, i) => (
+        {(() => {
+          const svcCardW = Math.floor((cardW - 16 - 30) / 4); // 16=paddingH 8+8, 30=3×10px gaps
+          return (
             <Animated.View
-              key={item.id}
-              entering={FadeInUp.duration(280).springify().delay(120 + i * 25)}
+              entering={FadeInUp.duration(320).springify().delay(120)}
+              style={s.servicesGrid}
             >
-              <ServiceItem
-                item={item}
-                onPress={press(() => {
-                  if (item.id === "gift") { setGiftModalVisible(true); return; }
-                  if (item.route) router.push(item.route as any);
-                })}
-              />
+              {SERVICES.map((item, i) => (
+                <Animated.View
+                  key={item.id}
+                  entering={FadeInUp.duration(280).springify().delay(120 + i * 25)}
+                >
+                  <ServiceItem
+                    item={item}
+                    cardW={svcCardW}
+                    onPress={press(() => {
+                      if (item.id === "gift") { setGiftModalVisible(true); return; }
+                      if (item.route) router.push(item.route as any);
+                    })}
+                  />
+                </Animated.View>
+              ))}
             </Animated.View>
-          ))}
-        </Animated.View>
+          );
+        })()}
 
         {/* ── Promo Banner ── */}
         <Animated.View
@@ -599,7 +612,8 @@ const s = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingHorizontal: 8,
-    rowGap: 14,
+    rowGap: 10,
+    columnGap: 10,
     alignSelf: "stretch",
   },
 
@@ -659,8 +673,8 @@ const s = StyleSheet.create({
     marginBottom: 10,
     alignSelf: "stretch",
   },
-  secTitle: { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text },
-  viewAll:  { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "#0B0A0A" },
+  secTitle: { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  viewAll:  { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: "rgba(255,255,255,0.7)" },
 
   txCard: {
     marginHorizontal: 16,
@@ -675,17 +689,28 @@ const s = StyleSheet.create({
 });
 
 const sv = StyleSheet.create({
-  wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
-  iconBox: {
-    width: 54, height: 54, borderRadius: 14,
-    alignItems: "center", justifyContent: "center",
-    backgroundColor: "#F5F5F5",
-    borderWidth: 1, borderColor: "#EEEEEE",
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.04)",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.07,
+    shadowRadius: 30,
+    elevation: 4,
+  },
+  inner: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 18,
+    paddingHorizontal: 6,
+    gap: 9,
   },
   label: {
-    fontSize: rf(10.5), fontFamily: "Manrope_600SemiBold",
-    textAlign: "center", color: "#0B0A0A",
-    lineHeight: rf(14), maxWidth: 64, flexShrink: 1,
+    fontSize: rf(10), fontFamily: "Manrope_600SemiBold",
+    textAlign: "center", color: "#1A1A1A",
+    lineHeight: rf(13.5), flexShrink: 1,
   },
 });
 
