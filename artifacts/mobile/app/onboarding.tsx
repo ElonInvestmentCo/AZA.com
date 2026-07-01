@@ -34,10 +34,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const slide1Img        = require("@/assets/images/slide1-payvora.png");
 const slide2Img        = require("@/assets/images/slide2-giftcards.png");
 const slide3Img        = require("@/assets/images/slide3.png");
+const slide5Img        = require("@/assets/images/slide5-virtualcard.png");
 const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide2Img, slide3Img, onboardPortfolio, onboardEsim]);
+Asset.loadAsync([slide1Img, slide2Img, slide3Img, slide5Img, onboardPortfolio, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -389,6 +390,7 @@ function CardMCIcon({ colored }: { colored: boolean }) {
   );
 }
 
+// ── Slide 5: Virtual Card image — fade + spring scale in ──────────────────────
 function VirtualCardSlide({
   slideW,
   slideH,
@@ -398,6 +400,11 @@ function VirtualCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
+  // Image is portrait (≈685×950 px natural size).
+  // Fill as much of the slide as possible without overflow.
+  const imgH = Math.min(slideH * 0.92, slideW * 1.25);
+  const imgW = imgH * (685 / 950);
+
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
 
@@ -409,162 +416,25 @@ function VirtualCardSlide({
       sc.value = 0.88;
       return;
     }
-    op.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    sc.value = withSpring(1, { damping: 18, stiffness: 140 });
+    op.value = withTiming(1, { duration: 520, easing: Easing.out(Easing.quad) });
+    sc.value = withSpring(1, { damping: 16, stiffness: 140 });
   }, [isActive]);
 
-  // Figma card dimensions (reference scale)
-  const CW = 252.18;
-  const CH = 151.63;
-  const CR = 17.11;
-  const VSTEP = 43.06; // vertical offset between card tops (394.61-351.55 = 351.55-308.49)
-
-  // Approximate visual bounds after isometric shear:
-  //   visual width  ≈ 351px  (card W * 0.87 + card H * 0.87 ≈ 351)
-  //   visual height ≈ 290px  (3 cards stacked with shear)
-  const VISUAL_W = 351;
-  const VISUAL_H = 290;
-  const layoutScale = clamp(
-    Math.min((slideW * 0.88) / VISUAL_W, (slideH * 0.65) / VISUAL_H),
-    0.55,
-    1.2,
-  );
-
-  // Combine entrance animation + layout scale into one transform
   const animStyle = useAnimatedStyle(() => ({
     opacity: op.value,
-    transform: [{ scale: sc.value * layoutScale }],
+    transform: [{ scale: sc.value }],
   }));
-
-  // The container is exactly wide/tall enough to hold all 3 cards (pre-transform coords).
-  // Flex centering puts its center at (slideW/2, slideH/2).
-  // Average visual center of the 3 cards ≈ container center — layout is balanced.
-  const containerH = CH + VSTEP * 2;
-
-  // Shared base style for each card (absolute within container, with isometric matrix)
-  const isoTransform = [{ matrix: ISO_MATRIX_VALS }] as any;
-
-  const cardBase = {
-    position: "absolute" as const,
-    width: CW,
-    height: CH,
-    borderRadius: CR,
-    overflow: "hidden" as const,
-    transform: isoTransform,
-  };
-
-  const textWhite = "rgba(255,255,255,0.95)" as const;
-  const textDark  = "#344054" as const;
 
   return (
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={[animStyle, { width: CW, height: containerH }]}>
-
-        {/* ── Card 3 — back, glass ── */}
-        <View style={[cardBase, {
-          top: 0, left: 0,
-          backgroundColor: "rgba(228, 218, 255, 0.32)",
-          borderWidth: 1,
-          borderColor: "rgba(180, 160, 240, 0.35)",
-          shadowColor: "#4B2EC0",
-          shadowOffset: { width: 6.85, height: 8.56 },
-          shadowOpacity: 0.06,
-          shadowRadius: 13.7,
-          elevation: 2,
-        }]}>
-          <Text style={{
-            position: "absolute", right: 14, top: 14,
-            fontSize: 9, fontFamily: "Manrope_700Bold",
-            color: "rgba(255,255,255,0.5)", letterSpacing: 0.5,
-          }}>PAYVORA</Text>
-        </View>
-
-        {/* ── Card 2 — middle, light purple #F4EBFF ── */}
-        <View style={[cardBase, {
-          top: VSTEP, left: 0,
-          backgroundColor: "#F4EBFF",
-          shadowColor: "#7B4BD0",
-          shadowOffset: { width: 6.85, height: 8.56 },
-          shadowOpacity: 0.14,
-          shadowRadius: 13.7,
-          elevation: 6,
-        }]}>
-          {/* Figma gradient blobs: Pink/500 0.3, Blue/500 0.3, Success/500 0.3, Orange/500 0.3 */}
-          <View style={{ position: "absolute", left: "43.3%", top: 0, right: "6.7%", bottom: "50%",
-            backgroundColor: "#EE46BC", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: 0, right: "50%", top: "25%", bottom: "25%",
-            backgroundColor: "#2E90FA", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: "43.3%", right: "6.7%", top: "50%", bottom: 0,
-            backgroundColor: "#12B76A", opacity: 0.3, borderRadius: 60 }} />
-          <View style={{ position: "absolute", left: "86.6%", right: "-36.6%", top: "25%", bottom: "25%",
-            backgroundColor: "#FB6514", opacity: 0.3, borderRadius: 60 }} />
-
-          {/* Brand — top-right area (Figma: left:116.6, top:17.11) */}
-          <Text style={{
-            position: "absolute", left: 116, top: 14,
-            fontSize: 10, fontFamily: "Manrope_700Bold",
-            color: textDark, letterSpacing: 0.3,
-          }}>PAYVORA</Text>
-
-          {/* Mastercard badge — white bg (Figma: payment method icon, bottom-right) */}
-          <View style={{
-            position: "absolute", right: 10, bottom: 10,
-            backgroundColor: "#fff", borderRadius: 4, padding: 3,
-          }}>
-            <CardMCIcon colored />
-          </View>
-        </View>
-
-        {/* ── Card 1 — front, glass with card details ── */}
-        <View style={[cardBase, {
-          top: VSTEP * 2, left: 0,
-          backgroundColor: "rgba(220, 210, 255, 0.45)",
-          borderWidth: 1,
-          borderColor: "rgba(180, 160, 240, 0.5)",
-          shadowColor: "#4B2EC0",
-          shadowOffset: { width: 6.85, height: 8.56 },
-          shadowOpacity: 0.12,
-          shadowRadius: 13.7,
-          elevation: 10,
-        }]}>
-          {/* Brand — Figma: left:116.6, top:17.11 */}
-          <Text style={{
-            position: "absolute", left: 116, top: 14,
-            fontSize: 10, fontFamily: "Manrope_700Bold",
-            color: textWhite, letterSpacing: 0.5,
-          }}>PAYVORA</Text>
-
-          {/* Cardholder — Figma: left:36.19, top:61.6 */}
-          <Text style={{
-            position: "absolute", left: 14, top: 50,
-            fontSize: 8, fontFamily: "Manrope_600SemiBold",
-            color: "rgba(255,255,255,0.75)", letterSpacing: 0.8,
-            textTransform: "uppercase",
-          }}>JOHN DOE</Text>
-
-          {/* Card number — Figma: left:14.07, top:71.87, letterSpacing:0.15em */}
-          <Text style={{
-            position: "absolute", left: 14, top: 63,
-            fontSize: 10, fontFamily: "Manrope_600SemiBold",
-            color: textWhite, letterSpacing: 2,
-          }}>{"•••• •••• •••• 4521"}</Text>
-
-          {/* Expiry — Figma: left:150.93, top:127.85 */}
-          <Text style={{
-            position: "absolute", left: 150, top: 125,
-            fontSize: 8, fontFamily: "Manrope_600SemiBold",
-            color: "rgba(255,255,255,0.85)",
-          }}>12/28</Text>
-
-          {/* Mastercard badge — semi-transparent bg */}
-          <View style={{
-            position: "absolute", right: 10, bottom: 10,
-            backgroundColor: "rgba(255,255,255,0.15)", borderRadius: 4, padding: 3,
-          }}>
-            <CardMCIcon colored={false} />
-          </View>
-        </View>
-
+      <Animated.View style={animStyle}>
+        <Image
+          source={slide5Img}
+          style={{ width: imgW, height: imgH }}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          priority="high"
+        />
       </Animated.View>
     </View>
   );
