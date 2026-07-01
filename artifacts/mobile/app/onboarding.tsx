@@ -152,11 +152,6 @@ function AnimatedWalletSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Unified hero sizing — HERO_FILL of slide height, full slide width.
-  // expo-image contentFit="contain" handles aspect ratio automatically.
-  const imgH = slideH * HERO_FILL;
-  const imgW = slideW;
-
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
 
@@ -178,12 +173,12 @@ function AnimatedWalletSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+    <View style={{ width: slideW, height: slideH }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={slide1Img}
-          style={{ width: imgW, height: imgH }}
-          contentFit="contain"
+          style={{ width: slideW, height: slideH }}
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -207,10 +202,6 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Unified hero sizing — same visual height as every other slide.
-  const imgH = slideH * HERO_FILL;
-  const imgW = slideW;
-
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
 
@@ -232,12 +223,12 @@ function GiftCardSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+    <View style={{ width: slideW, height: slideH }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={slide2Img}
-          style={{ width: imgW, height: imgH }}
-          contentFit="contain"
+          style={{ width: slideW, height: slideH }}
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -286,17 +277,13 @@ function ImageSlide({
     transform: [{ scale: sc.value }, { translateX: px.value }],
   }));
 
-  // Width-first: fill the full slide width, let natural portrait ratio determine height.
-  // Overflow is clipped by the container, trimming transparent edges at top/bottom only.
-  const naturalH = slideW * (950 / 685);
-
   return (
-    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+    <View style={{ width: slideW, height: slideH }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={slide3Img}
-          style={{ width: slideW, height: naturalH }}
-          contentFit="contain"
+          style={{ width: slideW, height: slideH }}
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -347,12 +334,12 @@ function ImageSlideStatic({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+    <View style={{ width: slideW, height: slideH }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={source}
-          style={{ width: slideW, height: slideH * HERO_FILL }}
-          contentFit="contain"
+          style={{ width: slideW, height: slideH }}
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -405,10 +392,6 @@ function VirtualCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  // Unified hero sizing — same visual height as every other slide.
-  const imgH = slideH * HERO_FILL;
-  const imgW = slideW;
-
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
 
@@ -430,12 +413,12 @@ function VirtualCardSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View style={animStyle}>
+    <View style={{ width: slideW, height: slideH }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
         <Image
           source={slide5Img}
-          style={{ width: imgW, height: imgH }}
-          contentFit="contain"
+          style={{ width: slideW, height: slideH }}
+          contentFit="cover"
           cachePolicy="memory-disk"
           priority="high"
         />
