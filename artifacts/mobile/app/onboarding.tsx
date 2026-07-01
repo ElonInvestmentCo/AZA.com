@@ -35,7 +35,7 @@ const slide1Img        = require("@/assets/images/slide1-payvora.png");
 const slide2Img        = require("@/assets/images/slide2-giftcards.png");
 const slide3Img        = require("@/assets/images/slide3-bills.png");
 const slide5Img        = require("@/assets/images/slide5-virtualcard.png");
-const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
+const onboardPortfolio = require("@/assets/images/slide4-portfolio.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
 Asset.loadAsync([slide1Img, slide2Img, slide3Img, slide5Img, onboardPortfolio, onboardEsim]);

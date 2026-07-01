@@ -31,7 +31,7 @@ const RAW_ASSETS = [
   require("@/assets/images/gift-card.png"),
   require("@/assets/images/gift-card-visa.png"),
   require("@/assets/images/man-illustration.png"),
-  require("@/assets/images/onboard-portfolio.png"),
+  require("@/assets/images/slide4-portfolio.png"),
   require("@/assets/images/onboard-card.png"),
   require("@/assets/images/onboard-esim.png"),
   require("@/assets/images/didnt-received-code.png"),
