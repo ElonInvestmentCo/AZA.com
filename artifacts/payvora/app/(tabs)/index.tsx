@@ -89,7 +89,7 @@ const QUICK_ACTIONS = [
   { label: "Cable TV",    icon: "tv",          key: "cable"       },
   { label: "Rates",       icon: "bar-chart-2", key: "rates"       },
   { label: "Transaction", icon: "list",        key: "transaction" },
-  { label: "Bet Funding", icon: "dollar-sign", key: "bet"         },
+  { label: "Virtual Card", icon: "credit-card", key: "virtual-card" },
   { label: "More",        icon: "grid",        key: "more"        },
 ];
 
@@ -669,9 +669,10 @@ export default function HomeScreen() {
 
   async function handleQuick(key: string) {
     await Haptics.selectionAsync();
-    if (key === "gift")        router.push("/gift-card" as any);
-    if (key === "transaction") router.push("/(tabs)/send" as any);
-    if (key === "settings")    router.push("/(tabs)/profile" as any);
+    if (key === "gift")         router.push("/gift-card" as any);
+    if (key === "transaction")  router.push("/(tabs)/send" as any);
+    if (key === "settings")     router.push("/(tabs)/profile" as any);
+    if (key === "virtual-card") router.push("/choose-card-type" as any);
   }
 
   function openSheet(tx: FullTxRow) {

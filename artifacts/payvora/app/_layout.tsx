@@ -59,6 +59,7 @@ function RootLayoutNav() {
         <Stack.Screen name="fund-wallet" options={{ headerShown: false }} />
         <Stack.Screen name="confirm-transaction" options={{ headerShown: false }} />
         <Stack.Screen name="trade-submitted" options={{ headerShown: false }} />
+        <Stack.Screen name="choose-card-type" options={{ headerShown: false }} />
       </Stack>
     </>
   );
