@@ -253,7 +253,7 @@ export async function buildQrPage(
   </header>
 
   <div class="cards">
-    ${card("AZA Mobile", 19000, "purple", azaUrl, azaSvg)}
+    ${card("PAYVORA Mobile", 19000, "purple", azaUrl, azaSvg)}
     ${card("Payvora Mobile", 19001, "", payvoraUrl, payvoraSvg)}
   </div>
 

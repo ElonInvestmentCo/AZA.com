@@ -417,7 +417,7 @@ export default function HomeScreen() {
             </View>
             <Text style={[gm.tileTitle, { color: "#5C4000" }]}>Sell Gift Card</Text>
             <Text style={[gm.tileDesc, { color: "#5C400099" }]}>
-              Sell local and international gift cards easily and instantly on aza.
+              Sell local and international gift cards easily and instantly on PAYVORA.
             </Text>
           </TouchableOpacity>
 

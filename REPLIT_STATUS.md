@@ -1,6 +1,6 @@
 # REPLIT_STATUS.md
 
-# AZA.com / PayVora Development Status
+# PAYVORA Development Status
 
 This file is the authoritative project guide for future Replit AI sessions.
 
@@ -11,7 +11,7 @@ PROJECT
 --------------------------------------------------
 
 Repository:
-ElonInvestmentCo/AZA.com
+ElonInvestmentCo/PAYVORA
 
 Primary mobile application:
 
