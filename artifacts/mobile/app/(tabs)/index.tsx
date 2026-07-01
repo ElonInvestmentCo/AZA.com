@@ -13,7 +13,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Svg, { Circle, Defs, G, Path, Rect, RadialGradient, Stop } from "react-native-svg";
+import Svg, { Defs, Path, Rect, RadialGradient, Stop } from "react-native-svg";
 import {
   FundWalletIcon,
   SellIcon,
@@ -61,30 +61,8 @@ const C = {
   card:      "#111111",
 };
 
-const avatarSrc = require("@/assets/images/3d_avatar_16.png");
-
-/* ── Mesh dot texture SVG for balance card ──────────────────────────────── */
-function MeshTexture({ width, height }: { width: number; height: number }) {
-  const cols = 14;
-  const rows = 10;
-  const dots = [];
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = (c / (cols - 1)) * width;
-      const y = (r / (rows - 1)) * height;
-      const dist = Math.sqrt(Math.pow(c / cols, 2) + Math.pow(r / rows, 2));
-      const opacity = Math.max(0, 0.35 - dist * 0.12);
-      dots.push(
-        <Circle key={`${r}-${c}`} cx={x} cy={y} r={1.4} fill={`rgba(255,255,255,${opacity.toFixed(2)})`} />
-      );
-    }
-  }
-  return (
-    <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ position: "absolute", right: 0, top: 0 }}>
-      {dots}
-    </Svg>
-  );
-}
+const avatarSrc  = require("@/assets/images/3d_avatar_16.png");
+const cardBgSrc  = require("@/assets/images/card-bg.png");
 
 /* ── 3-D gift box illustration (inline SVG) ─────────────────────────────── */
 function GiftBox3D({ size = 120 }: { size?: number }) {
@@ -328,8 +306,13 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(340).springify().delay(50)}
           style={[s.balCard, { width: cardW }]}
         >
-          {/* Mesh dots texture */}
-          <MeshTexture width={cardW * 0.55} height={160} />
+          {/* Card background image */}
+          <Image
+            source={cardBgSrc}
+            style={s.balCardBg}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
 
           {/* Top row: avatar + greeting + eye */}
           <View style={s.balCardTop}>
@@ -562,6 +545,11 @@ const s = StyleSheet.create({
     shadowRadius: 20,
     elevation: 12,
     alignSelf: "center",
+  },
+  balCardBg: {
+    position: "absolute",
+    top: 0, left: 0, right: 0, bottom: 0,
+    borderRadius: 20,
   },
   balCardTop: {
     flexDirection: "row",
