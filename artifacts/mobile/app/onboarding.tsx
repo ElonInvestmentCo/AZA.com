@@ -68,42 +68,42 @@ const SLIDES: SlideItem[] = [
     type: "animated-wallet",
     title: "Withdraw like a Boss",
     subtitle: "Fast, secure withdrawals made simple.",
-    bgColor: "#ffffff",
+    bgColor: "#EEF7FF",   // Ice Blue
   },
   {
     id: "2",
     type: "giftcard",
     title: "Sell your gift card",
     subtitle: "Sell smarter. Get paid faster.",
-    bgColor: "#EDE7F6",
+    bgColor: "#FFF6E8",   // Warm Cream
   },
   {
     id: "3",
     type: "image",
     title: "Bill payments",
     subtitle: "Pay your bills seamlessly in one place",
-    bgColor: "#ffffff",
+    bgColor: "#EAF8F2",   // Soft Mint
   },
   {
     id: "4",
     type: "chatgpt-portfolio",
     title: "Track Your Portfolio",
     subtitle: "Monitor your crypto assets in real time.",
-    bgColor: "#ffffff",
+    bgColor: "#F5F5F7",   // Light Silver
   },
   {
     id: "5",
     type: "virtual-card",
     title: "Virtual Card",
     subtitle: "Pay anywhere with your PAYVORA virtual card.",
-    bgColor: "#ffffff",
+    bgColor: "#F2EFFB",   // Soft Lavender
   },
   {
     id: "6",
     type: "chatgpt-esim",
     title: "Global eSIM",
     subtitle: "Stay connected wherever you go.",
-    bgColor: "#ffffff",
+    bgColor: "#EAF5FF",   // Sky Blue
   },
 ];
 
@@ -178,7 +178,7 @@ function AnimatedWalletSlide({
         <Image
           source={slide1Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -228,7 +228,7 @@ function GiftCardSlide({
         <Image
           source={slide2Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -283,7 +283,7 @@ function ImageSlide({
         <Image
           source={slide3Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -339,7 +339,7 @@ function ImageSlideStatic({
         <Image
           source={source}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -418,7 +418,7 @@ function VirtualCardSlide({
         <Image
           source={slide5Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -536,11 +536,12 @@ export default function OnboardingScreen() {
         }}
       />
 
-      {/* Bottom section */}
+      {/* Bottom section — bg matches active slide for seamless bleed */}
       <View
         style={[
           styles.bottom,
           {
+            backgroundColor: activeSlide.bgColor,
             paddingBottom: bottomInset + 20,
             paddingHorizontal: hPad,
             alignSelf: "center",
@@ -604,7 +605,7 @@ const styles = StyleSheet.create({
   root:          { flex: 1, backgroundColor: "#fff" },
   header:        { alignItems: "center", justifyContent: "center" },
   logo:          { fontFamily: "Manrope_700Bold", letterSpacing: 1.5, color: "#0b0a0a" },
-  bottom:        { backgroundColor: "#fff" },
+  bottom:        {},
   dots:          { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
   dot:           { width: 8, height: 8, borderRadius: 2 },
   dotActive:     { backgroundColor: "transparent", borderWidth: 1.5, borderColor: "#0b0a0a" },
