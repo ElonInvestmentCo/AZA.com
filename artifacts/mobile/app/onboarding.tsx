@@ -2,9 +2,8 @@
 import { Asset } from "expo-asset";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  FlatList,
   Platform,
   Pressable,
   StyleSheet,
@@ -16,8 +15,11 @@ import {
 import Animated, {
   cancelAnimation,
   Easing,
+  Extrapolation,
   FadeInUp,
+  interpolate,
   runOnJS,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
@@ -437,13 +439,46 @@ function VirtualCardSlide({
   );
 }
 
+// ── Page dot indicator ────────────────────────────────────────────────────────
+const INACTIVE_DOT_COLOR = "#d0d3d8";
+const ACTIVE_BORDER_COLOR = "#0b0a0a";
+
+function PageDot({
+  index,
+  scrollX,
+  pageWidth,
+}: {
+  index: number;
+  scrollX: SharedValue<number>;
+  pageWidth: number;
+}) {
+  const animStyle = useAnimatedStyle(() => {
+    const borderOpacity = interpolate(
+      scrollX.value,
+      [(index - 1) * pageWidth, index * pageWidth, (index + 1) * pageWidth],
+      [0, 1, 0],
+      Extrapolation.CLAMP,
+    );
+    return {
+      borderWidth: 1.5,
+      borderColor: `rgba(11, 10, 10, ${borderOpacity})`,
+      backgroundColor: INACTIVE_DOT_COLOR,
+    };
+  });
+  return <Animated.View style={[styles.dot, animStyle]} />;
+}
+
 // ── Main screen ───────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<any>(null);
+  const scrollX = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollX.value = event.contentOffset.x;
+  });
 
   const topInset    = Platform.OS === "web" ? 0 : insets.top;
   const bottomInset = Platform.OS === "web" ? 0 : insets.bottom;
@@ -476,14 +511,16 @@ export default function OnboardingScreen() {
       </View>
 
       {/* Slide carousel — scroll drives the parallax depth on image slides */}
-      <FlatList
-        ref={flatListRef}
+      <Animated.FlatList
+        ref={flatListRef as any}
         data={SLIDES}
         keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
         bounces={false}
         showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={scrollHandler}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         style={{ height: slideAreaH }}
@@ -586,10 +623,7 @@ export default function OnboardingScreen() {
         {/* Dots */}
         <View style={[styles.dots, { height: DOTS_H }]}>
           {SLIDES.map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, i === activeIndex ? styles.dotActive : styles.dotInactive]}
-            />
+            <PageDot key={i} index={i} scrollX={scrollX} pageWidth={width} />
           ))}
         </View>
 
@@ -642,8 +676,6 @@ const styles = StyleSheet.create({
   bottom:        { backgroundColor: "#fff" },
   dots:          { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: 4 },
   dot:           { width: 8, height: 8, borderRadius: 2 },
-  dotActive:     { backgroundColor: "transparent", borderWidth: 1.5, borderColor: "#0b0a0a" },
-  dotInactive:   { backgroundColor: "#d0d3d8" },
   textBlock:     { alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 4 },
   title:         { fontFamily: "Manrope_700Bold", color: "#0b0a0a", textAlign: "center", letterSpacing: -0.3 },
   subtitle:      { fontFamily: "Manrope_400Regular", color: "#8A8F96", textAlign: "center", fontSize: 14, lineHeight: 21 },
