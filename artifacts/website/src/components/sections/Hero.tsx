@@ -83,39 +83,91 @@ export function Hero() {
           <div className="relative w-72 h-[580px]">
             {/* Phone shell */}
             <div className="absolute inset-0 rounded-[48px] bg-[#1C1C2A] border-4 border-[#2A2A3D] shadow-2xl overflow-hidden">
-              {/* Screen */}
-              <div className="absolute inset-[3px] rounded-[44px] bg-[#0A0A0F] overflow-hidden">
+              {/* Screen — pure white background */}
+              <div className="absolute inset-[3px] rounded-[44px] bg-white overflow-hidden">
                 {/* Notch */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#1C1C2A] rounded-full z-10" />
-                {/* Screen content preview */}
-                <div className="pt-16 px-4 space-y-3">
-                  <div className="bg-[#14141F] rounded-2xl p-4">
-                    <p className="text-[#8F8FA3] text-xs mb-1">Total Balance</p>
-                    <p className="text-white text-2xl font-black">₦124,580.00</p>
-                    <div className="flex gap-2 mt-3">
-                      {["Fund", "Send", "Bills"].map((a) => (
-                        <div
-                          key={a}
-                          className="flex-1 bg-[#1C1C2A] rounded-xl py-2 text-center text-xs text-[#00D9A0] font-semibold"
-                        >
-                          {a}
-                        </div>
-                      ))}
-                    </div>
+                <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-[#1C1C2A] rounded-full z-10" />
+
+                {/* Screen content */}
+                <div className="pt-10 flex flex-col h-full">
+
+                  {/* Brand name */}
+                  <div className="text-center py-2">
+                    <span className="text-[11px] font-semibold tracking-[3px] text-black uppercase">aza</span>
                   </div>
-                  <div className="bg-[#14141F] rounded-2xl p-3 space-y-2">
+
+                  {/* ── GREETING ROW — Figma exact, no card/border/shadow ── */}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "0 14px",
+                      marginTop: 6,
+                      background: "#FFFFFF",
+                    }}
+                  >
+                    {/* Avatar */}
+                    <div style={{ width: 28, height: 27, flexShrink: 0, borderRadius: 4, overflow: "hidden" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/avatar_3d_16.png"
+                        alt="User avatar"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </div>
+
+                    {/* Text stack */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 1, flexShrink: 0 }}>
+                      <span style={{ fontFamily: "Roboto, system-ui, sans-serif", fontWeight: 700, fontSize: 9.6, lineHeight: "120%", color: "#1C1C1C" }}>
+                        Hi, Dove
+                      </span>
+                      <span style={{ fontFamily: "Roboto, system-ui, sans-serif", fontWeight: 400, fontSize: 7.7, lineHeight: "150%", color: "#595F67" }}>
+                        Your available balance
+                      </span>
+                    </div>
+
+                    {/* Spacer */}
+                    <div style={{ flex: 1 }} />
+
+                    {/* Balance amount */}
+                    <span style={{ fontFamily: "'IBM Plex Sans', system-ui, sans-serif", fontWeight: 600, fontSize: 11.5, lineHeight: "120%", color: "#0B0A0A", whiteSpace: "nowrap" }}>
+                      ₦200,590.00
+                    </span>
+
+                    {/* Eye icon */}
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="#0D0D0D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="#0D0D0D" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+
+                  {/* Action bar */}
+                  <div className="mx-3 mt-3 bg-black rounded-md py-2 flex items-center justify-around">
+                    {["Fund Wallet", "Sell", "Withdraw"].map((a) => (
+                      <span key={a} className="text-white text-[7px] font-bold">{a}</span>
+                    ))}
+                  </div>
+
+                  {/* Transactions */}
+                  <div className="mx-3 mt-3 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[8px] font-semibold text-[#0B0A0A]">Recent Transaction</span>
+                      <span className="text-[7px] text-black font-semibold">See All</span>
+                    </div>
                     {[
-                      { label: "Amazon Gift Card", val: "+₦15,200", color: "#00D9A0" },
-                      { label: "Electricity Bill", val: "-₦4,500", color: "#FF5B7A" },
-                      { label: "Airtime MTN", val: "-₦500", color: "#FF5B7A" },
+                      { label: "Deposit Giftcard", val: "₦200,40.00",  color: "#00B03C" },
+                      { label: "Withdraws",         val: "-₦400,000.00", color: "#FF0000" },
                     ].map(({ label, val, color }) => (
-                      <div key={label} className="flex items-center justify-between py-1">
-                        <div className="w-6 h-6 rounded-lg bg-[#1C1C2A]" />
-                        <span className="text-white text-xs flex-1 ml-2">{label}</span>
-                        <span className="text-xs font-semibold" style={{ color }}>{val}</span>
+                      <div key={label} className="flex items-center justify-between bg-white py-1">
+                        <div className="w-4 h-4 rounded bg-gray-100 flex-shrink-0" />
+                        <span className="text-[7.5px] text-[#595F67] font-semibold flex-1 ml-2">{label}</span>
+                        <span className="text-[7.5px] font-extrabold" style={{ color }}>{val}</span>
                       </div>
                     ))}
                   </div>
+
                 </div>
               </div>
             </div>
