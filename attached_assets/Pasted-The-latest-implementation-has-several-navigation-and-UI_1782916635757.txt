@@ -1,0 +1,165 @@
+The latest implementation has several navigation and UI issues that need to be fixed before making any additional changes.
+
+## 1. Remove duplicated pages
+
+There should only be **one implementation** of every screen.
+
+Currently, multiple pages appear to be duplicated or recreated instead of navigating to the existing screens.
+
+Examples include:
+
+* Dashboard/Home
+* More
+* Settings
+* Bills
+* Card screens
+
+Do **not** create cloned versions.
+
+Instead:
+
+* Reuse the existing routes.
+* Reuse existing components.
+* Reuse existing navigation.
+* Remove duplicate screens and duplicate route registrations.
+* Every button should navigate to the existing page only once.
+
+---
+
+## 2. Fix navigation
+
+Several buttons either:
+
+* do nothing,
+* open the wrong page,
+* open duplicate pages,
+* or are not connected.
+
+Every interactive element must work.
+
+Verify every navigation path:
+
+* Fund Wallet
+* Send
+* Withdraw
+* Gift Cards
+* Airtime
+* Electricity
+* Cable TV
+* Rates
+* Transactions
+* Betting
+* Funding
+* More
+* Settings
+* Notifications
+* Card section
+* Recent Transactions
+* View All
+* Bottom Tab Navigation
+
+Every button should navigate exactly once to its intended destination.
+
+---
+
+## 3. Fix non-responsive buttons
+
+Some buttons require multiple taps or do not respond.
+
+Inspect every:
+
+* TouchableOpacity
+* Pressable
+* Button
+* Card
+* Icon button
+
+Ensure:
+
+* onPress is connected.
+* touch area is large enough.
+* no invisible View is blocking touches.
+* pointerEvents are correct.
+* zIndex does not prevent interaction.
+* scrolling does not interfere with taps.
+
+Every button should respond instantly.
+
+---
+
+## 4. Fix page hierarchy
+
+The app should follow this structure:
+
+Dashboard
+├── Cards
+├── Wallet
+├── Transactions
+├── Services
+│ ├── Airtime
+│ ├── Electricity
+│ ├── Cable TV
+│ ├── Betting
+│ ├── Funding
+│ └── Gift Cards
+├── More
+│ ├── Bills
+│ ├── Crypto
+│ ├── Gift Cards
+│ ├── Rates
+│ ├── Settings
+│ └── Referral
+└── Settings
+
+No duplicate routes.
+
+No duplicate pages.
+
+No circular navigation.
+
+---
+
+## 5. Keep everything inside the existing PayVora app
+
+Do NOT build standalone pages.
+
+Do NOT build mockups.
+
+Do NOT create preview-only screens.
+
+Everything must be integrated into the existing navigation stack, routing system, and application architecture.
+
+---
+
+## 6. Match the reference navigation
+
+The app should feel like one cohesive fintech application.
+
+Navigation should be smooth, predictable, and consistent.
+
+The Back button should always return to the previous screen.
+
+No dead ends.
+
+No broken routes.
+
+No repeated screens.
+
+---
+
+## 7. Final verification
+
+Before stopping, manually test every screen and every button.
+
+Confirm:
+
+* no duplicated pages remain
+* every route works
+* every button responds
+* every back button works
+* every bottom-tab item works
+* no navigation loops
+* no placeholder pages
+* no mockup screens
+
+Do not move on to new features until the navigation and responsiveness are fully fixed.
