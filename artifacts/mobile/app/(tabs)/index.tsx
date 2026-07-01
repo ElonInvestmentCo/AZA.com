@@ -275,6 +275,14 @@ export default function HomeScreen() {
   return (
     <View style={s.root}>
 
+      {/* ── Full-screen background image ── */}
+      <Image
+        source={cardBgSrc}
+        style={StyleSheet.absoluteFillObject}
+        contentFit="cover"
+        cachePolicy="memory-disk"
+      />
+
       {/* ── Header ── */}
       <Animated.View
         entering={FadeInDown.duration(300).springify()}
@@ -284,13 +292,13 @@ export default function HomeScreen() {
           onPress={press(() => router.push("/(app)/settings" as any))}
           style={s.hdrBtn}
         >
-          <Feather name="menu" size={22} color={C.text} />
+          <Feather name="menu" size={22} color="#FFFFFF" />
         </TouchableOpacity>
 
         <Text style={s.logo}>PAYVORA.</Text>
 
         <TouchableOpacity style={s.hdrBtn}>
-          <Feather name="bell" size={22} color={C.text} />
+          <Feather name="bell" size={22} color="#FFFFFF" />
           <View style={s.notifBadge}>
             <Text style={s.notifBadgeText}>2</Text>
           </View>
@@ -306,14 +314,6 @@ export default function HomeScreen() {
           entering={FadeInDown.duration(340).springify().delay(50)}
           style={[s.balCard, { width: cardW }]}
         >
-          {/* Card background image */}
-          <Image
-            source={cardBgSrc}
-            style={s.balCardBg}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-          />
-
           {/* Top row: avatar + greeting + eye */}
           <View style={s.balCardTop}>
             <View style={s.balAvatarWrap}>
@@ -500,7 +500,7 @@ export default function HomeScreen() {
 
 /* ── Styles ──────────────────────────────────────────────────────────────── */
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
+  root:   { flex: 1, backgroundColor: "transparent" },
   scroll: { paddingTop: 4, gap: 18, alignItems: "center" },
 
   /* Header */
@@ -510,7 +510,7 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 12,
-    backgroundColor: C.bg,
+    backgroundColor: "transparent",
   },
   hdrBtn: {
     width: 40, height: 40, borderRadius: 20,
@@ -528,7 +528,7 @@ const s = StyleSheet.create({
   notifBadgeText: {
     fontSize: 9, fontFamily: "Manrope_700Bold", color: "#FFFFFF",
   },
-  logo: { fontFamily: "Manrope_700Bold", fontSize: 18, letterSpacing: 1.5, color: "#0B0A0A" },
+  logo: { fontFamily: "Manrope_700Bold", fontSize: 18, letterSpacing: 1.5, color: "#FFFFFF" },
 
   /* Balance card */
   balCard: {
@@ -545,11 +545,6 @@ const s = StyleSheet.create({
     shadowRadius: 20,
     elevation: 12,
     alignSelf: "center",
-  },
-  balCardBg: {
-    position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
-    borderRadius: 20,
   },
   balCardTop: {
     flexDirection: "row",
