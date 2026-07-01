@@ -13,7 +13,6 @@ import {
   ViewToken,
   useWindowDimensions,
 } from "react-native";
-import LottieWalletSlide from "@/components/LottieWalletSlide";
 import Animated, {
   cancelAnimation,
   Easing,
@@ -523,16 +522,12 @@ export default function OnboardingScreen() {
                 opacity: 0.18,
               }} pointerEvents="none" />
               {item.type === "animated-wallet" && (
-                Platform.OS === "web" ? (
-                  <LottieWalletSlide slideW={width} slideH={slideAreaH} />
-                ) : (
-                  <AnimatedWalletSlide
-                    illustrationSize={illustrationSize}
-                    slideW={width}
-                    slideH={slideAreaH}
-                    isActive={isActive}
-                  />
-                )
+                <AnimatedWalletSlide
+                  illustrationSize={illustrationSize}
+                  slideW={width}
+                  slideH={slideAreaH}
+                  isActive={isActive}
+                />
               )}
               {item.type === "giftcard" && (
                 <GiftCardSlide slideW={width} slideH={slideAreaH} isActive={isActive} />
