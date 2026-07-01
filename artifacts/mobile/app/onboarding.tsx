@@ -1,7 +1,6 @@
 // @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
 import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -44,65 +43,6 @@ Asset.loadAsync([slide1Img, slide2Img, slide3Img, slide5Img, onboardPortfolio, o
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
   return Math.min(Math.max(val, min), max);
-}
-
-/** Convert #RRGGBB → rgba(r,g,b,0) so gradients don't bleed to black-transparent */
-function hex0(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r},${g},${b},0)`;
-}
-
-/**
- * Overlays soft gradient fades on all four edges of the slide,
- * dissolving the illustration into the slide's background color.
- * Top and left get a deeper fade (where content often bleeds out);
- * bottom and right are subtler.
- */
-function EdgeFadeOverlay({
-  bgColor,
-  slideW,
-  slideH,
-}: {
-  bgColor: string;
-  slideW: number;
-  slideH: number;
-}) {
-  const t = hex0(bgColor);          // transparent end of each gradient
-  const fadeTop    = slideH * 0.28; // top fade depth
-  const fadeBottom = slideH * 0.18; // bottom fade depth
-  const fadeLeft   = slideW * 0.28; // left fade depth
-  const fadeRight  = slideW * 0.18; // right fade depth
-
-  return (
-    <>
-      {/* Top */}
-      <LinearGradient
-        colors={[bgColor, t] as any}
-        style={{ position: "absolute", top: 0, left: 0, right: 0, height: fadeTop, zIndex: 2, pointerEvents: "none" }}
-      />
-      {/* Bottom */}
-      <LinearGradient
-        colors={[t, bgColor] as any}
-        style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: fadeBottom, zIndex: 2, pointerEvents: "none" }}
-      />
-      {/* Left */}
-      <LinearGradient
-        colors={[bgColor, t] as any}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: fadeLeft, zIndex: 2, pointerEvents: "none" }}
-      />
-      {/* Right */}
-      <LinearGradient
-        colors={[t, bgColor] as any}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: fadeRight, zIndex: 2, pointerEvents: "none" }}
-      />
-    </>
-  );
 }
 
 // ── Layout constants ──────────────────────────────────────────────────────────
@@ -206,13 +146,11 @@ function AnimatedWalletSlide({
   slideW,
   slideH,
   isActive,
-  bgColor,
 }: {
   illustrationSize: number;   // kept in signature so call-sites don't change
   slideW: number;
   slideH: number;
   isActive: boolean;
-  bgColor: string;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -244,7 +182,6 @@ function AnimatedWalletSlide({
           cachePolicy="memory-disk"
           priority="high"
         />
-        <EdgeFadeOverlay bgColor={bgColor} slideW={slideW} slideH={slideH} />
       </Animated.View>
     </View>
   );
@@ -260,12 +197,10 @@ function GiftCardSlide({
   slideW,
   slideH,
   isActive,
-  bgColor,
 }: {
   slideW: number;
   slideH: number;
   isActive: boolean;
-  bgColor: string;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -297,7 +232,6 @@ function GiftCardSlide({
           cachePolicy="memory-disk"
           priority="high"
         />
-        <EdgeFadeOverlay bgColor={bgColor} slideW={slideW} slideH={slideH} />
       </Animated.View>
     </View>
   );
@@ -310,14 +244,12 @@ function ImageSlide({
   slideH,
   isActive,
   parallaxFactor,
-  bgColor,
 }: {
   illustrationSize: number;
   slideW: number;
   slideH: number;
   isActive: boolean;
   parallaxFactor: number;
-  bgColor: string;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -355,7 +287,6 @@ function ImageSlide({
           cachePolicy="memory-disk"
           priority="high"
         />
-        <EdgeFadeOverlay bgColor={bgColor} slideW={slideW} slideH={slideH} />
       </Animated.View>
     </View>
   );
@@ -368,14 +299,12 @@ function ImageSlideStatic({
   slideH,
   isActive,
   parallaxFactor,
-  bgColor,
 }: {
   source: number;
   slideW: number;
   slideH: number;
   isActive: boolean;
   parallaxFactor: number;
-  bgColor: string;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -414,7 +343,6 @@ function ImageSlideStatic({
           cachePolicy="memory-disk"
           priority="high"
         />
-        <EdgeFadeOverlay bgColor={bgColor} slideW={slideW} slideH={slideH} />
       </Animated.View>
     </View>
   );
@@ -459,12 +387,10 @@ function VirtualCardSlide({
   slideW,
   slideH,
   isActive,
-  bgColor,
 }: {
   slideW: number;
   slideH: number;
   isActive: boolean;
-  bgColor: string;
 }) {
   const op = useSharedValue(0);
   const sc = useSharedValue(0.88);
@@ -496,7 +422,6 @@ function VirtualCardSlide({
           cachePolicy="memory-disk"
           priority="high"
         />
-        <EdgeFadeOverlay bgColor={bgColor} slideW={slideW} slideH={slideH} />
       </Animated.View>
     </View>
   );
@@ -566,12 +491,11 @@ export default function OnboardingScreen() {
                     slideW={width}
                     slideH={slideAreaH}
                     isActive={isActive}
-                    bgColor={item.bgColor}
                   />
                 )
               )}
               {item.type === "giftcard" && (
-                <GiftCardSlide slideW={width} slideH={slideAreaH} isActive={isActive} bgColor={item.bgColor} />
+                <GiftCardSlide slideW={width} slideH={slideAreaH} isActive={isActive} />
               )}
               {item.type === "image" && (
                 <ImageSlide
@@ -580,7 +504,6 @@ export default function OnboardingScreen() {
                   slideH={slideAreaH}
                   isActive={isActive}
                   parallaxFactor={index - activeIndex}
-                  bgColor={item.bgColor}
                 />
               )}
               {item.type === "chatgpt-portfolio" && (
@@ -590,7 +513,6 @@ export default function OnboardingScreen() {
                   slideH={slideAreaH}
                   isActive={isActive}
                   parallaxFactor={index - activeIndex}
-                  bgColor={item.bgColor}
                 />
               )}
               {item.type === "virtual-card" && (
@@ -598,7 +520,6 @@ export default function OnboardingScreen() {
                   slideW={width}
                   slideH={slideAreaH}
                   isActive={isActive}
-                  bgColor={item.bgColor}
                 />
               )}
               {item.type === "chatgpt-esim" && (
@@ -608,7 +529,6 @@ export default function OnboardingScreen() {
                   slideH={slideAreaH}
                   isActive={isActive}
                   parallaxFactor={index - activeIndex}
-                  bgColor={item.bgColor}
                 />
               )}
             </View>
