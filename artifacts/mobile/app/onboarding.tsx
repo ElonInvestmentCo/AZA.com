@@ -32,13 +32,12 @@ import type { SharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Assets ────────────────────────────────────────────────────────────────────
-const slide1Img        = require("@/assets/images/slide1.png");
+const slide1Img        = require("@/assets/images/slide1-payvora.png");
 const slide3Img        = require("@/assets/images/slide3.png");
-const manImg           = require("@/assets/images/man-illustration.png");
 const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide3Img, manImg, onboardPortfolio, onboardEsim]);
+Asset.loadAsync([slide1Img, slide3Img, onboardPortfolio, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -139,151 +138,48 @@ function ScaleBtn({
   );
 }
 
-// ── Slide 1: Wallet + man + premium ring pulse ────────────────────────────────
+// ── Slide 1: Payvora phone mockup — fade + spring scale in ───────────────────
 function AnimatedWalletSlide({
-  illustrationSize,
   slideW,
   slideH,
   isActive,
 }: {
-  illustrationSize: number;
+  illustrationSize: number;   // kept in signature so call-sites don't change
   slideW: number;
   slideH: number;
   isActive: boolean;
 }) {
-  // Layout
-  const manH     = illustrationSize * 1.38;
-  const manW     = manH * 0.72;
-  const illusTop  = (slideH - illustrationSize) / 2;
-  const illusLeft = (slideW - illustrationSize) / 2;
-  const manTop    = illusTop  + illustrationSize * 0.62 - manH * 0.50;
-  const manLeft   = illusLeft - manW * 0.08;
-  const startY    = -(slideH + manH);
+  // Fill most of the slide area; image is portrait (≈695×850 px natural size)
+  // so cap by both width AND height to ensure it never overflows.
+  const imgH = Math.min(slideH * 0.92, slideW * 1.15);
+  const imgW = imgH * (695 / 850);
 
-  // Ring overlay on PAY button
-  const ringSize = illustrationSize * 0.22;
-  const ringTop  = illusTop  + illustrationSize * 0.62 - ringSize / 2;
-  const ringLeft = illusLeft + illustrationSize * 0.61 - ringSize / 2;
-
-  // Shared values
-  const manY        = useSharedValue(startY);
-  const illusOp     = useSharedValue(0);
-  const illusSc     = useSharedValue(0.90);
-  const ringOp      = useSharedValue(0);
-  const ringSc      = useSharedValue(1);
-
-  // JS-thread function that drives the ring pulse (called via runOnJS)
-  const triggerPulse = useCallback(() => {
-    ringOp.value = 0;
-    ringSc.value = 1;
-    // 3 expanding white ring pulses
-    ringOp.value = withRepeat(
-      withSequence(
-        withTiming(0.72, { duration: 90, easing: Easing.out(Easing.quad) }),
-        withTiming(0,    { duration: 580, easing: Easing.in(Easing.quad) }),
-        withDelay(120, withTiming(0, { duration: 0 })),
-      ),
-      3,
-      false,
-    );
-    ringSc.value = withRepeat(
-      withSequence(
-        withTiming(1.0,  { duration: 90 }),
-        withTiming(2.5,  { duration: 580, easing: Easing.out(Easing.quad) }),
-        withDelay(120, withTiming(1.0, { duration: 0 })),
-      ),
-      3,
-      false,
-    );
-  }, []);
+  const op = useSharedValue(0);
+  const sc = useSharedValue(0.88);
 
   useEffect(() => {
     if (!isActive) {
-      cancelAnimation(manY);
-      cancelAnimation(illusOp);
-      cancelAnimation(illusSc);
-      cancelAnimation(ringOp);
-      cancelAnimation(ringSc);
-      manY.value    = startY;
-      illusOp.value = 0;
-      illusSc.value = 0.90;
-      ringOp.value  = 0;
-      ringSc.value  = 1;
+      cancelAnimation(op);
+      cancelAnimation(sc);
+      op.value = 0;
+      sc.value = 0.88;
       return;
     }
-    // Reset
-    manY.value    = startY;
-    illusOp.value = 0;
-    illusSc.value = 0.90;
-    ringOp.value  = 0;
-    ringSc.value  = 1;
+    op.value = withTiming(1, { duration: 520, easing: Easing.out(Easing.quad) });
+    sc.value = withSpring(1, { damping: 16, stiffness: 140 });
+  }, [isActive]);
 
-    // 1. Illustration fades + scales in
-    illusOp.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    illusSc.value = withSpring(1, { damping: 18, stiffness: 150 });
-
-    // 2. Man slides down; on completion trigger ring pulse
-    manY.value = withDelay(
-      200,
-      withTiming(0, { duration: 1100, easing: Easing.out(Easing.cubic) },
-        (finished) => {
-          "worklet";
-          if (finished) runOnJS(triggerPulse)();
-        }),
-    );
-  }, [isActive, illustrationSize]);
-
-  const manStyle   = useAnimatedStyle(() => ({ transform: [{ translateY: manY.value }] }));
-  const illusStyle = useAnimatedStyle(() => ({ opacity: illusOp.value, transform: [{ scale: illusSc.value }] }));
-  const ringStyle  = useAnimatedStyle(() => ({ opacity: ringOp.value,  transform: [{ scale: ringSc.value  }] }));
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: op.value,
+    transform: [{ scale: sc.value }],
+  }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      {/* Illustration — fades + scales in */}
-      <Animated.View
-        style={[
-          { position: "absolute", top: illusTop, left: illusLeft,
-            width: illustrationSize, height: illustrationSize },
-          illusStyle,
-        ]}
-      >
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={animStyle}>
         <Image
           source={slide1Img}
-          style={{ width: illustrationSize, height: illustrationSize }}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-          priority="high"
-        />
-      </Animated.View>
-
-      {/* Premium white ring pulse on PAY button */}
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            top: ringTop,
-            left: ringLeft,
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: 2.5,
-            borderColor: "#FFFFFF",
-            backgroundColor: "transparent",
-          },
-          ringStyle,
-        ]}
-      />
-
-      {/* Man — slides in from top */}
-      <Animated.View
-        style={[
-          { position: "absolute", top: manTop, left: manLeft, width: manW, height: manH },
-          manStyle,
-        ]}
-      >
-        <Image
-          source={manImg}
-          style={{ width: manW, height: manH }}
+          style={{ width: imgW, height: imgH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
