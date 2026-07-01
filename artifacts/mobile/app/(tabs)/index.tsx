@@ -525,7 +525,15 @@ const s = StyleSheet.create({
 
 const sv = StyleSheet.create({
   wrap:    { alignItems: "center", gap: 7, paddingVertical: 4 },
-  iconBox: { width: 52, height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  iconBox: {
+    width: 52, height: 52, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
   label:   { fontSize: rf(10), fontFamily: "Manrope_700Bold", textAlign: "center", color: C.textSec, lineHeight: rf(14), maxWidth: 64, flexShrink: 1 },
 });
 
