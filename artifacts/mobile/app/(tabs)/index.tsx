@@ -532,7 +532,7 @@ const s = StyleSheet.create({
 
   /* Balance card */
   balCard: {
-    backgroundColor: "#111111",
+    backgroundColor: "transparent",
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingTop: 18,
