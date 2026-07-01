@@ -10,21 +10,21 @@ import {
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
 
-interface AZAInputProps extends TextInputProps {
+interface PayvoraInputProps extends TextInputProps {
   label?: string;
   error?: string;
   secureToggle?: boolean;
   icon?: keyof typeof Feather.glyphMap;
 }
 
-export function AZAInput({
+export function PayvoraInput({
   label,
   error,
   secureToggle,
   icon,
   style,
   ...props
-}: AZAInputProps) {
+}: PayvoraInputProps) {
   const colors = useColors();
   const [focused, setFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

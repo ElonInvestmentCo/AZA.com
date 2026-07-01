@@ -286,12 +286,16 @@ function ImageSlide({
     transform: [{ scale: sc.value }, { translateX: px.value }],
   }));
 
+  // Width-first: fill the full slide width, let natural portrait ratio determine height.
+  // Overflow is clipped by the container, trimming transparent edges at top/bottom only.
+  const naturalH = slideW * (950 / 685);
+
   return (
-    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ width: slideW, height: slideH, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
       <Animated.View style={animStyle}>
         <Image
           source={slide3Img}
-          style={{ width: slideW, height: slideH * HERO_FILL }}
+          style={{ width: slideW, height: naturalH }}
           contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
@@ -475,7 +479,7 @@ export default function OnboardingScreen() {
 
       {/* Header — transparent so slide bg bleeds through under status bar */}
       <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: activeSlide.bgColor }]}>
-        <Text style={[styles.logo, { fontSize: logoSize }]}>AZA.</Text>
+        <Text style={[styles.logo, { fontSize: logoSize }]}>PAYVORA.</Text>
       </View>
 
       {/* Slide carousel — scroll drives the parallax depth on image slides */}

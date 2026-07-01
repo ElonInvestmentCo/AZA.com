@@ -8,7 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useColors } from "@/hooks/useColors";
 
-interface AZAButtonProps {
+interface PayvoraButtonProps {
   title: string;
   onPress: () => void;
   variant?: "primary" | "outline" | "ghost" | "danger";
@@ -17,14 +17,14 @@ interface AZAButtonProps {
   fullWidth?: boolean;
 }
 
-export function AZAButton({
+export function PayvoraButton({
   title,
   onPress,
   variant = "primary",
   loading = false,
   disabled = false,
   fullWidth = true,
-}: AZAButtonProps) {
+}: PayvoraButtonProps) {
   const colors = useColors();
   const scale = useSharedValue(1);
 
