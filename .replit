@@ -28,6 +28,10 @@ args = "PayVora Website"
 task = "workflow.run"
 args = "PAYVORA Mobile (Expo Go)"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Mockup Sandbox"
+
 [[workflows.workflow]]
 name = "API Server"
 author = "agent"
@@ -62,6 +66,19 @@ args = "pnpm --filter @workspace/mobile run dev"
 [workflows.workflow.metadata]
 outputType = "console"
 
+[[workflows.workflow]]
+name = "Mockup Sandbox"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "PORT=3001 BASE_PATH=/ pnpm --filter @workspace/mockup-sandbox run dev"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+isCanvasWorkflow = true
+
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
 expertMode = true
@@ -69,6 +86,10 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
 
 [[ports]]
 localPort = 5000
