@@ -62,20 +62,27 @@ type SlideItem = {
   bgColor: string;
 };
 
-const SLIDES: SlideItem[] = [
+type SlideGlow = {
+  color: string;
+  opacity: number;
+};
+
+const SLIDES: (SlideItem & { glow: SlideGlow })[] = [
   {
     id: "1",
     type: "animated-wallet",
     title: "Withdraw like a Boss",
     subtitle: "Fast, secure withdrawals made simple.",
     bgColor: "#ffffff",
+    glow: { color: "#EEF7FF", opacity: 1 },
   },
   {
     id: "2",
     type: "giftcard",
     title: "Sell your gift card",
     subtitle: "Sell smarter. Get paid faster.",
-    bgColor: "#EDE7F6",
+    bgColor: "#ffffff",
+    glow: { color: "#FFF6E8", opacity: 1 },
   },
   {
     id: "3",
@@ -83,6 +90,7 @@ const SLIDES: SlideItem[] = [
     title: "Bill payments",
     subtitle: "Pay your bills seamlessly in one place",
     bgColor: "#ffffff",
+    glow: { color: "#EAF8F2", opacity: 1 },
   },
   {
     id: "4",
@@ -90,6 +98,7 @@ const SLIDES: SlideItem[] = [
     title: "Track Your Portfolio",
     subtitle: "Monitor your crypto assets in real time.",
     bgColor: "#ffffff",
+    glow: { color: "#F5F5F7", opacity: 1 },
   },
   {
     id: "5",
@@ -97,6 +106,7 @@ const SLIDES: SlideItem[] = [
     title: "Virtual Card",
     subtitle: "Pay anywhere with your PAYVORA virtual card.",
     bgColor: "#ffffff",
+    glow: { color: "#F2EFFB", opacity: 1 },
   },
   {
     id: "6",
@@ -104,6 +114,7 @@ const SLIDES: SlideItem[] = [
     title: "Global eSIM",
     subtitle: "Stay connected wherever you go.",
     bgColor: "#ffffff",
+    glow: { color: "#EAF5FF", opacity: 1 },
   },
 ];
 
@@ -458,10 +469,10 @@ export default function OnboardingScreen() {
   const activeSlide = SLIDES[activeIndex];
 
   return (
-    <View style={[styles.root, { backgroundColor: activeSlide.bgColor }]}>
+    <View style={[styles.root, { backgroundColor: "#ffffff" }]}>
 
-      {/* Header — transparent so slide bg bleeds through under status bar */}
-      <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: activeSlide.bgColor }]}>
+      {/* Header — always white so glow never bleeds into logo area */}
+      <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: "#ffffff" }]}>
         <Text style={[styles.logo, { fontSize: logoSize }]}>PAYVORA.</Text>
       </View>
 
@@ -480,8 +491,37 @@ export default function OnboardingScreen() {
         getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
         renderItem={({ item, index }) => {
           const isActive = index === activeIndex;
+          const glowSize = Math.min(width, slideAreaH) * 1.1;
           return (
-            <View style={{ width, height: slideAreaH, backgroundColor: item.bgColor }}>
+            <View style={{ width, height: slideAreaH, backgroundColor: "#ffffff", overflow: "hidden" }}>
+              {/* Ambient glow — layered circles fading outward, confined to illustration area */}
+              <View style={{
+                position: "absolute",
+                top: "50%", left: "50%",
+                width: glowSize, height: glowSize,
+                marginTop: -(glowSize / 2), marginLeft: -(glowSize / 2),
+                borderRadius: glowSize / 2,
+                backgroundColor: item.glow.color,
+                opacity: 0.85,
+              }} pointerEvents="none" />
+              <View style={{
+                position: "absolute",
+                top: "50%", left: "50%",
+                width: glowSize * 1.22, height: glowSize * 1.22,
+                marginTop: -(glowSize * 1.22 / 2), marginLeft: -(glowSize * 1.22 / 2),
+                borderRadius: glowSize * 1.22 / 2,
+                backgroundColor: item.glow.color,
+                opacity: 0.45,
+              }} pointerEvents="none" />
+              <View style={{
+                position: "absolute",
+                top: "50%", left: "50%",
+                width: glowSize * 1.5, height: glowSize * 1.5,
+                marginTop: -(glowSize * 1.5 / 2), marginLeft: -(glowSize * 1.5 / 2),
+                borderRadius: glowSize * 1.5 / 2,
+                backgroundColor: item.glow.color,
+                opacity: 0.18,
+              }} pointerEvents="none" />
               {item.type === "animated-wallet" && (
                 Platform.OS === "web" ? (
                   <LottieWalletSlide slideW={width} slideH={slideAreaH} />
