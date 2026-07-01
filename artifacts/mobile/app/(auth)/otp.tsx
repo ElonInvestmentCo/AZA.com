@@ -236,7 +236,8 @@ export default function OtpScreen() {
           params: { verified: "1", email },
         } as any);
       } else {
-        router.replace("/(tabs)");
+        /* Login flow — go through Face ID / biometric gate */
+        router.replace("/(auth)/face-id" as any);
       }
     }, 1200);
   };
