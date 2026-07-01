@@ -64,84 +64,141 @@ const FEATURES = [
   { label: "More",         bg: "#F3F4F6", color: "#374151", icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2" strokeLinecap="round"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg> },
 ];
 
-/* ─── Choose-a-Card Screen ───────────────────────────── */
+/* ─── Choose-a-Card Screen — faithful copy of VirtualCardScreen.tsx, scaled to phone ── */
 type CardType = "virtual" | "disposable";
-const CARD_INFO: Record<CardType, { title: string; body: string }> = {
-  virtual:    { title: "Virtual card",          body: "Instant and ready to use online. Add to Apple Pay and use it to pay in stores." },
-  disposable: { title: "Disposable virtual card", body: "Single-use card for extra security. Expires after one transaction." },
+const DESCRIPTIONS: Record<CardType, { title: string; body: string }> = {
+  virtual: {
+    title: "Virtual card",
+    body: "Instant and ready to use online. Add to Apple Pay and use it to pay in stores, just like a physical card.",
+  },
+  disposable: {
+    title: "Disposable virtual card",
+    body: "Single-use card for extra security. Expires after one transaction, keeping your main account safe.",
+  },
 };
+
+/* sub-components matching VirtualCardScreen.tsx exactly */
+function VCSMastercardLogo() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3 }}>
+      <div style={{ position: "relative", width: 46, height: 28 }}>
+        <div style={{ position: "absolute", left: 0, top: 0, width: 28, height: 28, borderRadius: "50%", backgroundColor: "#EB001B", opacity: 0.95 }} />
+        <div style={{ position: "absolute", left: 18, top: 0, width: 28, height: 28, borderRadius: "50%", backgroundColor: "#F79E1B", opacity: 0.92 }} />
+      </div>
+      <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, letterSpacing: 0.3, fontWeight: 400, marginTop: 1 }}>
+        mastercard<span style={{ fontSize: 7, position: "relative", top: -4 }}>®</span>
+      </span>
+    </div>
+  );
+}
+function VCSPayvoraLogo() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
+      <div style={{ width: 20, height: 20, borderRadius: "50%", border: "1.5px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 700, lineHeight: 1 }}>P</span>
+      </div>
+      <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 9, letterSpacing: 2.5, fontWeight: 600 }}>PAYVORA</span>
+    </div>
+  );
+}
+function VCSCardIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>;
+}
+function VCSDisposableIcon() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /><path d="M6 15h2M10 15h2" strokeDasharray="2 2" /></svg>;
+}
+function VCSShieldIcon() {
+  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>;
+}
 
 function ChooseCardScreen({ onBack }: { onBack: () => void }) {
   const [selected, setSelected] = useState<CardType>("virtual");
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#FFFFFF" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px 6px" }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "#000", display: "flex", alignItems: "center" }}>
-          <IcoBack />
-        </button>
-        <span style={{ fontSize: 10.5, fontWeight: 700, color: "#000" }}>Choose a card type</span>
-        <div style={{ width: 22 }} />
-      </div>
+  /* The full VirtualCardScreen is 430px wide. Phone inner screen is ~274px.
+     Scale = 274/430 ≈ 0.637 — we scale-down the entire screen faithfully. */
+  const NATURAL_W = 430;
+  const SCALE = 0.637;
 
-      {/* Card visual */}
-      <div style={{ padding: "6px 14px 2px" }}>
-        <div style={{ width: "100%", aspectRatio: "1.586/1", borderRadius: 14, backgroundColor: "#141414", position: "relative", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.28)" }}>
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(145deg, rgba(255,255,255,0.04) 0%, transparent 50%, rgba(0,0,0,0.12) 100%)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-46%,-50%)", fontSize: 90, fontWeight: 900, color: "rgba(255,255,255,0.04)", lineHeight: 1, userSelect: "none" }}>P</div>
-          <div style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%) rotate(-90deg)", color: "rgba(255,255,255,0.7)", fontSize: 5, fontWeight: 600, letterSpacing: 2, whiteSpace: "nowrap" }}>CARD HOLDER</div>
-          <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%) rotate(90deg)", color: "rgba(255,255,255,0.7)", fontSize: 5, fontWeight: 600, letterSpacing: 2, whiteSpace: "nowrap" }}>VIRTUAL</div>
-          <div style={{ position: "absolute", bottom: 10, left: 12, right: 12, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-            <div style={{ display: "flex" }}>
-              <div style={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: "#EB001B" }} />
-              <div style={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: "#F79E1B", marginLeft: -7 }} />
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-              <div style={{ width: 12, height: 12, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 7, fontWeight: 700 }}>P</span>
-              </div>
-              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 4.5, letterSpacing: 1.5, fontWeight: 600 }}>PAYVORA</span>
+  return (
+    <div style={{ width: "100%", height: "100%", overflow: "hidden", position: "relative", background: "#fff" }}>
+      <div style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: NATURAL_W,
+        transformOrigin: "top left",
+        transform: `scale(${SCALE})`,
+        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        backgroundColor: "#FFFFFF",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: `${100 / SCALE}%`,
+      }}>
+
+        {/* Header — matches VirtualCardScreen.tsx */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 36, paddingBottom: 16, paddingLeft: 20, paddingRight: 20, backgroundColor: "#FFFFFF" }}>
+          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "#000", display: "flex", alignItems: "center" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M5 12l7 7M5 12l7-7" />
+            </svg>
+          </button>
+          <span style={{ fontSize: 17, fontWeight: 600, color: "#000000", letterSpacing: -0.2 }}>Choose a card type</span>
+          <div style={{ width: 30 }} />
+        </div>
+
+        {/* Card — matches VirtualCardScreen.tsx */}
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: 24, paddingBottom: 8, paddingLeft: 28, paddingRight: 28 }}>
+          <div style={{ width: "100%", maxWidth: 340, aspectRatio: "1.586 / 1", borderRadius: 22, backgroundColor: "#141414", position: "relative", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.28), 0 8px 20px rgba(0,0,0,0.18)", flexShrink: 0 }}>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(145deg, rgba(255,255,255,0.04) 0%, transparent 50%, rgba(0,0,0,0.12) 100%)", borderRadius: 22, pointerEvents: "none" }} />
+            {/* Watermark P */}
+            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-46%, -50%)", fontSize: 160, fontWeight: 900, color: "rgba(255,255,255,0.045)", lineHeight: 1, userSelect: "none", pointerEvents: "none", letterSpacing: -8 }}>P</div>
+            {/* CARD HOLDER vertical left */}
+            <div style={{ position: "absolute", left: 22, top: "50%", transform: "translateY(-50%) rotate(-90deg)", transformOrigin: "center center", color: "rgba(255,255,255,0.82)", fontSize: 10, fontWeight: 600, letterSpacing: 3.5, whiteSpace: "nowrap", userSelect: "none" }}>CARD HOLDER</div>
+            {/* VIRTUAL vertical right */}
+            <div style={{ position: "absolute", right: 22, top: "50%", transform: "translateY(-50%) rotate(90deg)", transformOrigin: "center center", color: "rgba(255,255,255,0.82)", fontSize: 10, fontWeight: 600, letterSpacing: 3.5, whiteSpace: "nowrap", userSelect: "none" }}>VIRTUAL</div>
+            {/* Bottom logos */}
+            <div style={{ position: "absolute", bottom: 20, left: 22, right: 22, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <VCSMastercardLogo />
+              <VCSPayvoraLogo />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Toggle */}
-      <div style={{ display: "flex", gap: 6, padding: "8px 12px 0" }}>
-        <button onClick={() => setSelected("virtual")} style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 12px", borderRadius: 50, border: "none", cursor: "pointer", backgroundColor: selected === "virtual" ? "#000" : "#F0F0F0", color: selected === "virtual" ? "#fff" : "#333", fontSize: 8.5, fontWeight: 600 }}>
-          Virtual
-        </button>
-        <button onClick={() => setSelected("disposable")} style={{ display: "flex", alignItems: "center", gap: 4, flex: 1, justifyContent: "center", padding: "6px 8px", borderRadius: 50, cursor: "pointer", border: selected === "disposable" ? "none" : "1px solid #E0E0E0", backgroundColor: selected === "disposable" ? "#000" : "transparent", color: selected === "disposable" ? "#fff" : "#555", fontSize: 8, fontWeight: 500 }}>
-          Disposable virtual
-        </button>
-      </div>
-
-      {/* Divider */}
-      <div style={{ height: 1, backgroundColor: "#F0F0F0", margin: "8px 12px 0" }} />
-
-      {/* Description */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "8px 12px 0" }}>
-        <div style={{ width: 28, height: 28, borderRadius: "50%", backgroundColor: "#F4F4F4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-          <IcoShield />
+        {/* Toggle — matches VirtualCardScreen.tsx */}
+        <div style={{ display: "flex", gap: 10, paddingTop: 28, paddingLeft: 24, paddingRight: 24 }}>
+          <button onClick={() => setSelected("virtual")} style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 18, paddingRight: 18, paddingTop: 11, paddingBottom: 11, borderRadius: 50, border: "none", cursor: "pointer", transition: "all 0.2s ease", backgroundColor: selected === "virtual" ? "#000000" : "#F0F0F0", color: selected === "virtual" ? "#FFFFFF" : "#333333", fontSize: 14, fontWeight: 600, letterSpacing: -0.1, whiteSpace: "nowrap" }}>
+            <span style={{ opacity: selected === "virtual" ? 1 : 0.6 }}><VCSCardIcon /></span>
+            Virtual
+          </button>
+          <button onClick={() => setSelected("disposable")} style={{ display: "flex", alignItems: "center", gap: 7, paddingLeft: 16, paddingRight: 16, paddingTop: 11, paddingBottom: 11, borderRadius: 50, border: selected === "disposable" ? "none" : "1.5px solid #E0E0E0", cursor: "pointer", transition: "all 0.2s ease", backgroundColor: selected === "disposable" ? "#000000" : "transparent", color: selected === "disposable" ? "#FFFFFF" : "#555555", fontSize: 14, fontWeight: 500, letterSpacing: -0.1, whiteSpace: "nowrap", flex: 1, justifyContent: "center" }}>
+            <span style={{ opacity: selected === "disposable" ? 1 : 0.55 }}><VCSDisposableIcon /></span>
+            Disposable virtual
+          </button>
         </div>
-        <div>
-          <p style={{ margin: 0, fontSize: 8.5, fontWeight: 700, color: "#000", marginBottom: 3 }}>{CARD_INFO[selected].title}</p>
-          <p style={{ margin: 0, fontSize: 7.5, fontWeight: 400, color: "#888", lineHeight: 1.5 }}>{CARD_INFO[selected].body}</p>
+
+        {/* Divider */}
+        <div style={{ height: 1, backgroundColor: "#F0F0F0", marginTop: 24, marginLeft: 24, marginRight: 24 }} />
+
+        {/* Description — matches VirtualCardScreen.tsx */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 16, paddingTop: 20, paddingLeft: 24, paddingRight: 24 }}>
+          <div style={{ width: 46, height: 46, borderRadius: "50%", backgroundColor: "#F4F4F4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <VCSShieldIcon />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#000000", letterSpacing: -0.2, marginBottom: 5 }}>{DESCRIPTIONS[selected].title}</p>
+            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 400, color: "#888888", lineHeight: 1.5, letterSpacing: -0.1 }}>{DESCRIPTIONS[selected].body}</p>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, minHeight: 40 }} />
+
+        {/* CTA — matches VirtualCardScreen.tsx */}
+        <div style={{ paddingLeft: 24, paddingRight: 24, paddingBottom: 44, paddingTop: 16 }}>
+          <button style={{ width: "100%", paddingTop: 17, paddingBottom: 17, borderRadius: 50, border: "none", backgroundColor: "#000000", color: "#FFFFFF", fontSize: 16, fontWeight: 600, letterSpacing: -0.2, cursor: "pointer" }}>
+            Get virtual card
+          </button>
         </div>
       </div>
-
-      <div style={{ flex: 1 }} />
-
-      {/* CTA */}
-      <div style={{ padding: "0 12px 14px" }}>
-        <button style={{ width: "100%", padding: "10px 0", borderRadius: 50, border: "none", backgroundColor: "#000", color: "#fff", fontSize: 9, fontWeight: 600, cursor: "pointer" }}>
-          Get virtual card
-        </button>
-      </div>
-
-      {/* Bottom nav */}
-      <BottomNav active="card" onCardPress={() => {}} />
     </div>
   );
 }
