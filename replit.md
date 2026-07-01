@@ -33,7 +33,7 @@ A fintech gift card trading platform — users can sell gift cards, fund their w
   - `context/AuthContext.tsx` — user auth state (AsyncStorage)
   - `assets/images/` — all local image assets
 - `artifacts/payvora/` — Payvora mobile app (separate brand)
-- `attached_assets/aza_export/` — Figma export reference code
+- `attached_assets/aza_export/` — Figma design export reference (historical, not used in app)
 - `attached_assets/design_ref/` — design reference screenshots
 
 ## Architecture decisions
@@ -69,5 +69,5 @@ A fintech gift card trading platform — users can sell gift cards, fund their w
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
-- Figma design reference: `attached_assets/aza_export/src/imports/` for screen-level TSX components
+- Figma design reference: `attached_assets/aza_export/src/imports/` for screen-level component specs (historical reference only)
 - CSS design specs: `attached_assets/Pasted--Gift-card-button-*` and similar pasted text files

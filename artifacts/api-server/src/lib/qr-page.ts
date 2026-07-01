@@ -34,11 +34,11 @@ async function makeSvg(url: string): Promise<string> {
 }
 
 export async function buildQrPage(
-  azaUrl: string | null,
+  mobileUrl: string | null,
   payvoraUrl: string | null,
 ): Promise<string> {
-  const [azaSvg, payvoraSvg] = await Promise.all([
-    azaUrl ? makeSvg(azaUrl) : Promise.resolve(""),
+  const [mobileSvg, payvoraSvg] = await Promise.all([
+    mobileUrl ? makeSvg(mobileUrl) : Promise.resolve(""),
     payvoraUrl ? makeSvg(payvoraUrl) : Promise.resolve(""),
   ]);
 
@@ -253,7 +253,7 @@ export async function buildQrPage(
   </header>
 
   <div class="cards">
-    ${card("PAYVORA Mobile", 19000, "purple", azaUrl, azaSvg)}
+    ${card("PAYVORA Mobile", 19000, "purple", mobileUrl, mobileSvg)}
     ${card("Payvora Mobile", 19001, "", payvoraUrl, payvoraSvg)}
   </div>
 

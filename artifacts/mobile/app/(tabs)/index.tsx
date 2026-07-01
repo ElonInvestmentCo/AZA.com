@@ -47,7 +47,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
 const MAX_W = 430;
-const BAL_VIS_KEY = "aza_balance_visible";
+const BAL_VIS_KEY = "payvora_balance_visible";
 
 const C = {
   bg:        "#FFFFFF",
@@ -61,7 +61,6 @@ const C = {
   actionBar: "#000000",
 };
 
-const logoSrc   = require("@/assets/images/lkd.png");
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
@@ -250,12 +249,7 @@ export default function HomeScreen() {
           <Feather name="menu" size={22} color={C.text} />
         </TouchableOpacity>
 
-        <Image
-          source={logoSrc}
-          style={s.logo}
-          contentFit="contain"
-          cachePolicy="memory-disk"
-        />
+        <Text style={s.logo}>PAYVORA.</Text>
 
         <TouchableOpacity style={s.hdrBtn}>
           <Feather name="bell" size={22} color={C.text} />
@@ -468,7 +462,7 @@ const s = StyleSheet.create({
     backgroundColor: "#FF3B30",
     borderWidth: 1.5, borderColor: C.bg,
   },
-  logo: { width: 80, height: 28 },
+  logo: { fontFamily: "Manrope_700Bold", fontSize: 18, letterSpacing: 1.5, color: "#0B0A0A" },
 
   greetSection: {
     marginHorizontal: 20,
