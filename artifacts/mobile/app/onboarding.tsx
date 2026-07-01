@@ -1,6 +1,5 @@
 // @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
-import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -33,11 +32,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // ── Assets ────────────────────────────────────────────────────────────────────
 const slide1Img        = require("@/assets/images/slide1-payvora.png");
+const slide2Img        = require("@/assets/images/slide2-giftcards.png");
 const slide3Img        = require("@/assets/images/slide3.png");
 const onboardPortfolio = require("@/assets/images/onboard-portfolio.png");
 const onboardEsim      = require("@/assets/images/onboard-esim.png");
 
-Asset.loadAsync([slide1Img, slide3Img, onboardPortfolio, onboardEsim]);
+Asset.loadAsync([slide1Img, slide2Img, slide3Img, onboardPortfolio, onboardEsim]);
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function clamp(val: number, min: number, max: number) {
@@ -189,174 +189,12 @@ function AnimatedWalletSlide({
   );
 }
 
-// ── Free Card — rebuilt from Figma CSS specs (237×150 reference) ──────────────
-//
-// All text content matches the card image exactly:
-//   John Smith / amazon wordmark / Amazon Platimun / 4756 •••• •••• 9018 / $3,469.52
-//
-// Positions: Figma left/top percentages × rendered W/H.
-// Gradient angle 216.89° → start{x:0.80,y:0.10} end{x:0.20,y:0.90} in RN.
-function FreeCard({ cardW }: { cardW: number }) {
-  const W = cardW;
-  const H = W * (150 / 237);
-  const R = W * (18 / 237);
-  const s = W / 237;            // uniform scale factor from 237px reference
-
-  const GRAD_START = { x: 0.80, y: 0.10 };
-  const GRAD_END   = { x: 0.20, y: 0.90 };
-
-  const greenTop    = -0.1297 * H;
-  const greenHeight = (1 + 0.1297 - 0.3627) * H;
-  const blueTop     =  0.3842 * H;
-  const blueHeight  = (1 + 0.1512 - 0.3842) * H;
-
-  // Font sizes scaled from the Figma bounding-box heights at 237×150 reference
-  const nameFz     = s * 11.2;   // "John Smith"       — Figma top:11.6% bottom:80.95%
-  const brandFz    = s *  7.5;   // "Amazon Platimun"  — Figma top:48.57% bottom:46.47%
-  const numFz      = s *  8.0;   // card number        — Figma top:63.53%
-  const balanceFz  = s * 13.5;   // "$3,469.52"        — Figma top:77.58%
-  const amazonFz   = s *  6.5;   // "amazon" wordmark  — Figma top-right cluster
-
-  return (
-    <View style={{
-      width: W, height: H,
-      borderRadius: R,
-      overflow: "hidden",
-      backgroundColor: "#272A38",
-    }}>
-
-      {/* ── Green gradient blob ── */}
-      <LinearGradient
-        colors={["#009B6E", "#99E200"]}
-        start={GRAD_START}
-        end={GRAD_END}
-        style={{
-          position: "absolute",
-          left:   0.2398 * W,
-          top:    greenTop,
-          width:  (1 - 0.2398 - 0.3230) * W,
-          height: greenHeight,
-          borderRadius: (1 - 0.2398 - 0.3230) * W * 0.5,
-        }}
-      />
-
-      {/* ── Blue gradient blob ── */}
-      <LinearGradient
-        colors={["#009DCA", "#0047BB"]}
-        start={GRAD_START}
-        end={GRAD_END}
-        style={{
-          position: "absolute",
-          left:   0.3391 * W,
-          top:    blueTop,
-          width:  (1 - 0.3391 - 0.2238) * W,
-          height: blueHeight,
-          borderRadius: (1 - 0.3391 - 0.2238) * W * 0.5,
-        }}
-      />
-
-      {/* ── Text content ─────────────────────────────────────────────────── */}
-
-      {/* "John Smith" — top-left, bold white */}
-      <Text style={{
-        position: "absolute",
-        left: 0.0731 * W,
-        top:  0.1160 * H,
-        color: "#FFFFFF",
-        fontSize: nameFz,
-        fontFamily: "Manrope_700Bold",
-        letterSpacing: 0.1,
-      }}>
-        John Smith
-      </Text>
-
-      {/* "amazon" wordmark — top-right, white */}
-      <View style={{ position: "absolute", right: 0.065 * W, top: 0.105 * H }}>
-        <Text style={{
-          color: "#FFFFFF",
-          fontSize: amazonFz,
-          fontFamily: "Manrope_700Bold",
-          letterSpacing: 0.5,
-        }}>
-          amazon
-        </Text>
-        {/* Curved-arrow underline — approximated as a bottom-rounded bar */}
-        <View style={{
-          height: s * 1.2,
-          marginTop: s * 0.8,
-          marginHorizontal: s * 1,
-          backgroundColor: "#FFFFFF",
-          borderRadius: s * 1,
-        }} />
-      </View>
-
-      {/* "Amazon Platimun" — mid-left, dimmed white */}
-      <Text style={{
-        position: "absolute",
-        left: 0.0721 * W,
-        top:  0.4857 * H,
-        color: "rgba(255,255,255,0.80)",
-        fontSize: brandFz,
-        fontFamily: "Manrope_400Regular",
-        letterSpacing: 0.1,
-      }}>
-        Amazon Platimun
-      </Text>
-
-      {/* Card number — "4756  ····  ····  9018" */}
-      <Text style={{
-        position: "absolute",
-        left: 0.0731 * W,
-        top:  0.6220 * H,
-        color: "#FFFFFF",
-        fontSize: numFz,
-        fontFamily: "Manrope_600SemiBold",
-        letterSpacing: s * 0.8,
-      }}>
-        {"4756  \u2022\u2022\u2022\u2022  \u2022\u2022\u2022\u2022  9018"}
-      </Text>
-
-      {/* "$3,469.52" — bottom-left, bold */}
-      <Text style={{
-        position: "absolute",
-        left: 0.0748 * W,
-        top:  0.7400 * H,
-        color: "#FFFFFF",
-        fontSize: balanceFz,
-        fontFamily: "Manrope_700Bold",
-        letterSpacing: -0.3,
-      }}>
-        $3,469.52
-      </Text>
-
-      {/* ── Mastercard circles (bottom-right) ────────────────────────────── */}
-      {/* Left circle — full white */}
-      <View style={{
-        position: "absolute",
-        left:   0.7796 * W,
-        top:    0.7311 * H,
-        width:  (1 - 0.7796 - 0.1279) * W,
-        height: (1 - 0.7311 - 0.1222) * H,
-        borderRadius: 999,
-        backgroundColor: "#FFFFFF",
-      }} />
-      {/* Right circle — 50% opacity */}
-      <View style={{
-        position: "absolute",
-        left:   0.8359 * W,
-        top:    0.7311 * H,
-        width:  (1 - 0.8359 - 0.0716) * W,
-        height: (1 - 0.7311 - 0.1222) * H,
-        borderRadius: 999,
-        backgroundColor: "#FFFFFF",
-        opacity: 0.5,
-      }} />
-
-    </View>
-  );
+// ── (FreeCard removed — slide 2 now uses a direct image asset) ────────────────
+function FreeCard({ cardW }: { cardW: number }) {  // kept as stub to avoid breaking anything
+  return null;
 }
 
-// ── Slide 2: Gift card — Figma card + fade/spring entrance + float loop ────────
+// ── Slide 2: Gift card image — fade + spring scale in ─────────────────────────
 function GiftCardSlide({
   slideW,
   slideH,
@@ -366,67 +204,41 @@ function GiftCardSlide({
   slideH: number;
   isActive: boolean;
 }) {
-  const cardW = clamp(slideW * 0.82, 240, 380);
+  // Image is portrait (≈685×950 px natural size — gift cards stacked collage).
+  // Fill as much of the slide as possible without overflow on any screen size.
+  const imgH = Math.min(slideH * 0.92, slideW * 1.25);
+  const imgW = imgH * (685 / 950);
 
-  const cardOp = useSharedValue(0);
-  const cardSc = useSharedValue(0.88);
-  // Float: gentle ±7px vertical oscillation
-  const floatY = useSharedValue(0);
-
-  const startFloat = useCallback(() => {
-    floatY.value = withRepeat(
-      withSequence(
-        withTiming(-7, { duration: 1600, easing: Easing.inOut(Easing.sin) }),
-        withTiming( 7, { duration: 1600, easing: Easing.inOut(Easing.sin) }),
-      ),
-      -1,   // infinite
-      false,
-    );
-  }, []);
+  const op = useSharedValue(0);
+  const sc = useSharedValue(0.88);
 
   useEffect(() => {
     if (!isActive) {
-      cancelAnimation(cardOp);
-      cancelAnimation(cardSc);
-      cancelAnimation(floatY);
-      cardOp.value = 0;
-      cardSc.value = 0.88;
-      floatY.value = 0;
+      cancelAnimation(op);
+      cancelAnimation(sc);
+      op.value = 0;
+      sc.value = 0.88;
       return;
     }
-    // Entrance
-    cardOp.value = withTiming(1, { duration: 480, easing: Easing.out(Easing.quad) });
-    cardSc.value = withSpring(1, { damping: 18, stiffness: 140 },
-      (finished) => {
-        "worklet";
-        if (finished) runOnJS(startFloat)();
-      },
-    );
+    op.value = withTiming(1, { duration: 520, easing: Easing.out(Easing.quad) });
+    sc.value = withSpring(1, { damping: 16, stiffness: 140 });
   }, [isActive]);
 
-  const cardStyle = useAnimatedStyle(() => ({
-    opacity: cardOp.value,
-    transform: [
-      { scale: cardSc.value },
-      { translateY: floatY.value },
-    ],
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: op.value,
+    transform: [{ scale: sc.value }],
   }));
 
   return (
     <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
-      <Animated.View
-        style={[
-          {
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 16 },
-            shadowOpacity: 0.38,
-            shadowRadius: 28,
-            elevation: 18,
-          },
-          cardStyle,
-        ]}
-      >
-        <FreeCard cardW={cardW} />
+      <Animated.View style={animStyle}>
+        <Image
+          source={slide2Img}
+          style={{ width: imgW, height: imgH }}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          priority="high"
+        />
       </Animated.View>
     </View>
   );
