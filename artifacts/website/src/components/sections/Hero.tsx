@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Star } from "lucide-react";
 
 /* ─── SVG icons ──────────────────────────────────────── */
@@ -113,14 +114,27 @@ function VCSShieldIcon() {
 
 function ChooseCardScreen({ onBack }: { onBack: () => void }) {
   const [selected, setSelected] = useState<CardType>("virtual");
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0.637);
 
-  /* The full VirtualCardScreen is 430px wide. Phone inner screen is ~274px.
-     Scale = 274/430 ≈ 0.637 — we scale-down the entire screen faithfully. */
+  /* Measure the real container width and recompute scale whenever it changes.
+     NATURAL_W = the design width (430px). Scale = container / 430. */
   const NATURAL_W = 430;
-  const SCALE = 0.637;
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width;
+      if (w > 0) setScale(Math.min(1, w / NATURAL_W));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const SCALE = scale;
 
   return (
-    <div style={{ width: "100%", height: "100%", overflow: "hidden", position: "relative", background: "#fff" }}>
+    <div ref={containerRef} style={{ width: "100%", height: "100%", overflow: "hidden", position: "relative", background: "#fff" }}>
       <div style={{
         position: "absolute",
         top: 0,
@@ -251,8 +265,7 @@ function DashboardScreen({ onCardPress }: { onCardPress: () => void }) {
       <div style={{ margin: "0 10px 8px", background: "#FFFFFF", borderRadius: 16, padding: "10px 12px", flexShrink: 0, boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
           <div style={{ width: 26, height: 26, borderRadius: "50%", overflow: "hidden", flexShrink: 0, border: "1.5px solid #E5E7EB" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/avatar_3d_16.png" alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <Image src="/avatar_3d_16.png" alt="avatar" width={26} height={26} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div>
             <div style={{ fontSize: 9, fontWeight: 700, color: "#111" }}>Hi, Dove 👋</div>
@@ -335,7 +348,7 @@ export function Hero() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl lg:text-6xl font-black text-white leading-[1.05] tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-black text-white leading-[1.05] tracking-tight mb-6">
             Your money,{" "}
             <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #00D9A0, #00b8ff)" }}>
               supercharged.
@@ -373,13 +386,13 @@ export function Hero() {
           </div>
         </div>
 
-        {/* ── RIGHT: phone mockup — fully visible, no scrolling needed ── */}
+        {/* ── RIGHT: phone mockup — responsive across all screen sizes ── */}
         <div className="flex-shrink-0 flex justify-center lg:justify-end">
-          <div className="relative w-64 h-[540px]">
+          <div className="relative w-64 h-[540px] xl:w-[300px] xl:h-[640px] 2xl:w-[340px] 2xl:h-[730px]">
             {/* Phone shell */}
-            <div className="absolute inset-0 rounded-[44px] bg-[#1C1C2A] border-4 border-[#2A2A3D] shadow-2xl overflow-hidden">
+            <div className="absolute inset-0 rounded-[44px] xl:rounded-[52px] 2xl:rounded-[56px] bg-[#1C1C2A] border-4 border-[#2A2A3D] shadow-2xl overflow-hidden">
               {/* Screen */}
-              <div className="absolute inset-[3px] rounded-[40px] overflow-hidden" style={{ background: "#F5F6FA" }}>
+              <div className="absolute inset-[3px] rounded-[40px] xl:rounded-[48px] 2xl:rounded-[52px] overflow-hidden" style={{ background: "#F5F6FA" }}>
                 {/* Notch */}
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-16 h-4 bg-[#1C1C2A] rounded-full z-10" />
 
@@ -393,7 +406,7 @@ export function Hero() {
 
             {/* Glow under phone */}
             <div
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-40 h-12 opacity-50 blur-2xl"
+              className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-40 xl:w-52 2xl:w-64 h-12 xl:h-16 2xl:h-20 opacity-50 blur-2xl"
               style={{ background: "radial-gradient(ellipse, #00D9A0, transparent)" }}
             />
           </div>

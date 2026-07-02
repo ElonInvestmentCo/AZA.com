@@ -110,6 +110,10 @@
     --text-5xl--line-height: 1;
     --text-6xl: 3.75rem;
     --text-6xl--line-height: 1;
+    --text-7xl: 4.5rem;
+    --text-7xl--line-height: 1;
+    --text-8xl: 6rem;
+    --text-8xl--line-height: 1;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
@@ -335,6 +339,24 @@
   }
   .z-50 {
     z-index: 50;
+  }
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 96rem;
+    }
   }
   .mx-auto {
     margin-inline: auto;
@@ -1235,9 +1257,81 @@
       line-height: var(--tw-leading, var(--text-6xl--line-height));
     }
   }
+  .xl\:h-16 {
+    @media (width >= 80rem) {
+      height: calc(var(--spacing) * 16);
+    }
+  }
+  .xl\:h-\[640px\] {
+    @media (width >= 80rem) {
+      height: 640px;
+    }
+  }
+  .xl\:w-52 {
+    @media (width >= 80rem) {
+      width: calc(var(--spacing) * 52);
+    }
+  }
+  .xl\:w-\[300px\] {
+    @media (width >= 80rem) {
+      width: 300px;
+    }
+  }
   .xl\:grid-cols-4 {
     @media (width >= 80rem) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .xl\:rounded-\[48px\] {
+    @media (width >= 80rem) {
+      border-radius: 48px;
+    }
+  }
+  .xl\:rounded-\[52px\] {
+    @media (width >= 80rem) {
+      border-radius: 52px;
+    }
+  }
+  .xl\:text-7xl {
+    @media (width >= 80rem) {
+      font-size: var(--text-7xl);
+      line-height: var(--tw-leading, var(--text-7xl--line-height));
+    }
+  }
+  .\32 xl\:h-20 {
+    @media (width >= 96rem) {
+      height: calc(var(--spacing) * 20);
+    }
+  }
+  .\32 xl\:h-\[730px\] {
+    @media (width >= 96rem) {
+      height: 730px;
+    }
+  }
+  .\32 xl\:w-64 {
+    @media (width >= 96rem) {
+      width: calc(var(--spacing) * 64);
+    }
+  }
+  .\32 xl\:w-\[340px\] {
+    @media (width >= 96rem) {
+      width: 340px;
+    }
+  }
+  .\32 xl\:rounded-\[52px\] {
+    @media (width >= 96rem) {
+      border-radius: 52px;
+    }
+  }
+  .\32 xl\:rounded-\[56px\] {
+    @media (width >= 96rem) {
+      border-radius: 56px;
+    }
+  }
+  .\32 xl\:text-8xl {
+    @media (width >= 96rem) {
+      font-size: var(--text-8xl);
+      line-height: var(--tw-leading, var(--text-8xl--line-height));
     }
   }
 }
