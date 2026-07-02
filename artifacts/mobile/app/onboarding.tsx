@@ -185,12 +185,12 @@ function AnimatedWalletSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }]}>
         <Image
           source={slide1Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -235,12 +235,12 @@ function GiftCardSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }]}>
         <Image
           source={slide2Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -290,12 +290,12 @@ function ImageSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }]}>
         <Image
           source={slide3Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -346,12 +346,12 @@ function ImageSlideStatic({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }]}>
         <Image
           source={source}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
@@ -425,12 +425,12 @@ function VirtualCardSlide({
   }));
 
   return (
-    <View style={{ width: slideW, height: slideH }}>
-      <Animated.View style={[animStyle, { width: slideW, height: slideH }]}>
+    <View style={{ width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[animStyle, { width: slideW, height: slideH, alignItems: "center", justifyContent: "center" }]}>
         <Image
           source={slide5Img}
           style={{ width: slideW, height: slideH }}
-          contentFit="cover"
+          contentFit="contain"
           cachePolicy="memory-disk"
           priority="high"
         />
