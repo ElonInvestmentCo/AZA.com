@@ -672,7 +672,7 @@ export default function HomeScreen() {
     if (key === "gift")         router.push("/gift-card" as any);
     if (key === "transaction")  router.push("/(tabs)/send" as any);
     if (key === "settings")     router.push("/(tabs)/profile" as any);
-    if (key === "virtual-card") router.push("/choose-card-type" as any);
+    if (key === "virtual-card") { /* card flow removed */ }
   }
 
   function openSheet(tx: FullTxRow) {
