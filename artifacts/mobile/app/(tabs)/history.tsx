@@ -203,9 +203,9 @@ function ReceiptRow({ label, value, valueColor, bold }: {
 }
 
 const r = StyleSheet.create({
-  row:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 11 },
-  label:     { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec },
-  value:     { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, textAlign: "right", flex: 1, marginLeft: 12 },
+  row:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 9 },
+  label:     { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec },
+  value:     { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.text, textAlign: "right", flex: 1, marginLeft: 12 },
   valueBold: { fontFamily: "Manrope_700Bold" },
 });
 
@@ -293,12 +293,12 @@ function TxDetailSheet({ tx, visible, onClose }: {
     <AnimatedSheet
       visible={visible}
       onClose={onClose}
-      maxHeight="88%"
+      maxHeight="82%"
       sheetStyle={{ paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[ds.scroll, { paddingBottom: insets.bottom + 24 }]}
+        contentContainerStyle={[ds.scroll, { paddingBottom: insets.bottom + 16 }]}
         bounces={false}
       >
         {/* Drag handle */}
@@ -351,7 +351,7 @@ function TxDetailSheet({ tx, visible, onClose }: {
             <View style={ds.rowDivider} />
             <ReceiptRow label="Category"  value={tx.cat}  />
             <View style={ds.rowDivider} />
-            <View style={[r.row, { paddingVertical: 11 }]}>
+            <View style={[r.row, { paddingVertical: 9 }]}>
               <Text style={r.label}>Reference</Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "flex-end" }}>
                 <Text style={[r.value, { flex: 0 }]} numberOfLines={1}>{tx.ref}</Text>
@@ -390,37 +390,37 @@ function TxDetailSheet({ tx, visible, onClose }: {
 }
 
 const ds = StyleSheet.create({
-  scroll: { paddingHorizontal: 22 },
-  handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginTop: 10, marginBottom: 18 },
+  scroll: { paddingHorizontal: 18 },
+  handle: { width: 32, height: 3.5, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginTop: 10, marginBottom: 12 },
 
   /* Hero */
-  hero:       { alignItems: "center", gap: 8, paddingBottom: 20 },
-  heroIcon:   { width: 68, height: 68, borderRadius: 22, alignItems: "center", justifyContent: "center", marginBottom: 4 },
-  heroAmount: { fontSize: rf(32), fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.5 },
-  heroName:   { fontSize: rf(16), fontFamily: "Manrope_600SemiBold", color: C.text },
-  statusPill: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1 },
-  statusDot:  { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontSize: 13, fontFamily: "Manrope_600SemiBold" },
+  hero:       { alignItems: "center", gap: 5, paddingBottom: 14 },
+  heroIcon:   { width: 52, height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center", marginBottom: 2 },
+  heroAmount: { fontSize: rf(26), fontFamily: "Manrope_700Bold", fontVariant: ["tabular-nums"], letterSpacing: -0.5 },
+  heroName:   { fontSize: rf(14), fontFamily: "Manrope_600SemiBold", color: C.text },
+  statusPill: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
+  statusDot:  { width: 5, height: 5, borderRadius: 3 },
+  statusText: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
 
   /* Note */
-  noteBox: { flexDirection: "row", alignItems: "flex-start", gap: 8, backgroundColor: "#F8F9FA", borderRadius: 12, padding: 12, marginBottom: 20, borderWidth: 1, borderColor: C.border },
-  noteText: { flex: 1, fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textSec, lineHeight: 19 },
+  noteBox: { flexDirection: "row", alignItems: "flex-start", gap: 7, backgroundColor: "#F8F9FA", borderRadius: 10, padding: 10, marginBottom: 12, borderWidth: 1, borderColor: C.border },
+  noteText: { flex: 1, fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec, lineHeight: 17 },
 
   /* Sections */
-  section:      { marginBottom: 18 },
-  sectionTitle: { fontSize: 11, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 8 },
-  card:         { borderRadius: 16, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg, paddingHorizontal: 16, overflow: "hidden" },
+  section:      { marginBottom: 12 },
+  sectionTitle: { fontSize: 10, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.7, marginBottom: 6 },
+  card:         { borderRadius: 14, borderWidth: 1, borderColor: C.border, backgroundColor: C.bg, paddingHorizontal: 14, overflow: "hidden" },
   rowDivider:        { height: 1, backgroundColor: "#F3F4F6" },
-  rowDividerStrong:  { backgroundColor: "#E5E7EB", marginVertical: 2 },
+  rowDividerStrong:  { backgroundColor: "#E5E7EB", marginVertical: 1 },
 
   /* Actions */
-  actions:       { gap: 10, marginTop: 4 },
-  shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 50, borderRadius: 14, backgroundColor: C.navy },
-  shareBtnText:  { fontSize: rf(15), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
-  cancelBtn:     { height: 46, borderRadius: 14, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
-  cancelBtnText: { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: C.danger },
-  closeBtn:      { height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  closeBtnText:  { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.textMut },
+  actions:       { gap: 8, marginTop: 2 },
+  shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 44, borderRadius: 12, backgroundColor: C.navy },
+  shareBtnText:  { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  cancelBtn:     { height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
+  cancelBtnText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.danger },
+  closeBtn:      { height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  closeBtnText:  { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textMut },
 });
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
