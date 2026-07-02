@@ -66,10 +66,6 @@ module.exports = {
       ],
     },
 
-    web: {
-      favicon: "./assets/images/icon.png",
-    },
-
     plugins: [
       [
         "expo-router",
