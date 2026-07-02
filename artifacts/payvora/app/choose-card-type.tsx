@@ -21,11 +21,14 @@ const TEXT_DARK  = "#0B0A0A";
 const TEXT_GRAY  = "#595F67";
 const TEXT_LIGHT = "#AAAFB5";
 const INPUT_BG   = "#F0F0F0";
-const CARD_BG    = "#F5F7FA";
+const ACCENT     = "#35C2C1";
+const SHOWCASE   = "#F5F7FA";
 
 /* ─── Card dimensions ─────────────────────────────────────────── */
 const { width: SCREEN_W } = Dimensions.get("window");
-const CARD_W = SCREEN_W - 96;
+const SHOWCASE_PADDING = 20;
+const CARD_GAP = 14;
+const CARD_W = (SCREEN_W - 48 - SHOWCASE_PADDING * 2 - CARD_GAP) / 2;
 const CARD_H = CARD_W * (332 / 210);
 
 /* ─── SVG strings ─────────────────────────────────────────────── */
@@ -69,6 +72,7 @@ const PREMIUM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="210" height=
 <path fill-rule="evenodd" clip-rule="evenodd" d="M41.75 52.9294C44.9506 50.3637 47 46.4212 47 42C47 37.5788 44.9506 33.6363 41.75 31.0706C38.5494 33.6363 36.5 37.5788 36.5 42C36.5 46.4212 38.5494 50.3637 41.75 52.9294Z"/>
 </mask>
 <path fill-rule="evenodd" clip-rule="evenodd" d="M41.75 52.9294C44.9506 50.3637 47 46.4212 47 42C47 37.5788 44.9506 33.6363 41.75 31.0706C38.5494 33.6363 36.5 37.5788 36.5 42C36.5 46.4212 38.5494 50.3637 41.75 52.9294Z" fill="#8282B0"/>
+<path d="M41.75 52.9294L41.1245 53.7096L41.75 54.211L42.3755 53.7096L41.75 52.9294ZM41.75 31.0706L42.3755 30.2903L41.75 29.7889L41.1245 30.2903L41.75 31.0706ZM46 42C46 46.1049 44.0986 49.7651 41.1245 52.1491L42.3755 53.7096C45.8027 50.9623 48 46.7374 48 42L46 42ZM41.1245 31.8508C44.0986 34.2349 46 37.8951 46 42L48 42C48 37.2626 45.8027 33.0377 42.3755 30.2903L41.1245 31.8508ZM37.5 42C37.5 37.8951 39.4014 34.2349 42.3755 31.8508L41.1245 30.2903C37.6974 33.0377 35.5 37.2626 35.5 42L37.5 42ZM42.3755 52.1491C39.4014 49.7651 37.5 46.1049 37.5 42L35.5 42C35.5 46.7374 37.6974 50.9623 41.1245 53.7096L42.3755 52.1491Z" fill="#C1C1D7" mask="url(#path-4-inside-1_1_329)"/>
 </g>
 </g>
 <g clip-path="url(#clip2_1_329)">
@@ -108,22 +112,20 @@ const PREMIUM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="210" height=
 /* ─── Card type ──────────────────────────────────────────────── */
 type CardType = "regular" | "premium";
 
-const CARD_INFO: Record<CardType, { label: string; title: string; body: string; svg: string }> = {
-  regular: {
+const CARDS: { type: CardType; label: string; body: string; svg: string }[] = [
+  {
+    type: "regular",
     label: "Regular",
-    title: "Regular Card",
     body: "Instant and ready to use online. Add to Apple Pay and use it to pay in stores, just like a physical card.",
     svg: REGULAR_SVG,
   },
-  premium: {
+  {
+    type: "premium",
     label: "Premium",
-    title: "Premium Card",
     body: "Elevated limits and exclusive benefits for a superior payment experience. Priority support included.",
     svg: PREMIUM_SVG,
   },
-};
-
-const CARD_TYPES: CardType[] = ["regular", "premium"];
+];
 
 /* ─── Main screen ────────────────────────────────────────────── */
 export default function ChooseCardTypeScreen() {
@@ -139,7 +141,7 @@ export default function ChooseCardTypeScreen() {
     setSelected(type);
   }
 
-  const info = CARD_INFO[selected];
+  const activeCard = CARDS.find((c) => c.type === selected)!;
 
   return (
     <View style={[s.screen, { paddingTop: topPad }]}>
@@ -158,30 +160,21 @@ export default function ChooseCardTypeScreen() {
         <View style={s.headerSpacer} />
       </View>
 
-      {/* ── Card showcase area ─────────────────────────────────── */}
-      <View style={s.cardShowcase}>
-        <SvgXml
-          xml={info.svg}
-          width={CARD_W}
-          height={CARD_H}
-        />
-      </View>
-
-      {/* ── Tab switcher ───────────────────────────────────────── */}
-      <View style={s.tabRow}>
-        {CARD_TYPES.map((type) => {
+      {/* ── Card showcase ──────────────────────────────────────── */}
+      <View style={s.showcase}>
+        {CARDS.map(({ type, label, svg }) => {
           const active = selected === type;
           return (
             <TouchableOpacity
               key={type}
               onPress={() => pick(type)}
-              activeOpacity={0.7}
-              style={s.tabItem}
+              activeOpacity={0.85}
+              style={[s.cardWrap, active ? s.cardWrapActive : s.cardWrapInactive]}
             >
-              <Text style={[s.tabText, active ? s.tabTextActive : s.tabTextInactive]}>
-                {CARD_INFO[type].label}
+              <SvgXml xml={svg} width={CARD_W} height={CARD_H} />
+              <Text style={[s.cardLabel, active ? s.cardLabelActive : s.cardLabelInactive]}>
+                {label}
               </Text>
-              {active && <View style={s.tabUnderline} />}
             </TouchableOpacity>
           );
         })}
@@ -192,7 +185,7 @@ export default function ChooseCardTypeScreen() {
 
       {/* ── Description ────────────────────────────────────────── */}
       <View style={s.descSection}>
-        <Text style={s.descText}>{info.body}</Text>
+        <Text style={s.descText}>{activeCard.body}</Text>
       </View>
 
       {/* ── Spacer ─────────────────────────────────────────────── */}
@@ -206,7 +199,7 @@ export default function ChooseCardTypeScreen() {
           onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
         >
           <Text style={s.ctaText}>
-            {`Get ${info.label.toLowerCase()} card`}
+            {`Get ${activeCard.label.toLowerCase()} card`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -242,55 +235,53 @@ const s = StyleSheet.create({
   },
   headerSpacer: { width: 36 },
 
-  /* Card showcase */
-  cardShowcase: {
-    backgroundColor: CARD_BG,
+  /* Showcase container */
+  showcase: {
+    backgroundColor: SHOWCASE,
     marginHorizontal: 24,
     borderRadius: 20,
-    alignItems: "center",
-    paddingVertical: 32,
+    flexDirection: "row",
+    gap: CARD_GAP,
+    padding: SHOWCASE_PADDING,
     marginBottom: 28,
   },
 
-  /* Tab switcher */
-  tabRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 32,
-    paddingHorizontal: 24,
-    marginBottom: 4,
-  },
-  tabItem: {
+  /* Individual card wrapper */
+  cardWrap: {
+    flex: 1,
     alignItems: "center",
-    paddingBottom: 10,
+    gap: 10,
+    borderRadius: 14,
+    borderWidth: 2.5,
+    padding: 3,
   },
-  tabText: {
+  cardWrapActive: {
+    borderColor: ACCENT,
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  cardWrapInactive: {
+    borderColor: "transparent",
+  },
+
+  /* Card label */
+  cardLabel: {
     fontFamily: "Inter_600SemiBold",
-    fontSize: 16,
-    letterSpacing: -0.2,
+    fontSize: 13,
+    letterSpacing: -0.1,
+    paddingBottom: 2,
   },
-  tabTextActive: {
-    color: TEXT_DARK,
-  },
-  tabTextInactive: {
-    color: TEXT_LIGHT,
-  },
-  tabUnderline: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 2.5,
-    borderRadius: 2,
-    backgroundColor: BLACK,
-  },
+  cardLabelActive: { color: TEXT_DARK },
+  cardLabelInactive: { color: TEXT_LIGHT },
 
   /* Divider */
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: "#EDF1F3",
     marginHorizontal: 24,
-    marginTop: 2,
     marginBottom: 20,
   },
 
