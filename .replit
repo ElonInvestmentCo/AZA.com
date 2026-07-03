@@ -22,10 +22,6 @@ args = "PayVora Website"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Mockup Sandbox"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "PAYVORA Mobile (Expo Go)"
 
 [[workflows.workflow]]
@@ -39,19 +35,6 @@ outputType = "webview"
 task = "shell.exec"
 args = "pnpm --filter @workspace/website run dev"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Mockup Sandbox"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=3001 BASE_PATH=/ pnpm --filter @workspace/mockup-sandbox run dev"
-waitForPort = 3001
-
-[workflows.workflow.metadata]
-outputType = "console"
-isCanvasWorkflow = true
 
 [[workflows.workflow]]
 name = "PAYVORA Mobile (Expo Go)"
@@ -81,6 +64,10 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
+localPort = 18115
+externalPort = 3000
+
+[[ports]]
 localPort = 18116
 externalPort = 3001
 
@@ -102,7 +89,7 @@ externalPort = 3003
 
 [nix]
 channel = "stable-25_05"
-packages = ["nano"]
+packages = ["nano", "lsof"]
 
 [userenv]
 
