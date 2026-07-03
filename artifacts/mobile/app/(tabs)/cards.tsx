@@ -1,11 +1,9 @@
-import { Feather } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useRef, useCallback } from "react";
 import {
   Alert,
+  Animated,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,533 +11,438 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Circle, Path, Rect, ClipPath, Defs, G } from "react-native-svg";
 
-/* ─── Design tokens ──────────────────────────────────────────────────────── */
-const C = {
-  bg:      "#FFFFFF",
-  surface: "#F5F7FA",
-  text:    "#111827",
-  textSec: "#6B7280",
-  textMut: "#9CA3AF",
-  navy:    "#1A1A2E",
-  border:  "#E5E7EB",
-};
+/* ─── Slide data (mirrors the Figma design) ─────────────────────────────── */
+const SLIDES = [
+  {
+    id:          "virtual",
+    label:       "Virtual",
+    cardColor:   "#6B7FD4",
+    cardGlow:    "rgba(107,127,212,0.40)",
+    cardLabel:   "VIRTUAL",
+    buttonColor: "#4B63CC",
+    buttonText:  "Get virtual card",
+    description:
+      "Instant and ready to use online. Add to Apple Pay and use it to pay in stores, just like a physical card.",
+  },
+  {
+    id:          "disposable",
+    label:       "Disposable virtual",
+    cardColor:   "#F472B6",
+    cardGlow:    "rgba(244,114,182,0.40)",
+    cardLabel:   "DISPOSABLE VIRTUAL",
+    buttonColor: "#EC4899",
+    buttonText:  "Get disposable virtual card",
+    description:
+      "Add an extra layer of security with our disposable virtual cards. Your details automatically change each time you make a payment, protecting you from fraud.",
+  },
+] as const;
 
-type CardType = "regular" | "premium";
-
-/* ─── Card dimensions (portrait) ────────────────────────────────────────── */
-/* Original Figma frame was landscape 332×210; rotating 90° → portrait 210×332.
-   We display it at CARD_W×CARD_H, preserving that landscape aspect ratio. */
-const CARD_W = 185;
-const CARD_H = Math.round(332 * (CARD_W / 210)); // ≈ 293
-
-/* ─── Regular card ───────────────────────────────────────────────────────── */
-function RegularCard() {
+/* ─── Mastercard logo (two overlapping circles + label) ─────────────────── */
+function MastercardLogo() {
+  const S = 26;
+  const overlap = 10;
   return (
-    <View style={[card.base, { backgroundColor: "#F4F4F4" }]}>
-      {/* Chip (RFID) — upper area */}
-      <View style={card.chipWrap}>
-        <Svg width={38} height={29} viewBox="0 0 40 30">
-          <Defs>
-            <ClipPath id="cr">
-              <Rect width={40} height={30} rx={4.5} />
-            </ClipPath>
-          </Defs>
-          <G clipPath="url(#cr)">
-            <Rect width={40} height={30} rx={4.5} fill="#E9DCA5" />
-            {/* horizontal lines */}
-            <Path d="M0 10 H40" stroke="#8C7A3A" strokeWidth={0.8} />
-            <Path d="M0 20 H40" stroke="#8C7A3A" strokeWidth={0.8} />
-            {/* vertical lines */}
-            <Path d="M13 0 V30" stroke="#8C7A3A" strokeWidth={0.8} />
-            <Path d="M27 0 V30" stroke="#8C7A3A" strokeWidth={0.8} />
-            {/* center square */}
-            <Rect x={13} y={10} width={14} height={10} fill="#D4B96A" opacity={0.6} />
-          </G>
-        </Svg>
+    <View>
+      <View style={{ width: S + overlap + S - overlap, height: S, flexDirection: "row" }}>
+        <View style={[mc.circle, { backgroundColor: "#EB001B", left: 0 }]} />
+        <View style={[mc.circle, { backgroundColor: "#F79E1B", left: S - overlap }]} />
+        <View style={[mc.circle, { backgroundColor: "#FF5F00", left: (S - overlap) / 2, opacity: 0.45 }]} />
       </View>
-
-      {/* Brand name — vertical, right side */}
-      <View style={card.brandWrap}>
-        <Text style={[card.brandText, { color: "#424242" }]}>PAYVORA</Text>
-      </View>
-
-      {/* Mastercard logo — bottom */}
-      <View style={card.mcWrap}>
-        <View style={[card.mcCircle, { backgroundColor: "#EB001B", left: 0 }]} />
-        <View style={[card.mcCircle, { backgroundColor: "#F79E1B", left: 18 }]} />
-        {/* overlap tint */}
-        <View style={[card.mcCircle, { backgroundColor: "#FF5F00", left: 9, opacity: 0.4 }]} />
-      </View>
-      <Text style={[card.mcLabel, { color: "#424242" }]}>mastercard</Text>
+      <Text style={mc.label}>mastercard</Text>
     </View>
   );
 }
 
-/* ─── Premium card ───────────────────────────────────────────────────────── */
-function PremiumCard() {
+const mc = StyleSheet.create({
+  circle: { position: "absolute", width: 26, height: 26, borderRadius: 13 },
+  label:  { color: "rgba(255,255,255,0.85)", fontSize: 8, fontFamily: "Manrope_500Medium", letterSpacing: 0.4, marginTop: 2 },
+});
+
+/* ─── "R" mark (PAYVORA brand) ──────────────────────────────────────────── */
+function PayvoraMark() {
   return (
-    <View style={[card.base, { overflow: "hidden" }]}>
-      <LinearGradient
-        colors={["#1A1A2E", "#16213E", "#0F3460"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFillObject}
-      />
-      {/* Decorative arc */}
-      <View style={card.arc} />
+    <View style={pm.wrap}>
+      <Text style={pm.letter}>P</Text>
+    </View>
+  );
+}
 
-      {/* Chip */}
-      <View style={card.chipWrap}>
-        <Svg width={38} height={29} viewBox="0 0 40 30">
-          <Defs>
-            <ClipPath id="cp">
-              <Rect width={40} height={30} rx={4.5} />
-            </ClipPath>
-          </Defs>
-          <G clipPath="url(#cp)">
-            <Rect width={40} height={30} rx={4.5} fill="#B8973A" />
-            <Path d="M0 10 H40" stroke="#8C6A1A" strokeWidth={0.8} />
-            <Path d="M0 20 H40" stroke="#8C6A1A" strokeWidth={0.8} />
-            <Path d="M13 0 V30" stroke="#8C6A1A" strokeWidth={0.8} />
-            <Path d="M27 0 V30" stroke="#8C6A1A" strokeWidth={0.8} />
-            <Rect x={13} y={10} width={14} height={10} fill="#D4A020" opacity={0.7} />
-          </G>
-        </Svg>
+const pm = StyleSheet.create({
+  wrap:   { width: 38, height: 38, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
+  letter: { color: "#FFFFFF", fontSize: 20, fontFamily: "Manrope_700Bold", lineHeight: 22 },
+});
+
+/* ─── Portrait card visual ───────────────────────────────────────────────── */
+function Card({
+  slide,
+  cardW,
+  cardH,
+}: {
+  slide: typeof SLIDES[number];
+  cardW: number;
+  cardH: number;
+}) {
+  return (
+    <View
+      style={[
+        cv.root,
+        {
+          width: cardW,
+          height: cardH,
+          backgroundColor: slide.cardColor,
+          shadowColor: slide.cardGlow,
+        },
+      ]}
+    >
+      {/* Highlight blob — upper oval */}
+      <View style={cv.blob} />
+
+      {/* Card number watermark — centered */}
+      <View style={cv.numWrap}>
+        <Text style={cv.num}>8003  6071  0534  6352</Text>
       </View>
 
-      {/* Brand name */}
-      <View style={card.brandWrap}>
-        <Text style={[card.brandText, { color: "#FFFFFF" }]}>PAYVORA</Text>
+      {/* "CARD HOLDER" — rotated −90° left side */}
+      <View style={[cv.sideLabel, { left: -(cardH * 0.25) / 2 + 10 }]}>
+        <Text style={cv.sideLabelText}>CARD HOLDER</Text>
       </View>
 
-      {/* Mastercard logo */}
-      <View style={card.mcWrap}>
-        <View style={[card.mcCircle, { backgroundColor: "#EB001B", left: 0 }]} />
-        <View style={[card.mcCircle, { backgroundColor: "#F79E1B", left: 18 }]} />
-        <View style={[card.mcCircle, { backgroundColor: "#FF5F00", left: 9, opacity: 0.4 }]} />
+      {/* Card type — rotated +90° right side */}
+      <View style={[cv.sideLabel, { right: -(cardH * 0.25) / 2 + 10, transform: [{ rotate: "90deg" }] }]}>
+        <Text style={[cv.sideLabelText, { fontSize: 8.5 }]}>{slide.cardLabel}</Text>
       </View>
-      <Text style={[card.mcLabel, { color: "rgba(255,255,255,0.7)" }]}>mastercard</Text>
 
-      {/* PREMIUM badge */}
-      <View style={card.premiumBadge}>
-        <Text style={card.premiumBadgeText}>PREMIUM</Text>
+      {/* Bottom row */}
+      <View style={cv.bottom}>
+        <MastercardLogo />
+        <PayvoraMark />
       </View>
     </View>
   );
 }
 
-const card = StyleSheet.create({
-  base: {
-    width:         CARD_W,
-    height:        CARD_H,
-    borderRadius:  16,
-    shadowColor:   "#000",
-    shadowOffset:  { width: 0, height: 8 },
-    shadowOpacity: 0.14,
-    shadowRadius:  20,
-    elevation:     10,
-    position:      "relative",
+const cv = StyleSheet.create({
+  root: {
+    borderRadius: 28,
+    shadowOffset: { width: 0, height: 24 },
+    shadowOpacity: 0.55,
+    shadowRadius: 40,
+    elevation: 14,
+    overflow: "hidden",
+    position: "relative",
   },
-  arc: {
-    position:        "absolute",
-    width:           CARD_W * 1.4,
-    height:          CARD_W * 1.4,
-    borderRadius:    CARD_W * 0.7,
-    backgroundColor: "rgba(255,255,255,0.05)",
-    top:             -CARD_W * 0.5,
-    right:           -CARD_W * 0.4,
-  },
-  chipWrap: {
+  blob: {
     position: "absolute",
-    top:      60,
-    left:     20,
+    top: "10%",
+    left: "20%",
+    width: "60%",
+    height: "38%",
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.13)",
   },
-  brandWrap: {
+  numWrap: {
     position: "absolute",
-    right:    16,
-    top:      0,
-    bottom:   0,
+    top: 0, bottom: 0, left: 0, right: 0,
+    alignItems: "center",
     justifyContent: "center",
-    alignItems:     "center",
   },
-  brandText: {
-    fontFamily:    "Manrope_700Bold",
-    fontSize:      11,
-    letterSpacing: 2,
-    transform:     [{ rotate: "90deg" }],
+  num: {
+    color: "rgba(255,255,255,0.20)",
+    fontSize: 11,
+    fontFamily: "Manrope_500Medium",
+    letterSpacing: 3,
   },
-  mcWrap: {
-    position:  "absolute",
-    bottom:    30,
-    left:      18,
-    width:     48,
-    height:    28,
+  sideLabel: {
+    position: "absolute",
+    top: 0, bottom: 0,
+    justifyContent: "center",
+    transform: [{ rotate: "-90deg" }],
   },
-  mcCircle: {
-    position:     "absolute",
-    width:         28,
-    height:        28,
-    borderRadius:  14,
+  sideLabelText: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 9,
+    fontFamily: "Manrope_600SemiBold",
+    letterSpacing: 2.5,
+    textTransform: "uppercase",
   },
-  mcLabel: {
-    position:      "absolute",
-    bottom:        14,
-    left:          20,
-    fontSize:       8,
-    fontFamily:    "Manrope_500Medium",
-    letterSpacing: 0.3,
-  },
-  premiumBadge: {
-    position:        "absolute",
-    top:             20,
-    right:           14,
-    backgroundColor: "rgba(255,215,0,0.15)",
-    borderWidth:     1,
-    borderColor:     "rgba(255,215,0,0.4)",
-    borderRadius:    6,
-    paddingHorizontal: 7,
-    paddingVertical:   3,
-  },
-  premiumBadgeText: {
-    fontSize:      7,
-    fontFamily:    "Manrope_700Bold",
-    color:         "#FFD700",
-    letterSpacing: 1,
+  bottom: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
   },
 });
 
-/* ─── Card data ──────────────────────────────────────────────────────────── */
-const CARD_DATA: Record<CardType, { label: string; title: string; description: string; cta: string }> = {
-  regular: {
-    label:       "Regular",
-    title:       "Regular Card",
-    description: "Instant and ready to use online. Add to Apple Pay and use it to pay in stores, just like a physical card.",
-    cta:         "Get Regular Card",
-  },
-  premium: {
-    label:       "Premium",
-    title:       "Premium Card",
-    description: "Unlock higher limits, premium benefits, and enhanced features designed for frequent users.",
-    cta:         "Get Premium Card",
-  },
-};
+/* ─── Tab button with crossfaded bold ↔ normal text ─────────────────────── */
+function TabButton({
+  slide,
+  index,
+  scrollX,
+  pageW,
+  onPress,
+}: {
+  slide: typeof SLIDES[number];
+  index: number;
+  scrollX: Animated.Value;
+  pageW: number;
+  onPress: () => void;
+}) {
+  const activeAnim = scrollX.interpolate({
+    inputRange: [0, pageW],
+    outputRange: index === 0 ? [1, 0] : [0, 1],
+    extrapolate: "clamp",
+  });
 
-const SLIDE_DURATION = 350;
-const SLIDE_EASING   = Easing.bezier(0.4, 0, 0.2, 1);
+  const normalOpacity = activeAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const boldOpacity   = activeAnim;
+
+  const normalColor: Animated.AnimatedInterpolation<string> = scrollX.interpolate({
+    inputRange: [0, pageW],
+    outputRange: index === 0
+      ? (["#111111", "#b0b0b0"] as any)
+      : (["#b0b0b0", "#111111"] as any),
+    extrapolate: "clamp",
+  });
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={tb.wrap}>
+      {/* Hidden bold copy to reserve width */}
+      <Text style={[tb.hidden, tb.bold]}>{slide.label}</Text>
+      {/* Normal */}
+      <Animated.Text style={[tb.label, tb.normal, { position: "absolute", opacity: normalOpacity, color: normalColor as any }]}>
+        {slide.label}
+      </Animated.Text>
+      {/* Bold */}
+      <Animated.Text style={[tb.label, tb.bold, { position: "absolute", opacity: boldOpacity, color: "#111111" }]}>
+        {slide.label}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+}
+
+const tb = StyleSheet.create({
+  wrap:   { position: "relative", paddingVertical: 6, paddingHorizontal: 4 },
+  hidden: { opacity: 0 },
+  label:  { fontSize: 17, letterSpacing: -0.2, fontFamily: "Manrope_600SemiBold" },
+  normal: { fontFamily: "Manrope_400Regular" },
+  bold:   { fontFamily: "Manrope_700Bold" },
+});
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
 export default function CardsScreen() {
-  const insets  = useSafeAreaInsets();
-  const { width: screenW } = useWindowDimensions();
-  const topPad  = Platform.OS === "web" ? 40 : insets.top;
+  const insets = useSafeAreaInsets();
+  const { width: screenW, height: screenH } = useWindowDimensions();
+  const topPad = Platform.OS === "web" ? 48 : insets.top;
+  const pageW  = screenW;
 
-  const [selected, setSelected] = useState<CardType>("regular");
-  const trackX    = useSharedValue(0);
-  const descOp    = useSharedValue(1);
+  /* Card dimensions — portrait, ~0.63 aspect ratio */
+  const cardH = Math.min(Math.round(screenH * 0.46), 400);
+  const cardW = Math.round(cardH * 0.63);
 
-  const trackStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: trackX.value }],
-  }));
-  const descStyle = useAnimatedStyle(() => ({
-    opacity: descOp.value,
-  }));
+  const scrollX   = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<ScrollView>(null);
 
-  function selectCard(type: CardType) {
-    if (type === selected) return;
+  const snapTo = useCallback((index: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    scrollRef.current?.scrollTo({ x: index * pageW, animated: true });
+  }, [pageW]);
 
-    /* Fade out description, slide card, fade in description */
-    descOp.value = withTiming(0, { duration: 120 });
-
-    const targetX = type === "regular" ? 0 : -CARD_W;
-    trackX.value = withTiming(targetX, { duration: SLIDE_DURATION, easing: SLIDE_EASING }, () => {
-      descOp.value = withTiming(1, { duration: 180 });
-    });
-
-    setSelected(type);
-  }
-
-  const info = CARD_DATA[selected];
-  const isPremium = selected === "premium";
+  /* Cross-fade opacities for description + button */
+  const slide0Opacity = scrollX.interpolate({ inputRange: [0, pageW], outputRange: [1, 0], extrapolate: "clamp" });
+  const slide1Opacity = scrollX.interpolate({ inputRange: [0, pageW], outputRange: [0, 1], extrapolate: "clamp" });
+  const opacities = [slide0Opacity, slide1Opacity];
 
   return (
-    <View style={[s.root, { backgroundColor: C.bg }]}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[s.scroll, { paddingTop: topPad, paddingBottom: insets.bottom + 100 }]}
-        bounces={false}
-      >
-        {/* ── Header ── */}
-        <View style={s.header}>
-          <View style={s.headerSpacer} />
-          <Text style={s.headerTitle}>Choose a Card Type</Text>
-          <View style={s.headerSpacer} />
-        </View>
+    <View style={[s.root, { paddingTop: topPad }]}>
 
-        {/* ── Card showcase ── */}
-        <View style={[s.showcase, { marginHorizontal: 16 }]}>
+      {/* ── Header ── */}
+      <View style={s.header}>
+        <View style={s.headerSpacer} />
+        <Text style={s.headerTitle}>Choose a card type</Text>
+        <View style={s.headerSpacer} />
+      </View>
 
-          {/* Tab switcher */}
-          <View style={s.tabRow}>
-            {(["regular", "premium"] as CardType[]).map((type) => {
-              const active = selected === type;
-              return (
-                <TouchableOpacity
-                  key={type}
-                  onPress={() => selectCard(type)}
-                  activeOpacity={0.85}
-                  style={[s.tabBtn, active && s.tabBtnActive]}
-                >
-                  <Text style={[s.tabLabel, active && s.tabLabelActive]}>
-                    {CARD_DATA[type].label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-
-          {/* Card track */}
-          <View style={s.cardViewport}>
-            <Animated.View style={[s.cardTrack, trackStyle]}>
-              {/* Regular */}
-              <View style={{ width: CARD_W }}>
-                <RegularCard />
-              </View>
-              {/* Premium */}
-              <View style={{ width: CARD_W }}>
-                <PremiumCard />
-              </View>
-            </Animated.View>
-          </View>
-        </View>
-
-        {/* ── Description ── */}
-        <Animated.View style={[s.desc, descStyle]}>
-          <Text style={s.descLabel}>
-            {isPremium ? "Premium" : "Standard"}
-          </Text>
-          <Text style={s.descTitle}>{info.title}</Text>
-          <Text style={s.descBody}>{info.description}</Text>
-        </Animated.View>
-
-        {/* ── Feature bullets ── */}
-        <Animated.View style={[s.bullets, descStyle]}>
-          {(isPremium
-            ? ["Higher spending limits", "Priority customer support", "Exclusive cashback rewards", "International payments"]
-            : ["Instant virtual card", "Apple Pay & Google Pay", "Online purchases worldwide", "Bank-level security"]
-          ).map((item) => (
-            <View key={item} style={s.bulletRow}>
-              <View style={[s.bulletDot, { backgroundColor: isPremium ? "#0F3460" : C.navy }]} />
-              <Text style={s.bulletText}>{item}</Text>
-            </View>
-          ))}
-        </Animated.View>
-      </ScrollView>
-
-      {/* ── CTA button (fixed above tab bar) ── */}
-      <View style={[s.ctaWrap, { paddingBottom: Math.max(insets.bottom, 16) + 72 }]}>
-        {isPremium ? (
-          <LinearGradient
-            colors={["#5B8DB8", "#7FBCD2"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={s.ctaGradient}
-          >
-            <TouchableOpacity
-              style={s.ctaInner}
-              activeOpacity={0.88}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                Alert.alert("Premium Card", "Your Premium Card request has been submitted! Our team will review and activate your card within 24 hours.", [{ text: "Got it" }]);
-              }}
-            >
-              <Text style={s.ctaText}>{info.cta}</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        ) : (
-          <TouchableOpacity
-            style={[s.ctaBtn, { backgroundColor: C.navy }]}
-            activeOpacity={0.88}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              Alert.alert("Regular Card", "Your Regular Card is being set up! You'll receive a notification once it's ready to use.", [{ text: "Got it" }]);
-            }}
-          >
-            <Text style={s.ctaText}>{info.cta}</Text>
-          </TouchableOpacity>
+      {/* ── Card swipe zone ── */}
+      <Animated.ScrollView
+        ref={scrollRef as any}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        decelerationRate="fast"
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: false },
         )}
+        contentContainerStyle={{ width: pageW * SLIDES.length }}
+        style={{ flexShrink: 0 }}
+      >
+        {SLIDES.map((slide) => (
+          <View key={slide.id} style={[s.cardPage, { width: pageW }]}>
+            <View style={{ width: cardW, height: cardH }}>
+              <Card slide={slide} cardW={cardW} cardH={cardH} />
+            </View>
+          </View>
+        ))}
+      </Animated.ScrollView>
+
+      {/* ── Bottom UI (tabs + description + CTA) ── */}
+      <View style={s.bottom}>
+
+        {/* Tabs */}
+        <View style={s.tabs}>
+          {SLIDES.map((slide, i) => (
+            <TabButton
+              key={slide.id}
+              slide={slide}
+              index={i}
+              scrollX={scrollX}
+              pageW={pageW}
+              onPress={() => snapTo(i)}
+            />
+          ))}
+        </View>
+
+        {/* Description — cross-fades */}
+        <View style={s.descArea}>
+          {SLIDES.map((slide, i) => (
+            <Animated.Text
+              key={slide.id}
+              style={[
+                s.descText,
+                {
+                  opacity: opacities[i],
+                  position: "absolute",
+                  left: 32, right: 32,
+                  pointerEvents: "none",
+                },
+              ]}
+            >
+              {slide.description}
+            </Animated.Text>
+          ))}
+        </View>
+
+        {/* CTA buttons — cross-fades */}
+        <View style={s.ctaArea}>
+          {SLIDES.map((slide, i) => (
+            <Animated.View
+              key={slide.id}
+              style={[
+                s.ctaBtnWrap,
+                {
+                  opacity: opacities[i],
+                  position: "absolute",
+                  left: 20, right: 20,
+                  pointerEvents: "box-none",
+                },
+              ]}
+            >
+              <TouchableOpacity
+                activeOpacity={0.88}
+                style={[s.ctaBtn, { backgroundColor: slide.buttonColor }]}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  Alert.alert(
+                    slide.label + " Card",
+                    "Your " + slide.label.toLowerCase() + " card request has been submitted! We'll notify you when it's ready.",
+                    [{ text: "Got it" }],
+                  );
+                }}
+              >
+                <Text style={s.ctaBtnText}>{slide.buttonText}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          ))}
+        </View>
+
       </View>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  root:   { flex: 1, backgroundColor: C.bg },
-  scroll: { flexGrow: 1 },
+  root: { flex: 1, backgroundColor: "#FFFFFF" },
 
-  /* Header */
   header: {
-    flexDirection:   "row",
-    alignItems:      "center",
-    justifyContent:  "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingBottom:   24,
-    paddingTop:      8,
+    paddingBottom: 16,
+    paddingTop: 8,
   },
   headerSpacer: { width: 36 },
   headerTitle: {
-    fontSize:      17,
-    fontFamily:    "Manrope_600SemiBold",
-    color:         C.text,
-    letterSpacing: -0.3,
+    fontSize: 17,
+    fontFamily: "Manrope_700Bold",
+    color: "#111111",
+    letterSpacing: -0.2,
+    textAlign: "center",
   },
 
-  /* Showcase */
-  showcase: {
-    backgroundColor: C.surface,
-    borderRadius:    20,
-    paddingTop:      24,
-    paddingBottom:   28,
-    alignItems:      "center",
-    gap:             24,
+  cardPage: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 24,
   },
 
-  /* Tabs */
-  tabRow: {
-    flexDirection:   "row",
-    backgroundColor: "#FFFFFF",
-    borderRadius:    40,
-    padding:         4,
-    gap:             2,
-    shadowColor:     "#000",
-    shadowOffset:    { width: 0, height: 1 },
-    shadowOpacity:   0.06,
-    shadowRadius:    4,
-    elevation:       2,
-  },
-  tabBtn: {
-    paddingHorizontal: 24,
-    paddingVertical:   9,
-    borderRadius:      40,
-  },
-  tabBtnActive: {
-    backgroundColor: C.navy,
-    shadowColor:     "#000",
-    shadowOffset:    { width: 0, height: 2 },
-    shadowOpacity:   0.15,
-    shadowRadius:    6,
-    elevation:       3,
-  },
-  tabLabel: {
-    fontSize:      13,
-    fontFamily:    "Manrope_600SemiBold",
-    color:         C.textMut,
-    letterSpacing: 0.2,
-  },
-  tabLabelActive: {
-    color: "#FFFFFF",
+  bottom: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    paddingBottom: 36,
   },
 
-  /* Card viewport / track */
-  cardViewport: {
-    width:    CARD_W,
-    height:   CARD_H,
-    overflow: "hidden",
-  },
-  cardTrack: {
+  tabs: {
     flexDirection: "row",
-    width:         CARD_W * 2,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 32,
+    paddingVertical: 4,
   },
 
-  /* Description */
-  desc: {
-    paddingHorizontal: 24,
-    paddingTop:        28,
-    gap:               8,
+  descArea: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    minHeight: 80,
   },
-  descLabel: {
-    fontSize:      11,
-    fontFamily:    "Manrope_700Bold",
-    color:         C.textMut,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  descTitle: {
-    fontSize:      22,
-    fontFamily:    "Manrope_700Bold",
-    color:         C.text,
-    letterSpacing: -0.5,
-  },
-  descBody: {
-    fontSize:   15,
+  descText: {
     fontFamily: "Manrope_400Regular",
-    color:      C.textSec,
-    lineHeight: 24,
-    marginTop:  4,
+    fontSize: 15,
+    color: "#999999",
+    lineHeight: 23,
+    textAlign: "center",
   },
 
-  /* Feature bullets */
-  bullets: {
-    paddingHorizontal: 24,
-    paddingTop:        18,
-    gap:               12,
+  ctaArea: {
+    height: 58,
+    position: "relative",
+    marginHorizontal: 20,
   },
-  bulletRow: {
-    flexDirection: "row",
-    alignItems:    "center",
-    gap:           10,
-  },
-  bulletDot: {
-    width:        7,
-    height:       7,
-    borderRadius: 4,
-  },
-  bulletText: {
-    fontSize:   14,
-    fontFamily: "Manrope_500Medium",
-    color:      C.textSec,
-  },
-
-  /* CTA */
-  ctaWrap: {
-    position:          "absolute",
-    bottom:            0,
-    left:              0,
-    right:             0,
-    paddingHorizontal: 20,
-    paddingTop:        12,
-    backgroundColor:   C.bg,
-    borderTopWidth:    1,
-    borderTopColor:    C.border,
-  },
-  ctaGradient: {
-    borderRadius: 40,
-    height:       56,
-  },
-  ctaInner: {
-    flex:           1,
-    alignItems:     "center",
-    justifyContent: "center",
-  },
+  ctaBtnWrap: {},
   ctaBtn: {
-    height:         56,
-    borderRadius:   40,
-    alignItems:     "center",
+    height: 58,
+    borderRadius: 100,
+    alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.30,
+    shadowRadius: 20,
+    elevation: 8,
   },
-  ctaText: {
-    fontSize:      16,
-    fontFamily:    "Manrope_700Bold",
-    color:         "#FFFFFF",
+  ctaBtnText: {
+    fontFamily: "Manrope_600SemiBold",
+    fontSize: 17,
+    color: "#FFFFFF",
     letterSpacing: -0.2,
   },
 });
