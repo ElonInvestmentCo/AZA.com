@@ -124,12 +124,12 @@ const ob = StyleSheet.create({
   boxFilled: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: "#1E232C",
+    borderColor: "#18c4bf",
   },
   boxFocused: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
-    borderColor: "#1E232C",
+    borderColor: "#18c4bf",
   },
   boxEmpty: {
     backgroundColor: "#F7F8F9",
