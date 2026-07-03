@@ -85,32 +85,32 @@ function PickerModal({
   const cfg = pickerKey ? PICKER_CONFIG[pickerKey] : null;
   return (
     <AnimatedSheet visible={pickerKey !== null} onClose={onClose} maxHeight="60%">
-      <View style={pm.handle} />
-      <Text style={pm.title}>{cfg?.title ?? ""}</Text>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {(cfg?.options ?? []).map(o => (
-          <TouchableOpacity
-            key={o}
-            style={pm.option}
-            onPress={() => {
-              Haptics.selectionAsync();
-              if (pickerKey) onSelect(pickerKey, o);
-              onClose();
-            }}
-          >
-            <Text style={pm.optText}>{o}</Text>
-            <Feather name="check" size={14} color="#7C3AED" />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <View style={pm.inner}>
+        <Text style={pm.title}>{cfg?.title ?? ""}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {(cfg?.options ?? []).map(o => (
+            <TouchableOpacity
+              key={o}
+              style={pm.option}
+              onPress={() => {
+                Haptics.selectionAsync();
+                if (pickerKey) onSelect(pickerKey, o);
+                onClose();
+              }}
+            >
+              <Text style={pm.optText}>{o}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
     </AnimatedSheet>
   );
 }
 
 const pm = StyleSheet.create({
-  handle:  { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
+  inner:   { paddingHorizontal: 20, paddingTop: 20, flex: 1 },
   title:   { fontSize: rf(16), fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
-  option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: C.border },
+  option:  { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: C.border },
   optText: { fontSize: 15, fontFamily: "Manrope_500Medium", color: C.text },
 });
 

@@ -11,13 +11,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CANVAS_W = 393;
-const CANVAS_H = 852;
-
 export default function SubmittedScreen() {
   const router = useRouter();
 
-  const params   = useLocalSearchParams<{
+  const params = useLocalSearchParams<{
     title?:    string;
     subtitle?: string;
     dest?:     string;
@@ -34,35 +31,43 @@ export default function SubmittedScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
       <StatusBar barStyle="dark-content" />
-      <View style={styles.canvasWrap}>
-        <View style={styles.canvas}>
+      <View style={styles.container}>
+
+        {/* Illustration — grows to fill available top space */}
+        <View style={styles.illustrationWrap}>
           <Image
             source={require("@/assets/images/replica/success-illustration.png")}
             style={styles.illustration}
             resizeMode="contain"
           />
-
-          <Image
-            source={require("@/assets/images/replica/badge-success.png")}
-            style={styles.badge}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.title}>{title}</Text>
-
-          <Text style={styles.subtitle}>{subtitle}</Text>
-
-          <TouchableOpacity
-            activeOpacity={0.85}
-            style={styles.button}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace(dest as any);
-            }}
-          >
-            <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
         </View>
+
+        {/* Badge */}
+        <Image
+          source={require("@/assets/images/replica/badge-success.png")}
+          style={styles.badge}
+          resizeMode="contain"
+        />
+
+        {/* Copy */}
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+
+        {/* Push button toward bottom */}
+        <View style={styles.spacer} />
+
+        {/* CTA */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={styles.button}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.replace(dest as any);
+          }}
+        >
+          <Text style={styles.buttonText}>Done</Text>
+        </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   );
@@ -73,63 +78,56 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-  canvasWrap: {
+  container: {
     flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 16,
     alignItems: "center",
-    justifyContent: "flex-start",
-    backgroundColor: "#FFFFFF",
   },
-  canvas: {
-    width: CANVAS_W,
-    height: CANVAS_H,
-    maxWidth: "100%",
-    position: "relative",
-    backgroundColor: "#FFFFFF",
+
+  /* Illustration takes ~42% of screen height */
+  illustrationWrap: {
+    width: "100%",
+    flex: 0.42,
+    alignItems: "center",
+    justifyContent: "center",
   },
   illustration: {
-    position: "absolute",
-    left: 29,
-    top: 55,
-    width: 295.7,
-    height: 232.34,
+    width: "88%",
+    height: "100%",
   },
+
+  /* Fixed-size badge sits directly below the illustration */
   badge: {
-    position: "absolute",
-    left: 144,
-    top: 275,
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
+    marginTop: 8,
+    marginBottom: 4,
   },
+
   title: {
-    position: "absolute",
-    top: 408,
-    left: 0,
-    right: 0,
-    textAlign: "center",
+    marginTop: 20,
     fontSize: 26,
-    fontWeight: "800",
-    color: "#1F232C",
-    letterSpacing: 0.2,
     fontFamily: "Manrope_700Bold",
+    color: "#1F232C",
+    textAlign: "center",
+    letterSpacing: 0.2,
   },
   subtitle: {
-    position: "absolute",
-    top: 452,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#8E94A5",
-    fontWeight: "400",
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 22,
     fontFamily: "Manrope_400Regular",
+    color: "#8E94A5",
+    textAlign: "center",
   },
+
+  spacer: { flex: 1 },
+
   button: {
-    position: "absolute",
-    left: 24,
-    right: 24,
-    top: 520,
-    height: 56,
+    width: "100%",
+    height: 54,
     backgroundColor: "#1F232C",
     borderRadius: 12,
     alignItems: "center",
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "600",
     fontFamily: "Manrope_600SemiBold",
+    letterSpacing: 0.1,
   },
 });

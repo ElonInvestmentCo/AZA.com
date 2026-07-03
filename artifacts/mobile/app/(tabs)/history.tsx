@@ -298,12 +298,9 @@ function TxDetailSheet({ tx, visible, onClose }: {
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[ds.scroll, { paddingBottom: insets.bottom + 16 }]}
+        contentContainerStyle={[ds.scroll, { paddingTop: 20, paddingBottom: insets.bottom + 16 }]}
         bounces={false}
       >
-        {/* Drag handle */}
-        <View style={ds.handle} />
-
         {/* ── Hero ── */}
         <View style={ds.hero}>
           <View style={[ds.heroIcon, { backgroundColor: tx.iconBg }]}>
@@ -391,7 +388,6 @@ function TxDetailSheet({ tx, visible, onClose }: {
 
 const ds = StyleSheet.create({
   scroll: { paddingHorizontal: 18 },
-  handle: { width: 32, height: 3.5, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginTop: 10, marginBottom: 12 },
 
   /* Hero */
   hero:       { alignItems: "center", gap: 5, paddingBottom: 14 },

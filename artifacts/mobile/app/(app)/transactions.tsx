@@ -152,8 +152,7 @@ export default function TransactionsScreen() {
       {/* Transaction detail sheet */}
       <AnimatedSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="70%">
         {selected && (
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 0, paddingBottom: insets.bottom + 16 }}>
-            <View style={d.handle} />
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 0, paddingTop: 20, paddingHorizontal: 20, paddingBottom: insets.bottom + 16 }}>
             <View style={d.hero}>
               <View style={[d.heroIcon, { backgroundColor: selected.iconBg }]}>
                 <Feather name={selected.icon} size={26} color={selected.iconColor} />
@@ -236,8 +235,6 @@ const s = StyleSheet.create({
 });
 
 const d = StyleSheet.create({
-  handle:    { width: 32, height: 3.5, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginBottom: 16 },
-
   hero:      { alignItems: "center", gap: 6, paddingBottom: 20 },
   heroIcon:  { width: 56, height: 56, borderRadius: 18, alignItems: "center", justifyContent: "center", marginBottom: 4 },
   heroAmount:{ fontSize: 26, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },

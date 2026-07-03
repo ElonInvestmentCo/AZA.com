@@ -61,16 +61,17 @@ function PickerModal({
 }: { visible: boolean; title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <AnimatedSheet visible={visible} onClose={onClose} maxHeight="65%">
-      <View style={pm.handle} />
-      <Text style={pm.title}>{title}</Text>
-      <ScrollView showsVerticalScrollIndicator={false}>{children}</ScrollView>
+      <View style={pm.inner}>
+        <Text style={pm.title}>{title}</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>{children}</ScrollView>
+      </View>
     </AnimatedSheet>
   );
 }
 
 const pm = StyleSheet.create({
-  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: C.border, alignSelf: "center", marginBottom: 16 },
-  title:  { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
+  inner: { paddingHorizontal: 20, paddingTop: 20, flex: 1 },
+  title: { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text, marginBottom: 12 },
 });
 
 export default function CryptoScreen() {
@@ -228,7 +229,6 @@ export default function CryptoScreen() {
                 <Text style={pm2.optSymbol}>{coin.symbol}</Text>
               </View>
             </View>
-            {selectedCoin.id === coin.id && <Feather name="check" size={16} color="#7C3AED" />}
           </TouchableOpacity>
         ))}
       </PickerModal>
@@ -238,7 +238,6 @@ export default function CryptoScreen() {
         {NETWORKS.map(n => (
           <TouchableOpacity key={n} style={pm2.option} onPress={() => { Haptics.selectionAsync(); setNetwork(n); setPicker(null); }}>
             <Text style={pm2.optName}>{n}</Text>
-            {network === n && <Feather name="check" size={16} color="#7C3AED" />}
           </TouchableOpacity>
         ))}
       </PickerModal>
