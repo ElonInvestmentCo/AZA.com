@@ -9,7 +9,6 @@ export default function AppLayout() {
       <Stack.Screen name="confirm-transaction" />
       <Stack.Screen name="submitted" />
       <Stack.Screen name="rejected" />
-      <Stack.Screen name="success-payment" />
       <Stack.Screen name="transactions" />
       <Stack.Screen name="card-status" />
       <Stack.Screen name="sell-gift-card" />

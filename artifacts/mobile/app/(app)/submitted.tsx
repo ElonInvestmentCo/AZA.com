@@ -17,14 +17,19 @@ const CANVAS_H = 852;
 export default function SubmittedScreen() {
   const router = useRouter();
 
-  const params   = useLocalSearchParams<{ cardType?: string; amount?: string; naira?: string }>();
-  const cardType = params.cardType ?? "Gift Card";
-  const amount   = params.amount   ?? "$100";
-  const naira    = params.naira    ?? "₦120,000";
+  const params   = useLocalSearchParams<{
+    title?:    string;
+    subtitle?: string;
+    dest?:     string;
+  }>();
+
+  const title    = params.title    ?? "Trade Submitted";
+  const subtitle = params.subtitle ?? "Your trade has been submitted\nsuccessfully";
+  const dest     = params.dest     ?? "/(tabs)";
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, [cardType, amount, naira]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
@@ -43,18 +48,16 @@ export default function SubmittedScreen() {
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>Trade Submitted</Text>
+          <Text style={styles.title}>{title}</Text>
 
-          <Text style={styles.subtitle}>
-            Your trade has been submitted{"\n"}successfully
-          </Text>
+          <Text style={styles.subtitle}>{subtitle}</Text>
 
           <TouchableOpacity
             activeOpacity={0.85}
             style={styles.button}
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.replace("/(tabs)" as any);
+              router.replace(dest as any);
             }}
           >
             <Text style={styles.buttonText}>Done</Text>

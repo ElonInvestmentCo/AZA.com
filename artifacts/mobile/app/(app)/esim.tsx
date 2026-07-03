@@ -178,7 +178,7 @@ export default function EsimScreen() {
           onPress={() => {
             if (!selected) return;
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            router.push("/(app)/success-payment" as any);
+            router.push({ pathname: "/(app)/submitted" as any, params: { title: "eSIM Activated", subtitle: "Your eSIM plan has been\nactivated successfully" } });
           }}
           activeOpacity={0.85}
         >

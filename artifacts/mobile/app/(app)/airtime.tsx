@@ -54,7 +54,7 @@ export default function AirtimeScreen() {
     if (!canProceed) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setDone(true);
-    setTimeout(() => { setDone(false); router.push("/(app)/success-payment" as any); }, 800);
+    setTimeout(() => { setDone(false); router.push({ pathname: "/(app)/submitted" as any, params: { title: "Airtime Purchased", subtitle: "Airtime has been sent to\nyour number successfully" } }); }, 800);
   };
 
   return (

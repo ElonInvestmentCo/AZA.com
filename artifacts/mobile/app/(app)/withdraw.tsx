@@ -215,7 +215,7 @@ export default function WithdrawScreen() {
             if (!canProceed) return;
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             setDone(true);
-            setTimeout(() => { setDone(false); router.push("/(app)/success-payment" as any); }, 1000);
+            setTimeout(() => { setDone(false); router.push({ pathname: "/(app)/submitted" as any, params: { title: "Withdrawal Successful", subtitle: "Your withdrawal has been\nprocessed successfully" } }); }, 1000);
           }}
           activeOpacity={0.85}
         >
