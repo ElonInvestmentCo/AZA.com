@@ -1,16 +1,25 @@
-# PAYVORA Mobile App
+# PAYVORA — Nigerian Fintech Platform
 
-A fintech gift card trading platform — users can sell gift cards, fund their wallet, pay bills, and track transactions.
+A fintech platform for gift card trading, bill payments, airtime, and virtual dollar cards. Monorepo with website, mobile app, and API server.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
-- `pnpm --filter @workspace/mobile run dev` — run the PAYVORA mobile app (Expo tunnel)
+### Workflows (Replit)
+- **PayVora Website** — Next.js 15 landing page on port 5000 (preview pane)
+- **PAYVORA Mobile (Expo Go)** — Expo dev server on port 19000; scan QR code with Expo Go app
+- **artifacts/api-server: API Server** — Express API on port 8080
+
+### Commands
+- `pnpm install` — install all workspace dependencies (run this after cloning)
+- `pnpm --filter @workspace/api-server run dev` — build + start API server (port 8080)
+- `pnpm --filter @workspace/website run dev` — start Next.js website (port 5000)
+- `pnpm --filter @workspace/mobile run dev` — start mobile Expo dev server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `RELOADLY_CLIENT_ID` + `RELOADLY_CLIENT_SECRET` — needed for bill payment and eSIM routes (`/api/bills/*`, `/api/esim/*`)
 
 ## Stack
 
