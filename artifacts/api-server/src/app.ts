@@ -14,15 +14,22 @@ const app: Express = express();
  *
  * Always allow Expo Go auth proxy and localhost for native dev clients.
  * ──────────────────────────────────────────────────────────────────────────── */
-const replitDomain = process.env.REPLIT_DEV_DOMAIN
-  ? [`https://${process.env.REPLIT_DEV_DOMAIN}`]
-  : [];
+const replitOrigins: string[] = [];
+if (process.env.REPLIT_DEV_DOMAIN) {
+  replitOrigins.push(`https://${process.env.REPLIT_DEV_DOMAIN}`);
+}
+if (process.env.REPLIT_DOMAINS) {
+  process.env.REPLIT_DOMAINS.split(",")
+    .map((d) => d.trim())
+    .filter(Boolean)
+    .forEach((d) => replitOrigins.push(`https://${d}`));
+}
 
 const ALWAYS_ALLOWED = [
   "https://www.payvora.org",
   "https://payvora.org",
   "https://auth.expo.io",
-  ...replitDomain,
+  ...replitOrigins,
 ];
 
 const extraOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")

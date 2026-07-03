@@ -1,0 +1,73 @@
+FIX PAYVORA DEPLOYMENT (CRITICAL)
+
+GOAL:
+Make www.payvora.org serve ONLY the landing website (artifacts/landing) successfully on Railway with ZERO API/port conflicts.
+
+CURRENT ISSUE:
+- Railway is currently deploying the API server instead of the landing page
+- The landing page exists at: artifacts/landing (React/Vite app)
+- Deployment is broken due to:
+  1. Wrong service entry (API instead of landing)
+  2. Port conflicts (Express + Next.js both using PORT)
+  3. Broken standalone Next.js setup previously attempted
+  4. Missing/incorrect build output being served
+
+REQUIRED FINAL STATE:
+
+1. www.payvora.org MUST serve ONLY:
+   → artifacts/landing
+
+2. DO NOT run:
+   - API server in same Railway service
+   - Next.js standalone mode
+   - dual-process launcher (no start.mjs juggling)
+
+3. SIMPLE ARCHITECTURE:
+   - Railway service = FRONTEND ONLY
+   - Build: artifacts/landing
+   - Start: static site or Vite preview (no Express, no API)
+
+4. FIX STEPS:
+
+A. Remove API from deployment entirely:
+   - DO NOT build artifacts/api-server in Railway service
+
+B. Fix Railway build command:
+   Must only build landing app:
+   cd artifacts/landing && npm install && npm run build
+
+C. Fix Railway start command:
+   Use ONE of:
+   - npm run preview (Vite)
+   OR
+   - serve dist folder (recommended)
+
+Example:
+   npx serve -s dist -l $PORT
+
+D. Ensure:
+   - No Express server runs here
+   - No Next.js server runs here
+   - No port 8080 conflicts
+   - Only frontend static hosting
+
+5. ROUTES:
+   - / must load landing page
+   - /sign-up must NOT 404 (add simple route or redirect to /)
+     OR create /sign-up page in landing app if needed
+
+6. DEPLOYMENT RULE:
+   Railway must behave like static hosting, NOT backend server.
+
+7. FINAL CHECK:
+   - Build succeeds
+   - Deployment starts without crash loops
+   - Opening https://www.payvora.org shows landing page exactly like screenshot
+   - No API logs in Railway runtime
+
+DO NOT:
+- do not over-engineer with dual servers
+- do not add start.mjs process managers
+- do not mix backend + frontend in same service
+
+JUST FIX IT CLEANLY AND DEPLOY LANDING PAGE ONLY.
