@@ -2,8 +2,10 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +17,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fetchBillers, matchBiller, payBill, type ReloadlyBiller } from "@/utils/api";
 
 const C = {
   bg:        "#FFFFFF",
@@ -30,6 +33,13 @@ const C = {
 };
 
 const PROVIDERS = ["Spectranet", "Swift Networks", "ipNX", "Lagos Fibre"];
+
+const PROVIDER_HINTS: Record<string, string[]> = {
+  "Spectranet":     ["spectranet"],
+  "Swift Networks": ["swift"],
+  "ipNX":           ["ipnx"],
+  "Lagos Fibre":    ["lagosfibre", "fibre"],
+};
 
 function FieldLabel({ text }: { text: string }) {
   return <Text style={f.label}>{text}</Text>;
@@ -88,8 +98,50 @@ export default function BillsScreen() {
   const [accountNum, setAccountNum] = useState("");
   const [amount,    setAmount]    = useState("");
   const [picker,    setPicker]    = useState(false);
+  const [billers,    setBillers]    = useState<ReloadlyBiller[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const canProceed = !!provider && !!accountNum && !!amount;
+  useEffect(() => {
+    fetchBillers("INTERNET_BILL_PAYMENT")
+      .then(setBillers)
+      .catch((err) => console.warn("Failed to load internet billers:", err));
+  }, []);
+
+  const canProceed = !!provider && !!accountNum && !!amount && !submitting;
+
+  const handlePay = async () => {
+    if (!canProceed) return;
+
+    const biller = matchBiller(billers, PROVIDER_HINTS[provider] ?? [provider]);
+    if (!biller) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Provider unavailable", `${provider} isn't currently available. Please try again later.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await payBill({
+        billerId: biller.id,
+        subscriberAccountNumber: accountNum,
+        amount: parseInt(amount || "0"),
+        referenceId: `internet-${Date.now()}`,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: "/(app)/submitted" as any,
+        params: {
+          title:    "Payment Successful",
+          subtitle: `Your bill payment is being\nprocessed (ref: ${result.referenceId})`,
+        },
+      });
+    } catch (err) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Payment Failed", err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -174,14 +226,14 @@ export default function BillsScreen() {
 
         <TouchableOpacity
           style={[s.payBtn, !canProceed && { opacity: 0.45 }]}
-          onPress={() => {
-            if (!canProceed) return;
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            router.push({ pathname: "/(app)/submitted" as any, params: { title: "Payment Successful", subtitle: "Your bill payment has been\nprocessed successfully" } });
-          }}
+          onPress={handlePay}
           activeOpacity={0.85}
+          disabled={!canProceed}
         >
-          <Text style={s.payBtnText}>Pay Bill</Text>
+          {submitting ? (
+            <ActivityIndicator color="#FFFFFF" style={{ marginRight: 6 }} />
+          ) : null}
+          <Text style={s.payBtnText}>{submitting ? "Processing..." : "Pay Bill"}</Text>
         </TouchableOpacity>
 
       </ScrollView>
@@ -206,6 +258,6 @@ const s = StyleSheet.create({
   summaryLabel: { fontSize: 10, fontFamily: "Manrope_400Regular", color: "rgba(255,255,255,0.7)" },
   summaryValue: { fontSize: 10, fontFamily: "Manrope_500Medium", color: "#FFFFFF" },
 
-  payBtn:     { backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
+  payBtn:     { flexDirection: "row", backgroundColor: C.black, height: 48, borderRadius: 10, alignItems: "center", justifyContent: "center", elevation: 4 },
   payBtnText: { fontSize: 14, fontFamily: "Manrope_700Bold", color: "#FFFFFF", letterSpacing: -0.14 },
 });

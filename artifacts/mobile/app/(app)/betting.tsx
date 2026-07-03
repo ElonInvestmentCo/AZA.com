@@ -1,8 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +17,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fetchBillers, matchBiller, payBill, type ReloadlyBiller } from "@/utils/api";
 
 const C = {
   bg:        "#FFFFFF",
@@ -31,15 +34,15 @@ const C = {
 };
 
 const PLATFORMS = [
-  { id: "sportybet",  name: "SportyBet",  color: "#059669", bg: "#F0FFF4", abbr: "SBT" },
-  { id: "bet9ja",     name: "Bet9ja",     color: "#065F46", bg: "#D1FAE5", abbr: "B9J" },
-  { id: "betway",     name: "Betway",     color: "#047857", bg: "#ECFDF5", abbr: "BTW" },
-  { id: "1xbet",      name: "1xBet",      color: "#1D4ED8", bg: "#EFF6FF", abbr: "1XB" },
-  { id: "nairabet",   name: "NairaBet",   color: "#7C3AED", bg: "#F5F3FF", abbr: "NRB" },
-  { id: "betking",    name: "BetKing",    color: "#B45309", bg: "#FFFBEB", abbr: "BTK" },
-  { id: "msport",     name: "MSport",     color: "#DC2626", bg: "#FFF1F2", abbr: "MSP" },
-  { id: "betlion",    name: "BetLion",    color: "#D97706", bg: "#FFF7ED", abbr: "BLN" },
-  { id: "supabets",   name: "Supabets",   color: "#0891B2", bg: "#ECFEFF", abbr: "SUP" },
+  { id: "sportybet",  name: "SportyBet",  color: "#059669", bg: "#F0FFF4", abbr: "SBT", hints: ["sportybet", "sporty"] },
+  { id: "bet9ja",     name: "Bet9ja",     color: "#065F46", bg: "#D1FAE5", abbr: "B9J", hints: ["bet9ja"] },
+  { id: "betway",     name: "Betway",     color: "#047857", bg: "#ECFDF5", abbr: "BTW", hints: ["betway"] },
+  { id: "1xbet",      name: "1xBet",      color: "#1D4ED8", bg: "#EFF6FF", abbr: "1XB", hints: ["1xbet"] },
+  { id: "nairabet",   name: "NairaBet",   color: "#7C3AED", bg: "#F5F3FF", abbr: "NRB", hints: ["nairabet"] },
+  { id: "betking",    name: "BetKing",    color: "#B45309", bg: "#FFFBEB", abbr: "BTK", hints: ["betking"] },
+  { id: "msport",     name: "MSport",     color: "#DC2626", bg: "#FFF1F2", abbr: "MSP", hints: ["msport"] },
+  { id: "betlion",    name: "BetLion",    color: "#D97706", bg: "#FFF7ED", abbr: "BLN", hints: ["betlion"] },
+  { id: "supabets",   name: "Supabets",   color: "#0891B2", bg: "#ECFEFF", abbr: "SUP", hints: ["supabets", "supabet"] },
 ];
 
 const QUICK_AMOUNTS = ["₦500", "₦1,000", "₦2,000", "₦5,000", "₦10,000", "₦20,000"];
@@ -52,19 +55,49 @@ export default function BettingScreen() {
   const [platform, setPlatform] = useState<typeof PLATFORMS[number] | null>(null);
   const [userId,   setUserId]   = useState("");
   const [amount,   setAmount]   = useState("");
+  const [billers,    setBillers]    = useState<ReloadlyBiller[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const canProceed = !!platform && !!userId.trim() && !!amount;
+  useEffect(() => {
+    fetchBillers("BETTING_BILL_PAYMENT")
+      .then(setBillers)
+      .catch((err) => console.warn("Failed to load betting billers:", err));
+  }, []);
 
-  const handleFund = () => {
-    if (!canProceed) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.push({
-      pathname: "/(app)/submitted" as any,
-      params: {
-        title:    "Bet Funding Successful",
-        subtitle: `Your ${platform!.name} account has\nbeen funded successfully`,
-      },
-    });
+  const canProceed = !!platform && !!userId.trim() && !!amount && !submitting;
+
+  const handleFund = async () => {
+    if (!canProceed || !platform) return;
+
+    const biller = matchBiller(billers, platform.hints);
+    if (!biller) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Platform unavailable", `${platform.name} isn't currently available. Please try again later.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await payBill({
+        billerId: biller.id,
+        subscriberAccountNumber: userId.trim(),
+        amount: parseInt(amount || "0"),
+        referenceId: `betting-${Date.now()}`,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: "/(app)/submitted" as any,
+        params: {
+          title:    "Bet Funding Successful",
+          subtitle: `Your ${platform.name} account is being\nfunded (ref: ${result.referenceId})`,
+        },
+      });
+    } catch (err) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Payment Failed", err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -220,10 +253,15 @@ export default function BettingScreen() {
           style={[s.fundBtn, !canProceed && s.fundBtnDisabled]}
           onPress={handleFund}
           activeOpacity={0.85}
+          disabled={!canProceed}
         >
-          <Feather name="dollar-sign" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+          {submitting ? (
+            <ActivityIndicator color="#FFFFFF" style={{ marginRight: 6 }} />
+          ) : (
+            <Feather name="dollar-sign" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+          )}
           <Text style={s.fundBtnText}>
-            {platform ? `Fund ${platform.name}` : "Fund Account"}
+            {submitting ? "Processing..." : platform ? `Fund ${platform.name}` : "Fund Account"}
           </Text>
         </TouchableOpacity>
 

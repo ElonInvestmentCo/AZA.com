@@ -2,8 +2,10 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +18,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fetchBillers, matchBiller, payBill, type ReloadlyBiller } from "@/utils/api";
 
 const C = {
   bg:        "#FFFFFF",
@@ -32,14 +35,14 @@ const C = {
 };
 
 const DISCOS = [
-  { id: "ekedc",  name: "EKEDC",  full: "Eko Electric",          abbr: "EKE" },
-  { id: "ikedc",  name: "IKEDC",  full: "Ikeja Electric",        abbr: "IKE" },
-  { id: "aedc",   name: "AEDC",   full: "Abuja Electric",        abbr: "ABJ" },
-  { id: "phedc",  name: "PHEDC",  full: "Port Harcourt Electric",abbr: "PHC" },
-  { id: "bedc",   name: "BEDC",   full: "Benin Electric",        abbr: "BEN" },
-  { id: "kedco",  name: "KEDCO",  full: "Kano Electric",         abbr: "KAN" },
-  { id: "jedc",   name: "JEDC",   full: "Jos Electric",          abbr: "JOS" },
-  { id: "kedpo",  name: "KEDPO",  full: "Kaduna Electric",       abbr: "KAD" },
+  { id: "ekedc",  name: "EKEDC",  full: "Eko Electric",          abbr: "EKE", hints: ["eko"] },
+  { id: "ikedc",  name: "IKEDC",  full: "Ikeja Electric",        abbr: "IKE", hints: ["ikeja"] },
+  { id: "aedc",   name: "AEDC",   full: "Abuja Electric",        abbr: "ABJ", hints: ["abuja"] },
+  { id: "phedc",  name: "PHEDC",  full: "Port Harcourt Electric",abbr: "PHC", hints: ["portharcourt", "phed"] },
+  { id: "bedc",   name: "BEDC",   full: "Benin Electric",        abbr: "BEN", hints: ["benin"] },
+  { id: "kedco",  name: "KEDCO",  full: "Kano Electric",         abbr: "KAN", hints: ["kano"] },
+  { id: "jedc",   name: "JEDC",   full: "Jos Electric",          abbr: "JOS", hints: ["jos"] },
+  { id: "kedpo",  name: "KEDPO",  full: "Kaduna Electric",       abbr: "KAD", hints: ["kaduna"] },
 ];
 
 const QUICK_AMOUNTS = ["₦1,000", "₦2,000", "₦5,000", "₦10,000", "₦20,000", "₦50,000"];
@@ -56,20 +59,58 @@ export default function ElectricityScreen() {
   const [meterNum,   setMeterNum]   = useState("");
   const [amount,     setAmount]     = useState("");
   const [discoSheet, setDiscoSheet] = useState(false);
+  const [billers,    setBillers]    = useState<ReloadlyBiller[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchBillers("ELECTRICITY_BILL_PAYMENT")
+      .then(setBillers)
+      .catch((err) => console.warn("Failed to load electricity billers:", err));
+  }, []);
 
   const parseAmt = (raw: string) => parseInt(raw.replace(/,/g, "") || "0");
-  const canProceed = !!disco && meterNum.length >= 10 && !!amount;
+  const canProceed = !!disco && meterNum.length >= 10 && !!amount && !submitting;
 
-  const handlePay = () => {
-    if (!canProceed) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.push({
-      pathname: "/(app)/submitted" as any,
-      params: {
-        title:    "Payment Successful",
-        subtitle: "Your electricity token has been\ngenerated and sent to you",
-      },
-    });
+  const handlePay = async () => {
+    if (!canProceed || !disco) return;
+
+    const biller = matchBiller(
+      billers,
+      disco.hints,
+      meterType === "prepaid" ? "PREPAID" : "POSTPAID",
+    );
+
+    if (!biller) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        "Biller unavailable",
+        `${disco.full} isn't currently available for ${meterType} payments. Please try again later.`,
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await payBill({
+        billerId: biller.id,
+        subscriberAccountNumber: meterNum,
+        amount: parseAmt(amount),
+        referenceId: `electricity-${Date.now()}`,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: "/(app)/submitted" as any,
+        params: {
+          title:    "Payment Successful",
+          subtitle: `Your electricity token is being\nprocessed (ref: ${result.referenceId})`,
+        },
+      });
+    } catch (err) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Payment Failed", err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -232,9 +273,14 @@ export default function ElectricityScreen() {
           style={[s.payBtn, !canProceed && s.payBtnDisabled]}
           onPress={handlePay}
           activeOpacity={0.85}
+          disabled={!canProceed}
         >
-          <Feather name="zap" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
-          <Text style={s.payBtnText}>Pay Electricity Bill</Text>
+          {submitting ? (
+            <ActivityIndicator color="#FFFFFF" style={{ marginRight: 8 }} />
+          ) : (
+            <Feather name="zap" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+          )}
+          <Text style={s.payBtnText}>{submitting ? "Processing..." : "Pay Electricity Bill"}</Text>
         </TouchableOpacity>
 
       </ScrollView>

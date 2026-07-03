@@ -2,8 +2,10 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +18,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { fetchBillers, matchBiller, payBill, type ReloadlyBiller } from "@/utils/api";
 
 const C = {
   bg:        "#FFFFFF",
@@ -32,10 +35,10 @@ const C = {
 };
 
 const PROVIDERS = [
-  { id: "dstv",      name: "DSTV",      color: "#0069B4", bg: "#EFF6FF", abbr: "DST" },
-  { id: "gotv",      name: "GOtv",      color: "#FF6900", bg: "#FFF7ED", abbr: "GOT" },
-  { id: "startimes", name: "StarTimes", color: "#E11D48", bg: "#FFF1F2", abbr: "STA" },
-  { id: "consat",    name: "Consat",    color: "#7C3AED", bg: "#F5F3FF", abbr: "CON" },
+  { id: "dstv",      name: "DSTV",      color: "#0069B4", bg: "#EFF6FF", abbr: "DST", hints: ["dstv"] },
+  { id: "gotv",      name: "GOtv",      color: "#FF6900", bg: "#FFF7ED", abbr: "GOT", hints: ["gotv"] },
+  { id: "startimes", name: "StarTimes", color: "#E11D48", bg: "#FFF1F2", abbr: "STA", hints: ["startimes", "starttimes"] },
+  { id: "consat",    name: "Consat",    color: "#7C3AED", bg: "#F5F3FF", abbr: "CON", hints: ["consat"] },
 ];
 
 const BOUQUETS: Record<string, { id: string; name: string; price: string }[]> = {
@@ -78,20 +81,50 @@ export default function CableScreen() {
   const [smartCard,     setSmartCard]     = useState("");
   const [bouquet,       setBouquet]       = useState<{ id: string; name: string; price: string } | null>(null);
   const [bouquetSheet,  setBouquetSheet]  = useState(false);
+  const [billers,       setBillers]       = useState<ReloadlyBiller[]>([]);
+  const [submitting,    setSubmitting]    = useState(false);
+
+  useEffect(() => {
+    fetchBillers("CABLE_TV_BILL_PAYMENT")
+      .then(setBillers)
+      .catch((err) => console.warn("Failed to load cable billers:", err));
+  }, []);
 
   const bouquets = provider ? (BOUQUETS[provider.id] ?? []) : [];
-  const canProceed = !!provider && smartCard.length >= 10 && !!bouquet;
+  const canProceed = !!provider && smartCard.length >= 10 && !!bouquet && !submitting;
 
-  const handleSubscribe = () => {
-    if (!canProceed) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.push({
-      pathname: "/(app)/submitted" as any,
-      params: {
-        title:    "Subscription Successful",
-        subtitle: `Your ${provider!.name} subscription\nhas been activated successfully`,
-      },
-    });
+  const handleSubscribe = async () => {
+    if (!canProceed || !provider || !bouquet) return;
+
+    const biller = matchBiller(billers, provider.hints);
+    if (!biller) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Biller unavailable", `${provider.name} isn't currently available. Please try again later.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = await payBill({
+        billerId: biller.id,
+        subscriberAccountNumber: smartCard,
+        amount: parseInt(bouquet.price.replace(/,/g, "")),
+        referenceId: `cable-${Date.now()}`,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.push({
+        pathname: "/(app)/submitted" as any,
+        params: {
+          title:    "Subscription Successful",
+          subtitle: `Your ${provider.name} subscription is\nbeing processed (ref: ${result.referenceId})`,
+        },
+      });
+    } catch (err) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert("Payment Failed", err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -251,10 +284,15 @@ export default function CableScreen() {
           style={[s.payBtn, !canProceed && s.payBtnDisabled]}
           onPress={handleSubscribe}
           activeOpacity={0.85}
+          disabled={!canProceed}
         >
-          <Feather name="tv" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+          {submitting ? (
+            <ActivityIndicator color="#FFFFFF" style={{ marginRight: 8 }} />
+          ) : (
+            <Feather name="tv" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
+          )}
           <Text style={s.payBtnText}>
-            {provider ? `Subscribe to ${provider.name}` : "Subscribe"}
+            {submitting ? "Processing..." : provider ? `Subscribe to ${provider.name}` : "Subscribe"}
           </Text>
         </TouchableOpacity>
 
