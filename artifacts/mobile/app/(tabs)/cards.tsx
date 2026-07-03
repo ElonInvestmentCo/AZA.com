@@ -39,7 +39,7 @@ const SLIDES = [
   },
 ] as const;
 
-/* ─── Mastercard logo (two overlapping circles + label) ─────────────────── */
+/* ─── Mastercard logo ────────────────────────────────────────────────────── */
 function MastercardLogo() {
   const S = 26;
   const overlap = 10;
@@ -60,7 +60,7 @@ const mc = StyleSheet.create({
   label:  { color: "rgba(255,255,255,0.85)", fontSize: 8, fontFamily: "Manrope_500Medium", letterSpacing: 0.4, marginTop: 2 },
 });
 
-/* ─── "R" mark (PAYVORA brand) ──────────────────────────────────────────── */
+/* ─── PAYVORA "P" mark ───────────────────────────────────────────────────── */
 function PayvoraMark() {
   return (
     <View style={pm.wrap}>
@@ -96,25 +96,16 @@ function Card({
         },
       ]}
     >
-      {/* Highlight blob — upper oval */}
       <View style={cv.blob} />
-
-      {/* Card number watermark — centered */}
       <View style={cv.numWrap}>
         <Text style={cv.num}>8003  6071  0534  6352</Text>
       </View>
-
-      {/* "CARD HOLDER" — rotated −90° left side */}
       <View style={[cv.sideLabel, { left: -(cardH * 0.25) / 2 + 10 }]}>
         <Text style={cv.sideLabelText}>CARD HOLDER</Text>
       </View>
-
-      {/* Card type — rotated +90° right side */}
       <View style={[cv.sideLabel, { right: -(cardH * 0.25) / 2 + 10, transform: [{ rotate: "90deg" }] }]}>
         <Text style={[cv.sideLabelText, { fontSize: 8.5 }]}>{slide.cardLabel}</Text>
       </View>
-
-      {/* Bottom row */}
       <View style={cv.bottom}>
         <MastercardLogo />
         <PayvoraMark />
@@ -135,10 +126,8 @@ const cv = StyleSheet.create({
   },
   blob: {
     position: "absolute",
-    top: "10%",
-    left: "20%",
-    width: "60%",
-    height: "38%",
+    top: "10%", left: "20%",
+    width: "60%", height: "38%",
     borderRadius: 999,
     backgroundColor: "rgba(255,255,255,0.13)",
   },
@@ -169,9 +158,7 @@ const cv = StyleSheet.create({
   },
   bottom: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: 20, left: 20, right: 20,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
@@ -211,13 +198,11 @@ function TabButton({
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={tb.wrap}>
-      {/* Hidden bold copy to reserve width */}
+      {/* Hidden bold copy to reserve layout width */}
       <Text style={[tb.hidden, tb.bold]}>{slide.label}</Text>
-      {/* Normal */}
       <Animated.Text style={[tb.label, tb.normal, { position: "absolute", opacity: normalOpacity, color: normalColor as any }]}>
         {slide.label}
       </Animated.Text>
-      {/* Bold */}
       <Animated.Text style={[tb.label, tb.bold, { position: "absolute", opacity: boldOpacity, color: "#111111" }]}>
         {slide.label}
       </Animated.Text>
@@ -234,14 +219,50 @@ const tb = StyleSheet.create({
 });
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
+
+/*
+ * The pill tab bar in _layout.tsx is positioned ABSOLUTELY over the screen
+ * (not in the layout flow), so this screen must manually reserve space for it.
+ *
+ * Pill bar geometry (mirrored from _layout.tsx):
+ *   height:     68 pt
+ *   bottom:     max(insets.bottom + 10, iOS ? 20 : 12)
+ *
+ * Total clearance = barBottom + barHeight + a small breathing gap.
+ */
+const PILL_BAR_HEIGHT = 68;
+
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
   const { width: screenW, height: screenH } = useWindowDimensions();
   const topPad = Platform.OS === "web" ? 48 : insets.top;
   const pageW  = screenW;
 
-  /* Card dimensions — portrait, ~0.63 aspect ratio */
-  const cardH = Math.min(Math.round(screenH * 0.46), 400);
+  /*
+   * Bottom clearance: enough space so the CTA button sits comfortably above
+   * the floating pill tab bar on every device.
+   */
+  const barBottom = Math.max(
+    insets.bottom + 10,
+    Platform.OS === "ios" ? 20 : 12,
+  );
+  const tabBarClearance = barBottom + PILL_BAR_HEIGHT + 20; // 20 pt breathing room
+
+  /*
+   * Card height: dynamically sized so all UI elements fit without scrolling.
+   *
+   * Budget consumed by everything except the card:
+   *   topPad           – device status bar / notch
+   *   46               – header (paddingTop 8 + title ~22 + paddingBottom 16)
+   *   CARD_V_PAD * 2   – vertical padding around the card in its scroll zone
+   *   42               – tab row (label 21 + tb.wrap paddingV 12 + s.tabs paddingV 8 ≈ 41)
+   *   72               – minimum description area
+   *   58               – CTA button
+   *   tabBarClearance  – space for floating pill bar
+   */
+  const CARD_V_PAD   = 16;
+  const RESERVED     = topPad + 46 + CARD_V_PAD * 2 + 42 + 72 + 58 + tabBarClearance;
+  const cardH = Math.min(Math.max(Math.round(screenH - RESERVED), 200), 340);
   const cardW = Math.round(cardH * 0.63);
 
   const scrollX   = useRef(new Animated.Value(0)).current;
@@ -252,7 +273,6 @@ export default function CardsScreen() {
     scrollRef.current?.scrollTo({ x: index * pageW, animated: true });
   }, [pageW]);
 
-  /* Cross-fade opacities for description + button */
   const slide0Opacity = scrollX.interpolate({ inputRange: [0, pageW], outputRange: [1, 0], extrapolate: "clamp" });
   const slide1Opacity = scrollX.interpolate({ inputRange: [0, pageW], outputRange: [0, 1], extrapolate: "clamp" });
   const opacities = [slide0Opacity, slide1Opacity];
@@ -267,23 +287,32 @@ export default function CardsScreen() {
         <View style={s.headerSpacer} />
       </View>
 
-      {/* ── Card swipe zone ── */}
+      {/* ── Horizontal card swipe ──────────────────────────────────────────
+       *  • pagingEnabled + decelerationRate "fast" snaps pages cleanly.
+       *  • scrollEventThrottle={1} drives the interpolations at full 60 FPS.
+       *  • alwaysBounceVertical={false} prevents the scroll view from
+       *    jolting vertically when the user swipes slightly off-axis, which
+       *    is the main source of reported scroll jank on this screen.
+       *  • The Animated event uses useNativeDriver:false because it drives
+       *    opacity/color animated values that require the JS thread.
+       ─────────────────────────────────────────────────────────────────── */}
       <Animated.ScrollView
         ref={scrollRef as any}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
+        scrollEventThrottle={1}
         decelerationRate="fast"
+        alwaysBounceVertical={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           { useNativeDriver: false },
         )}
         contentContainerStyle={{ width: pageW * SLIDES.length }}
-        style={{ flexShrink: 0 }}
+        style={s.cardScroll}
       >
         {SLIDES.map((slide) => (
-          <View key={slide.id} style={[s.cardPage, { width: pageW }]}>
+          <View key={slide.id} style={[s.cardPage, { width: pageW, paddingVertical: CARD_V_PAD }]}>
             <View style={{ width: cardW, height: cardH }}>
               <Card slide={slide} cardW={cardW} cardH={cardH} />
             </View>
@@ -291,8 +320,8 @@ export default function CardsScreen() {
         ))}
       </Animated.ScrollView>
 
-      {/* ── Bottom UI (tabs + description + CTA) ── */}
-      <View style={s.bottom}>
+      {/* ── Bottom UI: tabs + description + CTA ─────────────────────────── */}
+      <View style={[s.bottom, { paddingBottom: tabBarClearance }]}>
 
         {/* Tabs */}
         <View style={s.tabs}>
@@ -308,7 +337,7 @@ export default function CardsScreen() {
           ))}
         </View>
 
-        {/* Description — cross-fades */}
+        {/* Description — cross-fades between slides */}
         <View style={s.descArea}>
           {SLIDES.map((slide, i) => (
             <Animated.Text
@@ -328,7 +357,7 @@ export default function CardsScreen() {
           ))}
         </View>
 
-        {/* CTA buttons — cross-fades */}
+        {/* CTA — cross-fades between slides */}
         <View style={s.ctaArea}>
           {SLIDES.map((slide, i) => (
             <Animated.View
@@ -338,7 +367,7 @@ export default function CardsScreen() {
                 {
                   opacity: opacities[i],
                   position: "absolute",
-                  left: 20, right: 20,
+                  left: 0, right: 0,
                   pointerEvents: "box-none",
                 },
               ]}
@@ -367,7 +396,10 @@ export default function CardsScreen() {
 }
 
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#FFFFFF" },
+  root: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
 
   header: {
     flexDirection: "row",
@@ -386,17 +418,29 @@ const s = StyleSheet.create({
     textAlign: "center",
   },
 
+  /*
+   * Card scroll zone — fixed height (flexShrink: 0) so it doesn't compress
+   * when the bottom section needs space, and doesn't expand to take extra
+   * space that should go to the description area.
+   */
+  cardScroll: { flexShrink: 0 },
+
   cardPage: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 24,
   },
 
+  /*
+   * Bottom section — takes all remaining vertical space (flex: 1) and
+   * distributes it between tabs (fixed), description (flex: 1), and CTA
+   * (fixed). paddingBottom is applied inline so it can use the dynamic
+   * tabBarClearance value.
+   */
   bottom: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
-    paddingBottom: 36,
+    paddingHorizontal: 20,
   },
 
   tabs: {
@@ -412,7 +456,7 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
-    minHeight: 80,
+    overflow: "hidden",
   },
   descText: {
     fontFamily: "Manrope_400Regular",
@@ -423,13 +467,12 @@ const s = StyleSheet.create({
   },
 
   ctaArea: {
-    height: 58,
+    height: 54,
     position: "relative",
-    marginHorizontal: 20,
   },
   ctaBtnWrap: {},
   ctaBtn: {
-    height: 58,
+    height: 54,
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
