@@ -166,6 +166,17 @@ const cv = StyleSheet.create({
 });
 
 /* ─── Tab button with crossfaded bold ↔ normal text ─────────────────────── */
+/*
+ * Layout strategy:
+ *   - A hidden bold copy (opacity: 0, pointerEvents: "none") establishes the
+ *     wrapper's intrinsic width so the row never shifts when font weight changes.
+ *   - Two Animated.Text layers use StyleSheet.absoluteFillObject so they have
+ *     explicit top/bottom/left/right: 0 — this is critical. Without explicit
+ *     coordinates Yoga may place absolute children at ambiguous positions,
+ *     causing them to overflow into adjacent sections (the bug in the original).
+ *   - overflow: "hidden" on the wrapper + numberOfLines={1} guarantee the labels
+ *     stay within their allocated box no matter how long the text is.
+ */
 function TabButton({
   slide,
   index,
@@ -198,12 +209,22 @@ function TabButton({
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={tb.wrap}>
-      {/* Hidden bold copy to reserve layout width */}
-      <Text style={[tb.hidden, tb.bold]}>{slide.label}</Text>
-      <Animated.Text style={[tb.label, tb.normal, { position: "absolute", opacity: normalOpacity, color: normalColor as any }]}>
+      {/* Invisible bold copy — sets the wrapper's intrinsic width/height */}
+      <Text style={[tb.measure, tb.bold]} numberOfLines={1}>{slide.label}</Text>
+
+      {/* Normal-weight layer — fades out when this tab is active */}
+      <Animated.Text
+        style={[tb.label, tb.normal, StyleSheet.absoluteFillObject, { opacity: normalOpacity, color: normalColor as any }]}
+        numberOfLines={1}
+      >
         {slide.label}
       </Animated.Text>
-      <Animated.Text style={[tb.label, tb.bold, { position: "absolute", opacity: boldOpacity, color: "#111111" }]}>
+
+      {/* Bold layer — fades in when this tab is active */}
+      <Animated.Text
+        style={[tb.label, tb.bold, StyleSheet.absoluteFillObject, { opacity: boldOpacity, color: "#111111" }]}
+        numberOfLines={1}
+      >
         {slide.label}
       </Animated.Text>
     </TouchableOpacity>
@@ -211,9 +232,17 @@ function TabButton({
 }
 
 const tb = StyleSheet.create({
-  wrap:   { position: "relative", paddingVertical: 6, paddingHorizontal: 4 },
-  hidden: { opacity: 0 },
-  label:  { fontSize: 17, letterSpacing: -0.2, fontFamily: "Manrope_600SemiBold" },
+  wrap: {
+    paddingVertical: 6, paddingHorizontal: 4,
+    overflow: "hidden",      // clips text that is wider than the measured width
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  measure: { opacity: 0 },  // invisible; only contributes to layout measurement
+  label: {
+    fontSize: 17, letterSpacing: -0.2,
+    textAlign: "center",     // keeps text centred within the absoluteFillObject frame
+  },
   normal: { fontFamily: "Manrope_400Regular" },
   bold:   { fontFamily: "Manrope_700Bold" },
 });
@@ -337,23 +366,32 @@ export default function CardsScreen() {
           ))}
         </View>
 
-        {/* Description — cross-fades between slides */}
+        {/* Description — cross-fades between slides
+         *
+         * Each description lives inside an Animated.View that uses
+         * StyleSheet.absoluteFillObject (top/bottom/left/right: 0) so it is
+         * explicitly anchored to all four edges of descArea.  Without explicit
+         * coordinates Yoga's absolute placement is ambiguous and the text can
+         * bleed into the tab row or the CTA area.
+         *
+         * The Text element (non-absolute, normal flow inside the Animated.View)
+         * wraps naturally and is vertically centred by alignItems/justifyContent
+         * on the Animated.View.  paddingHorizontal gives the text comfortable
+         * breathing room without fighting with the parent's own padding.
+         */}
         <View style={s.descArea}>
           {SLIDES.map((slide, i) => (
-            <Animated.Text
+            <Animated.View
               key={slide.id}
               style={[
-                s.descText,
-                {
-                  opacity: opacities[i],
-                  position: "absolute",
-                  left: 32, right: 32,
-                  pointerEvents: "none",
-                },
+                StyleSheet.absoluteFillObject,
+                s.descLayer,
+                { opacity: opacities[i] },
               ]}
+              pointerEvents="none"
             >
-              {slide.description}
-            </Animated.Text>
+              <Text style={s.descText}>{slide.description}</Text>
+            </Animated.View>
           ))}
         </View>
 
@@ -453,10 +491,14 @@ const s = StyleSheet.create({
 
   descArea: {
     flex: 1,
+    overflow: "hidden",   // clips any text that overflows the allocated flex space
+  },
+  /* Full-bleed wrapper for each description — anchored to all four edges so
+   * Yoga never places it at an ambiguous position. Text is centred inside. */
+  descLayer: {
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
-    overflow: "hidden",
+    paddingHorizontal: 8,
   },
   descText: {
     fontFamily: "Manrope_400Regular",
