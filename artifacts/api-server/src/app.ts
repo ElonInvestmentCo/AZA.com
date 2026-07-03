@@ -14,10 +14,15 @@ const app: Express = express();
  *
  * Always allow Expo Go auth proxy and localhost for native dev clients.
  * ──────────────────────────────────────────────────────────────────────────── */
+const replitDomain = process.env.REPLIT_DEV_DOMAIN
+  ? [`https://${process.env.REPLIT_DEV_DOMAIN}`]
+  : [];
+
 const ALWAYS_ALLOWED = [
   "https://www.payvora.org",
   "https://payvora.org",
   "https://auth.expo.io",
+  ...replitDomain,
 ];
 
 const extraOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
