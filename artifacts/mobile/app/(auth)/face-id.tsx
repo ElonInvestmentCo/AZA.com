@@ -15,12 +15,14 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Animated, {
+  Easing,
   FadeIn,
   FadeInDown,
   FadeInUp,
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSequence,
   withSpring,
@@ -31,7 +33,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 /* ── Storage keys ────────────────────────────────────────────────────────── */
 const BIOMETRIC_KEY = "payvora_biometric_enabled";
 
-/* ── Design tokens ───────────────────────────────────────────────────────── */
+/* ── Design tokens — unchanged from original ─────────────────────────────── */
 const C = {
   bg:         "#FFFFFF",
   dark:       "#1E232C",
@@ -45,36 +47,164 @@ const C = {
 };
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Face ID scan icon — drawn with pure Views matching the reference exactly
+   Pulse ring — one animated ring that expands outward and fades.
+   Multiple instances with staggered delays create a sonar / radar effect.
+   ══════════════════════════════════════════════════════════════════════════ */
+function PulseRing({
+  size,
+  color,
+  delay,
+  duration = 2000,
+}: {
+  size: number;
+  color: string;
+  delay: number;
+  duration?: number;
+}) {
+  const scale   = useSharedValue(1);
+  const opacity = useSharedValue(0);
+
+  useEffect(() => {
+    scale.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(1,    { duration: 0 }),
+          withTiming(1.55, { duration, easing: Easing.out(Easing.quad) }),
+        ),
+        -1,
+        false,
+      ),
+    );
+    opacity.value = withDelay(
+      delay,
+      withRepeat(
+        withSequence(
+          withTiming(0.28, { duration: 0 }),
+          withTiming(0,    { duration, easing: Easing.out(Easing.quad) }),
+        ),
+        -1,
+        false,
+      ),
+    );
+  }, []);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity:   opacity.value,
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          position:     "absolute",
+          width:        size,
+          height:       size,
+          borderRadius: size / 2,
+          borderWidth:  1.5,
+          borderColor:  color,
+        },
+      ]}
+    />
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Sweep scan line — a glowing horizontal bar that travels top→bottom
+   inside the Face ID circle during scanning state.
+   ══════════════════════════════════════════════════════════════════════════ */
+function ScanLine({
+  circleSize,
+  active,
+}: {
+  circleSize: number;
+  active: boolean;
+}) {
+  const translateY = useSharedValue(-(circleSize * 0.32));
+  const opacity    = useSharedValue(0);
+
+  useEffect(() => {
+    if (active) {
+      opacity.value    = withTiming(1, { duration: 200 });
+      translateY.value = withRepeat(
+        withSequence(
+          withTiming(-(circleSize * 0.32), { duration: 0 }),
+          withTiming(circleSize * 0.32,    { duration: 1200, easing: Easing.inOut(Easing.sin) }),
+          withTiming(-(circleSize * 0.32), { duration: 1200, easing: Easing.inOut(Easing.sin) }),
+        ),
+        -1,
+        false,
+      );
+    } else {
+      cancelAnimation(translateY);
+      cancelAnimation(opacity);
+      opacity.value = withTiming(0, { duration: 200 });
+    }
+  }, [active, circleSize]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+    opacity:   opacity.value,
+  }));
+
+  const lineW = Math.round(circleSize * 0.6);
+
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          position:     "absolute",
+          width:        lineW,
+          height:       2,
+          borderRadius: 1,
+          backgroundColor: C.teal,
+          /* glow via shadow */
+          shadowColor:     C.teal,
+          shadowOffset:    { width: 0, height: 0 },
+          shadowOpacity:   0.9,
+          shadowRadius:    6,
+        },
+      ]}
+      pointerEvents="none"
+    />
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Face ID icon — corner brackets + face features, animated on state changes.
+   Logic identical to original; only ambient glow and scan-line overlay added.
    ══════════════════════════════════════════════════════════════════════════ */
 function FaceIdIcon({
   circleSize = 160,
-  scanning = false,
-  success = false,
-  failed = false,
+  scanning   = false,
+  success    = false,
+  failed     = false,
 }: {
   circleSize?: number;
-  scanning?: boolean;
-  success?: boolean;
-  failed?: boolean;
+  scanning?:   boolean;
+  success?:    boolean;
+  failed?:     boolean;
 }) {
-  const scale = useSharedValue(1);
+  const scale   = useSharedValue(1);
   const opacity = useSharedValue(1);
 
   useEffect(() => {
     if (scanning) {
       scale.value = withRepeat(
         withSequence(
-          withTiming(1.06, { duration: 700 }),
-          withTiming(1.0,  { duration: 700 }),
+          withTiming(1.04, { duration: 800 }),
+          withTiming(1.0,  { duration: 800 }),
         ),
         -1,
         false,
       );
       opacity.value = withRepeat(
         withSequence(
-          withTiming(0.6, { duration: 700 }),
-          withTiming(1.0, { duration: 700 }),
+          withTiming(0.75, { duration: 800 }),
+          withTiming(1.0,  { duration: 800 }),
         ),
         -1,
         false,
@@ -82,46 +212,41 @@ function FaceIdIcon({
     } else {
       cancelAnimation(scale);
       cancelAnimation(opacity);
-      scale.value = withSpring(1, { damping: 14, stiffness: 200 });
+      scale.value   = withSpring(1,   { damping: 14, stiffness: 200 });
       opacity.value = withTiming(1, { duration: 200 });
     }
   }, [scanning]);
 
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    opacity: opacity.value,
+    opacity:   opacity.value,
   }));
 
-  /* Icon dimensions — proportional to circle */
-  const ic = circleSize * 0.52;   // icon content box
-  const bw = Math.round(ic * 0.047);  // bracket line thickness
-  const bl = Math.round(ic * 0.3);    // bracket arm length
-  const br = Math.round(bw * 1.5);    // bracket corner radius
+  const ic = circleSize * 0.52;
+  const bw = Math.round(ic * 0.047);
+  const bl = Math.round(ic * 0.3);
+  const br = Math.round(bw * 1.5);
 
-  /* Bracket color based on state */
-  const bracketColor = failed  ? C.error
-    : success ? C.success
-    : C.dark;
-
-  /* Feature: bracket border style */
+  const bracketColor = failed ? C.error : success ? C.success : C.dark;
   const bStyle = { backgroundColor: bracketColor, borderRadius: br };
 
-  /* Eye dims */
-  const eyeW  = Math.round(ic * 0.055);
-  const eyeH  = Math.round(ic * 0.22);
-  const eyeX  = Math.round(ic * 0.26);
-  const eyeY  = Math.round(ic * 0.28);
-  const eyeR  = Math.round(eyeW / 2);
+  const eyeW = Math.round(ic * 0.055);
+  const eyeH = Math.round(ic * 0.22);
+  const eyeX = Math.round(ic * 0.26);
+  const eyeY = Math.round(ic * 0.28);
+  const eyeR = Math.round(eyeW / 2);
 
-  /* Smile dims — U-shape using bottom border only */
   const smileW = Math.round(ic * 0.42);
   const smileH = Math.round(ic * 0.15);
   const smileY = Math.round(ic * 0.58);
 
-  const circleColor = failed  ? "#FFF1F2"
-    : success ? "#F0FFF8"
+  const circleColor = failed   ? "#FFF1F2"
+    : success  ? "#F0FFF8"
     : scanning ? "#EEEEF5"
     : C.iconCircle;
+
+  /* Teal ring highlight when scanning */
+  const ringColor = scanning ? C.teal : "transparent";
 
   return (
     <Animated.View
@@ -129,85 +254,82 @@ function FaceIdIcon({
         animStyle,
         fi.circle,
         {
-          width:        circleSize,
-          height:       circleSize,
-          borderRadius: circleSize / 2,
+          width:           circleSize,
+          height:          circleSize,
+          borderRadius:    circleSize / 2,
           backgroundColor: circleColor,
+          /* Premium border ring — teal when scanning, invisible otherwise */
+          borderWidth:  scanning ? 1.5 : 0,
+          borderColor:  ringColor,
+          /* Elevated shadow */
+          shadowColor:   scanning ? C.teal : "#000",
+          shadowOffset:  { width: 0, height: scanning ? 0 : 6 },
+          shadowOpacity: scanning ? 0.28 : 0.08,
+          shadowRadius:  scanning ? 18 : 16,
+          elevation:     8,
         },
       ]}
     >
-      {/* ── Icon content box — centered ── */}
       <View style={{ width: ic, height: ic }}>
+        {/* Corner brackets */}
+        <View style={[fi.absH, bStyle, { top: 0, left: 0,     width: bl, height: bw }]} />
+        <View style={[fi.absV, bStyle, { top: 0, left: 0,     width: bw, height: bl }]} />
+        <View style={[fi.absH, bStyle, { top: 0, right: 0,    width: bl, height: bw }]} />
+        <View style={[fi.absV, bStyle, { top: 0, right: 0,    width: bw, height: bl }]} />
+        <View style={[fi.absH, bStyle, { bottom: 0, left: 0,  width: bl, height: bw }]} />
+        <View style={[fi.absV, bStyle, { bottom: 0, left: 0,  width: bw, height: bl }]} />
+        <View style={[fi.absH, bStyle, { bottom: 0, right: 0, width: bl, height: bw }]} />
+        <View style={[fi.absV, bStyle, { bottom: 0, right: 0, width: bw, height: bl }]} />
 
-        {/* ── Corner brackets ── */}
-        {/* Top-left */}
-        <View style={[fi.absH, bStyle, { top: 0, left: 0,      width: bl, height: bw }]} />
-        <View style={[fi.absV, bStyle, { top: 0, left: 0,      width: bw, height: bl }]} />
-        {/* Top-right */}
-        <View style={[fi.absH, bStyle, { top: 0, right: 0,     width: bl, height: bw }]} />
-        <View style={[fi.absV, bStyle, { top: 0, right: 0,     width: bw, height: bl }]} />
-        {/* Bottom-left */}
-        <View style={[fi.absH, bStyle, { bottom: 0, left: 0,   width: bl, height: bw }]} />
-        <View style={[fi.absV, bStyle, { bottom: 0, left: 0,   width: bw, height: bl }]} />
-        {/* Bottom-right */}
-        <View style={[fi.absH, bStyle, { bottom: 0, right: 0,  width: bl, height: bw }]} />
-        <View style={[fi.absV, bStyle, { bottom: 0, right: 0,  width: bw, height: bl }]} />
+        {/* Eyes */}
+        <View style={[fi.abs, bStyle, { width: eyeW, height: eyeH, borderRadius: eyeR, left: eyeX, top: eyeY }]} />
+        <View style={[fi.abs, bStyle, { width: eyeW, height: eyeH, borderRadius: eyeR, right: eyeX, top: eyeY }]} />
 
-        {/* ── Eyes ── */}
-        <View style={[fi.abs, bStyle, {
-          width: eyeW, height: eyeH,
-          borderRadius: eyeR,
-          left: eyeX, top: eyeY,
-        }]} />
-        <View style={[fi.abs, bStyle, {
-          width: eyeW, height: eyeH,
-          borderRadius: eyeR,
-          right: eyeX, top: eyeY,
-        }]} />
-
-        {/* ── Nose — short vertical line center ── */}
+        {/* Nose */}
         <View style={[fi.abs, bStyle, {
           width: bw, height: Math.round(ic * 0.13),
           borderRadius: bw / 2,
-          alignSelf: "center",
-          top: eyeY + eyeH + Math.round(ic * 0.04),
           left: (ic - bw) / 2,
+          top:  eyeY + eyeH + Math.round(ic * 0.04),
         }]} />
 
-        {/* ── Smile — U-shape, bottom border only ── */}
+        {/* Smile */}
         <View style={[fi.abs, {
-          width:  smileW,
-          height: smileH,
-          borderBottomWidth:            bw,
-          borderLeftWidth:              bw,
-          borderRightWidth:             bw,
-          borderTopWidth:               0,
-          borderColor:                  bracketColor,
-          borderBottomLeftRadius:       smileW / 2,
-          borderBottomRightRadius:      smileW / 2,
+          width: smileW, height: smileH,
+          borderBottomWidth:       bw,
+          borderLeftWidth:         bw,
+          borderRightWidth:        bw,
+          borderTopWidth:          0,
+          borderColor:             bracketColor,
+          borderBottomLeftRadius:  smileW / 2,
+          borderBottomRightRadius: smileW / 2,
           top:  smileY,
           left: (ic - smileW) / 2,
           backgroundColor: "transparent",
         }]} />
 
-        {/* ── Success checkmark overlay ── */}
+        {/* Success overlay */}
         {success && (
           <Animated.View
             entering={FadeIn.duration(280)}
-            style={[fi.abs, fi.checkWrap, { width: ic * 0.5, height: ic * 0.5,
-              left: ic * 0.25, top: ic * 0.25, borderRadius: ic * 0.25 }]}
+            style={[fi.abs, fi.checkWrap, {
+              width: ic * 0.5, height: ic * 0.5,
+              left: ic * 0.25, top: ic * 0.25,
+              borderRadius: ic * 0.25,
+            }]}
           >
             <Ionicons name="checkmark" size={Math.round(ic * 0.28)} color="#FFFFFF" />
           </Animated.View>
         )}
 
-        {/* ── Failed X overlay ── */}
+        {/* Failed overlay */}
         {failed && (
           <Animated.View
             entering={FadeIn.duration(280)}
             style={[fi.abs, fi.checkWrap, {
               width: ic * 0.5, height: ic * 0.5,
-              left: ic * 0.25, top: ic * 0.25, borderRadius: ic * 0.25,
+              left: ic * 0.25, top: ic * 0.25,
+              borderRadius: ic * 0.25,
               backgroundColor: C.error,
             }]}
           >
@@ -215,68 +337,103 @@ function FaceIdIcon({
           </Animated.View>
         )}
       </View>
+
+      {/* Sweep scan line — overlaid on top of the icon content */}
+      <ScanLine circleSize={circleSize} active={scanning} />
     </Animated.View>
   );
 }
 
 const fi = StyleSheet.create({
-  circle: { alignItems: "center", justifyContent: "center" },
-  abs:    { position: "absolute" },
-  absH:   { position: "absolute" },
-  absV:   { position: "absolute" },
+  circle:    { alignItems: "center", justifyContent: "center" },
+  abs:       { position: "absolute" },
+  absH:      { position: "absolute" },
+  absV:      { position: "absolute" },
   checkWrap: {
-    position: "absolute",
+    position:        "absolute",
     backgroundColor: C.success,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems:      "center",
+    justifyContent:  "center",
   },
 });
 
 /* ══════════════════════════════════════════════════════════════════════════
-   Feature row — matches reference: bordered icon box + bold title + gray sub
+   Feature card — premium elevated card with teal left-accent strip.
    ══════════════════════════════════════════════════════════════════════════ */
 type FeatureItem = {
-  icon: keyof typeof Ionicons.glyphMap;
+  icon:  keyof typeof Ionicons.glyphMap;
   title: string;
-  sub: string;
+  sub:   string;
 };
 
 const FEATURES: FeatureItem[] = [
-  { icon: "shield-checkmark-outline", title: "Secure",  sub: "Your data is protected with Face ID" },
-  { icon: "flash-outline",            title: "Fast",    sub: "Quick access in just a glance"       },
+  { icon: "shield-checkmark-outline", title: "Secure",  sub: "Your data is protected with Face ID"    },
+  { icon: "flash-outline",            title: "Fast",    sub: "Quick access in just a glance"          },
   { icon: "lock-closed-outline",      title: "Private", sub: "Biometric data never leaves your device" },
 ];
 
-function FeatureRow({ item, delay }: { item: FeatureItem; delay: number }) {
+function FeatureCard({ item, delay }: { item: FeatureItem; delay: number }) {
   return (
     <Animated.View
-      entering={FadeInUp.duration(380).delay(delay).springify()}
-      style={fr.row}
+      entering={FadeInUp.duration(360).delay(delay).springify()}
+      style={fc.card}
     >
-      <View style={fr.iconBox}>
-        <Ionicons name={item.icon} size={22} color={C.dark} />
+      {/* Teal accent bar */}
+      <View style={fc.accent} />
+
+      {/* Icon in soft teal circle */}
+      <View style={fc.iconCircle}>
+        <Ionicons name={item.icon} size={20} color={C.teal} />
       </View>
-      <View style={fr.text}>
-        <Text style={fr.title}>{item.title}</Text>
-        <Text style={fr.sub}>{item.sub}</Text>
+
+      {/* Text */}
+      <View style={fc.text}>
+        <Text style={fc.title}>{item.title}</Text>
+        <Text style={fc.sub}>{item.sub}</Text>
       </View>
     </Animated.View>
   );
 }
 
-const fr = StyleSheet.create({
-  row:     { flexDirection: "row", alignItems: "center", gap: 16 },
-  iconBox: {
-    width: 48, height: 48, borderRadius: 12,
-    borderWidth: 1, borderColor: C.border,
-    backgroundColor: C.white,
-    alignItems: "center", justifyContent: "center",
-    shadowColor: "#000", shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
+const fc = StyleSheet.create({
+  card: {
+    flexDirection:    "row",
+    alignItems:       "center",
+    backgroundColor:  C.white,
+    borderRadius:     16,
+    paddingVertical:  14,
+    paddingRight:     16,
+    paddingLeft:      0,
+    gap:              14,
+    /* Elevation */
+    shadowColor:      "#1E232C",
+    shadowOffset:     { width: 0, height: 2 },
+    shadowOpacity:    0.07,
+    shadowRadius:     10,
+    elevation:        3,
+    /* Subtle border */
+    borderWidth:      1,
+    borderColor:      "rgba(232,236,244,0.8)",
+    overflow:         "hidden",
   },
-  text:    { flex: 1 },
-  title:   { fontSize: 15, fontFamily: "Manrope_700Bold", color: C.dark, marginBottom: 2 },
-  sub:     { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.gray, lineHeight: 18 },
+  accent: {
+    width:            4,
+    alignSelf:        "stretch",
+    backgroundColor:  C.teal,
+    borderTopRightRadius:    3,
+    borderBottomRightRadius: 3,
+  },
+  iconCircle: {
+    width:            42,
+    height:           42,
+    borderRadius:     21,
+    backgroundColor:  "rgba(53,194,193,0.10)",
+    alignItems:       "center",
+    justifyContent:   "center",
+  },
+  text:  { flex: 1 },
+  title: { fontSize: 15, fontFamily: "Manrope_700Bold",      color: C.dark, marginBottom: 3 },
+  sub:   { fontSize: 13, fontFamily: "Manrope_400Regular",   color: C.gray, lineHeight: 18 },
 });
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -295,8 +452,8 @@ export default function FaceIdScreen() {
   const [retries,   setRetries]   = useState(0);
   const [statusMsg, setStatusMsg] = useState("");
 
-  /* ── Shake animation for failure ── */
-  const shakeX = useSharedValue(0);
+  /* ── Shake on failure ── */
+  const shakeX    = useSharedValue(0);
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
   const triggerShake = useCallback(() => {
@@ -313,27 +470,23 @@ export default function FaceIdScreen() {
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
-  /* ── On mount: check if user already has biometrics enabled ── */
+  /* ── On mount ── */
   useEffect(() => {
     (async () => {
       try {
-        const hasHardware   = await LocalAuthentication.hasHardwareAsync();
-        const isEnrolled    = await LocalAuthentication.isEnrolledAsync();
-        const stored        = await AsyncStorage.getItem(BIOMETRIC_KEY);
-        const alreadySetup  = stored === "true";
+        const hasHardware  = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled   = await LocalAuthentication.isEnrolledAsync();
+        const stored       = await AsyncStorage.getItem(BIOMETRIC_KEY);
+        const alreadySetup = stored === "true";
 
         if (!hasHardware || !isEnrolled) {
-          /* Device doesn't support or has no biometrics enrolled */
           setState("unsupported");
           return;
         }
-
         if (alreadySetup) {
-          /* Returning user — auto-trigger auth */
           setState("scanning");
           triggerBiometricAuth(true);
         } else {
-          /* First time — show enrollment screen */
           setState("enroll");
         }
       } catch {
@@ -347,13 +500,13 @@ export default function FaceIdScreen() {
     setState("scanning");
     setStatusMsg("");
     try {
-      const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      const types    = await LocalAuthentication.supportedAuthenticationTypesAsync();
       const isFaceId = types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
 
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage:    isFaceId ? "Authenticate with Face ID" : "Authenticate with biometrics",
-        cancelLabel:      "Cancel",
-        fallbackLabel:    "Use password",
+        promptMessage:         isFaceId ? "Authenticate with Face ID" : "Authenticate with biometrics",
+        cancelLabel:           "Cancel",
+        fallbackLabel:         "Use password",
         disableDeviceFallback: false,
       });
 
@@ -385,30 +538,24 @@ export default function FaceIdScreen() {
     }
   }, [retries, triggerShake]);
 
-  /* ── Enable Face ID (first-time enroll) ── */
   const handleEnable = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     await triggerBiometricAuth(false);
   };
 
-  /* ── Skip ── */
   const handleSkip = async () => {
     Haptics.selectionAsync();
     await AsyncStorage.setItem(BIOMETRIC_KEY, "false");
     router.replace("/(tabs)");
   };
 
-  /* ── Retry ── */
   const handleRetry = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     triggerBiometricAuth(true);
   };
 
-  /* ── Unsupported — go straight to dashboard ── */
   useEffect(() => {
-    if (state === "unsupported") {
-      router.replace("/(tabs)");
-    }
+    if (state === "unsupported") router.replace("/(tabs)");
   }, [state]);
 
   if (state === "checking" || state === "unsupported") {
@@ -423,6 +570,12 @@ export default function FaceIdScreen() {
   const isSuccess  = state === "success";
   const isFailed   = state === "failed";
   const isEnroll   = state === "enroll";
+
+  /* Ring color: teal when scanning/success, muted when idle/failed */
+  const ringColor = (isScanning || isSuccess) ? C.teal
+    : isFailed ? C.error
+    : C.dark;
+  const ringDuration = isScanning ? 1600 : 2400;
 
   return (
     <View style={[s.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 28 }]}>
@@ -440,14 +593,32 @@ export default function FaceIdScreen() {
         <View style={{ width: 44 }} />
       </Animated.View>
 
-      {/* ── Scrollable content ── */}
+      {/* ── Content ── */}
       <View style={s.content}>
 
-        {/* ── Face ID icon ── */}
+        {/* ── Icon zone: ambient glow + pulse rings + face icon ── */}
         <Animated.View
           entering={FadeInDown.duration(520).delay(60).springify()}
-          style={s.iconWrap}
+          style={s.iconZone}
         >
+          {/* Soft ambient background glow */}
+          <View style={[s.ambientGlow, {
+            width:        circleSize * 2.8,
+            height:       circleSize * 2.8,
+            borderRadius: circleSize * 1.4,
+            backgroundColor: (isScanning || isSuccess)
+              ? "rgba(53,194,193,0.06)"
+              : isFailed
+              ? "rgba(255,91,122,0.05)"
+              : "rgba(53,194,193,0.04)",
+          }]} />
+
+          {/* Pulse rings — 3 staggered rings */}
+          <PulseRing size={circleSize} color={ringColor} delay={0}    duration={ringDuration} />
+          <PulseRing size={circleSize} color={ringColor} delay={ringDuration / 3}  duration={ringDuration} />
+          <PulseRing size={circleSize} color={ringColor} delay={(ringDuration / 3) * 2} duration={ringDuration} />
+
+          {/* Face ID icon with shake wrapper */}
           <Animated.View style={shakeStyle}>
             <FaceIdIcon
               circleSize={circleSize}
@@ -458,11 +629,18 @@ export default function FaceIdScreen() {
           </Animated.View>
         </Animated.View>
 
-        {/* ── Title ── */}
+        {/* ── Title block ── */}
         <Animated.View
           entering={FadeInUp.duration(400).delay(140).springify()}
           style={s.titleBlock}
         >
+          {/* Premium badge tag */}
+          {isEnroll && (
+            <View style={s.badge}>
+              <Text style={s.badgeText}>BIOMETRIC SECURITY</Text>
+            </View>
+          )}
+
           <Text style={s.heading}>
             {isSuccess  ? "Authenticated!"
               : isFailed  ? "Authentication Failed"
@@ -477,34 +655,33 @@ export default function FaceIdScreen() {
           </Text>
         </Animated.View>
 
-        {/* ── Feature rows — only on enroll screen ── */}
+        {/* ── Feature cards — enroll only ── */}
         {isEnroll && (
           <View style={s.featureList}>
             {FEATURES.map((f, i) => (
-              <FeatureRow key={f.title} item={f} delay={220 + i * 70} />
+              <FeatureCard key={f.title} item={f} delay={220 + i * 70} />
             ))}
           </View>
         )}
 
-        {/* ── Scanning state: subtle caption ── */}
+        {/* ── Scanning caption ── */}
         {isScanning && (
           <Animated.View entering={FadeIn.duration(300)} style={s.scanningRow}>
-            <ActivityIndicator size="small" color={C.dark} style={{ marginRight: 10 }} />
+            <View style={s.scanningDot} />
             <Text style={s.scanningText}>Waiting for Face ID…</Text>
           </Animated.View>
         )}
       </View>
 
-      {/* ── Bottom CTA area ── */}
+      {/* ── Bottom CTA ── */}
       <Animated.View
         entering={FadeInUp.duration(400).delay(320).springify()}
         style={s.cta}
       >
-        {/* Primary button */}
         {(isEnroll || isFailed) && (
           <Animated.View style={btnStyle}>
             <Pressable
-              style={s.primaryBtn}
+              style={[s.primaryBtn, isFailed && { backgroundColor: C.error }]}
               onPress={isFailed ? handleRetry : handleEnable}
               onPressIn={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -519,7 +696,6 @@ export default function FaceIdScreen() {
           </Animated.View>
         )}
 
-        {/* Secondary — "Not Now" on enroll, "Use Password" on failed */}
         {isEnroll && (
           <TouchableOpacity
             onPress={handleSkip}
@@ -542,7 +718,6 @@ export default function FaceIdScreen() {
           </TouchableOpacity>
         )}
 
-        {/* Success state: subtle redirect message */}
         {isSuccess && (
           <Animated.View entering={FadeIn.duration(300)} style={s.successRow}>
             <Ionicons name="checkmark-circle" size={18} color={C.success} />
@@ -567,7 +742,7 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 16,
   },
   backBtn: {
     width: 44, height: 44, borderRadius: 12,
@@ -587,97 +762,127 @@ const s = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 4,
   },
 
-  iconWrap: {
-    marginBottom: 32,
-    alignItems: "center",
-  },
-
-  titleBlock: {
-    alignItems: "center",
-    marginBottom: 36,
-    paddingHorizontal: 8,
-  },
-  heading: {
-    fontSize: 26,
-    fontFamily: "Manrope_700Bold",
-    color: C.dark,
-    letterSpacing: -0.3,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subText: {
-    fontSize: 15,
-    fontFamily: "Manrope_400Regular",
-    color: C.gray,
-    textAlign: "center",
-    lineHeight: 22,
-  },
-
-  featureList: {
-    width: "100%",
-    gap: 20,
-  },
-
-  scanningRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-  },
-  scanningText: {
-    fontSize: 14,
-    fontFamily: "Manrope_400Regular",
-    color: C.gray,
-  },
-
-  cta: {
-    width: "100%",
-    gap: 16,
-    paddingTop: 8,
-  },
-
-  primaryBtn: {
-    height: 60,
-    backgroundColor: C.dark,
-    borderRadius: 16,
+  /* Icon zone — relatively positioned so rings + glow stack behind the icon */
+  iconZone: {
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#1E232C",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
+    marginBottom: 28,
+  },
+  ambientGlow: {
+    position: "absolute",
+  },
+
+  /* ── Title ── */
+  titleBlock: {
+    alignItems: "center",
+    marginBottom: 32,
+    paddingHorizontal: 8,
+  },
+  badge: {
+    backgroundColor:  "rgba(53,194,193,0.10)",
+    borderRadius:     20,
+    paddingHorizontal: 12,
+    paddingVertical:   4,
+    marginBottom:     12,
+  },
+  badgeText: {
+    fontSize:      10,
+    fontFamily:    "Manrope_700Bold",
+    color:         C.teal,
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+  },
+  heading: {
+    fontSize:      30,
+    fontFamily:    "Manrope_700Bold",
+    color:         C.dark,
+    letterSpacing: -0.5,
+    textAlign:     "center",
+    marginBottom:  10,
+  },
+  subText: {
+    fontSize:    15,
+    fontFamily:  "Manrope_400Regular",
+    color:       C.gray,
+    textAlign:   "center",
+    lineHeight:  22,
+  },
+
+  /* ── Feature list ── */
+  featureList: {
+    width: "100%",
+    gap:   12,
+  },
+
+  /* ── Scanning caption ── */
+  scanningRow: {
+    flexDirection: "row",
+    alignItems:    "center",
+    marginTop:     8,
+    gap:           8,
+  },
+  scanningDot: {
+    width:           8,
+    height:          8,
+    borderRadius:    4,
+    backgroundColor: C.teal,
+  },
+  scanningText: {
+    fontSize:   14,
+    fontFamily: "Manrope_400Regular",
+    color:      C.gray,
+  },
+
+  /* ── CTA ── */
+  cta: {
+    width:    "100%",
+    gap:      16,
+    paddingTop: 8,
+  },
+  primaryBtn: {
+    height:          60,
+    backgroundColor: C.dark,
+    borderRadius:    18,
+    alignItems:      "center",
+    justifyContent:  "center",
+    /* Rich layered shadow for depth */
+    shadowColor:   "#1E232C",
+    shadowOffset:  { width: 0, height: 6 },
+    shadowOpacity: 0.22,
+    shadowRadius:  18,
+    elevation:     8,
   },
   primaryBtnText: {
-    fontSize: 16,
-    fontFamily: "Manrope_700Bold",
-    color: C.white,
+    fontSize:      16,
+    fontFamily:    "Manrope_700Bold",
+    color:         C.white,
     letterSpacing: 0.2,
   },
 
   secondaryBtn: {
-    alignItems: "center",
+    alignItems:     "center",
     justifyContent: "center",
     paddingVertical: 4,
   },
   secondaryBtnText: {
-    fontSize: 15,
+    fontSize:   15,
     fontFamily: "Manrope_600SemiBold",
-    color: C.teal,
-    textAlign: "center",
+    color:      C.teal,
+    textAlign:  "center",
   },
 
   successRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection:  "row",
+    alignItems:     "center",
     justifyContent: "center",
-    gap: 8,
+    gap:            8,
   },
   successText: {
-    fontSize: 14,
+    fontSize:   14,
     fontFamily: "Manrope_600SemiBold",
-    color: C.success,
+    color:      C.success,
   },
 });
