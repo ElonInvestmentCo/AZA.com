@@ -1,5 +1,7 @@
 - [Dark fintech design system](dark-fintech-design.md) — all screens use dark palette (#0A0A0F bg, #00D9A0 accent); colors.light keys are dark values for compat.
 - [Payvora production config](payvora-production-config.md) — Railway + www.payvora.org wiring: app.config.js, CORS, API URL resolution, OAuth redirect URIs.
+- [Railway start.mjs fix](railway-startmjs.md) — use `./node_modules/.bin/next` (cwd=artifacts/website), NOT `../../node_modules/.bin/next`; pnpm never hoists next to root in monorepo containers.
+- [Real auth system](real-auth-system.md) — JWT auth routes at /api/auth/*; bcryptjs passwords; Google accessToken (not idToken) via userinfo endpoint; Apple via identityToken+email; mobile AuthContext calls real API, stores JWT in AsyncStorage.
 - [Expo package versions](expo-package-versions.md) — expo 54 requires expo-auth-session ~7.0.11, expo-crypto ~15.0.9, expo-apple-authentication ~8.0.8; ^56.x versions break with "Cannot find native module ExpoCryptoAES".
 - [Lottie web incompatibility](lottie-web-compat.md) — lottie-react-native v7.x web shim uses DotLottieReact which only supports .lottie format, not JSON; use react-native-svg for cross-platform animations instead.
 - [Metro pnpm monorepo fix](metro-pnpm-fix.md) — metro.config.js needs watchFolders+nodeModulesPaths for pnpm; fs.watch ENOENT patch must return noopWatcher with .on/.off/.addListener/.removeListener/.once/.emit — bare {close} stub breaks FallbackWatcher.

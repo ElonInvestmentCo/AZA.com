@@ -104,13 +104,11 @@ function GoogleSignInActive({ onSuccess, onError }: Props) {
   useEffect(() => {
     if (!response) return;
     if (response.type === "success") {
-      const token = response.authentication?.accessToken;
-      if (!token) { setLoading(false); onError?.("Google sign-in failed — no token."); return; }
-      fetch("https://www.googleapis.com/userinfo/v2/me", { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json())
-        .then(info => loginWithSocial(info.email ?? `google_${Date.now()}@googleuser.com`, info.name || "Google User", "google"))
+      const accessToken = response.authentication?.accessToken;
+      if (!accessToken) { setLoading(false); onError?.("Google sign-in failed — no token."); return; }
+      loginWithSocial(accessToken, "google")
         .then(() => { setLoading(false); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); onSuccess(); })
-        .catch(() => { setLoading(false); onError?.("Could not fetch Google profile. Please try again."); });
+        .catch(() => { setLoading(false); onError?.("Could not sign in with Google. Please try again."); });
     } else if (response.type === "error") {
       setLoading(false);
       onError?.(response.error?.message ?? "Google sign-in failed. Please try again.");
@@ -174,7 +172,7 @@ function AppleSignIn({ onSuccess, onError }: Props) {
           const cred  = await AppleAuthentication.signInAsync({ requestedScopes: [AppleAuthentication.AppleAuthenticationScope.FULL_NAME, AppleAuthentication.AppleAuthenticationScope.EMAIL] });
           const name  = [cred.fullName?.givenName, cred.fullName?.familyName].filter(Boolean).join(" ") || "Apple User";
           const email = cred.email ?? `apple_${cred.user}@privaterelay.appleid.com`;
-          await loginWithSocial(email, name, "apple");
+          await loginWithSocial(cred.identityToken ?? "", "apple", { name, email });
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           onSuccess();
         } catch (err: any) {

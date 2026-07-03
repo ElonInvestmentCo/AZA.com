@@ -52,12 +52,12 @@ run(
 );
 
 // ── Next.js website ──────────────────────────────────────────────────────────
-// Run `next start` from the website directory so it finds .next/ automatically.
-// PORT env var is read by `next start` when no --port flag is given.
+// Run `next start` using the binary inside the website workspace's own
+// node_modules — pnpm always puts it there regardless of hoisting config.
 run(
   "web",
   "node",
-  ["../../node_modules/.bin/next", "start"],
+  ["./node_modules/.bin/next", "start"],
   {
     PORT: WEB_PORT,
     HOSTNAME: "0.0.0.0",

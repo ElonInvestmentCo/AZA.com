@@ -1,0 +1,210 @@
+2026-07-03T21:35:02.850942870Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:02.850949899Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:02.850953839Z [err]    requireStack: []
+2026-07-03T21:35:02.850957489Z [err]  }
+2026-07-03T21:35:02.850960579Z [err]  
+2026-07-03T21:35:02.850963749Z [err]  Node.js v22.23.0
+2026-07-03T21:35:02.850966869Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:02.851269646Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:02.851272076Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:02.851274606Z [err]    throw err;
+2026-07-03T21:35:02.851277456Z [err]    ^
+2026-07-03T21:35:02.851280065Z [err]  
+2026-07-03T21:35:02.851282885Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:02.851285485Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:02.851287945Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:02.851290365Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:02.851292645Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:02.851295115Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:02.851297465Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:03.204981779Z [inf]  Starting Container
+2026-07-03T21:35:03.290126452Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:03.311599966Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:03.311604786Z [err]    throw err;
+2026-07-03T21:35:03.311607635Z [err]    ^
+2026-07-03T21:35:03.311611055Z [err]  
+2026-07-03T21:35:03.311614155Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:03.311617685Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:03.311620735Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:03.311624395Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:03.311627575Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:03.311630805Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:03.311633585Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:03.311636425Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:03.311639305Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:03.311642045Z [err]    requireStack: []
+2026-07-03T21:35:03.311645365Z [err]  }
+2026-07-03T21:35:03.311648385Z [err]  
+2026-07-03T21:35:03.311651295Z [err]  Node.js v22.23.0
+2026-07-03T21:35:03.316589816Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:04.061227724Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:04.081069747Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:04.081073777Z [err]    throw err;
+2026-07-03T21:35:04.081077757Z [err]    ^
+2026-07-03T21:35:04.081081667Z [err]  
+2026-07-03T21:35:04.081086077Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:04.081089817Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:04.081093287Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:04.081096727Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:04.081100467Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:04.081104237Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:04.081107807Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:04.081110567Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:04.081113797Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:04.081116687Z [err]    requireStack: []
+2026-07-03T21:35:04.081119257Z [err]  }
+2026-07-03T21:35:04.081122337Z [err]  
+2026-07-03T21:35:04.081124827Z [err]  Node.js v22.23.0
+2026-07-03T21:35:04.087341753Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:04.909490298Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:04.909493328Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:04.909496398Z [err]    throw err;
+2026-07-03T21:35:04.909499578Z [err]    ^
+2026-07-03T21:35:04.909502968Z [err]  
+2026-07-03T21:35:04.909506168Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:04.909508788Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:04.909512118Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:04.909516248Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:04.909519708Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:04.909522528Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:04.909525288Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:04.909528417Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:04.909531457Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:04.909534177Z [err]    requireStack: []
+2026-07-03T21:35:04.909537417Z [err]  }
+2026-07-03T21:35:04.909540277Z [err]  
+2026-07-03T21:35:04.909543177Z [err]  Node.js v22.23.0
+2026-07-03T21:35:04.909546057Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:05.582322015Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:05.615286231Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:05.615329011Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:05.615333231Z [err]    throw err;
+2026-07-03T21:35:05.615337451Z [err]    ^
+2026-07-03T21:35:05.615341931Z [err]  
+2026-07-03T21:35:05.615345321Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:05.615349460Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:05.615353180Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:05.615356430Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:05.615359600Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:05.615363010Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:05.615367110Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:05.615370470Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:05.615374020Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:05.615377700Z [err]    requireStack: []
+2026-07-03T21:35:05.615381300Z [err]  }
+2026-07-03T21:35:05.615385010Z [err]  
+2026-07-03T21:35:05.615389180Z [err]  Node.js v22.23.0
+2026-07-03T21:35:06.347050705Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:06.368392491Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:06.368404771Z [err]    throw err;
+2026-07-03T21:35:06.368412311Z [err]    ^
+2026-07-03T21:35:06.368418821Z [err]  
+2026-07-03T21:35:06.368423791Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:06.368429491Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:06.368435330Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:06.368440370Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:06.368444810Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:06.368450220Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:06.368454540Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:06.368460630Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:06.368465030Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:06.368469110Z [err]    requireStack: []
+2026-07-03T21:35:06.368474100Z [err]  }
+2026-07-03T21:35:06.368479040Z [err]  
+2026-07-03T21:35:06.368483250Z [err]  Node.js v22.23.0
+2026-07-03T21:35:06.376879930Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:07.083238936Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:07.117527068Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:07.117532048Z [err]    requireStack: []
+2026-07-03T21:35:07.117534988Z [err]  }
+2026-07-03T21:35:07.117537507Z [err]  
+2026-07-03T21:35:07.117540357Z [err]  Node.js v22.23.0
+2026-07-03T21:35:07.117540837Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:07.117543337Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:07.117549547Z [err]    throw err;
+2026-07-03T21:35:07.117554207Z [err]    ^
+2026-07-03T21:35:07.117559087Z [err]  
+2026-07-03T21:35:07.117569507Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:07.117574007Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:07.117578827Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:07.117582807Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:07.117586487Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:07.117590647Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:07.117594647Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:07.117599207Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:07.865910075Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:07.878023600Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:07.878034620Z [err]    throw err;
+2026-07-03T21:35:07.878039050Z [err]    ^
+2026-07-03T21:35:07.878043600Z [err]  
+2026-07-03T21:35:07.878048560Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:07.878052800Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:07.878056660Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:07.878060380Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:07.878064300Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:07.878068790Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:07.878073250Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:07.878077310Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:07.878081880Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:07.878085580Z [err]    requireStack: []
+2026-07-03T21:35:07.878089069Z [err]  }
+2026-07-03T21:35:07.878092609Z [err]  
+2026-07-03T21:35:07.878096069Z [err]  Node.js v22.23.0
+2026-07-03T21:35:07.878100199Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:08.622704662Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:08.636447678Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:08.636459578Z [err]    throw err;
+2026-07-03T21:35:08.636465748Z [err]    ^
+2026-07-03T21:35:08.636471128Z [err]  
+2026-07-03T21:35:08.636476588Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:08.636482638Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:08.636488998Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:08.636493868Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:08.636498537Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:08.636503237Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:08.636508047Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:08.636514327Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:08.636519597Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:08.636524187Z [err]    requireStack: []
+2026-07-03T21:35:08.636528617Z [err]  }
+2026-07-03T21:35:08.636533447Z [err]  
+2026-07-03T21:35:08.636538267Z [err]  Node.js v22.23.0
+2026-07-03T21:35:08.636874623Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:09.349961561Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:09.374346691Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:09.374351391Z [err]    throw err;
+2026-07-03T21:35:09.374354360Z [err]    ^
+2026-07-03T21:35:09.374357310Z [err]  
+2026-07-03T21:35:09.374359920Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:09.374362540Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:09.374365130Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:09.374368170Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:09.374370760Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:09.374373800Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:09.374376010Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:09.374378420Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:09.374381510Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:09.374384090Z [err]    requireStack: []
+2026-07-03T21:35:09.374386990Z [err]  }
+2026-07-03T21:35:09.374389370Z [err]  
+2026-07-03T21:35:09.374391730Z [err]  Node.js v22.23.0
+2026-07-03T21:35:09.374394040Z [err]  [web] exited (code=1 signal=null) — shutting down
+2026-07-03T21:35:10.078488477Z [inf]  [launcher] starting API on :3001  |  website on :8080
+2026-07-03T21:35:10.100087169Z [err]  node:internal/modules/cjs/loader:1433
+2026-07-03T21:35:10.100091189Z [err]    throw err;
+2026-07-03T21:35:10.100094049Z [err]    ^
+2026-07-03T21:35:10.100096689Z [err]  
+2026-07-03T21:35:10.100099489Z [err]  Error: Cannot find module '/app/node_modules/.bin/next'
+2026-07-03T21:35:10.100102319Z [err]      at Function._resolveFilename (node:internal/modules/cjs/loader:1430:15)
+2026-07-03T21:35:10.100104879Z [err]      at defaultResolveImpl (node:internal/modules/cjs/loader:1040:19)
+2026-07-03T21:35:10.100107359Z [err]      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1045:22)
+2026-07-03T21:35:10.100110049Z [err]      at Function._load (node:internal/modules/cjs/loader:1216:25)
+2026-07-03T21:35:10.100112639Z [err]      at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)
+2026-07-03T21:35:10.100115189Z [err]      at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2026-07-03T21:35:10.100117689Z [err]      at node:internal/main/run_main_module:36:49 {
+2026-07-03T21:35:10.100120209Z [err]    code: 'MODULE_NOT_FOUND',
+2026-07-03T21:35:10.100122879Z [err]    requireStack: []
+2026-07-03T21:35:10.100125339Z [err]  }
+2026-07-03T21:35:10.100127749Z [err]  
+2026-07-03T21:35:10.100130229Z [err]  Node.js v22.23.0
+2026-07-03T21:35:10.110113510Z [err]  [web] exited (code=1 signal=null) — shutting down

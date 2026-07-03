@@ -1,13 +1,16 @@
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const AUTH_TOKEN_KEY = "payvora_token";
 
 /**
  * Resolves the API base URL in priority order:
  *
- * 1. EXPO_PUBLIC_API_URL      — explicit override (Railway service URL, etc.)
- * 2. EXPO_PUBLIC_DOMAIN       — derive as https://<domain>/api-server
- * 3. Web platform (no vars)   — relative path "/api-server" (same-origin)
- * 4. __DEV__ native           — localhost dev server
- * 5. Production native catch  — hard-coded production origin as last resort
+ * 1. EXPO_PUBLIC_API_URL  — explicit override (e.g. direct Railway API service URL)
+ * 2. EXPO_PUBLIC_DOMAIN   — production domain (proxied through Next.js at /api/*)
+ * 3. Web platform         — relative path (same-origin Next.js proxy)
+ * 4. __DEV__ native       — localhost dev server
+ * 5. Production fallback  — hard-coded production origin
  */
 function getApiBaseUrl(): string {
   const explicit = process.env.EXPO_PUBLIC_API_URL;
@@ -16,29 +19,33 @@ function getApiBaseUrl(): string {
   const rawDomain = process.env.EXPO_PUBLIC_DOMAIN;
   if (rawDomain) {
     const host = rawDomain.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    return `https://${host}/api-server`;
+    return `https://${host}`;
   }
 
-  if (Platform.OS === "web") return "/api-server";
+  if (Platform.OS === "web") return "";
 
   if (__DEV__) return "http://localhost:8080";
 
-  /* Production native build with no env vars — should not happen but
-     provides a safe fallback so the app doesn't silently break. */
-  return "https://www.payvora.org/api-server";
+  return "https://www.payvora.org";
 }
 
 export const API_BASE_URL = getApiBaseUrl();
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}/api${path}`;
-  const res = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers ?? {}),
-    },
-    ...options,
-  });
+
+  const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY).catch(() => null);
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string> ?? {}),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(url, { ...options, headers });
 
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
@@ -96,7 +103,6 @@ export async function payBill(params: {
   });
 }
 
-/** Finds the best-matching Reloadly biller for a locally-known provider name. */
 export function matchBiller(
   billers: ReloadlyBiller[],
   nameHints: string[],
