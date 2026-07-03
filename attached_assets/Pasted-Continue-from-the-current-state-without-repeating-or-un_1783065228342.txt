@@ -1,0 +1,61 @@
+Continue from the current state without repeating or undoing any completed work.
+
+Current progress:
+- Created dedicated screens:
+  - /(app)/electricity.tsx
+  - /(app)/betting.tsx
+  - /(app)/cable.tsx
+- Started updating the dashboard routing in /(tabs)/index.tsx before the session hit the free quota limit.
+
+Complete the remaining work only.
+
+Tasks:
+1. Finish updating the SERVICES array in /(tabs)/index.tsx:
+   - Electricity → /(app)/electricity
+   - Cable TV → /(app)/cable
+   - Betting → /(app)/betting
+   - Leave all other routes unchanged.
+
+2. Refactor /(app)/bills.tsx:
+   - Remove the top service selector/cards (Electricity, Cable TV, Internet, Bet Funding).
+   - Convert bills.tsx into a dedicated Internet Bills screen only.
+   - Preserve the existing UI style, animations, bottom sheets, validation, loading states, and payment flow.
+   - Remove any logic related to electricity, cable, or betting from this screen.
+
+3. Verify all new screens:
+   - electricity.tsx
+     - DisCo selector
+     - Prepaid/Postpaid toggle
+     - Meter number input
+     - Amount input
+     - Continue/Pay button
+   - cable.tsx
+     - Provider selector
+     - Smart card number input
+     - Package/plan selector
+     - Amount/payment section
+   - betting.tsx
+     - Betting platform selector/grid
+     - User ID input
+     - Amount input
+     - Continue/Pay button
+
+4. Ensure every new screen:
+   - Matches the existing PayVora design system exactly.
+   - Is fully responsive.
+   - Supports smooth scrolling.
+   - Respects safe areas.
+   - Has no overlapping or clipped elements.
+   - Uses the existing reusable components where possible instead of duplicating code.
+
+5. Verify navigation:
+   Dashboard → Electricity opens electricity.tsx
+   Dashboard → Cable TV opens cable.tsx
+   Dashboard → Betting opens betting.tsx
+   Dashboard → Internet opens bills.tsx
+
+6. Fix all imports, routing, and TypeScript errors introduced by the refactor.
+
+7. Run a full project type check and resolve every error without changing unrelated screens or existing functionality.
+
+Do not redesign the UI. Preserve the existing visual style, animations, spacing, colors, and component behavior. Only complete the unfinished routing, screen separation, cleanup, and verification.
