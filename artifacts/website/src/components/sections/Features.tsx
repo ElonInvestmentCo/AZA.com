@@ -1,86 +1,93 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
 import {
-  CreditCard,
-  Zap,
-  Wifi,
-  Lightbulb,
-  Tv,
-  Dice6,
-  ArrowLeftRight,
-  Gift,
-  Wallet,
+  CreditCard, Zap, Wifi, Lightbulb, Tv, Dice6,
+  ArrowLeftRight, Gift, Wallet, ArrowRight,
 } from "lucide-react";
 
 const features = [
   {
     icon: Gift,
     title: "Gift Card Trading",
-    description:
-      "Trade Amazon, iTunes, Google Play, Steam and 50+ other gift cards for instant Naira or crypto.",
+    description: "Trade Amazon, iTunes, Google Play, Steam and 50+ gift card brands for instant Naira or crypto. Best rates, 60-second settlement.",
     accent: "#00D9A0",
+    href: "/gift-cards",
+    badge: "Most Popular",
   },
   {
     icon: CreditCard,
     title: "Virtual Dollar Cards",
-    description:
-      "Get a free USD virtual card for international payments, subscriptions, and online shopping.",
+    description: "Get a free USD virtual card for international payments, subscriptions, and online shopping — powered directly from your wallet.",
     accent: "#00b8ff",
+    href: "/virtual-cards",
+    badge: null,
   },
   {
     icon: Wallet,
     title: "Digital Wallet",
-    description:
-      "Store Naira, fund instantly via bank transfer, and withdraw to any Nigerian bank account.",
+    description: "Store Naira, fund instantly via bank transfer, and withdraw to any Nigerian bank account. Zero hidden charges, ever.",
     accent: "#FF5B7A",
+    href: "/features",
+    badge: null,
   },
   {
     icon: Lightbulb,
     title: "Electricity Bills",
-    description:
-      "Pay EKEDC, IKEDC, AEDC, PHED and every DISCO directly from your wallet in seconds.",
+    description: "Pay EKEDC, IKEDC, AEDC, PHED and every DISCO directly from your wallet. Token delivered in under 30 seconds.",
     accent: "#F59E0B",
+    href: "/bill-payments",
+    badge: null,
   },
   {
     icon: Zap,
     title: "Airtime Recharge",
-    description:
-      "Recharge MTN, Airtel, Glo, and 9mobile with the best rates and instant delivery.",
+    description: "Recharge MTN, Airtel, Glo, and 9mobile with the best rates and instant delivery. Never run out of credit again.",
     accent: "#00D9A0",
+    href: "/airtime-data",
+    badge: null,
   },
   {
     icon: Wifi,
     title: "Data Bundles",
-    description:
-      "Buy internet data plans for all networks at prices cheaper than USSD codes.",
+    description: "Buy internet data plans for all networks at prices cheaper than USSD codes. Up to 38GB for under ₦3,500.",
     accent: "#00b8ff",
+    href: "/airtime-data",
+    badge: "Best Value",
   },
   {
     icon: Tv,
     title: "Cable TV",
-    description:
-      "Renew DStv, GOtv, StarTimes, and Showmax subscriptions without leaving the app.",
+    description: "Renew DStv, GOtv, StarTimes, and Showmax subscriptions without leaving the app. Auto-renew available.",
     accent: "#FF5B7A",
+    href: "/bill-payments",
+    badge: null,
   },
   {
     icon: Dice6,
     title: "Betting Wallet",
-    description:
-      "Fund Sportybet, Bet9ja, 1xBet, and other betting platforms directly from your wallet.",
+    description: "Fund Sportybet, Bet9ja, 1xBet, and other betting platforms directly from your wallet in seconds.",
     accent: "#F59E0B",
+    href: "/bill-payments",
+    badge: null,
   },
   {
     icon: ArrowLeftRight,
     title: "Bank Transfers",
-    description:
-      "Send money to any Nigerian bank account instantly with zero hidden charges.",
+    description: "Send money to any Nigerian bank account instantly with zero hidden charges. Transfers clear within seconds.",
     accent: "#00D9A0",
+    href: "/features",
+    badge: null,
   },
 ];
 
 export function Features() {
+  const [hovered, setHovered] = useState<string | null>(null);
+
   return (
     <section className="py-24 bg-[#0A0A0F]" id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-4">
             Everything you need
@@ -94,30 +101,66 @@ export function Features() {
           </p>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map(({ icon: Icon, title, description, accent }) => (
-            <div
+          {features.map(({ icon: Icon, title, description, accent, href, badge }) => (
+            <Link
               key={title}
-              className="group bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6 hover:border-[#2A2A3D] transition-all duration-300 hover:bg-[#1C1C2A]"
-              style={
-                {
-                  "--accent": accent,
-                } as React.CSSProperties
-              }
+              href={href}
+              className="group relative bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6 transition-all duration-300 hover:bg-[#1C1C2A] hover:scale-[1.02] hover:shadow-2xl block"
+              style={{ "--accent": accent } as React.CSSProperties}
+              onMouseEnter={() => setHovered(title)}
+              onMouseLeave={() => setHovered(null)}
             >
+              {/* Glow on hover */}
+              {hovered === title && (
+                <div
+                  className="absolute inset-0 rounded-2xl opacity-5 pointer-events-none"
+                  style={{ background: `radial-gradient(circle at 30% 30%, ${accent}, transparent 70%)` }}
+                />
+              )}
+
+              {/* Border accent on hover */}
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all group-hover:scale-110"
+                className="absolute inset-0 rounded-2xl border-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                style={{ borderColor: accent }}
+              />
+
+              {badge && (
+                <div
+                  className="absolute top-4 right-4 text-[10px] font-black px-2.5 py-1 rounded-full"
+                  style={{ background: `${accent}25`, color: accent }}
+                >
+                  {badge}
+                </div>
+              )}
+
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
                 style={{ background: `${accent}20` }}
               >
                 <Icon size={22} style={{ color: accent }} />
               </div>
+
               <h3 className="text-white font-bold text-lg mb-2">{title}</h3>
-              <p className="text-[#8F8FA3] text-sm leading-relaxed">
-                {description}
-              </p>
-            </div>
+              <p className="text-[#8F8FA3] text-sm leading-relaxed mb-4">{description}</p>
+
+              <div
+                className="flex items-center gap-1 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:gap-2"
+                style={{ color: accent }}
+              >
+                Learn more <ArrowRight size={14} />
+              </div>
+            </Link>
           ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link
+            href="/features"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#1C1C2A] text-white text-base font-semibold rounded-2xl border border-[#2A2A3D] hover:border-[#00D9A0] transition-all"
+          >
+            Explore all features <ArrowRight size={18} />
+          </Link>
         </div>
       </div>
     </section>

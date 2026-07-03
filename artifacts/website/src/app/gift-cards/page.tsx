@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Clock, TrendingUp, ShieldCheck } from "lucide-react";
+import { Clock, TrendingUp, ShieldCheck, Zap, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Gift Card Trading – PayVora",
@@ -9,10 +9,33 @@ export const metadata: Metadata = {
 };
 
 const brands = [
-  "Amazon", "iTunes", "Google Play", "Steam", "Razer Gold",
-  "Walmart", "eBay", "Visa Gift", "Netflix", "Xbox",
-  "PlayStation", "Footlocker", "Nike", "Target", "Best Buy",
-  "Nordstrom", "Sephora", "GameStop", "JCPenney", "American Express",
+  { name: "Amazon", color: "#FF9900" },
+  { name: "iTunes", color: "#FA233B" },
+  { name: "Google Play", color: "#34A853" },
+  { name: "Steam", color: "#1B2838" },
+  { name: "Razer Gold", color: "#44D62C" },
+  { name: "Walmart", color: "#0071CE" },
+  { name: "eBay", color: "#E53238" },
+  { name: "Visa Gift", color: "#1A1F71" },
+  { name: "Netflix", color: "#E50914" },
+  { name: "Xbox", color: "#107C10" },
+  { name: "PlayStation", color: "#003791" },
+  { name: "Footlocker", color: "#D32F2F" },
+  { name: "Nike", color: "#111111" },
+  { name: "Target", color: "#CC0000" },
+  { name: "Best Buy", color: "#0046BE" },
+  { name: "Nordstrom", color: "#000000" },
+  { name: "Sephora", color: "#D4145A" },
+  { name: "GameStop", color: "#AC2012" },
+  { name: "JCPenney", color: "#8B0000" },
+  { name: "American Express", color: "#007BC1" },
+];
+
+const steps = [
+  { step: "1", title: "Select your card", desc: "Choose the gift card brand and enter the denomination." },
+  { step: "2", title: "Upload the card", desc: "Photo the card code or enter it manually in the app." },
+  { step: "3", title: "Get your rate", desc: "See the exact Naira value before confirming — no surprises." },
+  { step: "4", title: "Receive cash", desc: "Funds hit your wallet in under 60 seconds. Withdraw anytime." },
 ];
 
 export default function GiftCardsPage() {
@@ -20,6 +43,7 @@ export default function GiftCardsPage() {
     <>
       <section className="pt-32 pb-24 bg-[#0A0A0F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Hero */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
               Best rates in Nigeria
@@ -29,16 +53,17 @@ export default function GiftCardsPage() {
               <span className="text-[#00D9A0]">get cash instantly.</span>
             </h1>
             <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto mb-12">
-              Upload your gift card, get the best market rate, and receive Naira in your wallet within 60 seconds. No stress. No delays.
+              Upload your gift card, get the best market rate, and receive Naira in your wallet within 60 seconds. No stress. No delays. No guessing.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mb-16">
+            {/* Key benefits */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto mb-16">
               {[
                 { icon: Clock, title: "60-second settlement", desc: "Funds hit your wallet in under a minute." },
                 { icon: TrendingUp, title: "Real-time rates", desc: "Rates updated live based on market conditions." },
                 { icon: ShieldCheck, title: "Verified & secure", desc: "Every card verified by our expert team." },
               ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6">
+                <div key={title} className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6 text-center hover:border-[#00D9A0] transition-all">
                   <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.12)] flex items-center justify-center mx-auto mb-4">
                     <Icon size={22} className="text-[#00D9A0]" />
                   </div>
@@ -50,43 +75,59 @@ export default function GiftCardsPage() {
           </div>
 
           {/* Brands */}
-          <div>
-            <h2 className="text-2xl font-black text-white text-center mb-8">
+          <div className="mb-24">
+            <h2 className="text-2xl sm:text-3xl font-black text-white text-center mb-8">
               50+ brands accepted
             </h2>
             <div className="flex flex-wrap gap-3 justify-center">
-              {brands.map((brand) => (
+              {brands.map(({ name }) => (
                 <div
-                  key={brand}
-                  className="px-4 py-2 bg-[#14141F] border border-[#2A2A3D] rounded-xl text-sm text-[#8F8FA3] hover:border-[#00D9A0] hover:text-white transition-all cursor-default"
+                  key={name}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#14141F] border border-[#2A2A3D] rounded-xl text-sm text-[#8F8FA3] hover:border-[#00D9A0] hover:text-white transition-all cursor-default group"
                 >
-                  {brand}
+                  <CheckCircle2 size={13} className="text-[#00D9A0] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {name}
                 </div>
               ))}
-              <div className="px-4 py-2 bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] rounded-xl text-sm text-[#00D9A0]">
+              <div className="flex items-center gap-2 px-4 py-2 bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] rounded-xl text-sm text-[#00D9A0] font-semibold">
+                <Zap size={13} />
                 + many more
               </div>
             </div>
           </div>
 
           {/* How it works */}
-          <div className="mt-24">
-            <h2 className="text-3xl font-black text-white text-center mb-12">
+          <div className="mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-12">
               How it works
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-              {[
-                { step: "1", title: "Select your card", desc: "Choose the gift card brand and enter the denomination." },
-                { step: "2", title: "Upload the card", desc: "Photo the card code or enter it manually." },
-                { step: "3", title: "Get your rate", desc: "See the exact Naira value before confirming." },
-                { step: "4", title: "Receive cash", desc: "Funds hit your wallet in under 60 seconds." },
-              ].map(({ step, title, desc }) => (
-                <div key={step} className="text-center">
-                  <div className="w-12 h-12 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] flex items-center justify-center mx-auto mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 relative">
+              <div className="hidden sm:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-[#2A2A3D] to-transparent" />
+              {steps.map(({ step, title, desc }) => (
+                <div key={step} className="text-center relative">
+                  <div className="w-12 h-12 rounded-full bg-[#0A0A0F] border-2 border-[rgba(0,217,160,0.4)] flex items-center justify-center mx-auto mb-4 relative z-10">
                     <span className="text-[#00D9A0] font-black">{step}</span>
                   </div>
                   <h3 className="text-white font-bold mb-2">{title}</h3>
-                  <p className="text-[#8F8FA3] text-sm">{desc}</p>
+                  <p className="text-[#8F8FA3] text-sm leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust signals */}
+          <div className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-8 text-center">
+            <h3 className="text-white font-bold text-xl mb-6">Trusted by traders across Nigeria</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              {[
+                { value: "50K+", label: "Happy traders" },
+                { value: "₦2B+", label: "Gift cards traded" },
+                { value: "< 60s", label: "Avg. settlement" },
+                { value: "4.9★", label: "Average rating" },
+              ].map(({ value, label }) => (
+                <div key={label}>
+                  <p className="text-[#00D9A0] text-2xl font-black mb-1">{value}</p>
+                  <p className="text-[#8F8FA3] text-sm">{label}</p>
                 </div>
               ))}
             </div>
