@@ -328,6 +328,6 @@ const s = StyleSheet.create({
   },
   footerLink: {
     fontSize: 15, fontFamily: "Manrope_700Bold",
-    color: C.dark, lineHeight: 21, textDecorationLine: "underline",
+    color: "#18c4bf", lineHeight: 21, textDecorationLine: "underline",
   },
 });
