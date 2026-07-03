@@ -64,15 +64,15 @@ const C = {
 const avatarSrc = require("@/assets/images/3d_avatar_16.png");
 
 const SERVICES = [
-  { id: "gift",    label: "Gift Card",     bg: "#FFF2CF", iconColor: "#5C4000", route: null                              },
-  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/airtime" as const          },
-  { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/bills"  as const           },
-  { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/bills"  as const           },
-  { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"  as const           },
-  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const     },
-  { id: "bet",     label: "Betting",       bg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/bills"  as const           },
-  { id: "funding", label: "Funding",       bg: "#EBF3FF", iconColor: "#1D6ECC", route: "/(app)/dashboard" as const        },
-  { id: "more",    label: "More",          bg: "#F0EEFF", iconColor: "#7C3AED", route: "/(app)/more"   as const           },
+  { id: "gift",    label: "Gift Card",     bg: "#FFF2CF", iconColor: "#5C4000", route: null                                  },
+  { id: "airtime", label: "Airtime",       bg: "#EEF9FF", iconColor: "#0891B2", route: "/(app)/airtime"      as const        },
+  { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/electricity"  as const        },
+  { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/cable"        as const        },
+  { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"        as const        },
+  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const        },
+  { id: "bet",     label: "Betting",       bg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/betting"      as const        },
+  { id: "funding", label: "Funding",       bg: "#EBF3FF", iconColor: "#1D6ECC", route: "/(app)/dashboard"   as const        },
+  { id: "more",    label: "More",          bg: "#F0EEFF", iconColor: "#7C3AED", route: "/(app)/more"         as const        },
 ];
 
 const PROMOS = [
