@@ -22,13 +22,12 @@ const WEB_PORT = process.env.PORT ?? "3000";
 
 console.log(`[launcher] starting API on :${API_PORT}  |  website on :${WEB_PORT}`);
 
-function run(label, cmd, args, extraEnv) {
+function run(label, cmd, args, extraEnv, cwd) {
   const child = spawn(cmd, args, {
-    // Each child gets the full environment MINUS PORT, then we inject the
-    // correct port for that process so they don't fight over the same socket.
+    // Strip PORT from the inherited env, then inject the correct port per process.
     env: { ...process.env, PORT: undefined, ...extraEnv },
     stdio: "inherit",
-    cwd: __dirname,
+    cwd: cwd ?? __dirname,
   });
 
   child.on("error", (err) => {
@@ -53,16 +52,17 @@ run(
 );
 
 // ── Next.js website ──────────────────────────────────────────────────────────
-// `output: "standalone"` in next.config.ts puts the self-contained server at
-// artifacts/website/.next/standalone/server.js after `next build`.
+// Run `next start` from the website directory so it finds .next/ automatically.
+// PORT env var is read by `next start` when no --port flag is given.
 run(
   "web",
   "node",
-  ["./artifacts/website/.next/standalone/server.js"],
+  ["../../node_modules/.bin/next", "start"],
   {
     PORT: WEB_PORT,
     HOSTNAME: "0.0.0.0",
-    // Tells the Next.js rewrite where to find the Express API.
+    // Tells Next.js rewrites where to find the Express API.
     INTERNAL_API_URL: `http://localhost:${API_PORT}`,
   },
+  path.join(__dirname, "artifacts/website"),
 );
