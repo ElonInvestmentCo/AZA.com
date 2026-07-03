@@ -6,7 +6,6 @@ import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,21 +29,7 @@ const C = {
   black:     "#000000",
 };
 
-type BillType = "electricity" | "cable" | "internet" | "betting";
-
-const BILL_TYPES: { id: BillType; label: string; icon: React.ComponentProps<typeof Feather>["name"]; bg: string; color: string }[] = [
-  { id: "electricity", label: "Electricity", icon: "zap",        bg: "#FFFBEB", color: "#D97706" },
-  { id: "cable",       label: "Cable TV",    icon: "tv",         bg: "#FFF1F2", color: "#E11D48" },
-  { id: "internet",    label: "Internet",    icon: "wifi",       bg: "#EFF6FF", color: "#2563EB" },
-  { id: "betting",     label: "Bet Funding", icon: "dollar-sign",bg: "#ECFEFF", color: "#0891B2" },
-];
-
-const PROVIDERS: Record<BillType, string[]> = {
-  electricity: ["EKEDC", "IKEDC", "AEDC", "PHEDC", "BEDC", "KEDCO", "JEDC"],
-  cable:       ["DSTV", "GOtv", "StarTimes", "Consat"],
-  internet:    ["Spectranet", "Swift Networks", "ipNX", "Lagos Fibre"],
-  betting:     ["Bet9ja", "SportyBet", "Betway", "1xBet", "NairaBet", "BetKing"],
-};
+const PROVIDERS = ["Spectranet", "Swift Networks", "ipNX", "Lagos Fibre"];
 
 function FieldLabel({ text }: { text: string }) {
   return <Text style={f.label}>{text}</Text>;
@@ -99,15 +84,12 @@ export default function BillsScreen() {
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 20 : insets.top;
 
-  const [billType,  setBillType]  = useState<BillType>("electricity");
   const [provider,  setProvider]  = useState("");
-  const [meterNum,  setMeterNum]  = useState("");
+  const [accountNum, setAccountNum] = useState("");
   const [amount,    setAmount]    = useState("");
   const [picker,    setPicker]    = useState(false);
 
-  const selected = BILL_TYPES.find(b => b.id === billType)!;
-  const providers = PROVIDERS[billType];
-  const canProceed = !!provider && !!meterNum && !!amount;
+  const canProceed = !!provider && !!accountNum && !!amount;
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: C.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -116,7 +98,7 @@ export default function BillsScreen() {
         <TouchableOpacity onPress={() => router.back()} style={s.backBtn} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
           <Feather name="arrow-left" size={22} color="#1E232C" />
         </TouchableOpacity>
-        <Text style={s.headerTitle}>Pay Bills</Text>
+        <Text style={s.headerTitle}>Internet Bill</Text>
         <View style={{ width: 44 }} />
       </Animated.View>
       <View style={s.divider} />
@@ -124,53 +106,34 @@ export default function BillsScreen() {
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}>
 
         <Animated.View entering={FadeInDown.duration(300).delay(30)}>
-          <Text style={s.subtitle}>Select bill category and fill in details.</Text>
-        </Animated.View>
-
-        {/* Bill type selector */}
-        <Animated.View entering={FadeInDown.duration(300).delay(60)}>
-          <Text style={s.label}>bill category</Text>
-          <View style={s.typeRow}>
-            {BILL_TYPES.map(b => (
-              <Pressable
-                key={b.id}
-                style={[s.typeItem, billType === b.id && { borderColor: b.color, borderWidth: 2, backgroundColor: b.bg }]}
-                onPress={() => { Haptics.selectionAsync(); setBillType(b.id); setProvider(""); }}
-              >
-                <View style={[s.typeIcon, { backgroundColor: billType === b.id ? b.color + "22" : "#F8F9FA" }]}>
-                  <Feather name={b.icon} size={18} color={billType === b.id ? b.color : C.textMuted} />
-                </View>
-                <Text style={[s.typeLabel, billType === b.id && { color: b.color }]}>{b.label}</Text>
-              </Pressable>
-            ))}
-          </View>
+          <Text style={s.subtitle}>Select your internet provider and fill in details.</Text>
         </Animated.View>
 
         {/* Provider */}
-        <Animated.View entering={FadeInDown.duration(300).delay(90)}>
+        <Animated.View entering={FadeInDown.duration(300).delay(60)}>
           <SelectField label="select provider" value={provider} placeholder="   Choose provider" onPress={() => setPicker(true)} />
         </Animated.View>
 
-        {/* Meter/account number */}
-        <Animated.View entering={FadeInDown.duration(300).delay(120)}>
+        {/* Account number */}
+        <Animated.View entering={FadeInDown.duration(300).delay(90)}>
           <View style={{ gap: 4 }}>
-            <Text style={s.label}>{billType === "electricity" ? "meter number" : billType === "cable" ? "smart card number" : "account number"}</Text>
+            <Text style={s.label}>account number</Text>
             <View style={f.input}>
               <TextInput
                 style={[f.val]}
                 placeholder="   Enter number"
                 placeholderTextColor="#646464"
-                value={meterNum}
-                onChangeText={setMeterNum}
+                value={accountNum}
+                onChangeText={setAccountNum}
                 keyboardType="numeric"
               />
-              {meterNum.length >= 10 && <Feather name="check-circle" size={18} color={C.success} />}
+              {accountNum.length >= 10 && <Feather name="check-circle" size={18} color={C.success} />}
             </View>
           </View>
         </Animated.View>
 
         {/* Amount */}
-        <Animated.View entering={FadeInDown.duration(300).delay(150)}>
+        <Animated.View entering={FadeInDown.duration(300).delay(120)}>
           <View style={{ gap: 4 }}>
             <Text style={s.label}>amount</Text>
             <View style={f.input}>
@@ -223,7 +186,7 @@ export default function BillsScreen() {
 
       </ScrollView>
 
-      <PickerModal visible={picker} title={`Select ${selected.label} Provider`} options={providers} onSelect={setProvider} onClose={() => setPicker(false)} />
+      <PickerModal visible={picker} title="Select Internet Provider" options={PROVIDERS} onSelect={setProvider} onClose={() => setPicker(false)} />
     </KeyboardAvoidingView>
   );
 }
@@ -236,11 +199,6 @@ const s = StyleSheet.create({
   scroll:      { paddingHorizontal: 20, paddingTop: 20, gap: 18 },
   subtitle:    { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, letterSpacing: 0.24 },
   label:       { fontSize: 12, fontFamily: "Manrope_500Medium", color: C.textMuted, textTransform: "capitalize", letterSpacing: 0.24, marginBottom: 6 },
-
-  typeRow:  { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  typeItem: { width: "47%", borderRadius: 12, borderWidth: 1, borderColor: C.border, backgroundColor: "#F8F9FA", padding: 14, alignItems: "center", gap: 8 },
-  typeIcon: { width: 42, height: 42, borderRadius: 12, alignItems: "center", justifyContent: "center" },
-  typeLabel:{ fontSize: 12, fontFamily: "Manrope_600SemiBold", color: C.textSec },
 
   summaryBox:   { backgroundColor: C.dark, borderRadius: 10, paddingHorizontal: 18, paddingVertical: 2 },
   summaryRow:   { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 13 },

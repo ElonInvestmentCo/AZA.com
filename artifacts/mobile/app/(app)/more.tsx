@@ -28,7 +28,10 @@ const SECTIONS = [
     items: [
       { id: "airtime",  label: "Airtime",      sublabel: "Buy airtime for any network",        icon: "phone"       as const, iconBg: "#FFFBEB", iconColor: "#D97706", route: "/(app)/airtime"  as const },
       { id: "data",     label: "Data Bundle",   sublabel: "Buy data for any network",           icon: "wifi"        as const, iconBg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/data"     as const },
-      { id: "bills",    label: "Pay Bills",     sublabel: "Electricity, cable TV & more",       icon: "zap"         as const, iconBg: "#FFFBEB", iconColor: "#D97706", route: "/(app)/bills"    as const },
+      { id: "elec",     label: "Electricity",   sublabel: "Pay your electricity bill",          icon: "zap"         as const, iconBg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/electricity" as const },
+      { id: "cable",    label: "Cable TV",      sublabel: "Subscribe to DSTV, GOtv & more",     icon: "tv"          as const, iconBg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/cable"    as const },
+      { id: "bills",    label: "Internet",      sublabel: "Pay your internet bill",             icon: "wifi"        as const, iconBg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/bills"    as const },
+      { id: "bet",      label: "Betting",       sublabel: "Fund your betting account",          icon: "dollar-sign" as const, iconBg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/betting" as const },
       { id: "esim",     label: "eSIM",          sublabel: "International eSIM data plans",      icon: "globe"       as const, iconBg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/esim"     as const },
     ],
   },
