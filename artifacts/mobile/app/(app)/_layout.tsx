@@ -22,6 +22,11 @@ export default function AppLayout() {
       <Stack.Screen name="referral" />
       <Stack.Screen name="esim" />
       <Stack.Screen name="more" />
+      <Stack.Screen name="pin-code" />
+      <Stack.Screen name="quick-payment" />
+      <Stack.Screen name="language" />
+      <Stack.Screen name="app-info" />
+      <Stack.Screen name="help-support" />
     </Stack>
   );
 }

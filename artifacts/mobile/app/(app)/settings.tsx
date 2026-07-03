@@ -82,32 +82,19 @@ export default function SettingsScreen() {
         router.push("/(auth)/face-id" as any);
         break;
       case "pin":
-        Alert.alert("Set PIN Code", "PIN code setup lets you authorise transactions quickly and securely.", [
-          { text: "Cancel", style: "cancel" },
-          { text: "Set PIN", onPress: () => {} },
-        ]);
+        router.push("/(app)/pin-code" as any);
         break;
       case "quick":
-        Alert.alert("Quick Payment", "Enable quick payment to complete transactions without entering your PIN each time.", [
-          { text: "Cancel", style: "cancel" },
-          { text: "Enable", onPress: () => {} },
-        ]);
+        router.push("/(app)/quick-payment" as any);
         break;
       case "language":
-        Alert.alert("Language", "Select your preferred language.", [
-          { text: "English (Default)", onPress: () => {} },
-          { text: "Cancel", style: "cancel" },
-        ]);
+        router.push("/(app)/language" as any);
         break;
       case "info":
-        Alert.alert("App Information", "PAYVORA\nVersion 1.0.0\n\nBuilt with ❤️ for seamless gift card trading.", [
-          { text: "OK" },
-        ]);
+        router.push("/(app)/app-info" as any);
         break;
       case "support":
-        Alert.alert("Help & Support", "Need assistance?\n\nEmail: support@payvora.app\nLive chat available 9am–6pm WAT.", [
-          { text: "OK" },
-        ]);
+        router.push("/(app)/help-support" as any);
         break;
     }
   };
