@@ -30,7 +30,7 @@ async function start() {
       logger.error({ err }, "Error listening on port");
       process.exit(1);
     }
-    logger.info("PayVora API server listening", { port });
+    logger.info({ port }, "PayVora API server listening");
   });
 }
 
