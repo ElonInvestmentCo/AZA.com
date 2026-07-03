@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AnimatedSheet } from "@/components/AnimatedSheet";
 
 const C = {
   bg:      "#FFFFFF",
@@ -65,7 +67,9 @@ export default function TransactionsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const topPad = Platform.OS === "web" ? 48 : insets.top;
-  const [filter, setFilter] = useState<TxCategory>("All");
+  const [filter,    setFilter]    = useState<TxCategory>("All");
+  const [selected,  setSelected]  = useState<TxItem | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const filtered = filter === "All" ? ALL_TX : ALL_TX.filter(t => t.category === filter);
 
@@ -84,7 +88,7 @@ export default function TransactionsScreen() {
       {/* Section header */}
       <Animated.View entering={FadeInDown.duration(290).delay(30)} style={s.sectionRow}>
         <Text style={s.sectionTitle}>Last 6 months</Text>
-        <TouchableOpacity onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+        <TouchableOpacity onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.push("/(tabs)/history" as any); }}>
           <Text style={s.viewDetail}>View detail</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -121,7 +125,7 @@ export default function TransactionsScreen() {
         }
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeInDown.duration(240).delay(index * 20)}>
-            <TouchableOpacity style={s.txRow} activeOpacity={0.75} onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}>
+            <TouchableOpacity style={s.txRow} activeOpacity={0.75} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelected(item); setSheetOpen(true); }}>
               <View style={[s.iconWrap, { backgroundColor: item.iconBg }]}>
                 <Feather name={item.icon} size={20} color={item.iconColor} />
               </View>
@@ -144,6 +148,57 @@ export default function TransactionsScreen() {
           </Animated.View>
         )}
       />
+
+      {/* Transaction detail sheet */}
+      <AnimatedSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} maxHeight="70%">
+        {selected && (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 0, paddingBottom: insets.bottom + 16 }}>
+            <View style={d.handle} />
+            <View style={d.hero}>
+              <View style={[d.heroIcon, { backgroundColor: selected.iconBg }]}>
+                <Feather name={selected.icon} size={26} color={selected.iconColor} />
+              </View>
+              <Text style={[d.heroAmount, { color: selected.positive ? C.success : C.danger }]}>
+                {selected.positive ? "+" : "-"}{selected.amount}
+              </Text>
+              <Text style={d.heroName}>{selected.name}</Text>
+              <View style={[d.statusPill, { backgroundColor: STATUS_COLORS[selected.status].bg, borderColor: STATUS_COLORS[selected.status].text + "33" }]}>
+                <View style={[d.statusDot, { backgroundColor: STATUS_COLORS[selected.status].text }]} />
+                <Text style={[d.statusLabel, { color: STATUS_COLORS[selected.status].text }]}>
+                  {selected.status === "completed" ? "Completed" : selected.status === "pending" ? "Pending" : "Failed"}
+                </Text>
+              </View>
+            </View>
+            <View style={d.card}>
+              {[
+                { label: "Reference", value: selected.ref },
+                { label: "Category",  value: selected.category },
+                { label: "Date",      value: selected.date },
+                { label: "Type",      value: selected.positive ? "Credit" : "Debit" },
+              ].map((row, i, arr) => (
+                <View key={row.label}>
+                  <View style={d.row}>
+                    <Text style={d.rowLabel}>{row.label}</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Text style={d.rowValue}>{row.value}</Text>
+                      {row.label === "Reference" && (
+                        <TouchableOpacity onPress={async () => { await Clipboard.setStringAsync(selected.ref); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); }} style={d.copyChip}>
+                          <Feather name="copy" size={11} color={C.primary} />
+                          <Text style={d.copyText}>Copy</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                  {i < arr.length - 1 && <View style={d.rowDivider} />}
+                </View>
+              ))}
+            </View>
+            <TouchableOpacity style={d.closeBtn} onPress={() => setSheetOpen(false)} activeOpacity={0.75}>
+              <Text style={d.closeBtnText}>Close</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
+      </AnimatedSheet>
     </View>
   );
 }
@@ -178,4 +233,28 @@ const s = StyleSheet.create({
   divider: { height: 1, backgroundColor: C.border },
   empty: { alignItems: "center", justifyContent: "center", paddingTop: 80, gap: 10 },
   emptyText: { fontSize: 14, fontFamily: "Manrope_500Medium", color: C.textMut },
+});
+
+const d = StyleSheet.create({
+  handle:    { width: 32, height: 3.5, borderRadius: 2, backgroundColor: "#D1D5DB", alignSelf: "center", marginBottom: 16 },
+
+  hero:      { alignItems: "center", gap: 6, paddingBottom: 20 },
+  heroIcon:  { width: 56, height: 56, borderRadius: 18, alignItems: "center", justifyContent: "center", marginBottom: 4 },
+  heroAmount:{ fontSize: 26, fontFamily: "Manrope_700Bold", letterSpacing: -0.5 },
+  heroName:  { fontSize: 14, fontFamily: "Manrope_600SemiBold", color: "#0B0A0A" },
+  statusPill:{ flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, marginTop: 2 },
+  statusDot: { width: 5, height: 5, borderRadius: 3 },
+  statusLabel:{ fontSize: 12, fontFamily: "Manrope_600SemiBold" },
+
+  card:      { borderRadius: 14, borderWidth: 1, borderColor: "#F0F0F0", backgroundColor: "#FFFFFF", paddingHorizontal: 16, marginBottom: 16 },
+  row:       { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12 },
+  rowLabel:  { fontSize: 13, fontFamily: "Manrope_400Regular", color: "#595F67" },
+  rowValue:  { fontSize: 13, fontFamily: "Manrope_500Medium", color: "#0B0A0A", textAlign: "right" },
+  rowDivider:{ height: 1, backgroundColor: "#F3F4F6" },
+
+  copyChip:  { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 7, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
+  copyText:  { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.primary },
+
+  closeBtn:  { height: 44, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  closeBtnText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: "#AAAFB5" },
 });

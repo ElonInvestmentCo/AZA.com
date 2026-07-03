@@ -3,6 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import {
+  Alert,
   Platform,
   Pressable,
   ScrollView,
@@ -356,7 +357,10 @@ export default function CardsScreen() {
             <TouchableOpacity
               style={s.ctaInner}
               activeOpacity={0.88}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                Alert.alert("Premium Card", "Your Premium Card request has been submitted! Our team will review and activate your card within 24 hours.", [{ text: "Got it" }]);
+              }}
             >
               <Text style={s.ctaText}>{info.cta}</Text>
             </TouchableOpacity>
@@ -365,7 +369,10 @@ export default function CardsScreen() {
           <TouchableOpacity
             style={[s.ctaBtn, { backgroundColor: C.navy }]}
             activeOpacity={0.88}
-            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              Alert.alert("Regular Card", "Your Regular Card is being set up! You'll receive a notification once it's ready to use.", [{ text: "Got it" }]);
+            }}
           >
             <Text style={s.ctaText}>{info.cta}</Text>
           </TouchableOpacity>

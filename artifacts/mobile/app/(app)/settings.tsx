@@ -71,7 +71,45 @@ export default function SettingsScreen() {
 
   const handleRowPress = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    if (id === "refer") router.push("/(app)/referral" as any);
+    switch (id) {
+      case "refer":
+        router.push("/(app)/referral" as any);
+        break;
+      case "password":
+        router.push("/(auth)/forgot-password" as any);
+        break;
+      case "biometrics":
+        router.push("/(auth)/face-id" as any);
+        break;
+      case "pin":
+        Alert.alert("Set PIN Code", "PIN code setup lets you authorise transactions quickly and securely.", [
+          { text: "Cancel", style: "cancel" },
+          { text: "Set PIN", onPress: () => {} },
+        ]);
+        break;
+      case "quick":
+        Alert.alert("Quick Payment", "Enable quick payment to complete transactions without entering your PIN each time.", [
+          { text: "Cancel", style: "cancel" },
+          { text: "Enable", onPress: () => {} },
+        ]);
+        break;
+      case "language":
+        Alert.alert("Language", "Select your preferred language.", [
+          { text: "English (Default)", onPress: () => {} },
+          { text: "Cancel", style: "cancel" },
+        ]);
+        break;
+      case "info":
+        Alert.alert("App Information", "PAYVORA\nVersion 1.0.0\n\nBuilt with ❤️ for seamless gift card trading.", [
+          { text: "OK" },
+        ]);
+        break;
+      case "support":
+        Alert.alert("Help & Support", "Need assistance?\n\nEmail: support@payvora.app\nLive chat available 9am–6pm WAT.", [
+          { text: "OK" },
+        ]);
+        break;
+    }
   };
 
   return (
