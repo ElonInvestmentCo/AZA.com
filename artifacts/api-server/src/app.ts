@@ -86,6 +86,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 app.get("/", async (_req: Request, res: Response) => {
+  if (process.env.NODE_ENV === "production") {
+    res.redirect(301, "https://www.payvora.org");
+    return;
+  }
   const [mobileUrl, payvoraUrl] = await Promise.all([
     getExpoUrl(19000),
     getExpoUrl(19001),
