@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -6,6 +8,7 @@ import { logger } from "./lib/logger";
 import { getExpoUrl, buildQrPage } from "./lib/qr-page";
 
 const app: Express = express();
+const IS_PROD = process.env.NODE_ENV === "production";
 
 /* ── CORS ────────────────────────────────────────────────────────────────────
  * Development: allow all origins (default cors() behaviour).
@@ -43,7 +46,6 @@ function corsOrigin(
   origin: string | undefined,
   callback: (err: Error | null, allow?: boolean) => void,
 ) {
-  /* Allow requests with no Origin header (native apps, curl, server-to-server) */
   if (!origin) return callback(null, true);
 
   const allowed = allowedOrigins.some(
@@ -60,7 +62,7 @@ function corsOrigin(
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? corsOrigin : true,
+    origin: IS_PROD ? corsOrigin : true,
     credentials: true,
   }),
 );
@@ -82,29 +84,40 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ── Routes ──────────────────────────────────────────────────────────────── */
+/* ── API Routes ───────────────────────────────────────────────────────────── */
 app.use("/api", router);
-
-app.get("/", async (_req: Request, res: Response) => {
-  if (process.env.NODE_ENV === "production") {
-    res.redirect(301, "https://www.payvora.org");
-    return;
-  }
-  const [mobileUrl, payvoraUrl] = await Promise.all([
-    getExpoUrl(19000),
-    getExpoUrl(19001),
-  ]);
-  const html = await buildQrPage(mobileUrl, payvoraUrl);
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.send(html);
-});
 
 app.get("/api/status", (_req: Request, res: Response) => {
   res.json({ name: "Payvora API", version: "1.0.0", status: "ok" });
 });
 
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({ error: "Not found" });
-});
+/* ── Static site (production) / QR dev page (development) ────────────────── */
+if (IS_PROD) {
+  /* Serve the pre-built Vite landing site.
+   * process.cwd() is the project root in Railway (/app).
+   * All non-/api routes fall back to index.html for client-side routing. */
+  const landingDist = path.join(process.cwd(), "artifacts", "landing", "dist");
+
+  app.use(express.static(landingDist, { index: "index.html" }));
+
+  app.get("*", (_req: Request, res: Response) => {
+    res.sendFile(path.join(landingDist, "index.html"));
+  });
+} else {
+  /* Dev: serve Expo QR scanner at root for easy mobile testing. */
+  app.get("/", async (_req: Request, res: Response) => {
+    const [mobileUrl, payvoraUrl] = await Promise.all([
+      getExpoUrl(19000),
+      getExpoUrl(19001),
+    ]);
+    const html = await buildQrPage(mobileUrl, payvoraUrl);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(html);
+  });
+
+  app.use((_req: Request, res: Response) => {
+    res.status(404).json({ error: "Not found" });
+  });
+}
 
 export default app;
