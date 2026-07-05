@@ -3,7 +3,10 @@ import * as Haptics from "expo-haptics";
 import { AnimatedSheet } from "@/components/AnimatedSheet";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { apiFetch } from "@/utils/api";
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -104,6 +107,7 @@ export default function WithdrawScreen() {
   const [amount,  setAmount]  = useState("");
   const [picker,  setPicker]  = useState(false);
   const [done,    setDone]    = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const balance   = user?.balance ?? 200590;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -211,16 +215,45 @@ export default function WithdrawScreen() {
 
         {/* Withdraw button */}
         <TouchableOpacity
-          style={[s.withdrawBtn, !canProceed && { opacity: 0.45 }]}
-          onPress={() => {
-            if (!canProceed) return;
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            setDone(true);
-            setTimeout(() => { setDone(false); router.push({ pathname: "/(app)/submitted" as any, params: { title: "Withdrawal Successful", subtitle: "Your withdrawal has been\nprocessed successfully" } }); }, 1000);
+          style={[s.withdrawBtn, (!canProceed || loading) && { opacity: 0.45 }]}
+          onPress={async () => {
+            if (!canProceed || loading) return;
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            setLoading(true);
+            try {
+              const amountNum = parseInt(amount.replace(/\D/g, ""), 10);
+              await apiFetch("/wallet/withdraw", {
+                method: "POST",
+                body: JSON.stringify({
+                  amountNaira: amountNum,
+                  bank,
+                  accountNumber: acctNum,
+                }),
+              });
+              setDone(true);
+              setTimeout(() => {
+                setDone(false);
+                router.push({
+                  pathname: "/(app)/submitted" as any,
+                  params: {
+                    title: "Withdrawal Successful",
+                    subtitle: "Your withdrawal has been\nprocessed successfully",
+                  },
+                });
+              }, 900);
+            } catch (err: any) {
+              Alert.alert("Withdrawal Failed", err.message || "Please try again.");
+            } finally {
+              setLoading(false);
+            }
           }}
           activeOpacity={0.85}
         >
-          <Text style={s.withdrawBtnText}>Withdraw</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={s.withdrawBtnText}>Withdraw</Text>
+          )}
         </TouchableOpacity>
 
       </ScrollView>

@@ -6,7 +6,7 @@
 
 PAYVORA is a next-generation fintech super app designed to unify payments, financial services, and digital value exchange into a single, seamless ecosystem. The platform is built for speed, trust, and accessibility, enabling users to send, receive, store, invest, and manage money through a unified interface.
 
-PAYVORA’s brand is positioned at the intersection of modern digital banking, decentralized financial thinking, and consumer-first UX design. It prioritizes clarity, minimalism, and high-performance financial infrastructure, making financial tools feel as intuitive as messaging or social apps.
+PAYVORA's brand is positioned at the intersection of modern digital banking and consumer-first UX design. It prioritises clarity, minimalism, and high-performance financial infrastructure, making financial tools feel as intuitive as messaging or social apps.
 
 ---
 
@@ -15,7 +15,7 @@ PAYVORA’s brand is positioned at the intersection of modern digital banking, d
 PAYVORA is positioned as a **premium fintech super app** that simplifies financial life through integration and intelligence.
 
 - **Category:** Fintech Super App / Digital Financial Ecosystem
-- **Positioning Statement:**  
+- **Positioning Statement:**
   *A unified financial platform that empowers users to move, manage, and grow money effortlessly in a digital-first world.*
 
 - **Market Position:**
@@ -26,41 +26,30 @@ PAYVORA is positioned as a **premium fintech super app** that simplifies financi
 - **Differentiation:**
   - Unified ecosystem instead of fragmented financial apps
   - AI-assisted financial workflows (future-facing architecture)
-  - Minimalist, high-performance UX with premium visual identity
+  - Minimalist, high-performance UX with premium dark visual identity
 
 ---
 
 ## Mission
 
-To democratize financial access by building a unified, intelligent, and seamless financial ecosystem that works for everyone, everywhere.
+To democratise financial access by building a unified, intelligent, and seamless financial ecosystem that works for everyone, everywhere.
 
 ---
 
 ## Vision
 
-To become the global standard for digital financial interaction—where managing money is as simple, fast, and intuitive as sending a message.
+To become the global standard for digital financial interaction — where managing money is as simple, fast, and intuitive as sending a message.
 
 ---
 
 ## Core Values
 
-- **Simplicity**
-  - Reduce financial complexity through clean, intuitive design
-
-- **Trust**
-  - Security-first architecture and transparent financial flows
-
-- **Accessibility**
-  - Financial inclusion across geographies, income levels, and digital literacy
-
-- **Speed**
-  - Real-time financial interactions with minimal friction
-
-- **Innovation**
-  - Continuous evolution through AI, automation, and modern infrastructure
-
-- **Control**
-  - Users retain full ownership and visibility of their financial data and actions
+- **Simplicity** — Reduce financial complexity through clean, intuitive design
+- **Trust** — Security-first architecture and transparent financial flows
+- **Accessibility** — Financial inclusion across geographies, income levels, and digital literacy
+- **Speed** — Real-time financial interactions with minimal friction
+- **Innovation** — Continuous evolution through AI, automation, and modern infrastructure
+- **Control** — Users retain full ownership and visibility of their financial data and actions
 
 ---
 
@@ -87,7 +76,7 @@ It avoids:
 - Clear and concise
 - Professional but not rigid
 - Confident without arrogance
-- Human-centered and supportive
+- Human-centred and supportive
 - Structurally minimal and information-rich
 
 ### Writing Style Guidelines
@@ -95,15 +84,28 @@ It avoids:
 - Prefer short, direct sentences
 - Avoid ambiguity in financial instructions
 - Use structured formatting for clarity
-- Prioritize action-oriented language
+- Prioritise action-oriented language
 - Maintain neutrality in financial advice
 
 ### Example Voice Patterns
 
-- “Transfer completed instantly.”
-- “Your balance has been updated.”
-- “Review required before proceeding.”
-- “Funds are securely stored and available.”
+- "Transfer completed instantly."
+- "Your balance has been updated."
+- "Review required before proceeding."
+- "Funds are securely stored and available."
+
+---
+
+## Visual Identity (Current Implementation)
+
+- **Primary accent:** `#00D9A0` (Mint Green / Teal) — buttons, links, active states, highlights
+- **App background:** `#0A0A0F` (Deep Black) — screen root and primary background
+- **Surface:** `#1A1A2E` — cards, sheets, list items
+- **Text Primary:** `#FFFFFF`
+- **Text Secondary:** `#8F8FA3`
+- **Font:** Manrope (400–700 weights via `@expo-google-fonts/manrope`)
+
+> The teal accent `#00D9A0` and deep black background `#0A0A0F` are **locked brand tokens** — they must not be changed without a full brand identity review.
 
 ---
 
@@ -122,8 +124,8 @@ PAYVORA is designed for a broad but strategically defined audience:
 ### Secondary Users
 
 - Financial beginners needing simplified tools
-- Crypto-aware users transitioning into regulated fintech
 - Emerging market users with limited banking access
+- Crypto-aware users transitioning into regulated fintech
 
 ### Enterprise Users (Future Scope)
 
@@ -137,30 +139,15 @@ PAYVORA is designed for a broad but strategically defined audience:
 
 PAYVORA is structured as a modular fintech ecosystem:
 
-### Core Modules
+### Core Modules (Implemented)
 
-- **Wallet System**
-  - Multi-currency storage and transfers
-  - Instant peer-to-peer payments
-
-- **Payments Layer**
-  - QR payments
-  - Merchant checkout
-  - Subscription handling
-
-- **Exchange Layer**
-  - Currency conversion
-  - Asset swapping (fiat + digital instruments)
-
-- **Financial Tools**
-  - Budget tracking
-  - Spending insights
-  - Automated savings
-
-- **Identity & Security Layer**
-  - Biometric authentication
-  - Fraud detection systems
-  - Encrypted transaction architecture
+- **Wallet System** — NGN balance storage, real-time display
+- **Bill Payments** — Airtime, data, electricity, cable TV, betting via Reloadly
+- **Gift Cards** — Trade interface (UI complete)
+- **Crypto** — Trade interface (UI complete)
+- **Virtual Cards** — Card management UI (UI complete)
+- **Rates** — Live rate display (static, upgrade planned)
+- **eSIM** — Plans via Reloadly
 
 ### Expansion Modules (Planned)
 
@@ -169,80 +156,8 @@ PAYVORA is structured as a modular fintech ecosystem:
 - Merchant dashboards
 - API banking infrastructure
 - AI financial assistant
-
----
-
-## Competitive Advantage
-
-PAYVORA’s competitive edge is defined by integration and experience quality.
-
-### Key Advantages
-
-- **Unified System Architecture**
-  - Eliminates need for multiple financial apps
-
-- **UX-First Fintech Design**
-  - Consumer-grade interface over banking complexity
-
-- **Real-Time Financial Operations**
-  - Instant settlement focus
-
-- **Scalable Modular Design**
-  - Supports rapid feature expansion without redesign
-
-- **AI-Ready Infrastructure**
-  - Designed for automation, prediction, and intelligent workflows
-
-- **Brand Consistency**
-  - Strong visual and interaction identity across all surfaces
-
----
-
-## Financial Inclusion Strategy
-
-PAYVORA is designed to reduce barriers to financial access globally.
-
-### Strategy Pillars
-
-- **Low Entry Barrier**
-  - Simple onboarding and minimal friction setup
-
-- **Cross-Border Accessibility**
-  - Multi-currency and international usability
-
-- **Mobile-First Architecture**
-  - Designed for regions where mobile is primary access point
-
-- **Lightweight UX Mode**
-  - Optimized performance for low-end devices and networks
-
-- **Education Layer (Planned)**
-  - Embedded financial literacy tools inside the app
-
----
-
-## Scalability Vision
-
-PAYVORA is built as a scalable financial operating system.
-
-### Technical Scalability
-
-- Microservices-based backend architecture
-- API-first design for external integrations
-- Cloud-native infrastructure
-- Event-driven transaction processing system
-
-### Product Scalability
-
-- Modular feature expansion without core redesign
-- Region-based financial compliance adaptability
-- Plugin-style ecosystem for third-party services
-
-### Market Scalability
-
-- Expansion from consumer fintech → SMB → enterprise
-- Localization-ready UI/UX system
-- Multi-regulatory framework support
+- KYC / identity verification
+- Push notification system
 
 ---
 
@@ -250,44 +165,31 @@ PAYVORA is built as a scalable financial operating system.
 
 - Every interaction must reduce complexity
 - Every feature must serve a clear user outcome
-- Design must prioritize clarity over decoration
+- Design must prioritise clarity over decoration
 - Trust must be visually and structurally reinforced
 - Performance is part of the brand experience
 - Financial operations must feel instant and predictable
 
 ---
 
-## Success Metrics
+## Competitive Advantage
 
-### User Metrics
-
-- Monthly Active Users (MAU)
-- Daily Active Transactions per User
-- Retention Rate (D7, D30, D90)
-- Onboarding Completion Rate
-
-### Financial Metrics
-
-- Total Transaction Volume (TTV)
-- Payment Success Rate
-- Cross-border transaction adoption
-- Average wallet balance growth
-
-### Experience Metrics
-
-- Time-to-complete transaction
-- User error rate in financial flows
-- Support ticket reduction over time
-- UX satisfaction score (in-app feedback)
-
-### System Metrics
-
-- Uptime (target: 99.99%)
-- Transaction latency (real-time threshold compliance)
-- Fraud detection accuracy
-- API response performance
+- **Unified System Architecture** — Eliminates need for multiple financial apps
+- **UX-First Fintech Design** — Consumer-grade interface over banking complexity
+- **Real-Time Financial Operations** — Instant settlement focus
+- **Scalable Modular Design** — Supports rapid feature expansion without redesign
+- **Brand Consistency** — Strong visual and interaction identity across all surfaces
 
 ---
 
-**PAYVORA Brand Strategy Document v1.0**  
-*Foundation for product design, engineering, marketing, and ecosystem expansion*
+## Financial Inclusion Strategy
+
+- **Low Entry Barrier** — Simple onboarding, no bank account required to start
+- **Cross-Border Accessibility** — Multi-currency and international usability planned
+- **Mobile-First Architecture** — Designed for regions where mobile is primary access point
+- **Lightweight UX Mode** — Optimised performance for varying network conditions
+
+---
+
+**PAYVORA Brand Strategy Document v1.1**
+*Updated to reflect current implementation — teal #00D9A0 accent, Manrope typeface, dark-first design*

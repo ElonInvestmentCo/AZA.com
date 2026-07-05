@@ -291,4 +291,116 @@ router.post("/auth/logout", requireAuth, (_req, res) => {
   res.json({ ok: true });
 });
 
+/* ── In-memory OTP store (keyed by lowercase email) ─────────────────────── */
+const otpStore = new Map<string, { code: string; expiresAt: number }>();
+
+function generateOtp(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+/* ── POST /api/auth/forgot-password ──────────────────────────────────────── */
+router.post("/auth/forgot-password", async (req, res) => {
+  const { email } = req.body as { email?: string };
+  if (!email) {
+    res.status(400).json({ error: "email is required" });
+    return;
+  }
+
+  const key = email.toLowerCase().trim();
+
+  const [user] = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.email, key))
+    .limit(1);
+
+  /* Always respond with 200 to prevent email enumeration */
+  if (!user) {
+    res.json({ ok: true, message: "If that email exists, a reset code has been sent." });
+    return;
+  }
+
+  const code = generateOtp();
+  otpStore.set(key, { code, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+  /* In production: send via email (SendGrid / Mailgun / Resend).
+   * For now, log to console so developers can complete the reset flow. */
+  console.log(`[PAYVORA OTP] Reset code for ${key}: ${code}`);
+
+  res.json({ ok: true, message: "If that email exists, a reset code has been sent." });
+});
+
+/* ── POST /api/auth/verify-otp ───────────────────────────────────────────── */
+router.post("/auth/verify-otp", async (req, res) => {
+  const { email, code } = req.body as { email?: string; code?: string };
+  if (!email || !code) {
+    res.status(400).json({ error: "email and code are required" });
+    return;
+  }
+
+  const key = email.toLowerCase().trim();
+  const entry = otpStore.get(key);
+
+  if (!entry || Date.now() > entry.expiresAt) {
+    res.status(400).json({ error: "Code has expired. Please request a new one." });
+    return;
+  }
+
+  if (entry.code !== code.trim()) {
+    res.status(400).json({ error: "Invalid verification code." });
+    return;
+  }
+
+  otpStore.delete(key);
+
+  /* Issue a short-lived reset token (reuses JWT infra with placeholder userId) */
+  const resetToken = signToken({ userId: "__reset__", email: key });
+
+  res.json({ ok: true, resetToken });
+});
+
+/* ── POST /api/auth/reset-password ───────────────────────────────────────── */
+router.post("/auth/reset-password", async (req, res) => {
+  const { resetToken, newPassword } = req.body as {
+    resetToken?: string;
+    newPassword?: string;
+  };
+
+  if (!resetToken || !newPassword) {
+    res.status(400).json({ error: "resetToken and newPassword are required" });
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    res.status(400).json({ error: "Password must be at least 8 characters" });
+    return;
+  }
+
+  const payload = verifyToken(resetToken);
+  if (!payload || payload.userId !== "__reset__") {
+    res.status(400).json({ error: "Invalid or expired reset token." });
+    return;
+  }
+
+  const [user] = await db
+    .select({ id: usersTable.id })
+    .from(usersTable)
+    .where(eq(usersTable.email, payload.email))
+    .limit(1);
+
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  await db
+    .update(usersTable)
+    .set({ passwordHash, updatedAt: new Date() })
+    .where(eq(usersTable.id, user.id));
+
+  res.json({ ok: true, message: "Password has been reset successfully." });
+});
+
 export default router;

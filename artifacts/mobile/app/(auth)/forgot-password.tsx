@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { apiFetch } from "@/utils/api";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -121,7 +122,7 @@ export default function ForgotPasswordScreen() {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
@@ -129,15 +130,20 @@ export default function ForgotPasswordScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLoading(true);
     setError("");
-    /* Simulate sending OTP to email */
-    setTimeout(() => {
-      setLoading(false);
-      /* Navigate to OTP screen in reset mode, passing the email so it can be displayed */
+    try {
+      await apiFetch("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ email: email.trim() }),
+      });
       router.push({
         pathname: "/(auth)/otp",
         params: { email: email.trim(), mode: "reset" },
       } as any);
-    }, 1400);
+    } catch {
+      setError("Failed to send reset code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -1,390 +1,257 @@
 # App Features
 
-## Wallet
-
-### Purpose
-Central financial hub of PAYVORA enabling storage, transfer, and management of multi-currency funds.
-
-### User Flow
-- Open app → Wallet dashboard
-- View balances and activity
-- Initiate transfers or payments
-
-### Business Rules
-- Requires KYC verification for full access
-- Supports multiple currencies
-- Real-time balance synchronization
-
-### Future Improvements
-- Sub-wallet segmentation (personal, business, savings)
-- AI-driven financial insights
+Status key: ✅ Complete | 🔶 UI Complete, backend pending | ❌ Planned / not started
 
 ---
 
-## Fund Wallet
+## Authentication ✅
 
-### Purpose
-Allows users to add funds into PAYVORA wallet.
+### Register
+- Email + full name + password (min 8 chars)
+- `POST /api/auth/register` — creates user + wallet in DB
+- Redirects to OTP screen after registration
 
-### User Flow
-- Select fund option
-- Choose payment method
-- Confirm transaction
-- Balance updates instantly or asynchronously
+### Login
+- Email + password
+- `POST /api/auth/login`
+- Redirects to OTP → Face ID gate
 
-### Business Rules
-- Minimum funding thresholds may apply
-- Fraud detection required
-- Transaction fees may apply depending on method
+### Google Sign-In ✅
+- Via `expo-auth-session` + `expo-web-browser`
+- Exchange access token at `POST /api/auth/google`
+- Calls Google userinfo endpoint server-side
 
-### Future Improvements
-- Instant bank linking
-- Crypto funding rails
+### Apple Sign-In ✅
+- Via `expo-apple-authentication` (iOS only)
+- Exchange identity token at `POST /api/auth/apple`
 
----
+### OTP Verification ✅
+- 4-digit code, 30-second resend countdown
+- Used in login flow (biometric gate) and password reset flow
+- Reset mode: verifies against server-stored 6-digit OTP → issues reset token
 
-## Withdraw
+### Forgot Password ✅
+- `POST /api/auth/forgot-password` — generates OTP, logs to console (email in production)
+- OTP verified at `POST /api/auth/verify-otp` → reset token returned
+- New password set at `POST /api/auth/reset-password`
 
-### Purpose
-Enables transfer of funds from PAYVORA to external accounts.
+### Face ID / Biometric ✅
+- `expo-local-authentication` — biometric gate after login/OTP
+- Acts as 2FA confirmation layer
 
-### User Flow
-- Select withdrawal option
-- Enter bank details
-- Input amount
-- Confirm transaction
-
-### Business Rules
-- KYC required
-- Daily limits enforced
-- Compliance screening for large withdrawals
-
-### Future Improvements
-- Instant withdrawal networks
-- Smart routing for lower fees
+### Session Management ✅
+- JWT tokens (30-day expiry), stored in `AsyncStorage`
+- Auto-restore on app launch via `/api/auth/me`
+- Logout clears token and user state
 
 ---
 
-## Transaction History
+## Wallet ✅
 
-### Purpose
-Provides full record of financial activity.
+### Balance Display
+- Fetched via `/api/auth/me` on login and app restore
+- Stored in `AuthContext` as `user.balance` (kobo integer)
+- Displayed as `₦XXX,XXX.XX` with show/hide toggle
 
-### User Flow
-- Navigate to Activity tab
-- Filter or search transactions
-- View details per transaction
+### Fund Wallet 🔶
+- Bank transfer instructions displayed
+- Payment gateway (Paystack / Flutterwave) integration pending
+- No wallet credit without gateway integration
 
-### Business Rules
-- Immutable logs
-- Real-time updates
-- Full audit trail required
-
-### Future Improvements
-- AI categorization
-- Exportable financial reports
-
----
-
-## Crypto
-
-### Purpose
-Enables users to trade and manage cryptocurrencies.
-
-### User Flow
-- Open crypto section
-- View assets and prices
-- Buy/sell crypto
-- Track portfolio
-
-### Business Rules
-- Real-time pricing required
-- Regional compliance enforced
-- Risk warnings mandatory
-
-### Future Improvements
-- Staking and yield products
-- Automated portfolio rebalancing
+### Withdraw ✅
+- Bank + account number + amount input
+- Validates balance sufficiency server-side
+- `POST /api/wallet/withdraw` — deducts balance, creates pending transaction record
+- Shows transaction ref and success confirmation
 
 ---
 
-## Gift Cards
+## Transaction History ✅
 
-### Purpose
-Digital gift card purchase and exchange system.
-
-### User Flow
-- Browse marketplace
-- Select card
-- Purchase and receive code
-
-### Business Rules
-- Instant delivery required
-- Fraud detection enabled
-- Limited refund policy
-
-### Future Improvements
-- Peer-to-peer trading
-- Global marketplace expansion
+- `GET /api/wallet/transactions` — paginated, ordered by newest first
+- Falls back to rich mock data if wallet is empty (demo mode)
+- Filter by: Credit, Debit, Pending
+- Date range: 7d, 30d, 3m, All time
+- Text search across name and category
+- Running totals: total in / total out for filtered view
+- Detail sheet: full receipt with share as text
 
 ---
 
-## Virtual Cards
+## Bill Payments ✅
 
-### Purpose
-Secure virtual payment card issuance.
+All powered by **Reloadly Utilities API**.
 
-### User Flow
-- Generate card
-- Fund card
-- Use for online payments
+### Airtime
+- Provider selection: MTN, Airtel, Glo, 9mobile
+- Amount entry + phone number
+- `POST /api/bills/pay` with `AIRTIME` biller type
 
-### Business Rules
-- Requires verified wallet
-- Spending limits enforced
-- Fraud monitoring active
+### Data Bundles
+- Provider + plan selection
+- `GET /api/bills/billers?type=INTERNET_BILL_PAYMENT`
 
-### Future Improvements
-- Disposable cards
-- Global issuing partners
+### Electricity
+- Meter number + distributor selection
+- Prepaid / postpaid support
+- `ELECTRICITY_BILL_PAYMENT` biller type
 
----
+### Cable TV
+- Provider: DSTV, GOtv, Startimes
+- Subscriber ID + plan selection
+- `CABLE_TV_BILL_PAYMENT` biller type
 
-## Rates
-
-### Purpose
-Real-time FX and crypto price tracking.
-
-### User Flow
-- Open rates screen
-- View live data
-- Use converter tools
-
-### Business Rules
-- Must sync with live market APIs
-- Ensure accuracy within defined latency threshold
-
-### Future Improvements
-- Predictive pricing models
-- Custom alerts
+### Betting Funding
+- Provider selection (Bet9ja, Sportybet, etc.)
+- Betting account ID
+- `BETTING_BILL_PAYMENT` biller type
 
 ---
 
-## Airtime
+## Gift Cards 🔶
 
-### Purpose
-Mobile airtime purchase functionality.
+### Sell Gift Card
+- Brand selection with flag/logo
+- Card value input
+- Image upload of physical card
+- Submission flow → pending review
+- Backend processing and rate locking pending
 
-### User Flow
-- Select airtime
-- Choose provider
-- Enter amount
-- Confirm purchase
-
-### Business Rules
-- Carrier integrations required
-- Instant delivery expected
-
-### Future Improvements
-- Auto-recharge subscriptions
-- Cross-border airtime
+### Rates Display
+- Static NGN/USD rates per gift card brand
+- Popular/Top Rate badges
+- Rates screen shows gift cards, crypto, eSIM tabs
 
 ---
 
-## Data
+## Crypto 🔶
 
-### Purpose
-Mobile data bundle purchase system.
+### Crypto Screen
+- Asset list: BTC, ETH, USDT, BNB, SOL, XRP
+- Price and 24h change display (static)
+- Portfolio allocation
 
-### User Flow
-- Select data plan
-- Choose carrier
-- Confirm purchase
-
-### Business Rules
-- Carrier-specific rules apply
-- Instant activation required
-
-### Future Improvements
-- AI plan recommendations
-- Usage optimization
+### Trade Asset Screen
+- Buy/sell interface with amount entry
+- Fiat ↔ crypto conversion preview
+- Live price feed integration pending
+- Trade execution backend pending
 
 ---
 
-## Electricity
+## Virtual Cards 🔶
 
-### Purpose
-Utility bill payment system.
+### Cards Tab
+- Active / inactive card status display
+- Card number (masked), expiry, CVV display
+- Fund card + freeze/unfreeze UI
+- Card request form
 
-### User Flow
-- Enter meter number
-- Select provider
-- Make payment
-
-### Business Rules
-- Account validation required
-- Receipt generation mandatory
-
-### Future Improvements
-- Auto-detection of bills
-- Smart reminders
+### Card Status Screen
+- Full card detail view
+- Spending limits display
+- Card issuer integration (Bridgecard / Mono) pending
 
 ---
 
-## Cable TV
+## Rates 🔶
 
-### Purpose
-Subscription management for TV services.
-
-### User Flow
-- Select provider
-- Enter subscriber ID
-- Pay subscription
-
-### Business Rules
-- Provider validation required
-- Renewal tracking enabled
-
-### Future Improvements
-- Bundled subscriptions
-- Auto-renew optimization
+- Gift card rates (static NGN/USD per brand)
+- Crypto rates (static NGN prices for BTC, ETH, USDT, BNB, SOL, XRP)
+- eSIM tab (live via Reloadly)
+- Live FX feed integration pending
 
 ---
 
-## Betting Funding
+## eSIM ✅
 
-### Purpose
-Wallet funding for betting platforms.
-
-### User Flow
-- Select provider
-- Enter account ID
-- Fund account
-
-### Business Rules
-- Age restrictions apply
-- Transaction limits enforced
-- Responsible gaming policies required
-
-### Future Improvements
-- Spending caps
-- Responsible gaming AI alerts
+- International eSIM plans via Reloadly
+- Region browsing: `GET /api/esim/regions`
+- Plan listing: `GET /api/esim/plans`
+- Purchase flow UI
 
 ---
 
-## Notifications
+## Onboarding ✅
 
-### Purpose
-User communication and updates.
-
-### User Flow
-- System pushes notifications
-- User views notification center
-
-### Business Rules
-- Critical alerts cannot be disabled
-- Real-time delivery required
-
-### Future Improvements
-- AI prioritization
-- Smart grouping
+- Animated multi-slide onboarding with Reanimated
+- Covers: Wallet, Bill Payments, Gift Cards, Virtual Cards features
+- Skip and Next navigation
+- Auto-advances to auth after completion
 
 ---
 
-## Security
+## Notifications ❌
 
-### Purpose
-Protect user accounts and transactions.
-
-### User Flow
-- Biometric login
-- OTP verification
-- Device management
-
-### Business Rules
-- End-to-end encryption required
-- Fraud detection systems active
-
-### Future Improvements
-- Behavioral biometrics
-- AI fraud detection
+- No notification centre screen yet
+- `expo-haptics` provides haptic feedback only
+- Push notification service (FCM / Expo Notifications) planned for Phase 7
 
 ---
 
-## KYC
+## KYC ❌
 
-### Purpose
-User identity verification system.
-
-### User Flow
-- Submit documents
-- Face verification
-- Approval process
-
-### Business Rules
-- Tiered access levels
-- Regulatory compliance required
-
-### Future Improvements
-- Instant verification via AI
-- Global identity interoperability
+- Not implemented in mobile app
+- AML/KYC policy page exists on marketing website (`/aml-kyc`)
+- Planned: BVN validation, NIN lookup, face match verification
 
 ---
 
-## Referral System
+## Referral System 🔶
 
-### Purpose
-User acquisition and growth mechanism.
-
-### User Flow
-- Share referral link
-- New user signs up
-- Rewards distributed
-
-### Business Rules
-- Anti-fraud monitoring required
-- Reward limits enforced
-
-### Future Improvements
-- Tiered referral system
-- Partner integrations
+- Referral code displayed with copy + share actions
+- Native share sheet integration
+- Reward tracking and distribution engine not yet built
 
 ---
 
-## Support
+## Security ✅
 
-### Purpose
-Customer support and issue resolution.
-
-### User Flow
-- Open help center
-- Submit ticket/chat
-- Track resolution
-
-### Business Rules
-- SLA-based response times
-- Ticket categorization required
-
-### Future Improvements
-- AI chatbot resolution
-- Predictive issue detection
+- JWT auth with 30-day expiry
+- bcryptjs password hashing (12 rounds)
+- Biometric gate via `expo-local-authentication`
+- OTP 2-factor verification
+- CORS restricted to allowed origins in production
+- All sensitive actions require re-authentication
 
 ---
 
-## Settings
+## Support ✅
 
-### Purpose
-User configuration and preferences.
+- Help & Support screen with FAQ links
+- App Info screen (version, build)
+- Language screen (UI only)
+- Contact routes to website
 
-### User Flow
-- Open settings
-- Update preferences
-- Manage security options
+---
 
-### Business Rules
-- Sensitive changes require re-authentication
-- Audit logs maintained
+## Settings / Profile ✅
 
-### Future Improvements
-- Personalized UI customization
-- Smart configuration suggestions
+- Profile: name, email, avatar from `AuthContext`
+- Logout: clears `AsyncStorage` + calls `POST /api/auth/logout`
+- Settings: language, support, app info, security
+
+---
+
+## Submitted / Rejected States ✅
+
+- `/(app)/submitted` — full-screen success state with title/subtitle params
+- `/(app)/rejected` — full-screen failure state
+- Used after bill payments, withdrawals, and gift card submissions
+
+---
+
+## Quick Payment 🔶
+
+- `/(app)/quick-payment` screen exists
+- Shortcut for common payment actions
+- Full wiring pending
+
+---
+
+## Dashboard (Home Tab) ✅
+
+- Wallet balance card (show/hide, fund, sell, withdraw)
+- Quick action grid (8 tiles)
+- Recent transactions preview
+- Greeting with username

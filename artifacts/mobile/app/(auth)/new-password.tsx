@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { PasswordInput } from "@/components/PasswordInput";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "@/utils/api";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -77,7 +78,7 @@ const st = StyleSheet.create({
 export default function NewPasswordScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
-  const params  = useLocalSearchParams<{ verified?: string; email?: string }>();
+  const params  = useLocalSearchParams<{ verified?: string; email?: string; resetToken?: string }>();
 
   const [newPass,  setNewPass]  = useState("");
   const [confirm,  setConfirm]  = useState("");
@@ -115,7 +116,7 @@ export default function NewPasswordScreen() {
 
   const { score } = getStrength(newPass);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!newPass.trim() || !confirm.trim()) {
       setError("Please fill in both fields.");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -134,11 +135,22 @@ export default function NewPasswordScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLoading(true);
     setError("");
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await apiFetch("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({
+          resetToken: params.resetToken ?? "",
+          newPassword: newPass,
+        }),
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace("/(auth)/password-changed");
-    }, 1200);
+    } catch (err: any) {
+      setError(err.message || "Failed to reset password. Please try again.");
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

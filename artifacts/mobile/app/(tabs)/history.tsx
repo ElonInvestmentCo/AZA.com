@@ -2,7 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { apiFetch } from "@/utils/api";
+import { useAuth } from "@/context/AuthContext";
 import {
   FlatList,
   Platform,
@@ -151,6 +153,58 @@ const ALL_TX: Transaction[] = [
     note:"1GB data — 09087654321", icon:"wifi",             iconBg:"#EFF6FF", iconColor:"#3B82F6",
   },
 ];
+
+/* ─── API transaction type + mapper ─────────────────────────────────────── */
+interface ApiTransaction {
+  id:          string;
+  type:        "credit" | "debit";
+  status:      "pending" | "completed" | "failed";
+  category:    string;
+  amountKobo:  number;
+  description: string;
+  externalRef?: string;
+  createdAt:   string;
+}
+
+function apiTxToLocal(t: ApiTransaction): Transaction {
+  const date     = new Date(t.createdAt);
+  const dateStr  = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const timeStr  = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+  const amtNaira = t.amountKobo / 100;
+  const amtStr   = "₦" + amtNaira.toLocaleString("en-NG");
+
+  type Icon = React.ComponentProps<typeof Feather>["name"];
+  const catMap: Record<string, { cat: string; icon: Icon; iconBg: string; iconColor: string }> = {
+    wallet_funding: { cat: "Wallet",    icon: "arrow-down-circle", iconBg: "#F0FFF4", iconColor: "#00B03C" },
+    bill_payment:   { cat: "Bills",     icon: "zap",               iconBg: "#FFFBEB", iconColor: "#D97706" },
+    gift_card:      { cat: "Gift Card", icon: "gift",              iconBg: "#FFF2CF", iconColor: "#5C4000" },
+    airtime:        { cat: "Airtime",   icon: "phone",             iconBg: "#FEFCE8", iconColor: "#CA8A04" },
+    esim:           { cat: "eSIM",      icon: "globe",             iconBg: "#EFF6FF", iconColor: "#3B82F6" },
+    withdrawal:     { cat: "Wallet",    icon: "arrow-up-circle",   iconBg: "#FFF0F0", iconColor: "#EF4444" },
+    transfer:       { cat: "Wallet",    icon: "arrow-right-circle",iconBg: "#F5F3FF", iconColor: "#7C3AED" },
+  };
+
+  const meta = catMap[t.category] ?? { cat: "Other", icon: "circle" as Icon, iconBg: "#F0F0F0", iconColor: "#888" };
+
+  return {
+    id:        t.id,
+    name:      t.description || meta.cat,
+    cat:       meta.cat,
+    date:      dateStr,
+    time:      timeStr,
+    ts:        date.getTime(),
+    amount:    amtStr,
+    amountRaw: amtNaira,
+    fee:       "₦0",
+    ref:       t.externalRef || `TXN-${t.id.slice(0, 8).toUpperCase()}`,
+    positive:  t.type === "credit",
+    status:    t.status as TxStatus,
+    note:      t.description,
+    icon:      meta.icon,
+    iconBg:    meta.iconBg,
+    iconColor: meta.iconColor,
+  };
+}
 
 /* ─── Filter types ───────────────────────────────────────────────────────── */
 type TxFilter  = "All" | "Credit" | "Debit" | "Pending";
@@ -423,13 +477,26 @@ const ds = StyleSheet.create({
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
   const topPad = Platform.OS === "web" ? 40 : insets.top;
+  const { user } = useAuth();
 
+  const [txData,     setTxData]     = useState<Transaction[]>(ALL_TX);
   const [txFilter,   setTxFilter]   = useState<TxFilter>("All");
   const [dateRange,  setDateRange]  = useState<DateRange>("all");
   const [searchText, setSearchText] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [selected,   setSelected]   = useState<Transaction | null>(null);
   const [sheetOpen,  setSheetOpen]  = useState(false);
+
+  /* ─── Fetch real transactions from API ── */
+  useEffect(() => {
+    apiFetch<{ transactions: ApiTransaction[] }>("/wallet/transactions")
+      .then(({ transactions }) => {
+        if (transactions.length > 0) {
+          setTxData(transactions.map(apiTxToLocal));
+        }
+      })
+      .catch(() => { /* keep mock data on error */ });
+  }, [user?.id]);
 
   const searchRef = useRef<TextInput>(null);
 
@@ -469,7 +536,7 @@ export default function HistoryScreen() {
   /* ─── Combined filter ── */
   const filtered = useMemo(() => {
     const q = searchText.toLowerCase().trim();
-    return ALL_TX.filter(t => {
+    return txData.filter(t => {
       if (txFilter === "Credit"  && !t.positive)            return false;
       if (txFilter === "Debit"   && t.positive)             return false;
       if (txFilter === "Pending" && t.status !== "pending") return false;

@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { apiFetch } from "@/utils/api";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -219,7 +220,7 @@ export default function OtpScreen() {
   const btnSc    = useSharedValue(1);
   const btnStyle = useAnimatedStyle(() => ({ transform: [{ scale: btnSc.value }] }));
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = digits.join("");
     if (code.length < OTP_LENGTH) {
       setError("Please enter the complete 4-digit code.");
@@ -228,19 +229,31 @@ export default function OtpScreen() {
     }
     setLoading(true);
     setError("");
-    setTimeout(() => {
-      setLoading(false);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      if (isReset) {
+
+    if (isReset) {
+      try {
+        const { resetToken } = await apiFetch<{ ok: boolean; resetToken: string }>(
+          "/auth/verify-otp",
+          { method: "POST", body: JSON.stringify({ email, code }) },
+        );
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         router.replace({
           pathname: "/(auth)/new-password",
-          params: { verified: "1", email },
+          params: { verified: "1", email, resetToken },
         } as any);
-      } else {
-        /* Login flow — go through Face ID / biometric gate */
-        router.replace("/(auth)/face-id" as any);
+      } catch (err: any) {
+        setLoading(false);
+        setError(err.message || "Invalid or expired code.");
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-    }, 1200);
+    } else {
+      /* Login flow — local biometric gate, no server round-trip needed */
+      setTimeout(() => {
+        setLoading(false);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        router.replace("/(auth)/face-id" as any);
+      }, 800);
+    }
   };
 
   const handleResend = () => {

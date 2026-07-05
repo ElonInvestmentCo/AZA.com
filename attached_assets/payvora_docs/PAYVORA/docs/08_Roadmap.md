@@ -2,267 +2,188 @@
 
 ## Overview
 
-This roadmap outlines the phased development strategy for the PAYVORA fintech platform. Each phase builds upon the previous one, ensuring security, regulatory compliance, scalability, and a reliable user experience from development through production.
+This roadmap outlines the phased development strategy for the PAYVORA fintech platform. Status reflects the current implementation as of July 2025.
 
 ---
 
-## Phase 1 — Project Foundation
-
-### Objectives
-Establish the technical foundation for the platform.
+## Phase 1 — Project Foundation ✅ COMPLETE
 
 ### Deliverables
-- System architecture
-- Monorepo/project structure
-- Database design
-- API standards
-- CI/CD pipeline
-- Docker environment
-- Environment configuration
-- Security baseline
-- Secrets management
-- Logging framework
+- pnpm monorepo structure (website, landing, mobile, api-server)
+- Express 5 API server with TypeScript
+- Drizzle ORM + PostgreSQL (hosted on Railway)
+- Expo 54 / React Native mobile app
+- Next.js 15 marketing website (`www.payvora.org`)
+- Vite + React landing site (served from API in production)
+- Docker-free deployment via Railway
+- JWT-based authentication library
+- Pino structured logging
+- Environment secrets management
 
-**Milestone**
-- Development environment fully operational
+**Status:** Dev environment fully operational on Replit + Railway production deployment.
 
 ---
 
-## Phase 2 — Identity & Compliance
-
-### Objectives
-Implement secure authentication and regulatory compliance.
+## Phase 2 — Identity & Compliance ✅ LARGELY COMPLETE
 
 ### Deliverables
-- User registration
-- Login
-- JWT authentication
-- Refresh tokens
-- Multi-factor authentication (MFA)
-- Password recovery
-- User profiles
-- Role-Based Access Control (RBAC)
-- KYC verification
-- Document upload
-- Identity verification workflow
-- Audit logs
+- ✅ User registration (email + password)
+- ✅ Login (email/password, Google OAuth, Apple Sign-In)
+- ✅ JWT authentication (30-day tokens)
+- ✅ Password recovery (forgot-password → OTP → reset-password)
+- ✅ OTP verification (in-memory 6-digit, 10-minute TTL)
+- ✅ Face ID / biometric gate (expo-local-authentication)
+- ✅ User profiles (name, email, avatar)
+- ✅ Session management (AsyncStorage + server-side logout)
+- ❌ Multi-factor authentication (SMS 2FA) — planned
+- ❌ Role-Based Access Control (RBAC) — planned
+- ❌ KYC verification (BVN, NIN, face match) — not started
+- ❌ Audit logs — not started
 
-**Milestone**
-- Fully verified user onboarding
+**Milestone:** Verified user onboarding operational. KYC pending.
 
 ---
 
-## Phase 3 — Wallet Infrastructure
-
-### Objectives
-Build PAYVORA's financial ledger and wallet system.
+## Phase 3 — Wallet Infrastructure ✅ CORE COMPLETE
 
 ### Deliverables
-- Wallet creation
-- Multi-currency wallets
-- Wallet funding
-- Withdrawals
-- Internal transfers
-- Double-entry ledger
-- Transaction history
-- Wallet statements
-- Balance reconciliation
+- ✅ Wallet creation (auto-created on register)
+- ✅ NGN balance storage (kobo precision)
+- ✅ Balance display (real-time from API)
+- ✅ Withdrawal to bank account (`POST /wallet/withdraw`)
+- ✅ Transaction recording (credits and debits)
+- ✅ Transaction history with filtering and search
+- 🔶 Wallet funding (bank transfer UI; payment gateway pending)
+- ❌ Double-entry ledger — planned
+- ❌ Wallet statements (export) — planned
+- ❌ Multi-currency wallets — planned
+- ❌ Balance reconciliation — planned
 
-**Milestone**
-- Secure wallet transactions operational
+**Milestone:** Core wallet transactions operational. Payment gateway integration needed for live funding.
 
 ---
 
-## Phase 4 — Trading Engine
-
-### Objectives
-Enable digital asset trading.
+## Phase 4 — Trading Engine 🔶 PARTIAL
 
 ### Deliverables
-- Cryptocurrency trading
-- Gift card trading
-- Live exchange rates
-- Trading workflow
-- Order processing
-- Trade history
-- Settlement engine
+- 🔶 Gift card trading UI (sell flow complete, processing backend pending)
+- 🔶 Crypto trading UI (buy/sell interface complete, live prices and execution pending)
+- 🔶 Live exchange rates (static rates display; live feed integration pending)
+- ❌ Order processing engine
+- ❌ Trade history (uses general transaction history)
+- ❌ Settlement engine
 
-**Milestone**
-- Trading engine live
+**Milestone:** UI scaffolding complete. Backend trading engine not yet built.
 
 ---
 
-## Phase 5 — Bill Payments & Financial Services
-
-### Objectives
-Expand financial services.
+## Phase 5 — Bill Payments & Financial Services ✅ COMPLETE
 
 ### Deliverables
-- Airtime purchase
-- Data subscriptions
-- Electricity bills
-- Cable TV payments
-- Betting wallet funding
-- Payment provider integrations
-- Transaction receipts
+- ✅ Airtime purchase (MTN, Airtel, Glo, 9mobile via Reloadly)
+- ✅ Data subscriptions (multi-carrier via Reloadly)
+- ✅ Electricity bills (EKEDC, IKEDC, AEDC via Reloadly)
+- ✅ Cable TV payments (DSTV, GOtv, Startimes via Reloadly)
+- ✅ Betting wallet funding (Bet9ja, Sportybet, etc. via Reloadly)
+- ✅ eSIM plans (international via Reloadly)
+- ✅ Transaction receipts (confirmation screens + shareable text)
 
-**Milestone**
-- Complete bill payment platform
+**Milestone:** Complete bill payment platform operational. Requires active Reloadly API keys.
 
 ---
 
-## Phase 6 — Virtual Cards
-
-### Objectives
-Launch virtual payment cards.
+## Phase 6 — Virtual Cards 🔶 UI ONLY
 
 ### Deliverables
-- Virtual card issuance
-- Card funding
-- Freeze/unfreeze cards
-- Spending controls
-- Card transactions
-- Card statements
-- Card management dashboard
+- 🔶 Virtual card request UI
+- 🔶 Card detail display (masked number, expiry, CVV)
+- 🔶 Card status (active/inactive) display
+- 🔶 Freeze/unfreeze UI
+- 🔶 Spending limits display
+- ❌ Card issuance API (Bridgecard / Mono integration pending)
+- ❌ Card funding from wallet
+- ❌ Card transaction history
 
-**Milestone**
-- Virtual cards operational
+**Milestone:** UI complete. Awaiting card issuer API integration.
 
 ---
 
-## Phase 7 — Notifications & Communication
-
-### Objectives
-Keep users informed across all channels.
+## Phase 7 — Notifications & Communication ❌ NOT STARTED
 
 ### Deliverables
-- Push notifications
-- Email notifications
-- SMS notifications
-- In-app notifications
-- Notification preferences
-- Messaging templates
+- ❌ Push notifications (FCM / Expo Notifications)
+- ❌ In-app notification centre
+- ❌ Email notifications (transaction confirmations, OTP)
+- ❌ SMS notifications
+- ❌ Notification preferences
 
-**Milestone**
-- Unified notification service
+**Note:** Currently using `expo-haptics` for in-app feedback only. OTP codes are logged to server console in dev.
 
 ---
 
-## Phase 8 — Administration & Operations
-
-### Objectives
-Provide internal tools for platform management.
+## Phase 8 — Administration & Operations ❌ NOT STARTED
 
 ### Deliverables
-- Admin authentication
-- User management
-- Transaction management
-- KYC review dashboard
-- Fraud monitoring
-- Customer support dashboard
-- Analytics
-- Reporting
-- Audit trail management
-
-**Milestone**
-- Admin portal fully functional
+- ❌ Admin authentication
+- ❌ User management dashboard
+- ❌ Transaction management
+- ❌ KYC review dashboard
+- ❌ Fraud monitoring
+- ❌ Customer support dashboard
+- ❌ Analytics and reporting
+- ❌ Audit trail management
 
 ---
 
-## Phase 9 — Testing & Security
-
-### Objectives
-Ensure platform reliability and security.
+## Phase 9 — Testing & Security ❌ NOT STARTED
 
 ### Deliverables
-- Unit testing
-- Integration testing
-- End-to-end testing
-- Performance testing
-- Load testing
-- Security testing
-- Penetration testing
-- User Acceptance Testing (UAT)
-
-**Milestone**
-- Production-ready certification
+- ❌ Unit testing
+- ❌ Integration testing
+- ❌ End-to-end testing
+- ❌ Performance and load testing
+- ❌ Security testing / penetration testing
 
 ---
 
-## Phase 10 — Production & Scaling
-
-### Objectives
-Deploy and scale the platform for real-world usage.
+## Phase 10 — Production & Scaling 🔶 IN PROGRESS
 
 ### Deliverables
-- Production deployment
-- Blue/green deployment
-- Monitoring
-- Centralized logging
-- Metrics and alerting
-- Automated backups
-- Disaster recovery
-- CDN integration
-- Auto scaling
-- Incident response documentation
-- Rollback procedures
-- Post-launch support
-
-**Milestone**
-- PAYVORA production launch
+- ✅ Production deployment (Railway + `www.payvora.org`)
+- ✅ CORS configuration for production domains
+- ✅ Environment secrets management
+- 🔶 Monitoring — basic (Railway logs)
+- ❌ Centralized structured logging (Pino configured, aggregation pending)
+- ❌ Automated backups
+- ❌ Disaster recovery plan
+- ❌ CDN integration
+- ❌ Auto scaling
 
 ---
 
-# Cross-Phase Activities
+## Current Priority Order
 
-- Security reviews
-- Code reviews
-- Documentation
-- API versioning
-- Database migrations
-- Performance optimization
-- Monitoring improvements
-- Compliance validation
-- Automated testing
-- Risk assessments
+1. **Email service integration** — required for OTP delivery (Phase 2, 7)
+2. **Payment gateway** (Paystack or Flutterwave) — required for wallet funding (Phase 3)
+3. **Card issuer integration** (Bridgecard / Mono) — required for virtual cards (Phase 6)
+4. **KYC integration** — required for full financial compliance (Phase 2)
+5. **Live price feeds** — crypto (CoinGecko) and FX rates (Phase 4)
+6. **Push notifications** — Expo Notifications + FCM (Phase 7)
+7. **Admin portal** — internal ops tooling (Phase 8)
 
 ---
 
-# Major Project Milestones
+## Major Milestones Summary
 
-| Milestone | Phase |
-|-----------|-------|
-| Development environment ready | 1 |
-| Secure onboarding complete | 2 |
-| Wallet infrastructure live | 3 |
-| Trading engine operational | 4 |
-| Financial services launched | 5 |
-| Virtual cards launched | 6 |
-| Notification platform completed | 7 |
-| Admin portal completed | 8 |
-| Production-ready certification | 9 |
-| PAYVORA public launch | 10 |
-
----
-
-# Expected Deliverables
-
-- Secure fintech backend
-- Mobile and web APIs
-- Admin portal
-- Wallet and ledger system
-- Trading engine
-- Bill payment platform
-- Virtual card platform
-- Notification service
-- Monitoring dashboards
-- CI/CD pipeline
-- Disaster recovery plan
-- Technical documentation
-- Production deployment infrastructure
-
----
-
-## Summary
-
-The PAYVORA roadmap follows a progressive, security-first development strategy. It begins with foundational infrastructure and compliance, builds core financial capabilities such as wallets and trading, expands into payment and card services, and concludes with comprehensive administration, testing, and production readiness.
+| Milestone | Phase | Status |
+|---|---|---|
+| Development environment ready | 1 | ✅ Complete |
+| Auth + onboarding complete | 2 | ✅ Complete |
+| Wallet infrastructure live | 3 | ✅ Core complete |
+| Trading engine operational | 4 | 🔶 UI only |
+| Financial services launched | 5 | ✅ Complete |
+| Virtual cards launched | 6 | 🔶 UI only |
+| Notification platform | 7 | ❌ Pending |
+| Admin portal | 8 | ❌ Pending |
+| Production-ready certification | 9 | ❌ Pending |
+| PAYVORA full public launch | 10 | 🔶 In progress |
