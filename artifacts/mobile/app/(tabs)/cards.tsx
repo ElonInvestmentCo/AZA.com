@@ -1,3 +1,11 @@
+/**
+ * Choose a Card Type screen
+ * Translated from the web prototype (Card06 + Card07 zip designs).
+ *
+ * Card designs:
+ *  – Virtual  : dark green #283C3A  (Card06 — red/orange Mastercard, gold chip, RFID)
+ *  – Premium  : olive gold  #6B6530  (Card07 — purple/navy Mastercard, warm-gold chip, frame)
+ */
 import * as Haptics from "expo-haptics";
 import React, { useRef, useCallback } from "react";
 import {
@@ -11,70 +19,140 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import Svg, {
+  Circle,
+  Path,
+  Rect,
+  G,
+  Defs,
+  ClipPath,
+  LinearGradient,
+  Stop,
+} from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-/* ─── Slide data (mirrors the Figma design) ─────────────────────────────── */
+/* ─── Slide data ─────────────────────────────────────────────────────────── */
 const SLIDES = [
   {
     id:          "virtual",
     label:       "Virtual",
-    cardColor:   "#6B7FD4",
-    cardGlow:    "rgba(107,127,212,0.40)",
-    cardLabel:   "VIRTUAL",
-    buttonColor: "#4B63CC",
+    cardBg:      "#283C3A",
+    cardGlow:    "rgba(40,60,58,0.45)",
+    buttonColor: "#283C3A",
     buttonText:  "Get virtual card",
     description:
       "Instant and ready to use online. Add to Apple Pay and use it to pay in stores, just like a physical card.",
   },
   {
-    id:          "disposable",
-    label:       "Disposable virtual",
-    cardColor:   "#F472B6",
-    cardGlow:    "rgba(244,114,182,0.40)",
-    cardLabel:   "DISPOSABLE VIRTUAL",
-    buttonColor: "#EC4899",
-    buttonText:  "Get disposable virtual card",
+    id:          "premium",
+    label:       "Premium",
+    cardBg:      "#6B6530",
+    cardGlow:    "rgba(116,109,53,0.45)",
+    buttonColor: "#5C5628",
+    buttonText:  "Get premium card",
     description:
-      "Add an extra layer of security with our disposable virtual cards. Your details automatically change each time you make a payment, protecting you from fraud.",
+      "Unlock exclusive benefits and worldwide acceptance with our premium metal-finish card.",
   },
 ] as const;
 
 /* ─── Mastercard logo ────────────────────────────────────────────────────── */
-function MastercardLogo() {
-  const S = 26;
-  const overlap = 10;
+function MastercardLogo({ isVirtual }: { isVirtual: boolean }) {
+  const S = 24;
+  const gap = 8; // overlap between the two circles
+  const totalW = S * 2 - gap;
+
+  if (isVirtual) {
+    // Card06: red left, orange right, amber blend in the middle
+    return (
+      <Svg width={totalW} height={S} viewBox={`0 0 ${totalW} ${S}`}>
+        <Circle cx={S / 2} cy={S / 2} r={S / 2} fill="#EF1B22" />
+        <Circle cx={totalW - S / 2} cy={S / 2} r={S / 2} fill="#F79E1C" />
+        {/* Blend overlap */}
+        <Circle cx={totalW / 2} cy={S / 2} r={S / 2 - gap + 2} fill="#FF5F00" opacity={0.4} />
+      </Svg>
+    );
+  }
+  // Card07: dark navy left, purple right
   return (
-    <View>
-      <View style={{ width: S + overlap + S - overlap, height: S, flexDirection: "row" }}>
-        <View style={[mc.circle, { backgroundColor: "#EB001B", left: 0 }]} />
-        <View style={[mc.circle, { backgroundColor: "#F79E1B", left: S - overlap }]} />
-        <View style={[mc.circle, { backgroundColor: "#FF5F00", left: (S - overlap) / 2, opacity: 0.45 }]} />
-      </View>
-      <Text style={mc.label}>mastercard</Text>
-    </View>
+    <Svg width={totalW} height={S} viewBox={`0 0 ${totalW} ${S}`}>
+      <Circle cx={S / 2} cy={S / 2} r={S / 2} fill="#28283E" stroke="#C1C1D7" strokeWidth={0.75} />
+      <Circle cx={totalW - S / 2} cy={S / 2} r={S / 2} fill="#8282B0" stroke="#C1C1D7" strokeWidth={0.75} />
+    </Svg>
   );
 }
 
-const mc = StyleSheet.create({
-  circle: { position: "absolute", width: 26, height: 26, borderRadius: 13 },
-  label:  { color: "rgba(255,255,255,0.85)", fontSize: 8, fontFamily: "Manrope_500Medium", letterSpacing: 0.4, marginTop: 2 },
-});
+/* ─── EMV chip ───────────────────────────────────────────────────────────── */
+function EmvChip({ isVirtual }: { isVirtual: boolean }) {
+  // Card06 chip: cream/gold  Card07 chip: richer warm gold
+  const bg = isVirtual ? "#E9DCA5" : "#D5B688";
+  const stroke = "#262626";
+  const sw = "0.7";
 
-/* ─── PAYVORA "P" mark ───────────────────────────────────────────────────── */
-function PayvoraMark() {
   return (
-    <View style={pm.wrap}>
-      <Text style={pm.letter}>P</Text>
-    </View>
+    <Svg width={36} height={28} viewBox="0 0 36 28">
+      {/* Chip body */}
+      <Rect x={0} y={0} width={36} height={28} rx={4} fill={bg} />
+
+      {/* Left contact traces */}
+      <Path
+        d={`M0.5 9H11C12.1 9 13 9.9 13 11V14.5
+           M13 27.5V21.5
+           M13 21.5V14.5
+           M13 21.5H0.5
+           M13 14.5H0.5`}
+        stroke={stroke} strokeWidth={sw} fill="none" strokeLinecap="round"
+      />
+      {/* Right contact traces */}
+      <Path
+        d={`M35.5 9H25C23.9 9 23 9.9 23 11V14.5
+           M23 27.5V21.5
+           M23 21.5V14.5
+           M23 21.5H35.5
+           M23 14.5H35.5`}
+        stroke={stroke} strokeWidth={sw} fill="none" strokeLinecap="round"
+      />
+    </Svg>
   );
 }
 
-const pm = StyleSheet.create({
-  wrap:   { width: 38, height: 38, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
-  letter: { color: "#FFFFFF", fontSize: 20, fontFamily: "Manrope_700Bold", lineHeight: 22 },
-});
+/* ─── RFID / contactless waves ───────────────────────────────────────────── */
+function RfidWaves({ isVirtual }: { isVirtual: boolean }) {
+  // Card06: dark stroke  Card07: white stroke (on darker bg the waves are subtle)
+  const strokeColor = isVirtual ? "#424242" : "rgba(255,255,255,0.55)";
+  return (
+    <Svg width={22} height={26} viewBox="0 0 22 26">
+      <Path
+        d="M5.5 13C7.6 10.6 7.6 6.4 5.5 4"
+        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none"
+      />
+      <Path
+        d="M10.1 15.5C13.8 11.4 13.8 4.6 10.1 0.5"
+        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none"
+      />
+      <Path
+        d="M15 18C20.4 12.2 20.4 3.8 15 -2"
+        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none"
+      />
+    </Svg>
+  );
+}
 
-/* ─── Portrait card visual ───────────────────────────────────────────────── */
+/* ─── Premium decorative frame (Card07 only) ─────────────────────────────── */
+function PremiumFrame({ w }: { w: number }) {
+  // Four parallelogram shapes fanning from center-bottom (Card07 Frame 252)
+  const frameW = Math.min(w * 0.65, 130);
+  const frameH = 32;
+  return (
+    <Svg width={frameW} height={frameH} viewBox="0 0 160 32">
+      <Path d="M0 32L10 0L30 0L20 32Z"   fill="rgba(255,255,255,0.18)" />
+      <Path d="M40 32L50 0L70 0L60 32Z"  fill="rgba(255,255,255,0.18)" />
+      <Path d="M80 32L90 0L110 0L100 32Z"fill="rgba(255,255,255,0.18)" />
+      <Path d="M120 32L130 0L150 0L140 32Z" fill="rgba(255,255,255,0.18)" />
+    </Svg>
+  );
+}
+
+/* ─── Card visual ────────────────────────────────────────────────────────── */
 function Card({
   slide,
   cardW,
@@ -84,6 +162,31 @@ function Card({
   cardW: number;
   cardH: number;
 }) {
+  const isVirtual = slide.id === "virtual";
+
+  /*
+   * Layout ratios derived from Card06/Card07 React components (316×500 reference):
+   *   Mastercard area : left 7.6 %, top 26 %   w 51/316 ≈ 16%, h 60/500 ≈ 12%
+   *   RFID waves      : left 7  %, top 43 %
+   *   EMV chip        : left 41 %, top 31 %
+   *   PAYVORA text    : right ~5%, top 2% (vertical, full height)
+   *   Premium frame   : centered, bottom 8%
+   */
+  const mastercardLeft  = cardW * 0.072;
+  const mastercardTop   = cardH * 0.26;
+  const rfidLeft        = cardW * 0.07;
+  const rfidTop         = cardH * 0.44;
+  const chipLeft        = cardW * 0.41;
+  const chipTop         = cardH * 0.31;
+
+  // Card07 has mastercard on the RIGHT (left: 263/316 ≈ 83%)
+  const mc07Left        = cardW * 0.83;
+  const mc07Top         = cardH * 0.033;
+  const chip07Left      = cardW * 0.83;
+  const chip07Top       = cardH * 0.31;
+  const rfid07Left      = cardW * 0.62;
+  const rfid07Top       = cardH * 0.31;
+
   return (
     <View
       style={[
@@ -91,45 +194,92 @@ function Card({
         {
           width: cardW,
           height: cardH,
-          backgroundColor: slide.cardColor,
+          backgroundColor: slide.cardBg,
           shadowColor: slide.cardGlow,
         },
       ]}
     >
-      <View style={cv.blob} />
+      {/* ── Card number (faint, horizontal center) ── */}
       <View style={cv.numWrap}>
-        <Text style={cv.num}>8003  6071  0534  6352</Text>
+        <Text style={cv.num}>•• 6352</Text>
       </View>
-      <View style={[cv.sideLabel, { left: -(cardH * 0.25) / 2 + 10 }]}>
-        <Text style={cv.sideLabelText}>CARD HOLDER</Text>
+
+      {/* ── PAYVORA brand name vertical right edge ── */}
+      <View
+        pointerEvents="none"
+        style={[
+          cv.brandWrap,
+          isVirtual
+            ? { right: 10, top: cardH * 0.04 }
+            : { left: cardW * 0.44, top: cardH * 0.13 },
+        ]}
+      >
+        <Text style={cv.brandText}>PAYVORA</Text>
       </View>
-      <View style={[cv.sideLabel, { right: -(cardH * 0.25) / 2 + 10, transform: [{ rotate: "90deg" }] }]}>
-        <Text style={[cv.sideLabelText, { fontSize: 8.5 }]}>{slide.cardLabel}</Text>
-      </View>
-      <View style={cv.bottom}>
-        <MastercardLogo />
-        <PayvoraMark />
-      </View>
+
+      {isVirtual ? (
+        <>
+          {/* ── Card06: Mastercard (left side, rotated label) ── */}
+          <View style={{ position: "absolute", left: mastercardLeft, top: mastercardTop }}>
+            <MastercardLogo isVirtual />
+            <Text style={cv.mastercardLabel}>mastercard</Text>
+          </View>
+
+          {/* ── Card06: RFID waves ── */}
+          <View style={{ position: "absolute", left: rfidLeft, top: rfidTop }}>
+            <RfidWaves isVirtual />
+          </View>
+
+          {/* ── Card06: EMV chip ── */}
+          <View style={{ position: "absolute", left: chipLeft, top: chipTop }}>
+            <EmvChip isVirtual />
+          </View>
+        </>
+      ) : (
+        <>
+          {/* ── Card07: Mastercard (right side) ── */}
+          <View style={{ position: "absolute", left: mc07Left, top: mc07Top }}>
+            <MastercardLogo isVirtual={false} />
+            <Text style={[cv.mastercardLabel, { color: "rgba(255,255,255,0.75)" }]}>
+              mastercard
+            </Text>
+          </View>
+
+          {/* ── Card07: EMV chip (right area) ── */}
+          <View style={{ position: "absolute", left: chip07Left, top: chip07Top }}>
+            <EmvChip isVirtual={false} />
+          </View>
+
+          {/* ── Card07: RFID waves ── */}
+          <View style={{ position: "absolute", left: rfid07Left, top: rfid07Top }}>
+            <RfidWaves isVirtual={false} />
+          </View>
+
+          {/* ── Card07: decorative frame at bottom ── */}
+          <View
+            style={{
+              position: "absolute",
+              bottom: cardH * 0.08,
+              left: (cardW - Math.min(cardW * 0.65, 130)) / 2,
+            }}
+          >
+            <PremiumFrame w={cardW} />
+          </View>
+        </>
+      )}
     </View>
   );
 }
 
 const cv = StyleSheet.create({
   root: {
-    borderRadius: 28,
+    borderRadius: 20,
     shadowOffset: { width: 0, height: 24 },
-    shadowOpacity: 0.55,
+    shadowOpacity: 0.5,
     shadowRadius: 40,
     elevation: 14,
     overflow: "hidden",
     position: "relative",
-  },
-  blob: {
-    position: "absolute",
-    top: "10%", left: "20%",
-    width: "60%", height: "38%",
-    borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.13)",
   },
   numWrap: {
     position: "absolute",
@@ -138,45 +288,32 @@ const cv = StyleSheet.create({
     justifyContent: "center",
   },
   num: {
-    color: "rgba(255,255,255,0.20)",
-    fontSize: 11,
+    color: "rgba(255,255,255,0.12)",
+    fontSize: 12,
     fontFamily: "Manrope_500Medium",
-    letterSpacing: 3,
+    letterSpacing: 4,
   },
-  sideLabel: {
+  brandWrap: {
     position: "absolute",
-    top: 0, bottom: 0,
-    justifyContent: "center",
-    transform: [{ rotate: "-90deg" }],
+    transform: [{ rotate: "90deg" }],
   },
-  sideLabelText: {
-    color: "rgba(255,255,255,0.72)",
-    fontSize: 9,
+  brandText: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 11,
     fontFamily: "Manrope_600SemiBold",
-    letterSpacing: 2.5,
+    letterSpacing: 3,
     textTransform: "uppercase",
   },
-  bottom: {
-    position: "absolute",
-    bottom: 20, left: 20, right: 20,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
+  mastercardLabel: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 7,
+    fontFamily: "Manrope_500Medium",
+    letterSpacing: 0.3,
+    marginTop: 3,
   },
 });
 
-/* ─── Tab button with crossfaded bold ↔ normal text ─────────────────────── */
-/*
- * Layout strategy:
- *   - A hidden bold copy (opacity: 0, pointerEvents: "none") establishes the
- *     wrapper's intrinsic width so the row never shifts when font weight changes.
- *   - Two Animated.Text layers use StyleSheet.absoluteFillObject so they have
- *     explicit top/bottom/left/right: 0 — this is critical. Without explicit
- *     coordinates Yoga may place absolute children at ambiguous positions,
- *     causing them to overflow into adjacent sections (the bug in the original).
- *   - overflow: "hidden" on the wrapper + numberOfLines={1} guarantee the labels
- *     stay within their allocated box no matter how long the text is.
- */
+/* ─── Tab button (crossfade bold ↔ normal) ───────────────────────────────── */
 function TabButton({
   slide,
   index,
@@ -195,12 +332,10 @@ function TabButton({
     outputRange: index === 0 ? [1, 0] : [0, 1],
     extrapolate: "clamp",
   });
-
   const normalOpacity = activeAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
   const boldOpacity   = activeAnim;
-
   const normalColor: Animated.AnimatedInterpolation<string> = scrollX.interpolate({
-    inputRange: [0, pageW],
+    inputRange:  [0, pageW],
     outputRange: index === 0
       ? (["#111111", "#b0b0b0"] as any)
       : (["#b0b0b0", "#111111"] as any),
@@ -209,18 +344,13 @@ function TabButton({
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={tb.wrap}>
-      {/* Invisible bold copy — sets the wrapper's intrinsic width/height */}
       <Text style={[tb.measure, tb.bold]} numberOfLines={1}>{slide.label}</Text>
-
-      {/* Normal-weight layer — fades out when this tab is active */}
       <Animated.Text
         style={[tb.label, tb.normal, StyleSheet.absoluteFillObject, { opacity: normalOpacity, color: normalColor as any }]}
         numberOfLines={1}
       >
         {slide.label}
       </Animated.Text>
-
-      {/* Bold layer — fades in when this tab is active */}
       <Animated.Text
         style={[tb.label, tb.bold, StyleSheet.absoluteFillObject, { opacity: boldOpacity, color: "#111111" }]}
         numberOfLines={1}
@@ -232,67 +362,30 @@ function TabButton({
 }
 
 const tb = StyleSheet.create({
-  wrap: {
-    paddingVertical: 6, paddingHorizontal: 4,
-    overflow: "hidden",      // clips text that is wider than the measured width
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  measure: { opacity: 0 },  // invisible; only contributes to layout measurement
-  label: {
-    fontSize: 17, letterSpacing: -0.2,
-    textAlign: "center",     // keeps text centred within the absoluteFillObject frame
-  },
-  normal: { fontFamily: "Manrope_400Regular" },
-  bold:   { fontFamily: "Manrope_700Bold" },
+  wrap:    { paddingVertical: 6, paddingHorizontal: 4, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  measure: { opacity: 0 },
+  label:   { fontSize: 17, letterSpacing: -0.2, textAlign: "center" },
+  normal:  { fontFamily: "Manrope_400Regular" },
+  bold:    { fontFamily: "Manrope_700Bold" },
 });
 
 /* ─── Main screen ────────────────────────────────────────────────────────── */
-
-/*
- * The pill tab bar in _layout.tsx is positioned ABSOLUTELY over the screen
- * (not in the layout flow), so this screen must manually reserve space for it.
- *
- * Pill bar geometry (mirrored from _layout.tsx):
- *   height:     68 pt
- *   bottom:     max(insets.bottom + 10, iOS ? 20 : 12)
- *
- * Total clearance = barBottom + barHeight + a small breathing gap.
- */
 const PILL_BAR_HEIGHT = 68;
 
 export default function CardsScreen() {
-  const insets = useSafeAreaInsets();
+  const insets  = useSafeAreaInsets();
   const { width: screenW, height: screenH } = useWindowDimensions();
-  const topPad = Platform.OS === "web" ? 48 : insets.top;
-  const pageW  = screenW;
+  const topPad  = Platform.OS === "web" ? 48 : insets.top;
+  const pageW   = screenW;
 
-  /*
-   * Bottom clearance: enough space so the CTA button sits comfortably above
-   * the floating pill tab bar on every device.
-   */
-  const barBottom = Math.max(
-    insets.bottom + 10,
-    Platform.OS === "ios" ? 20 : 12,
-  );
-  const tabBarClearance = barBottom + PILL_BAR_HEIGHT + 20; // 20 pt breathing room
+  const barBottom      = Math.max(insets.bottom + 10, Platform.OS === "ios" ? 20 : 12);
+  const tabBarClearance = barBottom + PILL_BAR_HEIGHT + 20;
 
-  /*
-   * Card height: dynamically sized so all UI elements fit without scrolling.
-   *
-   * Budget consumed by everything except the card:
-   *   topPad           – device status bar / notch
-   *   46               – header (paddingTop 8 + title ~22 + paddingBottom 16)
-   *   CARD_V_PAD * 2   – vertical padding around the card in its scroll zone
-   *   42               – tab row (label 21 + tb.wrap paddingV 12 + s.tabs paddingV 8 ≈ 41)
-   *   72               – minimum description area
-   *   58               – CTA button
-   *   tabBarClearance  – space for floating pill bar
-   */
-  const CARD_V_PAD   = 16;
-  const RESERVED     = topPad + 46 + CARD_V_PAD * 2 + 42 + 72 + 58 + tabBarClearance;
+  const CARD_V_PAD = 16;
+  const RESERVED   = topPad + 46 + CARD_V_PAD * 2 + 42 + 72 + 58 + tabBarClearance;
   const cardH = Math.min(Math.max(Math.round(screenH - RESERVED), 200), 340);
-  const cardW = Math.round(cardH * 0.63);
+  // Card06/07 aspect ratio: 210 / 332 ≈ 0.632
+  const cardW = Math.round(cardH * (210 / 332));
 
   const scrollX   = useRef(new Animated.Value(0)).current;
   const scrollRef = useRef<ScrollView>(null);
@@ -316,15 +409,7 @@ export default function CardsScreen() {
         <View style={s.headerSpacer} />
       </View>
 
-      {/* ── Horizontal card swipe ──────────────────────────────────────────
-       *  • pagingEnabled + decelerationRate "fast" snaps pages cleanly.
-       *  • scrollEventThrottle={1} drives the interpolations at full 60 FPS.
-       *  • alwaysBounceVertical={false} prevents the scroll view from
-       *    jolting vertically when the user swipes slightly off-axis, which
-       *    is the main source of reported scroll jank on this screen.
-       *  • The Animated event uses useNativeDriver:false because it drives
-       *    opacity/color animated values that require the JS thread.
-       ─────────────────────────────────────────────────────────────────── */}
+      {/* ── Horizontal card swipe ── */}
       <Animated.ScrollView
         ref={scrollRef as any}
         horizontal
@@ -349,7 +434,7 @@ export default function CardsScreen() {
         ))}
       </Animated.ScrollView>
 
-      {/* ── Bottom UI: tabs + description + CTA ─────────────────────────── */}
+      {/* ── Bottom UI ── */}
       <View style={[s.bottom, { paddingBottom: tabBarClearance }]}>
 
         {/* Tabs */}
@@ -366,28 +451,12 @@ export default function CardsScreen() {
           ))}
         </View>
 
-        {/* Description — cross-fades between slides
-         *
-         * Each description lives inside an Animated.View that uses
-         * StyleSheet.absoluteFillObject (top/bottom/left/right: 0) so it is
-         * explicitly anchored to all four edges of descArea.  Without explicit
-         * coordinates Yoga's absolute placement is ambiguous and the text can
-         * bleed into the tab row or the CTA area.
-         *
-         * The Text element (non-absolute, normal flow inside the Animated.View)
-         * wraps naturally and is vertically centred by alignItems/justifyContent
-         * on the Animated.View.  paddingHorizontal gives the text comfortable
-         * breathing room without fighting with the parent's own padding.
-         */}
+        {/* Description */}
         <View style={s.descArea}>
           {SLIDES.map((slide, i) => (
             <Animated.View
               key={slide.id}
-              style={[
-                StyleSheet.absoluteFillObject,
-                s.descLayer,
-                { opacity: opacities[i] },
-              ]}
+              style={[StyleSheet.absoluteFillObject, s.descLayer, { opacity: opacities[i] }]}
               pointerEvents="none"
             >
               <Text style={s.descText}>{slide.description}</Text>
@@ -395,20 +464,12 @@ export default function CardsScreen() {
           ))}
         </View>
 
-        {/* CTA — cross-fades between slides */}
+        {/* CTA */}
         <View style={s.ctaArea}>
           {SLIDES.map((slide, i) => (
             <Animated.View
               key={slide.id}
-              style={[
-                s.ctaBtnWrap,
-                {
-                  opacity: opacities[i],
-                  position: "absolute",
-                  left: 0, right: 0,
-                  pointerEvents: "box-none",
-                },
-              ]}
+              style={[s.ctaBtnWrap, { opacity: opacities[i], position: "absolute", left: 0, right: 0, pointerEvents: "box-none" }]}
             >
               <TouchableOpacity
                 activeOpacity={0.88}
@@ -434,100 +495,25 @@ export default function CardsScreen() {
 }
 
 const s = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
+  root:        { flex: 1, backgroundColor: "#FFFFFF" },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    paddingTop: 8,
-  },
-  headerSpacer: { width: 36 },
-  headerTitle: {
-    fontSize: 17,
-    fontFamily: "Manrope_700Bold",
-    color: "#111111",
-    letterSpacing: -0.2,
-    textAlign: "center",
-  },
+  header:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingBottom: 16, paddingTop: 8 },
+  headerSpacer:{ width: 36 },
+  headerTitle: { fontSize: 17, fontFamily: "Manrope_700Bold", color: "#111111", letterSpacing: -0.2, textAlign: "center" },
 
-  /*
-   * Card scroll zone — fixed height (flexShrink: 0) so it doesn't compress
-   * when the bottom section needs space, and doesn't expand to take extra
-   * space that should go to the description area.
-   */
-  cardScroll: { flexShrink: 0 },
+  cardScroll:  { flexShrink: 0 },
+  cardPage:    { alignItems: "center", justifyContent: "center" },
 
-  cardPage: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  bottom:      { flex: 1, flexDirection: "column", justifyContent: "space-between", paddingHorizontal: 20 },
 
-  /*
-   * Bottom section — takes all remaining vertical space (flex: 1) and
-   * distributes it between tabs (fixed), description (flex: 1), and CTA
-   * (fixed). paddingBottom is applied inline so it can use the dynamic
-   * tabBarClearance value.
-   */
-  bottom: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-  },
+  tabs:        { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 32, paddingVertical: 4 },
 
-  tabs: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 32,
-    paddingVertical: 4,
-  },
+  descArea:    { flex: 1, overflow: "hidden" },
+  descLayer:   { alignItems: "center", justifyContent: "center", paddingHorizontal: 8 },
+  descText:    { fontFamily: "Manrope_400Regular", fontSize: 15, color: "#999999", lineHeight: 23, textAlign: "center" },
 
-  descArea: {
-    flex: 1,
-    overflow: "hidden",   // clips any text that overflows the allocated flex space
-  },
-  /* Full-bleed wrapper for each description — anchored to all four edges so
-   * Yoga never places it at an ambiguous position. Text is centred inside. */
-  descLayer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
-  descText: {
-    fontFamily: "Manrope_400Regular",
-    fontSize: 15,
-    color: "#999999",
-    lineHeight: 23,
-    textAlign: "center",
-  },
-
-  ctaArea: {
-    height: 54,
-    position: "relative",
-  },
-  ctaBtnWrap: {},
-  ctaBtn: {
-    height: 54,
-    borderRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.30,
-    shadowRadius: 20,
-    elevation: 8,
-  },
-  ctaBtnText: {
-    fontFamily: "Manrope_600SemiBold",
-    fontSize: 17,
-    color: "#FFFFFF",
-    letterSpacing: -0.2,
-  },
+  ctaArea:     { height: 54, position: "relative" },
+  ctaBtnWrap:  {},
+  ctaBtn:      { height: 54, borderRadius: 100, alignItems: "center", justifyContent: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.30, shadowRadius: 20, elevation: 8 },
+  ctaBtnText:  { fontFamily: "Manrope_600SemiBold", fontSize: 17, color: "#FFFFFF", letterSpacing: -0.2 },
 });
