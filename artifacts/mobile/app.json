@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "PayVora",
+    "name": "PAYVORA",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,8 +10,8 @@
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-payvora.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#000000"
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0F"
     },
     "ios": {
       "supportsTablet": false

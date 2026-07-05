@@ -29,11 +29,11 @@ export function DownloadCTA() {
 
             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
               Ready to experience{" "}
-              <span className="text-[#00D9A0]">PayVora?</span>
+              <span className="text-[#00D9A0]">PAYVORA?</span>
             </h2>
             <p className="text-[#8F8FA3] text-lg mb-10 max-w-xl mx-auto">
               Join 50,000+ Nigerians who manage their money smarter with
-              PayVora. Download free today and get started in minutes.
+              PAYVORA. Download free today and get started in minutes.
             </p>
 
             {/* App store badges */}

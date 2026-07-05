@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy – PayVora",
-  description: "Read PayVora's Privacy Policy to understand how we collect, use, and protect your personal data.",
+  title: "Privacy Policy – PAYVORA",
+  description: "Read PAYVORA's Privacy Policy to understand how we collect, use, and protect your personal data.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -16,7 +16,7 @@ export default function PrivacyPolicyPage() {
           {[
             {
               title: "1. Introduction",
-              body: `PayVora ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and website (collectively, the "Services"). Please read this policy carefully. If you do not agree with its terms, please discontinue use of our Services.`,
+              body: `PAYVORA ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and website (collectively, the "Services"). Please read this policy carefully. If you do not agree with its terms, please discontinue use of our Services.`,
             },
             {
               title: "2. Information We Collect",
@@ -24,7 +24,7 @@ export default function PrivacyPolicyPage() {
             },
             {
               title: "3. How We Use Your Information",
-              body: `We use your information to:\n\n• Create and manage your PayVora account\n• Process transactions and facilitate gift card trades\n• Verify your identity in compliance with KYC/AML regulations\n• Send transaction confirmations and account alerts\n• Respond to customer support inquiries\n• Detect and prevent fraud and unauthorized access\n• Improve our Services and develop new features\n• Comply with applicable laws and regulatory requirements`,
+              body: `We use your information to:\n\n• Create and manage your PAYVORA account\n• Process transactions and facilitate gift card trades\n• Verify your identity in compliance with KYC/AML regulations\n• Send transaction confirmations and account alerts\n• Respond to customer support inquiries\n• Detect and prevent fraud and unauthorized access\n• Improve our Services and develop new features\n• Comply with applicable laws and regulatory requirements`,
             },
             {
               title: "4. How We Share Your Information",
@@ -44,7 +44,7 @@ export default function PrivacyPolicyPage() {
             },
             {
               title: "8. Children's Privacy",
-              body: `PayVora is not intended for users under 18 years of age. We do not knowingly collect data from minors. If we discover we have inadvertently collected data from a minor, we will delete it immediately.`,
+              body: `PAYVORA is not intended for users under 18 years of age. We do not knowingly collect data from minors. If we discover we have inadvertently collected data from a minor, we will delete it immediately.`,
             },
             {
               title: "9. Changes to This Policy",

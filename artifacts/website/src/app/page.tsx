@@ -9,9 +9,9 @@ import { FAQPreview } from "@/components/sections/FAQPreview";
 import { DownloadCTA } from "@/components/sections/DownloadCTA";
 
 export const metadata: Metadata = {
-  title: "PayVora – Nigeria's #1 Fintech App for Gift Cards & Bill Payments",
+  title: "PAYVORA – Nigeria's #1 Fintech App for Gift Cards & Bill Payments",
   description:
-    "Trade gift cards instantly, pay any bill, recharge airtime, and get a free virtual dollar card. Join thousands of Nigerians using PayVora.",
+    "Trade gift cards instantly, pay any bill, recharge airtime, and get a free virtual dollar card. Join thousands of Nigerians using PAYVORA.",
 };
 
 export default function HomePage() {

@@ -3,7 +3,7 @@ import { DownloadCTA } from "@/components/sections/DownloadCTA";
 import { Clock, TrendingUp, ShieldCheck, Zap, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Gift Card Trading – PayVora",
+  title: "Gift Card Trading – PAYVORA",
   description:
     "Trade Amazon, iTunes, Google Play, Steam, and 50+ gift card brands for instant Naira. Best rates in Nigeria.",
 };

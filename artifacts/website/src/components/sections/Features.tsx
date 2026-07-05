@@ -96,7 +96,7 @@ export function Features() {
             One app, endless possibilities
           </h2>
           <p className="text-[#8F8FA3] text-lg max-w-2xl mx-auto">
-            PayVora combines everything you need to manage your finances in one
+            PAYVORA combines everything you need to manage your finances in one
             sleek, fast, and secure app.
           </p>
         </div>

@@ -6,7 +6,7 @@ import { Shield, Lock, Eye } from "lucide-react";
 export const metadata: Metadata = {
   title: "Security",
   description:
-    "PayVora uses bank-grade 256-bit encryption, biometric authentication, 2FA, and AI fraud detection to keep your money safe.",
+    "PAYVORA uses bank-grade 256-bit encryption, biometric authentication, 2FA, and AI fraud detection to keep your money safe.",
 };
 
 export default function SecurityPage() {
@@ -39,7 +39,7 @@ export default function SecurityPage() {
               {
                 icon: Lock,
                 title: "End-to-end encryption",
-                body: "All communication between your device and PayVora servers is encrypted using TLS 1.3. Your data is stored with AES-256 encryption. No one — not even our engineers — can read your personal data.",
+                body: "All communication between your device and PAYVORA servers is encrypted using TLS 1.3. Your data is stored with AES-256 encryption. No one — not even our engineers — can read your personal data.",
               },
               {
                 icon: Shield,

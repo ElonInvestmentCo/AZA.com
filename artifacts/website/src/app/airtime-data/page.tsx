@@ -3,7 +3,7 @@ import { DownloadCTA } from "@/components/sections/DownloadCTA";
 import { Zap, Wifi, CheckCircle2, Clock, Shield, Smartphone } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Airtime & Data – PayVora",
+  title: "Airtime & Data – PAYVORA",
   description:
     "Recharge MTN, Airtel, Glo, and 9mobile airtime and data bundles at the cheapest rates in Nigeria.",
 };
@@ -73,7 +73,7 @@ const perks = [
 ];
 
 const steps = [
-  { step: "1", title: "Open PayVora", desc: "Go to Airtime or Data from your home dashboard." },
+  { step: "1", title: "Open PAYVORA", desc: "Go to Airtime or Data from your home dashboard." },
   { step: "2", title: "Pick your network", desc: "Select MTN, Airtel, Glo, or 9mobile." },
   { step: "3", title: "Enter number & amount", desc: "Type the phone number and choose a plan." },
   { step: "4", title: "Done!", desc: "Airtime or data lands on the number instantly." },

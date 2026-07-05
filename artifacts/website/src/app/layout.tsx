@@ -13,11 +13,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://payvora.com"),
   title: {
-    default: "PayVora – Digital Fintech App for Nigeria",
-    template: "%s | PayVora",
+    default: "PAYVORA – Digital Fintech App for Nigeria",
+    template: "%s | PAYVORA",
   },
   description:
-    "PayVora is a premium fintech app for Nigeria. Buy gift cards, pay bills, recharge airtime, get virtual dollar cards, and manage your digital wallet.",
+    "PAYVORA is a premium fintech app for Nigeria. Buy gift cards, pay bills, recharge airtime, get virtual dollar cards, and manage your digital wallet.",
   keywords: [
     "buy gift cards in Nigeria",
     "best virtual dollar card",
@@ -30,14 +30,14 @@ export const metadata: Metadata = {
     "gift card trading Nigeria",
     "bill payment app Nigeria",
   ],
-  authors: [{ name: "PayVora" }],
-  creator: "PayVora",
+  authors: [{ name: "PAYVORA" }],
+  creator: "PAYVORA",
   openGraph: {
     type: "website",
     locale: "en_NG",
     url: "https://payvora.com",
-    siteName: "PayVora",
-    title: "PayVora – Digital Fintech App for Nigeria",
+    siteName: "PAYVORA",
+    title: "PAYVORA – Digital Fintech App for Nigeria",
     description:
       "Buy gift cards, pay bills, recharge airtime, get virtual dollar cards, and manage your digital wallet.",
     images: [
@@ -45,13 +45,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PayVora – Digital Fintech App",
+        alt: "PAYVORA – Digital Fintech App",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PayVora – Digital Fintech App for Nigeria",
+    title: "PAYVORA – Digital Fintech App for Nigeria",
     description:
       "Buy gift cards, pay bills, recharge airtime, get virtual dollar cards, and manage your digital wallet.",
     images: ["/og-image.png"],

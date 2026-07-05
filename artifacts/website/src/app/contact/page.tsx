@@ -60,7 +60,7 @@ export default function ContactPage() {
                 <p className="text-[#8F8FA3] text-sm mb-2">Get instant help from our support team via the app.</p>
                 <span className="inline-flex items-center gap-1.5 text-sm text-[#00D9A0] font-semibold">
                   <span className="w-2 h-2 rounded-full bg-[#00D9A0] animate-pulse" />
-                  Available 24/7 in the PayVora app
+                  Available 24/7 in the PAYVORA app
                 </span>
               </div>
             </div>

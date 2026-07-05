@@ -254,7 +254,7 @@ function DashboardScreen({ onCardPress }: { onCardPress: () => void }) {
           <line x1="0" y1="9" x2="20" y2="9" />
           <line x1="0" y1="16" x2="20" y2="16" />
         </svg>
-        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: "#111", textTransform: "uppercase" }}>Payvora.</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: "#111", textTransform: "uppercase" }}>PAYVORA.</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#222" strokeWidth="2" strokeLinecap="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />

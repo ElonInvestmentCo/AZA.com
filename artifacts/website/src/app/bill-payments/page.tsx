@@ -3,9 +3,9 @@ import { DownloadCTA } from "@/components/sections/DownloadCTA";
 import { Lightbulb, Tv, Droplets, Dice6, CheckCircle2, Zap, Clock, Shield } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Bill Payments – PayVora",
+  title: "Bill Payments – PAYVORA",
   description:
-    "Pay electricity, cable TV, water, internet and betting wallet bills instantly with PayVora. No queues, no delays.",
+    "Pay electricity, cable TV, water, internet and betting wallet bills instantly with PAYVORA. No queues, no delays.",
 };
 
 const billTypes = [
@@ -38,13 +38,13 @@ const billTypes = [
     icon: Dice6,
     title: "Betting Wallets",
     color: "#FF5B7A",
-    desc: "Fund any betting platform directly from your PayVora wallet. No bank delays.",
+    desc: "Fund any betting platform directly from your PAYVORA wallet. No bank delays.",
     providers: ["Sportybet", "Bet9ja", "1xBet", "BetWay", "MSport", "Melbet", "NairaBet", "AccessBet"],
   },
 ];
 
 const steps = [
-  { step: "1", title: "Open PayVora", desc: "Launch the app and go to Bills from your home screen." },
+  { step: "1", title: "Open PAYVORA", desc: "Launch the app and go to Bills from your home screen." },
   { step: "2", title: "Select category", desc: "Choose from Electricity, Cable TV, Water, or Betting." },
   { step: "3", title: "Enter your details", desc: "Input your meter number, decoder, or account ID." },
   { step: "4", title: "Confirm & pay", desc: "Review the amount and tap confirm. Done in under 30 seconds." },
@@ -65,7 +65,7 @@ export default function BillPaymentsPage() {
               <span className="text-[#00D9A0]">in seconds.</span>
             </h1>
             <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto mb-10">
-              No more queues, no more USSD codes, no more stress. PayVora lets you pay every utility bill from your phone in under 30 seconds.
+              No more queues, no more USSD codes, no more stress. PAYVORA lets you pay every utility bill from your phone in under 30 seconds.
             </p>
 
             {/* Quick stats */}

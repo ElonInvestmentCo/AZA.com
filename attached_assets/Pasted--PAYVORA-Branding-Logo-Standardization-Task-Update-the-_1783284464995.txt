@@ -1,0 +1,171 @@
+# PAYVORA Branding & Logo Standardization Task
+
+Update the project to ensure the branding is fully consistent across the website, mobile app, and splash screen.
+
+## 1. Standardize Brand Name
+
+Replace every visible occurrence of:
+
+* `PayVora`
+* `Payvora`
+* `payvora`
+
+with the official brand name:
+
+**PAYVORA**
+
+This includes, but is not limited to:
+
+* Website UI
+* Mobile app UI
+* Authentication screens
+* Dashboard
+* Navigation
+* Headers
+* Footers
+* Buttons
+* Settings
+* Empty states
+* Toasts
+* Modals
+* Marketing pages
+* Landing page
+* Meta titles
+* Meta descriptions
+* Browser title
+* Open Graph tags
+* App name where appropriate
+* Email templates
+* Generated PDFs
+* Documentation shown inside the application
+* Loading screens
+* Any hardcoded strings
+
+Do **not** modify package names, environment variables, database names, internal identifiers, API routes, or anything that could break the application unless it is purely a user-facing label.
+
+---
+
+# 2. Fix Logo Rendering Everywhere
+
+Audit every location where the PAYVORA logo is displayed.
+
+Ensure the logo renders correctly on:
+
+* Desktop
+* Laptop
+* Tablet
+* Mobile browsers
+* Android
+* iPhone
+* High-DPI (Retina) displays
+* Dark mode
+* Light mode
+
+The logo must:
+
+* Never appear stretched
+* Never be squashed
+* Never be cropped
+* Never overflow its container
+* Maintain its original aspect ratio
+* Remain sharp on all screen densities
+* Scale responsively
+* Be vertically centered
+* Be horizontally aligned correctly
+* Preserve adequate padding
+* Respect safe areas
+
+Review and fix every logo instance, including:
+
+* Landing page
+* Navbar
+* Footer
+* Login
+* Registration
+* Forgot password
+* Dashboard
+* Sidebar
+* Settings
+* Profile
+* Mobile navigation
+* Loading indicators
+* Empty states
+* Any reusable logo component
+
+If multiple logo implementations exist, consolidate them into a single reusable logo component.
+
+---
+
+# 3. Select the Best SVG Logo
+
+Review every file inside the `logo_svg` directory.
+
+Evaluate each SVG for:
+
+* Visual quality
+* Sharpness
+* Scalability
+* Transparency
+* Responsiveness
+* Consistency with PAYVORA branding
+
+Choose the single best SVG as the official logo.
+
+Use only that SVG throughout the project.
+
+Remove duplicate usage while keeping the remaining SVG assets in the repository for future reference unless they are confirmed to be obsolete.
+
+---
+
+# 4. Update the Native Splash Screen
+
+Using the selected SVG:
+
+Update the native splash screen for the Expo mobile application.
+
+Requirements:
+
+* Use the selected official PAYVORA SVG.
+* Preserve the logo exactly as designed.
+* Do not modify its artwork.
+* Keep the aspect ratio intact.
+* Ensure the logo is centered both vertically and horizontally.
+* Use appropriate spacing around the logo.
+* Ensure it looks excellent on:
+
+  * Android phones
+  * Android tablets
+  * iPhones
+  * iPads
+* Verify that the splash screen scales correctly across different resolutions and pixel densities.
+* Ensure the splash screen is configured for the native Expo app rather than only the web version.
+
+---
+
+# 5. Verify Responsiveness
+
+Test the website and mobile app across multiple screen sizes to ensure:
+
+* No logo clipping
+* No layout shifts
+* No oversized logos
+* No blurry rendering
+* No pixelation
+* Correct spacing
+* Consistent branding everywhere
+
+---
+
+# 6. Final Deliverable
+
+When complete, provide a summary including:
+
+* Total number of branding text replacements made
+* Which SVG was selected as the official PAYVORA logo
+* Every file updated
+* Every component modified
+* Splash screen files changed
+* Responsive issues fixed
+* Any remaining branding inconsistencies, if any
+
+Do **not** redesign the logo or alter its appearance. Only standardize branding, improve implementation, and ensure consistent rendering across the website, mobile app, and native splash screen.

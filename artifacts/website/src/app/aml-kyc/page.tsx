@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AML/KYC Policy – PayVora",
+  title: "AML/KYC Policy – PAYVORA",
   description:
-    "PayVora's Anti-Money Laundering and Know Your Customer policy. We are committed to preventing financial crime.",
+    "PAYVORA's Anti-Money Laundering and Know Your Customer policy. We are committed to preventing financial crime.",
 };
 
 const sections = [
   {
     title: "1. Introduction & Purpose",
-    body: "PayVora is committed to full compliance with applicable Anti-Money Laundering (AML), Counter-Terrorism Financing (CTF), and Know Your Customer (KYC) regulations in Nigeria and internationally. This policy applies to all users, employees, contractors, and partners of PayVora.\n\nOur AML/KYC programme is designed to: prevent our platform from being used for money laundering, terrorism financing, or other financial crimes; detect and report suspicious activity to the appropriate authorities; and maintain the integrity and trustworthiness of our Services.",
+    body: "PAYVORA is committed to full compliance with applicable Anti-Money Laundering (AML), Counter-Terrorism Financing (CTF), and Know Your Customer (KYC) regulations in Nigeria and internationally. This policy applies to all users, employees, contractors, and partners of PAYVORA.\n\nOur AML/KYC programme is designed to: prevent our platform from being used for money laundering, terrorism financing, or other financial crimes; detect and report suspicious activity to the appropriate authorities; and maintain the integrity and trustworthiness of our Services.",
   },
   {
     title: "2. Regulatory Framework",
-    body: "PayVora operates in compliance with:\n\n• The Money Laundering (Prevention and Prohibition) Act 2022 (Nigeria)\n• The Terrorism (Prevention and Prohibition) Act 2022 (Nigeria)\n• CBN AML/CFT Regulations\n• NFIU Guidelines and Suspicious Transaction Reporting requirements\n• FATF (Financial Action Task Force) Recommendations\n• Nigeria Data Protection Regulation (NDPR)",
+    body: "PAYVORA operates in compliance with:\n\n• The Money Laundering (Prevention and Prohibition) Act 2022 (Nigeria)\n• The Terrorism (Prevention and Prohibition) Act 2022 (Nigeria)\n• CBN AML/CFT Regulations\n• NFIU Guidelines and Suspicious Transaction Reporting requirements\n• FATF (Financial Action Task Force) Recommendations\n• Nigeria Data Protection Regulation (NDPR)",
   },
   {
     title: "3. Customer Due Diligence (KYC)",
@@ -25,11 +25,11 @@ const sections = [
   },
   {
     title: "5. Transaction Monitoring",
-    body: "PayVora employs automated transaction monitoring to detect:\n\n• Structuring (splitting transactions to avoid reporting thresholds)\n• Rapid movement of funds through accounts\n• Transactions inconsistent with the user's profile or stated business purpose\n• High-value gift card transactions from newly created accounts\n• Geographic anomalies and impossible travel scenarios\n• Patterns associated with known fraud or money laundering typologies\n\nFlagged transactions are reviewed by our compliance team within 24 hours.",
+    body: "PAYVORA employs automated transaction monitoring to detect:\n\n• Structuring (splitting transactions to avoid reporting thresholds)\n• Rapid movement of funds through accounts\n• Transactions inconsistent with the user's profile or stated business purpose\n• High-value gift card transactions from newly created accounts\n• Geographic anomalies and impossible travel scenarios\n• Patterns associated with known fraud or money laundering typologies\n\nFlagged transactions are reviewed by our compliance team within 24 hours.",
   },
   {
     title: "6. Suspicious Transaction Reporting",
-    body: "PayVora submits Suspicious Transaction Reports (STRs) to the Nigerian Financial Intelligence Unit (NFIU) as required by law. We are legally prohibited from informing the subject of an STR that a report has been filed ('tipping off' prohibition).\n\nUsers whose accounts are under investigation may have their accounts frozen and funds held pending regulatory clearance. PayVora cooperates fully with law enforcement requests made through proper legal channels.",
+    body: "PAYVORA submits Suspicious Transaction Reports (STRs) to the Nigerian Financial Intelligence Unit (NFIU) as required by law. We are legally prohibited from informing the subject of an STR that a report has been filed ('tipping off' prohibition).\n\nUsers whose accounts are under investigation may have their accounts frozen and funds held pending regulatory clearance. PAYVORA cooperates fully with law enforcement requests made through proper legal channels.",
   },
   {
     title: "7. Record Keeping",
@@ -37,11 +37,11 @@ const sections = [
   },
   {
     title: "8. Employee Training",
-    body: "All PayVora employees and contractors who interact with customer data or transactions receive mandatory AML/KYC training upon onboarding and annually thereafter. Our compliance team receives specialist training on emerging typologies and regulatory updates.",
+    body: "All PAYVORA employees and contractors who interact with customer data or transactions receive mandatory AML/KYC training upon onboarding and annually thereafter. Our compliance team receives specialist training on emerging typologies and regulatory updates.",
   },
   {
     title: "9. Prohibited Users & Jurisdictions",
-    body: "PayVora does not provide services to:\n\n• Individuals or entities on OFAC, UN, EU, or Nigerian sanctions lists\n• Users from FATF-blacklisted jurisdictions\n• Anonymous or pseudonymous users seeking to circumvent KYC\n• Shell companies with no demonstrable legitimate business purpose\n\nAccounts found to belong to prohibited persons will be immediately suspended and funds held pending legal review.",
+    body: "PAYVORA does not provide services to:\n\n• Individuals or entities on OFAC, UN, EU, or Nigerian sanctions lists\n• Users from FATF-blacklisted jurisdictions\n• Anonymous or pseudonymous users seeking to circumvent KYC\n• Shell companies with no demonstrable legitimate business purpose\n\nAccounts found to belong to prohibited persons will be immediately suspended and funds held pending legal review.",
   },
   {
     title: "10. Contact & Reporting",

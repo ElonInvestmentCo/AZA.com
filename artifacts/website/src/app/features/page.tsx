@@ -10,7 +10,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Features",
   description:
-    "Explore all PayVora features: gift cards, virtual cards, airtime, data, electricity, cable TV, betting, and bank transfers.",
+    "Explore all PAYVORA features: gift cards, virtual cards, airtime, data, electricity, cable TV, betting, and bank transfers.",
 };
 
 const featurePages = [
@@ -39,7 +39,7 @@ export default function FeaturesPage() {
             <span className="text-[#00D9A0]">real Nigerians.</span>
           </h1>
           <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto mb-12">
-            PayVora combines every financial service you need into one app that&apos;s fast, reliable, and beautifully designed.
+            PAYVORA combines every financial service you need into one app that&apos;s fast, reliable, and beautifully designed.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-left">

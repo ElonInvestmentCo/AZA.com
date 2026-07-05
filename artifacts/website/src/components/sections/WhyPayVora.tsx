@@ -24,7 +24,7 @@ const reasons = [
   },
   {
     title: "Works for everyone",
-    description: "Whether you're an individual or a business, PayVora scales with your needs.",
+    description: "Whether you're an individual or a business, PAYVORA scales with your needs.",
   },
 ];
 
@@ -57,7 +57,7 @@ export function WhyPayVora() {
               <span className="text-[#00D9A0]">for you.</span>
             </h2>
             <p className="text-[#8F8FA3] text-lg leading-relaxed mb-10">
-              PayVora was built from the ground up by Nigerians who understand
+              PAYVORA was built from the ground up by Nigerians who understand
               the unique needs of the Nigerian market. Fast, reliable, and
               always improving.
             </p>
@@ -150,7 +150,7 @@ export function WhyPayVora() {
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-[#8F8FA3] text-xs">Virtual Card</p>
-                  <p className="text-white font-bold">PayVora</p>
+                  <p className="text-white font-bold">PAYVORA</p>
                 </div>
                 <div className="w-9 h-9 rounded-xl bg-[#00D9A0] flex items-center justify-center">
                   <span className="text-[#0A0A0F] font-black text-sm">P</span>

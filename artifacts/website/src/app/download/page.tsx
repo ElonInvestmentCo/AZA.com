@@ -35,11 +35,11 @@ export default function DownloadPage() {
             <Clock size={14} /> Publishing soon
           </div>
           <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
-            PayVora is coming{" "}
+            PAYVORA is coming{" "}
             <span className="text-[#00D9A0]">to your phone.</span>
           </h1>
           <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto mb-12">
-            We&apos;re putting the finishing touches on the PayVora app before we publish to the App Store and Google Play. Leave your email and we&apos;ll notify you the moment it&apos;s live.
+            We&apos;re putting the finishing touches on the PAYVORA app before we publish to the App Store and Google Play. Leave your email and we&apos;ll notify you the moment it&apos;s live.
           </p>
 
           {/* App store buttons — disabled */}
@@ -77,7 +77,7 @@ export default function DownloadPage() {
                   </div>
                   <h3 className="text-white font-bold text-lg mb-1">You&apos;re on the list!</h3>
                   <p className="text-[#8F8FA3] text-sm">
-                    We&apos;ll email <span className="text-[#00D9A0]">{email}</span> the moment PayVora goes live.
+                    We&apos;ll email <span className="text-[#00D9A0]">{email}</span> the moment PAYVORA goes live.
                   </p>
                 </div>
               ) : (

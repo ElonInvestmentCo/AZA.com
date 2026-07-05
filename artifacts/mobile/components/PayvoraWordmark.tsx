@@ -2,13 +2,19 @@
  * PayvoraWordmark — renders the official PAYVORA SVG logo wordmark.
  * Uses the uploaded brand SVG (traced vector artwork).
  * fill defaults to "#0B0A0A" (dark on white) — override via `color` prop.
+ *
+ * ViewBox is tightly clipped to the actual glyph bounds (150 335 1460 148)
+ * so the logo fills the given width/height without invisible whitespace.
  */
 import React from "react";
 import { SvgXml } from "react-native-svg";
 
+// Aspect ratio of the correctly-bounded viewBox: 1460 wide ÷ 148 tall ≈ 9.86
+const LOGO_ASPECT = 1460 / 148;
+
 const buildSvg = (color: string) => `<?xml version="1.0" standalone="no"?>
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="1774pt" height="887pt" viewBox="0 0 1774 887"
+ width="1460" height="148" viewBox="150 335 1460 148"
  preserveAspectRatio="xMidYMid meet">
 <g transform="translate(0,887) scale(0.1,-0.1)" fill="${color}" stroke="none">
 <path d="M2250 5460 c-66 -132 -120 -242 -120 -245 0 -2 415 -6 923 -7 l922
@@ -63,11 +69,14 @@ c113 0 219 -5 241 -11z"/>
 
 interface Props {
   width?: number;
+  /** Height — if omitted, auto-computed from width to preserve aspect ratio */
   height?: number;
   /** Fill color for the wordmark paths. Defaults to dark (#0B0A0A) for light bg. */
   color?: string;
 }
 
-export function PayvoraWordmark({ width = 148, height = 38, color = "#0B1B3A" }: Props) {
-  return <SvgXml xml={buildSvg(color)} width={width} height={height} />;
+export function PayvoraWordmark({ width = 200, height, color = "#0B1B3A" }: Props) {
+  // Derive height from width when not explicitly provided
+  const resolvedHeight = height ?? (typeof width === "number" ? Math.round(width / LOGO_ASPECT) : undefined);
+  return <SvgXml xml={buildSvg(color)} width={width} height={resolvedHeight} />;
 }

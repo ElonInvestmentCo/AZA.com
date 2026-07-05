@@ -4,7 +4,7 @@ const testimonials = [
   {
     name: "Chidi Okonkwo",
     role: "Freelance Designer, Lagos",
-    text: "PayVora changed how I handle my international payments. My virtual card works on every platform, and the gift card rates are unbeatable.",
+    text: "PAYVORA changed how I handle my international payments. My virtual card works on every platform, and the gift card rates are unbeatable.",
     rating: 5,
     initials: "CO",
     accent: "#00D9A0",
@@ -12,7 +12,7 @@ const testimonials = [
   {
     name: "Fatima Al-Hassan",
     role: "E-commerce Seller, Abuja",
-    text: "I trade gift cards daily and PayVora always gives me the best rates. Settlement is instant. I've tried 4 other apps and none come close.",
+    text: "I trade gift cards daily and PAYVORA always gives me the best rates. Settlement is instant. I've tried 4 other apps and none come close.",
     rating: 5,
     initials: "FA",
     accent: "#00b8ff",
@@ -36,7 +36,7 @@ const testimonials = [
   {
     name: "Yusuf Aliyu",
     role: "Business Owner, Kano",
-    text: "I use PayVora for all my business utility payments. Saves me hours every month. The bulk payment feature is a game changer.",
+    text: "I use PAYVORA for all my business utility payments. Saves me hours every month. The bulk payment feature is a game changer.",
     rating: 5,
     initials: "YA",
     accent: "#00D9A0",
@@ -44,7 +44,7 @@ const testimonials = [
   {
     name: "Adaora Eze",
     role: "Content Creator, Lagos",
-    text: "Getting paid for my work through gift cards is no longer a problem. PayVora converts them instantly and I never miss a payment.",
+    text: "Getting paid for my work through gift cards is no longer a problem. PAYVORA converts them instantly and I never miss a payment.",
     rating: 5,
     initials: "AE",
     accent: "#00b8ff",
@@ -64,7 +64,7 @@ export function TestimonialsSection() {
             Real stories, real results.
           </h2>
           <p className="text-[#8F8FA3] text-lg max-w-xl mx-auto">
-            Join thousands of Nigerians who trust PayVora every day.
+            Join thousands of Nigerians who trust PAYVORA every day.
           </p>
 
           {/* Aggregate rating */}

@@ -3,9 +3,9 @@ import { DownloadCTA } from "@/components/sections/DownloadCTA";
 import { CheckCircle2, Globe, ShoppingBag, Repeat, Shield, Zap, CreditCard, Lock } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Virtual Dollar Cards – PayVora",
+  title: "Virtual Dollar Cards – PAYVORA",
   description:
-    "Get a free USD virtual card with PayVora. Shop internationally, pay for subscriptions, and make online payments securely.",
+    "Get a free USD virtual card with PAYVORA. Shop internationally, pay for subscriptions, and make online payments securely.",
 };
 
 const usecases = [
@@ -52,7 +52,7 @@ export default function VirtualCardsPage() {
                 <span className="text-[#00D9A0]">the world.</span>
               </h1>
               <p className="text-[#8F8FA3] text-xl leading-relaxed mb-8">
-                Get a free virtual USD Visa card instantly. Shop on any international website, pay for subscriptions, and make cross-border payments — all funded from your PayVora wallet.
+                Get a free virtual USD Visa card instantly. Shop on any international website, pay for subscriptions, and make cross-border payments — all funded from your PAYVORA wallet.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
                 {[
@@ -88,7 +88,7 @@ export default function VirtualCardsPage() {
                   <div className="flex justify-between items-start relative z-10">
                     <div>
                       <p className="text-[#8F8FA3] text-xs">Virtual Card</p>
-                      <p className="text-white font-bold text-lg">PayVora</p>
+                      <p className="text-white font-bold text-lg">PAYVORA</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-[#00D9A0] flex items-center justify-center">
                       <span className="text-[#0A0A0F] font-black">P</span>
@@ -186,7 +186,7 @@ export default function VirtualCardsPage() {
             <div>
               <h3 className="text-white font-bold text-xl mb-2">Your card is protected</h3>
               <p className="text-[#8F8FA3] leading-relaxed">
-                Every PayVora virtual card is protected with real-time fraud monitoring, instant freeze capability, and full transaction history. If you ever notice unauthorized charges, freeze your card instantly from the app and contact our 24/7 support.
+                Every PAYVORA virtual card is protected with real-time fraud monitoring, instant freeze capability, and full transaction history. If you ever notice unauthorized charges, freeze your card instantly from the app and contact our 24/7 support.
               </p>
             </div>
           </div>

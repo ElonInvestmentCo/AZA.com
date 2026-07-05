@@ -6,19 +6,19 @@ import { ChevronDown, ArrowRight } from "lucide-react";
 
 const faqs = [
   {
-    q: "How do I create a PayVora account?",
-    a: "Download the PayVora app, tap 'Register', enter your email, phone number, and create a password. Verify your email via OTP and you're ready to go.",
+    q: "How do I create a PAYVORA account?",
+    a: "Download the PAYVORA app, tap 'Register', enter your email, phone number, and create a password. Verify your email via OTP and you're ready to go.",
   },
   {
     q: "How long does gift card trading take?",
     a: "Most gift card trades are processed within 60 seconds. In rare cases of high traffic, it may take up to 5 minutes.",
   },
   {
-    q: "Is PayVora safe to use?",
-    a: "Yes. PayVora uses 256-bit encryption, 2FA, and continuous fraud monitoring. Your funds and data are always protected.",
+    q: "Is PAYVORA safe to use?",
+    a: "Yes. PAYVORA uses 256-bit encryption, 2FA, and continuous fraud monitoring. Your funds and data are always protected.",
   },
   {
-    q: "What gift cards does PayVora accept?",
+    q: "What gift cards does PAYVORA accept?",
     a: "We accept Amazon, iTunes, Google Play, Steam, Razer Gold, Walmart, eBay, Visa, and 50+ more brands.",
   },
   {

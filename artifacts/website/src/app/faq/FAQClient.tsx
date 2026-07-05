@@ -8,20 +8,20 @@ const categories = [
     title: "Account & Registration",
     faqs: [
       {
-        q: "How do I create a PayVora account?",
-        a: "Download the PayVora app, tap 'Register', enter your email, phone number, and a strong password. Verify your email via OTP and your account is ready immediately.",
+        q: "How do I create a PAYVORA account?",
+        a: "Download the PAYVORA app, tap 'Register', enter your email, phone number, and a strong password. Verify your email via OTP and your account is ready immediately.",
       },
       {
         q: "What documents do I need to register?",
         a: "A basic account only requires a valid email address and phone number. To unlock higher transaction limits, complete KYC verification with a government-issued ID (NIN, BVN, or International Passport).",
       },
       {
-        q: "Can I have multiple PayVora accounts?",
+        q: "Can I have multiple PAYVORA accounts?",
         a: "No. One account per user is enforced. Multiple accounts violate our Terms of Service and may result in a permanent ban.",
       },
       {
-        q: "Is PayVora available outside Nigeria?",
-        a: "PayVora is optimised for Nigerian users. Gift card trading is available internationally, but local bill payment services are Nigeria-only.",
+        q: "Is PAYVORA available outside Nigeria?",
+        a: "PAYVORA is optimised for Nigerian users. Gift card trading is available internationally, but local bill payment services are Nigeria-only.",
       },
     ],
   },
@@ -29,7 +29,7 @@ const categories = [
     title: "Security",
     faqs: [
       {
-        q: "Is PayVora safe to use?",
+        q: "Is PAYVORA safe to use?",
         a: "Yes. We use 256-bit AES encryption, TLS 1.3 for data in transit, two-factor authentication, and AI-powered fraud monitoring. Your data is never sold to third parties.",
       },
       {
@@ -41,7 +41,7 @@ const categories = [
         a: "Passwords are hashed with bcrypt using a unique salt per user. PINs are encrypted with AES-256. Even our engineers cannot access your credentials.",
       },
       {
-        q: "Does PayVora support two-factor authentication?",
+        q: "Does PAYVORA support two-factor authentication?",
         a: "Yes. Enable OTP-based 2FA from your account settings. We strongly recommend this for an extra layer of security.",
       },
     ],
@@ -50,7 +50,7 @@ const categories = [
     title: "Gift Cards",
     faqs: [
       {
-        q: "What gift card brands does PayVora accept?",
+        q: "What gift card brands does PAYVORA accept?",
         a: "We accept 50+ brands including Amazon, iTunes, Google Play, Steam, Razer Gold, Walmart, eBay, Visa Gift Cards, Netflix, Xbox, PlayStation, Nike, Target, Best Buy, and many more.",
       },
       {
@@ -71,7 +71,7 @@ const categories = [
     title: "Withdrawals & Payments",
     faqs: [
       {
-        q: "How do I withdraw from my PayVora wallet?",
+        q: "How do I withdraw from my PAYVORA wallet?",
         a: "Go to 'Wallet' → 'Withdraw', enter the amount and your bank account details. Withdrawals above ₦5,000 are instant and free.",
       },
       {
@@ -97,7 +97,7 @@ const categories = [
       },
       {
         q: "What currency is the virtual card in?",
-        a: "PayVora virtual cards are USD-denominated Visa cards, accepted on any international website.",
+        a: "PAYVORA virtual cards are USD-denominated Visa cards, accepted on any international website.",
       },
       {
         q: "Can I use the virtual card for recurring payments?",
@@ -126,7 +126,7 @@ const categories = [
       },
       {
         q: "Can I schedule recurring bill payments?",
-        a: "Yes. PayVora supports auto-pay scheduling — set any bill to renew monthly automatically from your wallet balance.",
+        a: "Yes. PAYVORA supports auto-pay scheduling — set any bill to renew monthly automatically from your wallet balance.",
       },
     ],
   },
@@ -150,7 +150,7 @@ export function FAQClient() {
             Frequently Asked Questions
           </h1>
           <p className="text-[#8F8FA3] text-xl">
-            Everything you need to know about PayVora.
+            Everything you need to know about PAYVORA.
           </p>
         </div>
 

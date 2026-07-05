@@ -90,7 +90,7 @@ export function Footer() {
 
         <div className="mt-16 pt-8 border-t border-[#2A2A3D] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[#8F8FA3] text-sm">
-            © {new Date().getFullYear()} PayVora. All rights reserved.
+            © {new Date().getFullYear()} PAYVORA. All rights reserved.
           </p>
           <p className="text-[#8F8FA3] text-sm">
             Made with ❤️ in Nigeria
