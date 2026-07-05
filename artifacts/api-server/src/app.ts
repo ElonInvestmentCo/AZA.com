@@ -100,7 +100,7 @@ if (IS_PROD) {
 
   app.use(express.static(landingDist, { index: "index.html" }));
 
-  app.get("*", (_req: Request, res: Response) => {
+  app.get("/*splat", (_req: Request, res: Response) => {
     res.sendFile(path.join(landingDist, "index.html"));
   });
 } else {
