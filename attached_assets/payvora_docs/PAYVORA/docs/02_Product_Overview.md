@@ -99,10 +99,12 @@ Via **Reloadly API** (`/api/bills/billers`, `/api/bills/pay`):
 
 ---
 
-### Notifications ❌
+### Notifications 🔶
 
-- Push notification system not yet implemented
-- `expo-haptics` used for in-app feedback
+- In-app notification centre at `/(app)/notifications`
+- Transaction alerts, security notices, promotions, system messages
+- Read/dismiss controls per notification and mark-all-read
+- Push notification service (FCM / Expo Notifications) not yet integrated
 
 ---
 
@@ -117,10 +119,11 @@ Via **Reloadly API** (`/api/bills/billers`, `/api/bills/pay`):
 
 ---
 
-### KYC ❌
+### KYC ✅
 
-- Not yet implemented in mobile app
-- AML/KYC policy page exists on marketing website
+- Mobile screen at `/(app)/kyc` — full identity verification flow
+- `GET /api/kyc/status` and `POST /api/kyc/submit`
+- Supports NIN, BVN, passport, driver's license, voter's card
 
 ---
 

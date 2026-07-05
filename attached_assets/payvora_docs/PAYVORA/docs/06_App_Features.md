@@ -181,19 +181,28 @@ All powered by **Reloadly Utilities API**.
 
 ---
 
-## Notifications ❌
+## Notifications 🔶
 
-- No notification centre screen yet
-- `expo-haptics` provides haptic feedback only
-- Push notification service (FCM / Expo Notifications) planned for Phase 7
+- In-app notification centre screen at `/(app)/notifications`
+- Displays transaction alerts, security notices, promotions, and system messages
+- Unread count badge on bell icon (home header)
+- Mark individual or all notifications as read
+- Dismiss individual notifications
+- Bell icon on home dashboard wired to notifications screen
+- Push notification service (FCM / Expo Notifications) not yet integrated — mock data displayed
 
 ---
 
-## KYC ❌
+## KYC ✅
 
-- Not implemented in mobile app
-- AML/KYC policy page exists on marketing website (`/aml-kyc`)
-- Planned: BVN validation, NIN lookup, face match verification
+- Mobile screen at `/(app)/kyc` — identity verification flow
+- Accessible from More → Account → Identity Verification
+- `GET /api/kyc/status` — returns current KYC status + submitted data
+- `POST /api/kyc/submit` — submits fullName, dob, idType, idNumber
+- Supported ID types: NIN (11 digits), BVN (11 digits), International Passport, Driver's License, Voter's Card
+- Status states: none → pending → verified / rejected with UI feedback
+- KYC fields stored on `usersTable`: kycStatus, kycFullName, kycDob, kycIdType, kycIdNumber, kycRejectionReason, kycSubmittedAt, kycReviewedAt
+- Auto-approves in current environment (no third-party BVN/NIN provider wired)
 
 ---
 
@@ -241,11 +250,13 @@ All powered by **Reloadly Utilities API**.
 
 ---
 
-## Quick Payment 🔶
+## Quick Payment ✅
 
-- `/(app)/quick-payment` screen exists
-- Shortcut for common payment actions
-- Full wiring pending
+- `/(app)/quick-payment` — accessible from More → Account → Quick Payment
+- Toggle to enable/disable PIN-free payments for small transactions
+- Configurable spending limit: ₦5,000 / ₦10,000 / ₦20,000 / ₦50,000
+- Preference persisted in `AsyncStorage` across sessions
+- Transactions above the set limit still require PIN / biometric authentication
 
 ---
 

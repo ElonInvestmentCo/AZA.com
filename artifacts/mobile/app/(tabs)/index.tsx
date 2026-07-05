@@ -253,7 +253,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={s.hdrBtn}
-          onPress={press(() => router.push("/(tabs)/history" as any))}
+          onPress={press(() => router.push("/(app)/notifications" as any))}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Feather name="bell" size={22} color={C.text} />

@@ -37,10 +37,10 @@ This roadmap outlines the phased development strategy for the PAYVORA fintech pl
 - ✅ Session management (AsyncStorage + server-side logout)
 - ❌ Multi-factor authentication (SMS 2FA) — planned
 - ❌ Role-Based Access Control (RBAC) — planned
-- ❌ KYC verification (BVN, NIN, face match) — not started
+- ✅ KYC verification (BVN, NIN, face match) — UI + API complete (auto-approve; third-party provider pending)
 - ❌ Audit logs — not started
 
-**Milestone:** Verified user onboarding operational. KYC pending.
+**Milestone:** Verified user onboarding operational. KYC flow live.
 
 ---
 
@@ -166,10 +166,11 @@ This roadmap outlines the phased development strategy for the PAYVORA fintech pl
 1. **Email service integration** — required for OTP delivery (Phase 2, 7)
 2. **Payment gateway** (Paystack or Flutterwave) — required for wallet funding (Phase 3)
 3. **Card issuer integration** (Bridgecard / Mono) — required for virtual cards (Phase 6)
-4. **KYC integration** — required for full financial compliance (Phase 2)
-5. **Live price feeds** — crypto (CoinGecko) and FX rates (Phase 4)
-6. **Push notifications** — Expo Notifications + FCM (Phase 7)
-7. **Admin portal** — internal ops tooling (Phase 8)
+4. **Live price feeds** — crypto (CoinGecko) and FX rates (Phase 4)
+5. **Push notifications** — Expo Notifications + FCM (Phase 7)
+6. **Admin portal** — internal ops tooling (Phase 8)
+
+> ✅ **KYC integration** — completed: UI + API flow live in mobile app
 
 ---
 
