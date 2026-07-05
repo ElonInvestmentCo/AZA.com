@@ -1,20 +1,3 @@
 uploads = []
+generated = []
 outputs = []
-
-[[generated]]
-id = "Z8dju7pzwprLC-_ylVLzC"
-uri = "file://artifacts/mobile/assets/images/icon.png"
-type = "image"
-title = "aza app icon black white"
-
-[[generated]]
-id = "s5mTFbTq1AJ2vjZ8b_5-L"
-uri = "file://artifacts/mobile/assets/images/splash.png"
-type = "image"
-title = "aza splash screen dark"
-
-[[generated]]
-id = "-SNX5InWKZiQdbbZ7dYqX"
-uri = "file://artifacts/payvora/assets/images/icon.png"
-type = "image"
-title = "generated_image"
