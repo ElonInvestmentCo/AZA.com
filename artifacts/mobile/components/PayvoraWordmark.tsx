@@ -68,6 +68,6 @@ interface Props {
   color?: string;
 }
 
-export function PayvoraWordmark({ width = 148, height = 38, color = "#0B0A0A" }: Props) {
+export function PayvoraWordmark({ width = 148, height = 38, color = "#0B1B3A" }: Props) {
   return <SvgXml xml={buildSvg(color)} width={width} height={height} />;
 }
