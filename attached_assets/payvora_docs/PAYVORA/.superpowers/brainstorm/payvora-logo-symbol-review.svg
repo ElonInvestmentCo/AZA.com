@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="860" viewBox="0 0 1300 860">
+  <defs>
+    <style>
+      .title { font-family: Inter, Arial, sans-serif; font-size: 34px; font-weight: 780; fill: #0B1B3A; letter-spacing: 0; }
+      .sub { font-family: Inter, Arial, sans-serif; font-size: 18px; font-weight: 430; fill: #475569; letter-spacing: 0; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 16px; font-weight: 760; fill: #0B1B3A; letter-spacing: 0; }
+      .body { font-family: Inter, Arial, sans-serif; font-size: 15px; font-weight: 430; fill: #475569; letter-spacing: 0; }
+    </style>
+    <symbol id="payvora-symbol" viewBox="0 0 64 64">
+      <rect x="4" y="4" width="56" height="56" rx="15" fill="#2F6BFF"/>
+      <path d="M20.6 17.8H36.5C44.4 17.8 49.7 22.7 49.7 29.8C49.7 37 44.4 41.8 36.5 41.8H29V50H20.6V17.8ZM29 25V34.7H35.9C39.4 34.7 41.4 32.9 41.4 29.8C41.4 26.8 39.4 25 35.9 25H29Z" fill="#FFFFFF"/>
+      <path d="M30.9 41.4H39.6L47.6 50H38.3L30.9 41.4Z" fill="#FFFFFF" opacity=".96"/>
+    </symbol>
+  </defs>
+
+  <rect width="1300" height="860" fill="#F8FAFC"/>
+  <text x="72" y="82" class="title">PAYVORA Logo Symbol</text>
+  <text x="72" y="118" class="sub">Standalone symbol derived from the approved primary logo. No wordmark, no text inside the mark.</text>
+
+  <g transform="translate(72 170)">
+    <rect width="540" height="400" rx="8" fill="#FFFFFF" stroke="#D9E2EF"/>
+    <text x="32" y="48" class="label">Light Background</text>
+    <use href="#payvora-symbol" x="190" y="95" width="160" height="160"/>
+    <use href="#payvora-symbol" x="78" y="310" width="48" height="48"/>
+    <use href="#payvora-symbol" x="150" y="318" width="32" height="32"/>
+    <use href="#payvora-symbol" x="206" y="322" width="24" height="24"/>
+    <use href="#payvora-symbol" x="254" y="326" width="16" height="16"/>
+    <text x="78" y="382" class="body">48px</text>
+    <text x="150" y="382" class="body">32px</text>
+    <text x="206" y="382" class="body">24px</text>
+    <text x="254" y="382" class="body">16px</text>
+  </g>
+
+  <g transform="translate(688 170)">
+    <rect width="540" height="400" rx="8" fill="#0B1B3A"/>
+    <text x="32" y="48" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" fill="#FFFFFF">Dark Background</text>
+    <use href="#payvora-symbol" x="190" y="95" width="160" height="160"/>
+    <use href="#payvora-symbol" x="78" y="310" width="48" height="48"/>
+    <use href="#payvora-symbol" x="150" y="318" width="32" height="32"/>
+    <use href="#payvora-symbol" x="206" y="322" width="24" height="24"/>
+    <use href="#payvora-symbol" x="254" y="326" width="16" height="16"/>
+    <text x="78" y="382" font-family="Inter, Arial, sans-serif" font-size="15" fill="#D9E8FF">48px</text>
+    <text x="150" y="382" font-family="Inter, Arial, sans-serif" font-size="15" fill="#D9E8FF">32px</text>
+    <text x="206" y="382" font-family="Inter, Arial, sans-serif" font-size="15" fill="#D9E8FF">24px</text>
+    <text x="254" y="382" font-family="Inter, Arial, sans-serif" font-size="15" fill="#D9E8FF">16px</text>
+  </g>
+
+  <g transform="translate(72 620)">
+    <rect width="1156" height="120" rx="8" fill="#FFFFFF" stroke="#D9E2EF"/>
+    <text x="28" y="40" class="label">Design Rationale</text>
+    <text x="28" y="72" class="body">The standalone symbol keeps the approved protected-P foundation, expands it to a cleaner 64x64 construction, and increases internal contrast for small-size recognition.</text>
+    <text x="28" y="96" class="body">The rounded square communicates security and stability; the forward lower stroke communicates speed, movement, and financial flow without using coins, currency marks, or crypto clichés.</text>
+  </g>
+</svg>

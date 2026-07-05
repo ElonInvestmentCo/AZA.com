@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1300" height="820" viewBox="0 0 1300 820">
+  <defs>
+    <style>
+      .title { font-family: Inter, Arial, sans-serif; font-size: 34px; font-weight: 780; fill: #0B1B3A; letter-spacing: 0; }
+      .sub { font-family: Inter, Arial, sans-serif; font-size: 18px; font-weight: 430; fill: #475569; letter-spacing: 0; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 16px; font-weight: 760; letter-spacing: 0; }
+      .body { font-family: Inter, Arial, sans-serif; font-size: 15px; font-weight: 430; fill: #475569; letter-spacing: 0; }
+      .word { font-family: Inter, "SF Pro Display", Arial, sans-serif; font-size: 72px; font-weight: 780; letter-spacing: 0; }
+      .word-small { font-family: Inter, "SF Pro Display", Arial, sans-serif; font-size: 34px; font-weight: 780; letter-spacing: 0; }
+    </style>
+  </defs>
+
+  <rect width="1300" height="820" fill="#F8FAFC"/>
+  <text x="72" y="82" class="title">PAYVORA Wordmark</text>
+  <text x="72" y="118" class="sub">Standalone wordmark derived from the approved primary logo typography. No symbol or icon included.</text>
+
+  <g transform="translate(72 170)">
+    <rect width="540" height="260" rx="8" fill="#FFFFFF" stroke="#D9E2EF"/>
+    <text x="32" y="48" class="label" fill="#0B1B3A">Light Background</text>
+    <text x="70" y="155" class="word" fill="#0B1B3A">PAYVORA</text>
+  </g>
+
+  <g transform="translate(688 170)">
+    <rect width="540" height="260" rx="8" fill="#0B1B3A"/>
+    <text x="32" y="48" class="label" fill="#FFFFFF">Dark Background</text>
+    <text x="70" y="155" class="word" fill="#FFFFFF">PAYVORA</text>
+  </g>
+
+  <g transform="translate(72 485)">
+    <rect width="1156" height="120" rx="8" fill="#FFFFFF" stroke="#D9E2EF"/>
+    <text x="32" y="48" class="label" fill="#0B1B3A">Small-Size Behavior</text>
+    <text x="32" y="94" class="word-small" fill="#0B1B3A">PAYVORA</text>
+    <text x="260" y="92" class="body">Recommended minimum digital width: 96px. Preferred UI-header width: 120-160px.</text>
+  </g>
+
+  <g transform="translate(72 655)">
+    <rect width="1156" height="98" rx="8" fill="#FFFFFF" stroke="#D9E2EF"/>
+    <text x="32" y="40" class="label" fill="#0B1B3A">Recommendation</text>
+    <text x="32" y="70" class="body">Use a custom-outlined geometric sans wordmark with uppercase proportions, zero tracking, and manual kerning. Keep the tone restrained, confident, and global-fintech clean.</text>
+  </g>
+</svg>

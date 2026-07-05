@@ -1,5 +1,6 @@
 // @ts-ignore — expo-asset types resolved at runtime via expo's module resolver
 import { Asset } from "expo-asset";
+import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -507,7 +508,7 @@ export default function OnboardingScreen() {
 
       {/* Header — always white so glow never bleeds into logo area */}
       <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: "#ffffff" }]}>
-        <Text style={[styles.logo, { fontSize: logoSize }]}>PAYVORA.</Text>
+        <PayvoraWordmark width={110} height={28} />
       </View>
 
       {/* Slide carousel — scroll drives the parallax depth on image slides */}

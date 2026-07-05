@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="72" viewBox="0 0 390 72" role="img" aria-labelledby="title desc">
+  <title id="title">PAYVORA Primary Logo - Signal Accent</title>
+  <desc id="desc">Primary PAYVORA logo lockup with a geometric blue P symbol, cyan flow accent, and navy wordmark.</desc>
+  <g fill="none" fill-rule="evenodd">
+    <rect x="8" y="12" width="48" height="48" rx="14" fill="#2F6BFF"/>
+    <path d="M21.8 22.2H35.4C42.9 22.2 48 26.7 48 33.2C48 39.8 42.9 44.2 35.4 44.2H29.4V52H21.8V22.2ZM29.4 28.5V38H35C38.5 38 40.6 36.2 40.6 33.2C40.6 30.2 38.5 28.5 35 28.5H29.4Z" fill="#FFFFFF"/>
+    <path d="M30.9 44.2H38.4L45.4 52H37.2L30.9 44.2Z" fill="#2DD4FF"/>
+    <text x="86" y="51" fill="#0B1B3A" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="780" letter-spacing="0">PAYVORA</text>
+  </g>
+</svg>

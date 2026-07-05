@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060">
+  <defs>
+    <style>
+      .bg { fill: #F8FAFC; }
+      .panel { fill: #FFFFFF; stroke: #D9E2EF; }
+      .dark { fill: #0B1B3A; }
+      .blue { fill: #2F6BFF; }
+      .cyan { fill: #2DD4FF; }
+      .white { fill: #FFFFFF; }
+      .navy { fill: #0B1B3A; }
+      .muted { fill: #475569; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 16px; font-weight: 760; letter-spacing: 0; }
+      .body { font-family: Inter, Arial, sans-serif; font-size: 15px; font-weight: 420; letter-spacing: 0; }
+      .title { font-family: Inter, Arial, sans-serif; font-size: 36px; font-weight: 780; letter-spacing: 0; }
+      .subtitle { font-family: Inter, Arial, sans-serif; font-size: 18px; font-weight: 430; letter-spacing: 0; }
+      .word { font-family: Inter, Arial, sans-serif; font-size: 42px; font-weight: 780; letter-spacing: 0; }
+    </style>
+
+    <symbol id="symbol-a1" viewBox="0 0 64 64">
+      <rect x="8" y="8" width="48" height="48" rx="13" class="blue"/>
+      <path d="M22 18H35.6C43.1 18 48 22.5 48 29.1C48 35.8 43.1 40.2 35.6 40.2H29.2V48H22V18ZM29.2 24.2V34H35.2C38.7 34 40.8 32.2 40.8 29.1C40.8 26.1 38.7 24.2 35.2 24.2H29.2Z" class="white"/>
+      <path d="M30.7 39.7H38.6L46 48H37.9L30.7 39.7Z" class="white" opacity="0.96"/>
+    </symbol>
+
+    <symbol id="symbol-a2" viewBox="0 0 64 64">
+      <rect x="8" y="8" width="48" height="48" rx="12" class="blue"/>
+      <path d="M21.5 18H35.7C43.3 18 48.5 22.7 48.5 29.1C48.5 35.4 43.3 39.9 35.7 39.9H29.1V48H21.5V18ZM29.1 24.4V33.7H35.2C38.7 33.7 40.8 32 40.8 29.1C40.8 26.1 38.7 24.4 35.2 24.4H29.1Z" class="white"/>
+      <path d="M18.2 39.9H29.9L37.1 48H28.8L18.2 36.1V39.9Z" class="white" opacity="0.94"/>
+    </symbol>
+
+    <symbol id="symbol-a3" viewBox="0 0 64 64">
+      <rect x="8" y="8" width="48" height="48" rx="14" class="blue"/>
+      <path d="M21.8 18.2H35.4C42.9 18.2 48 22.7 48 29.2C48 35.8 42.9 40.2 35.4 40.2H29.4V48H21.8V18.2ZM29.4 24.5V34H35C38.5 34 40.6 32.2 40.6 29.2C40.6 26.2 38.5 24.5 35 24.5H29.4Z" class="white"/>
+      <path d="M30.9 40.2H38.4L45.4 48H37.2L30.9 40.2Z" class="cyan"/>
+    </symbol>
+
+    <symbol id="lockup-a1-dark" viewBox="0 0 390 72">
+      <use href="#symbol-a1" width="64" height="64" x="0" y="4"/>
+      <text x="86" y="51" class="word navy">PAYVORA</text>
+    </symbol>
+
+    <symbol id="lockup-a1-light" viewBox="0 0 390 72">
+      <use href="#symbol-a1" width="64" height="64" x="0" y="4"/>
+      <text x="86" y="51" class="word white">PAYVORA</text>
+    </symbol>
+
+    <symbol id="lockup-a2-dark" viewBox="0 0 390 72">
+      <use href="#symbol-a2" width="64" height="64" x="0" y="4"/>
+      <text x="88" y="51" class="word navy">PAYVORA</text>
+    </symbol>
+
+    <symbol id="lockup-a2-light" viewBox="0 0 390 72">
+      <use href="#symbol-a2" width="64" height="64" x="0" y="4"/>
+      <text x="88" y="51" class="word white">PAYVORA</text>
+    </symbol>
+
+    <symbol id="lockup-a3-dark" viewBox="0 0 390 72">
+      <use href="#symbol-a3" width="64" height="64" x="0" y="4"/>
+      <text x="86" y="51" class="word navy">PAYVORA</text>
+    </symbol>
+
+    <symbol id="lockup-a3-light" viewBox="0 0 390 72">
+      <use href="#symbol-a3" width="64" height="64" x="0" y="4"/>
+      <text x="86" y="51" class="word white">PAYVORA</text>
+    </symbol>
+  </defs>
+
+  <rect width="1600" height="1060" class="bg"/>
+  <text x="80" y="86" class="title navy">PAYVORA Primary Logo: Refined Concept A</text>
+  <text x="80" y="124" class="subtitle muted">Three refined variations of the approved Vora Flow direction. No new concepts, no secondary assets.</text>
+
+  <g transform="translate(80 175)">
+    <rect width="460" height="700" rx="8" class="panel"/>
+    <rect x="1" y="1" width="458" height="200" rx="7" fill="#FFFFFF"/>
+    <use href="#lockup-a1-dark" width="390" height="72" x="36" y="65"/>
+    <rect x="1" y="201" width="458" height="200" class="dark"/>
+    <use href="#lockup-a1-light" width="390" height="72" x="36" y="265"/>
+
+    <text x="32" y="460" class="label navy">Variation A1: Balanced Flow</text>
+    <text x="32" y="494" class="body muted">Most premium and restrained. The outer container</text>
+    <text x="32" y="518" class="body muted">has softer fintech confidence, while the P counter</text>
+    <text x="32" y="542" class="body muted">is opened and optically centered for clarity.</text>
+    <text x="32" y="586" class="body muted">Best for: primary brand lockup, website headers,</text>
+    <text x="32" y="610" class="body muted">investor materials, product surfaces.</text>
+    <rect x="32" y="642" width="168" height="34" rx="4" fill="#EAF0FF"/>
+    <text x="48" y="665" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="760" fill="#2F6BFF">Recommended</text>
+  </g>
+
+  <g transform="translate(570 175)">
+    <rect width="460" height="700" rx="8" class="panel"/>
+    <rect x="1" y="1" width="458" height="200" rx="7" fill="#FFFFFF"/>
+    <use href="#lockup-a2-dark" width="390" height="72" x="35" y="65"/>
+    <rect x="1" y="201" width="458" height="200" class="dark"/>
+    <use href="#lockup-a2-light" width="390" height="72" x="35" y="265"/>
+
+    <text x="32" y="460" class="label navy">Variation A2: Connected Rail</text>
+    <text x="32" y="494" class="body muted">Keeps the protected P, but extends the flow cue</text>
+    <text x="32" y="518" class="body muted">toward the lower-left edge. It feels more active</text>
+    <text x="32" y="542" class="body muted">and transactional without becoming a new mark.</text>
+    <text x="32" y="586" class="body muted">Best for: emphasizing movement, wallet funding,</text>
+    <text x="32" y="610" class="body muted">withdrawals, and exchange behavior.</text>
+  </g>
+
+  <g transform="translate(1060 175)">
+    <rect width="460" height="700" rx="8" class="panel"/>
+    <rect x="1" y="1" width="458" height="200" rx="7" fill="#FFFFFF"/>
+    <use href="#lockup-a3-dark" width="390" height="72" x="36" y="65"/>
+    <rect x="1" y="201" width="458" height="200" class="dark"/>
+    <use href="#lockup-a3-light" width="390" height="72" x="36" y="265"/>
+
+    <text x="32" y="460" class="label navy">Variation A3: Signal Accent</text>
+    <text x="32" y="494" class="body muted">Adds a small high-signal accent to the forward</text>
+    <text x="32" y="518" class="body muted">flow piece. It feels more digital and energetic,</text>
+    <text x="32" y="542" class="body muted">but is less timeless than the single-color mark.</text>
+    <text x="32" y="586" class="body muted">Best for: a slightly more expressive fintech tone</text>
+    <text x="32" y="610" class="body muted">while remaining flat and SVG-clean.</text>
+  </g>
+
+  <g transform="translate(80 920)">
+    <rect width="1440" height="86" rx="8" class="dark"/>
+    <text x="28" y="36" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="780" fill="#FFFFFF">Recommendation</text>
+    <text x="28" y="65" font-family="Inter, Arial, sans-serif" font-size="17" fill="#D9E8FF">Choose Variation A1. It has the strongest Stripe/Revolut/Wise-level restraint: distinctive, secure, balanced, scalable, and easy to reproduce as a primary logo.</text>
+  </g>
+</svg>

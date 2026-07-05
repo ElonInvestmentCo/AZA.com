@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="72" viewBox="0 0 390 72" role="img" aria-labelledby="title desc">
+  <title id="title">PAYVORA Primary Logo - Balanced Flow</title>
+  <desc id="desc">Primary PAYVORA logo lockup with a geometric blue P symbol and navy wordmark.</desc>
+  <g fill="none" fill-rule="evenodd">
+    <rect x="8" y="12" width="48" height="48" rx="13" fill="#2F6BFF"/>
+    <path d="M22 22H35.6C43.1 22 48 26.5 48 33.1C48 39.8 43.1 44.2 35.6 44.2H29.2V52H22V22ZM29.2 28.2V38H35.2C38.7 38 40.8 36.2 40.8 33.1C40.8 30.1 38.7 28.2 35.2 28.2H29.2Z" fill="#FFFFFF"/>
+    <path d="M30.7 43.7H38.6L46 52H37.9L30.7 43.7Z" fill="#FFFFFF" opacity=".96"/>
+    <text x="86" y="51" fill="#0B1B3A" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="780" letter-spacing="0">PAYVORA</text>
+  </g>
+</svg>

@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import * as Haptics from "expo-haptics";
 import { PasswordInput } from "@/components/PasswordInput";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
@@ -221,7 +222,7 @@ export default function LoginScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.backIcon} />
           </Pressable>
-          <Text style={s.wordmark}>PAYVORA.</Text>
+          <PayvoraWordmark width={148} height={38} />
           <View style={{ width: 44 }} />
         </Animated.View>
 

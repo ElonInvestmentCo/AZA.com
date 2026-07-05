@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -161,7 +162,7 @@ export default function ForgotPasswordScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.dark} />
           </Pressable>
-          <Text style={s.wordmark}>PAYVORA.</Text>
+          <PayvoraWordmark width={148} height={38} />
           <View style={{ width: 44 }} />
         </Animated.View>
 

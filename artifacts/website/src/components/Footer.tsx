@@ -40,13 +40,13 @@ export function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-[#00D9A0] flex items-center justify-center">
-                <span className="text-[#0A0A0F] font-black text-base">P</span>
-              </div>
-              <span className="text-white font-bold text-xl tracking-tight">
-                Pay<span className="text-[#00D9A0]">Vora</span>
-              </span>
+            <Link href="/" className="flex items-center mb-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/payvora-wordmark.svg"
+                alt="PAYVORA"
+                style={{ height: "34px", width: "auto", filter: "brightness(0) invert(1)" }}
+              />
             </Link>
             <p className="text-[#8F8FA3] text-sm leading-relaxed max-w-xs">
               Nigeria&apos;s premium fintech platform. Trade gift cards, pay bills,
