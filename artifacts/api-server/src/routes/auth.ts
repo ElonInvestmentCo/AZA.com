@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { OAuth2Client } from "google-auth-library";
 import { eq } from "drizzle-orm";
 import { db, usersTable, walletsTable } from "@workspace/db";
-import { signToken } from "../lib/jwt.js";
+import { signToken, verifyToken } from "../lib/jwt.js";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
 
 const router = Router();

@@ -4,6 +4,7 @@ import esimRouter from "./esim.js";
 import billsRouter from "./bills.js";
 import authRouter from "./auth.js";
 import walletRouter from "./wallet.js";
+import kycRouter from "./kyc.js";
 
 const router: IRouter = Router();
 
@@ -12,5 +13,6 @@ router.use(healthRouter);
 router.use(esimRouter);
 router.use(billsRouter);
 router.use(walletRouter);
+router.use(kycRouter);
 
 export default router;

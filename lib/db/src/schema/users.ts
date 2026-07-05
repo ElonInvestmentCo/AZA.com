@@ -13,6 +13,15 @@ export const usersTable = pgTable("users", {
   googleId: text("google_id"),
   appleId: text("apple_id"),
   avatarUrl: text("avatar_url"),
+  /** none | pending | verified | rejected */
+  kycStatus: text("kyc_status").notNull().default("none"),
+  kycFullName: text("kyc_full_name"),
+  kycDob: text("kyc_dob"),
+  kycIdType: text("kyc_id_type"),
+  kycIdNumber: text("kyc_id_number"),
+  kycRejectionReason: text("kyc_rejection_reason"),
+  kycSubmittedAt: timestamp("kyc_submitted_at", { withTimezone: true }),
+  kycReviewedAt: timestamp("kyc_reviewed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

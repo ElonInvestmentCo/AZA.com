@@ -46,6 +46,7 @@ const SECTIONS = [
   {
     title: "Account",
     items: [
+      { id: "kyc",      label: "Identity Verification", sublabel: "Verify your identity (KYC)",  icon: "shield"      as const, iconBg: "#F0FFF9", iconColor: "#00B03C", route: "/(app)/kyc"       as const },
       { id: "referral", label: "Refer & Earn",  sublabel: "Earn ₦5,000 per referral",          icon: "users"       as const, iconBg: "#FFF0F0", iconColor: "#E11D48", route: "/(app)/referral"  as const },
       { id: "settings", label: "Settings",      sublabel: "Manage account & preferences",       icon: "settings"    as const, iconBg: "#F0F4FF", iconColor: "#2563EB", route: "/(app)/settings"  as const },
     ],
