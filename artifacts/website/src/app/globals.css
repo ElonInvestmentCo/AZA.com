@@ -58,3 +58,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #00D9A0;
 }
+
+/* ── Responsive logo ──────────────────────────────────────────────────────── */
+.nav-logo {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  /* SVG is resolution-independent — always crisp on Retina */
+}
+
+@media (min-width: 481px) {
+  .nav-logo { height: 42px; }
+}
+
+@media (min-width: 1025px) {
+  .nav-logo { height: 52px; }
+}

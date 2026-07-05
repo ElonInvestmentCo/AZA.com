@@ -38,7 +38,8 @@ export function Navbar() {
             <img
               src="/payvora-wordmark.svg"
               alt="PAYVORA"
-              style={{ height: "32px", width: "auto", filter: "brightness(0) invert(1)" }}
+              className="nav-logo"
+              style={{ filter: "brightness(0) invert(1)" }}
             />
           </Link>
 
