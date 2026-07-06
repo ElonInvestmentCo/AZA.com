@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Terms of Service – PAYVORA",
   description:
     "Read PAYVORA's Terms of Service. By using our platform you agree to these terms.",
+  alternates: { canonical: "https://www.payvora.org/terms" },
 };
 
 const sections = [

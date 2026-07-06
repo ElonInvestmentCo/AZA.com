@@ -15,7 +15,7 @@ const footerLinks = {
     { label: "Download App", href: "/download" },
   ],
   Legal: [
-    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
     { label: "AML/KYC Policy", href: "/aml-kyc" },
     { label: "Refund Policy", href: "/refund-policy" },

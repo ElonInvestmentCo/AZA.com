@@ -197,17 +197,12 @@ function AppleSignIn({ onSuccess, onError }: Props) {
 /* ─── Exported component ─────────────────────────────────────────────────────── */
 
 /*
- * Determines whether this device/platform can run Google Sign-In.
- * - Web: yes (webClientId)
- * - Android: yes (falls back to webClientId)
- * - iOS: ONLY when EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID is explicitly set.
- *        Passing the web client ID as iosClientId does not work because
- *        the library uses it to build native redirect schemes.
+ * Google Sign-In is enabled on all platforms.
+ * On iOS without a native iosClientId, expo-auth-session opens
+ * the system browser for the OAuth flow using webClientId — this works fine.
  */
 function canRunGoogleOnThisPlatform(): boolean {
-  if (Platform.OS === "web" || Platform.OS === "android") return true;
-  if (Platform.OS === "ios") return !!process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-  return false;
+  return true;
 }
 
 export default function SocialAuthButtons({ onSuccess, onError }: Props) {
