@@ -4,6 +4,7 @@ import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { apiFetch } from "@/utils/api";
+import { useAuth } from "@/context/AuthContext";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -102,6 +103,8 @@ const inp = StyleSheet.create({
 export default function ForgotPasswordScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
+  const { user } = useAuth();
+  const isLoggedIn = !!user;
 
   const [email,   setEmail]   = useState("");
   const [loading, setLoading] = useState(false);
@@ -235,16 +238,18 @@ export default function ForgotPasswordScreen() {
           </Text>
         </Animated.View>
 
-        {/* ── Footer ── */}
-        <Animated.View
-          entering={FadeInUp.duration(380).delay(280).springify()}
-          style={s.footer}
-        >
-          <Text style={s.footerText}>Remember your password? </Text>
-          <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
-            <Text style={s.footerLink}>Log in</Text>
-          </TouchableOpacity>
-        </Animated.View>
+        {/* ── Footer — only shown when user is NOT already logged in ── */}
+        {!isLoggedIn && (
+          <Animated.View
+            entering={FadeInUp.duration(380).delay(280).springify()}
+            style={s.footer}
+          >
+            <Text style={s.footerText}>Remember your password? </Text>
+            <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
+              <Text style={s.footerLink}>Log in</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -1,17 +1,14 @@
 /**
  * SocialAuthButtons — Google OAuth + Apple Sign-In for PAYVORA.
  *
- * Google auth is isolated to its own inner component so it can be
- * conditionally rendered. On iOS, it requires a dedicated iOS OAuth
- * client ID (EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID). Without one the button
- * is shown in a disabled state with an informative message.
+ * Google auth uses the backend web OAuth flow via WebBrowser.openAuthSessionAsync.
+ * The backend redirects to mobile://auth?token=… after successful sign-in.
  *
  * Apple Sign-In is shown on iOS only (native entitlement required).
  */
 
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import * as AppleAuthentication from "expo-apple-authentication";
-import * as Google from "expo-auth-session/providers/google";
 import * as Haptics from "expo-haptics";
 import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useState } from "react";
@@ -23,15 +20,14 @@ import {
   StyleSheet,
   Text,
   View,
-  useWindowDimensions,
 } from "react-native";
 import Animated, {
-  FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
+import { API_BASE_URL } from "@/utils/api";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -86,44 +82,55 @@ const sb = StyleSheet.create({
   dim: { opacity: 0.5 },
 });
 
-/* ─── Google sign-in — inner component (uses hook, only rendered on eligible platforms) */
-function GoogleSignInActive({ onSuccess, onError }: Props) {
+/* ─── Google sign-in ─────────────────────────────────────────────────────────── */
+function GoogleSignIn({ onSuccess, onError }: Props) {
   const { loginWithSocial } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  const IOS_ID  = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-  const WEB_ID  = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-  const ANDR_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+  const handlePress = async () => {
+    setLoading(true);
+    try {
+      const googleAuthUrl = `${API_BASE_URL}/api/auth/google`;
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId:     WEB_ID,
-    iosClientId:     Platform.OS === "ios" ? IOS_ID : undefined,
-    androidClientId: Platform.OS === "android" ? ANDR_ID : undefined,
-  });
+      // Open Google OAuth in system browser.
+      // Backend redirects to mobile://auth?token=… on success.
+      const result = await WebBrowser.openAuthSessionAsync(
+        googleAuthUrl,
+        "mobile://",
+      );
 
-  useEffect(() => {
-    if (!response) return;
-    if (response.type === "success") {
-      const accessToken = response.authentication?.accessToken;
-      if (!accessToken) { setLoading(false); onError?.("Google sign-in failed — no token."); return; }
-      loginWithSocial(accessToken, "google")
-        .then(() => { setLoading(false); Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); onSuccess(); })
-        .catch(() => { setLoading(false); onError?.("Could not sign in with Google. Please try again."); });
-    } else if (response.type === "error") {
-      setLoading(false);
-      onError?.(response.error?.message ?? "Google sign-in failed. Please try again.");
-    } else if (response.type === "cancel" || response.type === "dismiss") {
+      if (result.type === "success" && result.url) {
+        // Parse token from the deep link URL: mobile://auth?token=xxx
+        const raw = result.url;
+        const tokenMatch = raw.match(/[?&]token=([^&]+)/);
+        const errorMatch = raw.match(/[?&]error=([^&]+)/);
+
+        if (tokenMatch?.[1]) {
+          const token = decodeURIComponent(tokenMatch[1]);
+          await loginWithSocial(token, "google");
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          onSuccess();
+        } else if (errorMatch?.[1]) {
+          onError?.(decodeURIComponent(errorMatch[1]));
+        } else {
+          onError?.("Google sign-in failed — no token received.");
+        }
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        // User cancelled — do nothing
+      } else {
+        // Covers "opened" / "locked" / any unexpected result
+        onError?.("Google sign-in failed. Please try again.");
+      }
+    } catch (err: any) {
+      onError?.(err?.message ?? "Google sign-in failed. Please try again.");
+    } finally {
       setLoading(false);
     }
-  }, [response]);
+  };
 
   return (
     <SocialBtn
-      onPress={async () => {
-        if (!request) { Alert.alert("Google Sign-In", "Google sign-in is not ready yet."); return; }
-        setLoading(true);
-        await promptAsync();
-      }}
+      onPress={handlePress}
       loading={loading} disabled={false}
       bg={C.google.bg} border={C.google.border} shadow={C.google.shadow}
     >
@@ -131,20 +138,6 @@ function GoogleSignInActive({ onSuccess, onError }: Props) {
         ? <ActivityIndicator size="small" color={C.loading} />
         : <><AntDesign name="google" size={20} color={C.google.icon} /><Text style={[ss.txt, { color: C.google.text }]}>Google</Text></>
       }
-    </SocialBtn>
-  );
-}
-
-/* ─── Google sign-in — disabled placeholder (no hook) ──────────────────────── */
-function GoogleSignInDisabled() {
-  return (
-    <SocialBtn
-      onPress={() => Alert.alert("Google Sign-In", "Google sign-in is not available on iOS in this build.\n\nAn iOS OAuth client ID is required in Google Cloud Console.")}
-      loading={false} disabled={true}
-      bg={C.disabled.bg} border={C.disabled.border} shadow="transparent"
-    >
-      <AntDesign name="google" size={20} color={C.disabled.text} />
-      <Text style={[ss.txt, { color: C.disabled.text }]}>Google</Text>
     </SocialBtn>
   );
 }
@@ -195,26 +188,11 @@ function AppleSignIn({ onSuccess, onError }: Props) {
 }
 
 /* ─── Exported component ─────────────────────────────────────────────────────── */
-
-/*
- * Google Sign-In is enabled on all platforms.
- * On iOS without a native iosClientId, expo-auth-session opens
- * the system browser for the OAuth flow using webClientId — this works fine.
- */
-function canRunGoogleOnThisPlatform(): boolean {
-  return true;
-}
-
 export default function SocialAuthButtons({ onSuccess, onError }: Props) {
-  const googleEnabled = canRunGoogleOnThisPlatform();
-
   return (
     <View style={ss.row}>
       <View style={ss.half}>
-        {googleEnabled
-          ? <GoogleSignInActive onSuccess={onSuccess} onError={onError} />
-          : <GoogleSignInDisabled />
-        }
+        <GoogleSignIn onSuccess={onSuccess} onError={onError} />
       </View>
       <View style={ss.half}>
         <AppleSignIn onSuccess={onSuccess} onError={onError} />
