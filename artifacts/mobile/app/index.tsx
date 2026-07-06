@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
 import SplashAnimation from "@/components/SplashAnimation";
+import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 
 export default function SplashIndex() {
   const router = useRouter();
@@ -66,9 +67,9 @@ export default function SplashIndex() {
             duration={2000}
             onFinish={() => setAnimDone(true)}
           />
-          <Animated.Text style={[s.wordmark, wordmarkStyle]}>
-            PAYVORA.
-          </Animated.Text>
+          <Animated.View style={[s.wordmarkWrap, wordmarkStyle]}>
+            <PayvoraWordmark width={220} color="#FFFFFF" />
+          </Animated.View>
         </View>
       </Animated.View>
     </View>
@@ -89,15 +90,9 @@ const s = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  wordmark: {
-    fontFamily: "Manrope_700Bold",
-    fontSize: 52,
-    letterSpacing: 4,
-    color: "#FFFFFF",
-    textAlign: "center",
+  wordmarkWrap: {
     marginTop: 24,
-    textShadowColor: "rgba(255,255,255,0.18)",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

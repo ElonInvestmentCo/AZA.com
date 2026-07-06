@@ -19,8 +19,9 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import Svg, { Circle, Path, Rect } from "react-native-svg";
+import { SvgXml } from "react-native-svg";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { VIRTUAL_CARD_SVG, PREMIUM_CARD_SVG } from "@/assets/images/cards/cardSvgs";
 
 /* ─── Slide data ─────────────────────────────────────────────────────────── */
 const SLIDES = [
@@ -46,125 +47,15 @@ const SLIDES = [
   },
 ] as const;
 
-/* ─── Mastercard logo — scales with card width ───────────────────────────── */
-function MastercardLogo({
-  isVirtual,
-  r = 12,
-}: {
-  isVirtual: boolean;
-  r?: number;
-}) {
-  const gap      = r * 0.6;
-  const totalW   = r * 2 + r * 2 - gap;
-  const totalH   = r * 2;
-  const cx1      = r;
-  const cx2      = totalW - r;
-  const cy       = r;
-
-  if (isVirtual) {
-    // Card06: red left, orange right
-    return (
-      <Svg width={totalW} height={totalH} viewBox={`0 0 ${totalW} ${totalH}`}>
-        <Circle cx={cx1} cy={cy} r={r} fill="#EF1B22" />
-        <Circle cx={cx2} cy={cy} r={r} fill="#F79E1C" />
-        {/* amber blend in overlap */}
-        <Circle cx={totalW / 2} cy={cy} r={r * 0.55} fill="#FF5F00" opacity={0.45} />
-      </Svg>
-    );
-  }
-  // Card07: dark navy left, purple right
-  return (
-    <Svg width={totalW} height={totalH} viewBox={`0 0 ${totalW} ${totalH}`}>
-      <Circle cx={cx1} cy={cy} r={r} fill="#28283E" stroke="#C1C1D7" strokeWidth={0.75} />
-      <Circle cx={cx2} cy={cy} r={r} fill="#8282B0" stroke="#C1C1D7" strokeWidth={0.75} />
-    </Svg>
-  );
-}
-
-/* ─── EMV chip — scales with card width ──────────────────────────────────── */
-function EmvChip({
-  isVirtual,
-  w = 36,
-  h = 28,
-}: {
-  isVirtual: boolean;
-  w?: number;
-  h?: number;
-}) {
-  const bg = isVirtual ? "#E9DCA5" : "#D5B688";
-  const st = "#262626";
-  const sw = "0.7";
-  const mx = w;   // viewBox coords = actual px so SVG scales cleanly
-  const my = h;
-  const px = mx * 0.36; // left trace join x (~36% = left contact pad edge)
-  const qx = mx * 0.64; // right trace join x
-
-  return (
-    <Svg width={w} height={h} viewBox={`0 0 ${mx} ${my}`}>
-      <Rect x={0} y={0} width={mx} height={my} rx={4} fill={bg} />
-      {/* left traces */}
-      <Path
-        d={`M0.5 ${my * 0.32}H${px}C${px + 2} ${my * 0.32} ${px + 3} ${my * 0.42} ${px + 3} ${my * 0.5}
-           V${my * 0.77}M${px + 3} ${my * 0.99}V${my * 0.77}M${px + 3} ${my * 0.77}H0.5
-           M${px + 3} ${my * 0.5}H0.5`}
-        stroke={st} strokeWidth={sw} fill="none" strokeLinecap="round"
-      />
-      {/* right traces */}
-      <Path
-        d={`M${mx - 0.5} ${my * 0.32}H${qx}C${qx - 2} ${my * 0.32} ${qx - 3} ${my * 0.42} ${qx - 3} ${my * 0.5}
-           V${my * 0.77}M${qx - 3} ${my * 0.99}V${my * 0.77}M${qx - 3} ${my * 0.77}H${mx - 0.5}
-           M${qx - 3} ${my * 0.5}H${mx - 0.5}`}
-        stroke={st} strokeWidth={sw} fill="none" strokeLinecap="round"
-      />
-    </Svg>
-  );
-}
-
-/* ─── RFID / contactless waves — scales with card ────────────────────────── */
-function RfidWaves({
-  isVirtual,
-  size = 22,
-}: {
-  isVirtual: boolean;
-  size?: number;
-}) {
-  const strokeColor = isVirtual ? "#424242" : "rgba(255,255,255,0.6)";
-  // Arc paths drawn in a 22×26 viewBox; SVG scales to `size`
-  const vw = 22, vh = 26;
-  return (
-    <Svg width={size} height={size * (vh / vw)} viewBox={`0 0 ${vw} ${vh}`}>
-      <Path d="M5.5 13C7.6 10.6 7.6 6.4 5.5 4"
-        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none" />
-      <Path d="M10.1 15.5C13.8 11.4 13.8 4.6 10.1 0.5"
-        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none" />
-      <Path d="M15 18C20.4 12.2 20.4 3.8 15 -2"
-        stroke={strokeColor} strokeWidth={2} strokeLinecap="round" fill="none" />
-    </Svg>
-  );
-}
-
-/* ─── Premium decorative frame (Card07 only) ─────────────────────────────── */
-function PremiumFrame({ cardW }: { cardW: number }) {
-  const w = cardW * 0.65;
-  const h = cardW * 0.16;
-  return (
-    <Svg width={w} height={h} viewBox="0 0 160 40">
-      <Path d="M0 40L12 0L32 0L20 40Z"    fill="rgba(255,255,255,0.18)" />
-      <Path d="M40 40L52 0L72 0L60 40Z"   fill="rgba(255,255,255,0.18)" />
-      <Path d="M80 40L92 0L112 0L100 40Z" fill="rgba(255,255,255,0.18)" />
-      <Path d="M120 40L132 0L152 0L140 40Z" fill="rgba(255,255,255,0.18)" />
-    </Svg>
-  );
-}
-
 /* ─── Card visual ────────────────────────────────────────────────────────── */
 /*
+ * Renders the exact provided card artwork (SVG) for each slide.
  * Two-wrapper pattern (fixes iOS shadow clipping):
  *   outer  – shadow props, NO overflow (so shadow is not clipped)
- *   inner  – overflow: "hidden" + background, clips card artwork
+ *   inner  – overflow: "hidden", clips the SVG to rounded corners
  *
- * All internal element sizes are derived from cardW / cardH so they stay
- * proportionally correct on any screen size.
+ * Source SVGs use a 210×332 viewBox, so we scale via SvgXml's width/height
+ * while keeping that aspect ratio (cardW/cardH are derived from it upstream).
  */
 function Card({
   slide,
@@ -176,115 +67,12 @@ function Card({
   cardH: number;
 }) {
   const isVirtual = slide.id === "virtual";
-
-  // Scaled element sizes
-  const mcR      = Math.round(cardW * 0.062);   // Mastercard circle radius
-  const chipW    = Math.round(cardW * 0.185);    // EMV chip width
-  const chipH    = Math.round(chipW * 0.76);     // EMV chip height  (≈0.76 aspect)
-  const rfidSize = Math.round(cardW * 0.114);    // RFID arc icon size
-
-  /* ── Layout ratios from Card06/07 React components (316×500 ref frame) ──
-   *
-   *  Card06 (Virtual, dark-green):
-   *    Mastercard  left 7.6 %, top 26 %
-   *    RFID        left 7 %,   top 44 %
-   *    EMV chip    left 41 %,  top 31 %
-   *    PAYVORA     right ~5 %, top 2 %   (rotated 90°)
-   *
-   *  Card07 (Premium, gold):
-   *    Mastercard  left 83 %,  top 3.3 %
-   *    EMV chip    left 83 %,  top 31 %
-   *    RFID        left 62 %,  top 31 %
-   *    PAYVORA     left 44 %,  top 13 %  (rotated 90°)
-   *    Frame       bottom 8 %, centered
-   */
-  const layout = isVirtual
-    ? {
-        mcLeft:    cardW * 0.076,
-        mcTop:     cardH * 0.26,
-        rfidLeft:  cardW * 0.07,
-        rfidTop:   cardH * 0.44,
-        chipLeft:  cardW * 0.41,
-        chipTop:   cardH * 0.31,
-        brandRight:  cardW * 0.052,
-        brandTop:    cardH * 0.04,
-      }
-    : {
-        mcLeft:    cardW * 0.83 - mcR * 2,  // keep within right edge
-        mcTop:     cardH * 0.033,
-        rfidLeft:  cardW * 0.62,
-        rfidTop:   cardH * 0.31,
-        chipLeft:  cardW * 0.83 - chipW,    // right-align chip
-        chipTop:   cardH * 0.31,
-        brandLeft:   cardW * 0.44,
-        brandTop:    cardH * 0.13,
-      };
+  const svgXml = isVirtual ? VIRTUAL_CARD_SVG : PREMIUM_CARD_SVG;
 
   return (
-    <View
-      style={[
-        cv.shadowWrap,
-        {
-          width: cardW,
-          height: cardH,
-          shadowColor: slide.cardGlow,
-        },
-      ]}
-    >
-      {/* ── Inner wrapper: clips artwork, no shadow ── */}
-      <View style={[cv.cardInner, { backgroundColor: slide.cardBg }]}>
-
-        {/* Faint card number */}
-        <View style={cv.numWrap}>
-          <Text style={cv.num}>•• 6352</Text>
-        </View>
-
-        {/* PAYVORA brand — vertical along one edge */}
-        {isVirtual ? (
-          <View
-            pointerEvents="none"
-            style={[cv.brandWrap, { right: (layout as any).brandRight, top: (layout as any).brandTop }]}
-          >
-            <Text style={cv.brandText}>PAYVORA</Text>
-          </View>
-        ) : (
-          <View
-            pointerEvents="none"
-            style={[cv.brandWrap, { left: (layout as any).brandLeft, top: (layout as any).brandTop }]}
-          >
-            <Text style={cv.brandText}>PAYVORA</Text>
-          </View>
-        )}
-
-        {/* Mastercard */}
-        <View style={{ position: "absolute", left: layout.mcLeft, top: layout.mcTop }}>
-          <MastercardLogo isVirtual={isVirtual} r={mcR} />
-          <Text style={cv.mastercardLabel}>mastercard</Text>
-        </View>
-
-        {/* EMV chip */}
-        <View style={{ position: "absolute", left: layout.chipLeft, top: layout.chipTop }}>
-          <EmvChip isVirtual={isVirtual} w={chipW} h={chipH} />
-        </View>
-
-        {/* RFID waves */}
-        <View style={{ position: "absolute", left: layout.rfidLeft, top: layout.rfidTop }}>
-          <RfidWaves isVirtual={isVirtual} size={rfidSize} />
-        </View>
-
-        {/* Premium-only decorative frame */}
-        {!isVirtual && (
-          <View
-            style={{
-              position: "absolute",
-              bottom: cardH * 0.08,
-              left: (cardW - cardW * 0.65) / 2,
-            }}
-          >
-            <PremiumFrame cardW={cardW} />
-          </View>
-        )}
-
+    <View style={[cv.shadowWrap, { width: cardW, height: cardH, shadowColor: slide.cardGlow }]}>
+      <View style={cv.cardInner}>
+        <SvgXml xml={svgXml} width={cardW} height={cardH} />
       </View>
     </View>
   );
@@ -303,36 +91,6 @@ const cv = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     position: "relative",
-  },
-  numWrap: {
-    position: "absolute",
-    top: 0, bottom: 0, left: 0, right: 0,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  num: {
-    color: "rgba(255,255,255,0.12)",
-    fontSize: 12,
-    fontFamily: "Manrope_500Medium",
-    letterSpacing: 4,
-  },
-  brandWrap: {
-    position: "absolute",
-    transform: [{ rotate: "90deg" }],
-  },
-  brandText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 10,
-    fontFamily: "Manrope_600SemiBold",
-    letterSpacing: 3,
-    textTransform: "uppercase",
-  },
-  mastercardLabel: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 7,
-    fontFamily: "Manrope_500Medium",
-    letterSpacing: 0.3,
-    marginTop: 3,
   },
 });
 
@@ -457,7 +215,7 @@ export default function CardsScreen() {
         )}
         onMomentumScrollEnd={handleMomentumScrollEnd}
         contentContainerStyle={{ width: pageW * SLIDES.length }}
-        style={s.cardScroll}
+        style={[s.cardScroll, { height: cardH + CARD_V_PAD * 2 }]}
       >
         {SLIDES.map((slide) => (
           <View key={slide.id} style={[s.cardPage, { width: pageW, paddingVertical: CARD_V_PAD }]}>
