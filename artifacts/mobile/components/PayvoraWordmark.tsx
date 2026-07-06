@@ -9,14 +9,15 @@
 import React from "react";
 import { SvgXml } from "react-native-svg";
 
-// Aspect ratio of the correctly-bounded viewBox: 1460 wide ÷ 148 tall ≈ 9.86
-const LOGO_ASPECT = 1460 / 148;
+// Aspect ratio of the correctly-bounded viewBox (computed from actual path bounds,
+// with padding, so glyph ascenders/descenders are never clipped): 1490 ÷ 265 ≈ 5.62
+const LOGO_ASPECT = 1490 / 265;
 
 const buildSvg = (color: string) => `<?xml version="1.0" standalone="no"?>
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="1460" height="148" viewBox="0 0 1460 148"
+ width="1490" height="265" viewBox="0 0 1490 265"
  preserveAspectRatio="xMidYMid meet">
-<g transform="translate(-150,552) scale(0.1,-0.1)" fill="${color}" stroke="none">
+<g transform="translate(-145,577) scale(0.1,-0.1)" fill="${color}" stroke="none">
 <path d="M2250 5460 c-66 -132 -120 -242 -120 -245 0 -2 415 -6 923 -7 l922
 -3 54 -23 c122 -52 195 -128 231 -241 47 -149 8 -311 -104 -430 -83 -88 -194
 -134 -363 -151 -59 -6 -308 -35 -553 -65 -643 -79 -683 -84 -685 -87 -1 -2
