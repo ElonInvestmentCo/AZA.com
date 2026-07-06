@@ -508,7 +508,7 @@ export default function OnboardingScreen() {
 
       {/* Header — always white so glow never bleeds into logo area */}
       <View style={[styles.header, { height: HEADER_H + topInset, paddingTop: topInset, backgroundColor: "#ffffff" }]}>
-        <PayvoraWordmark width={140} height={36} />
+        <PayvoraWordmark width={156} height={40} />
       </View>
 
       {/* Slide carousel — scroll drives the parallax depth on image slides */}

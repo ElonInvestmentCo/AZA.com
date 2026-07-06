@@ -222,7 +222,7 @@ export default function LoginScreen() {
           >
             <Ionicons name="chevron-back" size={22} color={C.backIcon} />
           </Pressable>
-          <PayvoraWordmark width={148} height={38} />
+          <PayvoraWordmark width={164} height={42} />
           <View style={{ width: 44 }} />
         </Animated.View>
 

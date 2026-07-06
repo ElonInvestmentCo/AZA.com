@@ -250,7 +250,7 @@ export default function HomeScreen() {
           <Feather name="menu" size={22} color={C.text} />
         </TouchableOpacity>
 
-        <PayvoraWordmark width={140} height={36} color={C.text} />
+        <PayvoraWordmark width={156} height={40} color={C.text} />
 
         <TouchableOpacity
           style={s.hdrBtn}

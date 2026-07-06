@@ -45,7 +45,7 @@ export function Footer() {
               <img
                 src="/payvora-wordmark.svg"
                 alt="PAYVORA"
-                style={{ height: "34px", width: "auto", filter: "brightness(0) invert(1)" }}
+                style={{ height: "38px", width: "auto", filter: "brightness(0) invert(1)" }}
               />
             </Link>
             <p className="text-[#8F8FA3] text-sm leading-relaxed max-w-xs">

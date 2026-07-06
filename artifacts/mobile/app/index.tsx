@@ -68,7 +68,7 @@ export default function SplashIndex() {
             onFinish={() => setAnimDone(true)}
           />
           <Animated.View style={[s.wordmarkWrap, wordmarkStyle]}>
-            <PayvoraWordmark width={220} color="#FFFFFF" />
+            <PayvoraWordmark width={250} color="#FFFFFF" />
           </Animated.View>
         </View>
       </Animated.View>
