@@ -26,6 +26,10 @@ args = "PayVora Website"
 task = "workflow.run"
 args = "PayVora API"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "PAYVORA Mobile"
+
 [[workflows.workflow]]
 name = "PayVora Website"
 author = "agent"
@@ -49,6 +53,18 @@ waitForPort = 8080
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow]]
+name = "PAYVORA Mobile"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "CI=1 EXPO_NO_WEB=1 EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_REPL_ID=$REPL_ID REACT_NATIVE_PACKAGER_HOSTNAME=$REPLIT_DEV_DOMAIN pnpm --filter @workspace/mobile exec expo start --lan --port 8099"
+waitForPort = 8099
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -85,6 +101,10 @@ externalPort = 5000
 [[ports]]
 localPort = 19665
 externalPort = 3003
+
+[[ports]]
+localPort = 8099
+externalPort = 8099
 
 [nix]
 channel = "stable-25_05"
