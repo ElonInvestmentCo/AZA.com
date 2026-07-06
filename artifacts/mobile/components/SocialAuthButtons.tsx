@@ -27,7 +27,6 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
-import { API_BASE_URL } from "@/utils/api";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -90,7 +89,11 @@ function GoogleSignIn({ onSuccess, onError }: Props) {
   const handlePress = async () => {
     setLoading(true);
     try {
-      const googleAuthUrl = `${API_BASE_URL}/api/auth/google`;
+      // Google OAuth MUST always go through the production domain.
+      // The dev EXPO_PUBLIC_DOMAIN is set to the Replit tunnel URL which is
+      // not registered with Google Cloud Console — only www.payvora.org is.
+      const oauthBase = process.env.EXPO_PUBLIC_AUTH_URL ?? "https://www.payvora.org";
+      const googleAuthUrl = `${oauthBase}/api/auth/google`;
 
       // Open Google OAuth in system browser.
       // Backend redirects to mobile://auth?token=… on success.
