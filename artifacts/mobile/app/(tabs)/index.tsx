@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { PayvoraWordmark } from "@/components/PayvoraWordmark";
 import {
   Platform,
   Pressable,
@@ -249,7 +250,7 @@ export default function HomeScreen() {
           <Feather name="menu" size={22} color={C.text} />
         </TouchableOpacity>
 
-        <Text style={s.logo}>PAYVORA.</Text>
+        <PayvoraWordmark width={140} height={36} color={C.text} />
 
         <TouchableOpacity
           style={s.hdrBtn}
@@ -465,7 +466,6 @@ const s = StyleSheet.create({
     backgroundColor: "#FF3B30",
     borderWidth: 1.5, borderColor: C.bg,
   },
-  logo: { fontFamily: "Manrope_700Bold", fontSize: 18, letterSpacing: 1.5, color: "#0B0A0A" },
 
   greetSection: {
     marginHorizontal: 20,
