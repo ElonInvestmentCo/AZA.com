@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://payvora.com"),
+  metadataBase: new URL("https://www.payvora.org"),
   title: {
     default: "PAYVORA – Digital Fintech App for Nigeria",
     template: "%s | PAYVORA",
@@ -32,10 +32,13 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "PAYVORA" }],
   creator: "PAYVORA",
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
   openGraph: {
     type: "website",
     locale: "en_NG",
-    url: "https://payvora.com",
+    url: "https://www.payvora.org",
     siteName: "PAYVORA",
     title: "PAYVORA – Digital Fintech App for Nigeria",
     description:

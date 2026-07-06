@@ -38,8 +38,12 @@ const ALWAYS_ALLOWED = [
   ...replitOrigins,
 ];
 
-const extraOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
-  .split(",")
+/* Support both CORS_ALLOWED_ORIGINS (Replit convention) and
+ * ALLOWED_ORIGINS (Railway convention) so either env works. */
+const extraOrigins = [
+  ...(process.env.CORS_ALLOWED_ORIGINS ?? "").split(","),
+  ...(process.env.ALLOWED_ORIGINS ?? "").split(","),
+]
   .map((s) => s.trim())
   .filter(Boolean);
 

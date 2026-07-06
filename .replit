@@ -87,6 +87,10 @@ localPort = 8080
 externalPort = 8080
 
 [[ports]]
+localPort = 8099
+externalPort = 8099
+
+[[ports]]
 localPort = 19000
 externalPort = 3002
 
@@ -102,10 +106,6 @@ externalPort = 5000
 localPort = 19665
 externalPort = 3003
 
-[[ports]]
-localPort = 8099
-externalPort = 8099
-
 [nix]
 channel = "stable-25_05"
 packages = ["nano", "lsof"]
@@ -115,8 +115,8 @@ packages = ["nano", "lsof"]
 [userenv.shared]
 PORT = "8080"
 EXPO_PUBLIC_DOMAIN = "www.payvora.org"
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID = "529491115901-mt2b2k6me217h5r11sruunhfingtoetv.apps.googleusercontent.com"
 RELOADLY_ENV = "topup-prod"
 NODE_ENV = "development"
 INTERNAL_API_URL = "http://localhost:8080"
 GOOGLE_CALLBACK_URL = "https://www.payvora.org/api/auth/google/callback"
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID = "419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq.apps.googleusercontent.com"
