@@ -46,13 +46,13 @@ waitForPort = 5000
 name = "PayVora API"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd artifacts/api-server && node --enable-source-maps ./dist/index.mjs"
-waitForPort = 8080
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server run build && cd artifacts/api-server && node --enable-source-maps ./dist/index.mjs"
+waitForPort = 8080
 
 [[workflows.workflow]]
 name = "PAYVORA Mobile"
@@ -83,14 +83,6 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8099
-externalPort = 8099
-
-[[ports]]
 localPort = 19000
 externalPort = 3002
 
@@ -105,6 +97,10 @@ externalPort = 5000
 [[ports]]
 localPort = 19665
 externalPort = 3003
+
+[[ports]]
+localPort = 8099
+externalPort = 8099
 
 [nix]
 channel = "stable-25_05"
