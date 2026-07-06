@@ -8,7 +8,17 @@ import { requireAuth, type AuthRequest } from "../middleware/auth.js";
 
 const router = Router();
 
+/* OAuth2Client for verifying mobile idTokens */
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+/** Build a fresh OAuth2Client configured for the web redirect flow */
+function makeWebOAuthClient(): OAuth2Client | null {
+  const id  = process.env.GOOGLE_CLIENT_ID;
+  const sec = process.env.GOOGLE_CLIENT_SECRET;
+  const cb  = process.env.GOOGLE_CALLBACK_URL;
+  if (!id || !sec || !cb) return null;
+  return new OAuth2Client(id, sec, cb);
+}
 
 /* ── helpers ──────────────────────────────────────────────────────────────── */
 
@@ -217,6 +227,98 @@ router.post("/auth/google", async (req, res) => {
 
   const token = signToken({ userId: user.id, email: user.email });
   res.json({ token, user: safeUser(user) });
+});
+
+/* ── GET /api/auth/google ─────────────────────────────────────────────────
+ * Initiates the web-based OAuth2 redirect flow (browser → Google → callback).
+ * Used when the mobile app opens a system browser for sign-in.
+ * ──────────────────────────────────────────────────────────────────────────── */
+router.get("/auth/google", (req, res) => {
+  const client = makeWebOAuthClient();
+  if (!client) {
+    res.status(503).json({ error: "Google OAuth is not configured on this server" });
+    return;
+  }
+
+  const url = client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["openid", "email", "profile"],
+    prompt: "select_account",
+  });
+
+  res.redirect(url);
+});
+
+/* ── GET /api/auth/google/callback ────────────────────────────────────────
+ * Google redirects here with ?code=… after user grants consent.
+ * Exchanges the code for tokens, finds/creates the user, issues a JWT,
+ * then redirects to the mobile app via deep-link: mobile://auth?token=…
+ * ──────────────────────────────────────────────────────────────────────────── */
+router.get("/auth/google/callback", async (req, res) => {
+  const { code, error } = req.query as { code?: string; error?: string };
+
+  if (error || !code) {
+    const msg = encodeURIComponent(error ?? "Google sign-in was cancelled");
+    res.redirect(`mobile://auth?error=${msg}`);
+    return;
+  }
+
+  const client = makeWebOAuthClient();
+  if (!client) {
+    res.status(503).json({ error: "Google OAuth is not configured on this server" });
+    return;
+  }
+
+  try {
+    const { tokens } = await client.getToken(code);
+
+    const userInfoRes = await fetch("https://www.googleapis.com/userinfo/v2/me", {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    });
+    if (!userInfoRes.ok) throw new Error("Failed to fetch user info from Google");
+
+    const info = (await userInfoRes.json()) as {
+      email?: string;
+      name?: string;
+      picture?: string;
+      id?: string;
+    };
+    if (!info.email) throw new Error("Google did not return an email address");
+
+    let [user] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, info.email.toLowerCase()))
+      .limit(1);
+
+    if (!user) {
+      const [created] = await db
+        .insert(usersTable)
+        .values({
+          email: info.email.toLowerCase(),
+          fullName: info.name ?? null,
+          avatarUrl: info.picture ?? null,
+          googleId: info.id,
+          authProvider: "oauth",
+        })
+        .returning();
+      if (!created) throw new Error("Failed to create user account");
+      user = created;
+      await createWalletForUser(user.id);
+    } else if (!user.googleId) {
+      await db
+        .update(usersTable)
+        .set({ googleId: info.id, avatarUrl: info.picture ?? user.avatarUrl })
+        .where(eq(usersTable.id, user.id));
+    }
+
+    const token = signToken({ userId: user.id, email: user.email });
+    res.redirect(`mobile://auth?token=${encodeURIComponent(token)}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Authentication failed";
+    logger.error({ err }, "[Google OAuth callback] error");
+    res.redirect(`mobile://auth?error=${encodeURIComponent(msg)}`);
+  }
 });
 
 /* ── POST /api/auth/apple ────────────────────────────────────────────────── */

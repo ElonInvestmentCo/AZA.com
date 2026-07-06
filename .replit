@@ -99,3 +99,4 @@ EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID = "529491115901-mt2b2k6me217h5r11sruunhfingtoet
 RELOADLY_ENV = "topup-prod"
 NODE_ENV = "development"
 INTERNAL_API_URL = "http://localhost:8080"
+GOOGLE_CALLBACK_URL = "https://www.payvora.org/api/auth/google/callback"

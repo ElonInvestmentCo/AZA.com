@@ -10,6 +10,9 @@ import { getExpoUrl, buildQrPage } from "./lib/qr-page";
 const app: Express = express();
 const IS_PROD = process.env.NODE_ENV === "production";
 
+/* Trust Railway / Replit reverse proxy so req.ip and req.protocol are correct */
+app.set("trust proxy", 1);
+
 /* ── CORS ────────────────────────────────────────────────────────────────────
  * Development: allow all origins (default cors() behaviour).
  * Production:  restrict to the production domain(s) plus any additional
