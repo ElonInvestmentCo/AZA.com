@@ -1,15 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0A0A0F;
-  --color-surface: #14141F;
-  --color-card: #1C1C2A;
-  --color-accent: #00D9A0;
-  --color-accent-dim: rgba(0, 217, 160, 0.12);
-  --color-accent-glow: rgba(0, 217, 160, 0.22);
-  --color-muted: #8F8FA3;
-  --color-border: #2A2A3D;
-  --color-destructive: #FF5B7A;
+  /* ── Light / white design system ────────────────── */
+  --color-bg:           #FFFFFF;
+  --color-surface:      #F7F8FA;
+  --color-card:         #FFFFFF;
+  --color-accent:       #00D9A0;
+  --color-accent-dark:  #00B88A;
+  --color-accent-dim:   rgba(0, 217, 160, 0.10);
+  --color-accent-glow:  rgba(0, 217, 160, 0.18);
+  --color-text:         #111827;
+  --color-text-sec:     #374151;
+  --color-muted:        #6B7280;
+  --color-border:       #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-destructive:  #EF4444;
 
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
 
@@ -30,16 +35,16 @@ html {
 }
 
 body {
-  background-color: #0A0A0F;
-  color: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #111827;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-  background: rgba(0, 217, 160, 0.3);
-  color: #FFFFFF;
+  background: rgba(0, 217, 160, 0.18);
+  color: #111827;
 }
 
 ::-webkit-scrollbar {
@@ -47,11 +52,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0A0F;
+  background: #F7F8FA;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2A2A3D;
+  background: #D1D5DB;
   border-radius: 3px;
 }
 
@@ -65,7 +70,6 @@ body {
   width: auto;
   object-fit: contain;
   display: block;
-  /* SVG is resolution-independent — always crisp on Retina */
 }
 
 @media (min-width: 481px) {
@@ -74,4 +78,14 @@ body {
 
 @media (min-width: 1025px) {
   .nav-logo { height: 72px; }
+}
+
+/* ── Fade-in scroll animation ─────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
 }
