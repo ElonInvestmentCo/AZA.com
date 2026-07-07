@@ -1,6 +1,8 @@
+import { BlurView } from "expo-blur";
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import {
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   View,
@@ -270,16 +272,25 @@ export function AnimatedSheet({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* Animated backdrop */}
+      {/* Animated backdrop with blur */}
       <Animated.View
-        style={[
-          StyleSheet.absoluteFillObject,
-          styles.backdrop,
-          { opacity: 0 },
-          backdropStyle,
-        ]}
+        style={[StyleSheet.absoluteFillObject, { opacity: 0 }, backdropStyle]}
         pointerEvents="none"
-      />
+      >
+        {Platform.OS !== "web" ? (
+          <BlurView
+            style={StyleSheet.absoluteFillObject}
+            intensity={35}
+            tint="dark"
+          />
+        ) : null}
+        <View
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: Platform.OS === "web" ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.28)" },
+          ]}
+        />
+      </Animated.View>
 
       {/* Dismiss area above the sheet */}
       <Pressable style={styles.dismissArea} onPress={handleClose} />
@@ -309,9 +320,7 @@ export function AnimatedSheet({
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    backgroundColor: "#000",
-  },
+  backdrop: {},
   dismissArea: {
     flex: 1,
   },

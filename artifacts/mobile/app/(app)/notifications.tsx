@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -261,7 +262,7 @@ function NotifCard({
 }: {
   item: Notification; index: number; onPress: () => void; onDismiss: () => void;
 }) {
-  const router = useRouter();
+  const router  = useRouter();
   const st = item.status ? STATUS_STYLE[item.status] : null;
 
   const handleCTA = () => {
@@ -269,58 +270,79 @@ function NotifCard({
     if (item.cta?.action) router.push(`/(app)/${item.cta.action}` as any);
   };
 
+  const renderRightActions = useCallback(() => (
+    <View style={nc.swipeAction}>
+      <Feather name="trash-2" size={20} color="#FFFFFF" />
+      <Text style={nc.swipeActionText}>Delete</Text>
+    </View>
+  ), []);
+
+  const handleSwipeOpen = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Small delay so the swipe animation completes before removing
+    setTimeout(() => onDismiss(), 180);
+  }, [onDismiss]);
+
   return (
     <Animated.View entering={FadeInDown.duration(260).delay(index * 25).springify()}>
-      <TouchableOpacity
-        style={[nc.card, !item.read && nc.cardUnread]}
-        activeOpacity={0.78}
-        onPress={() => { Haptics.selectionAsync(); onPress(); }}
+      <Swipeable
+        renderRightActions={renderRightActions}
+        onSwipeableOpen={handleSwipeOpen}
+        rightThreshold={72}
+        friction={1.8}
+        overshootRight={false}
       >
-        {/* Unread blue dot */}
-        {!item.read && <View style={nc.unreadDot} />}
+        <TouchableOpacity
+          style={[nc.card, !item.read && nc.cardUnread]}
+          activeOpacity={0.78}
+          onPress={() => { Haptics.selectionAsync(); onPress(); }}
+        >
+          {/* Unread blue dot */}
+          {!item.read && <View style={nc.unreadDot} />}
 
-        {/* Icon */}
-        <View style={[nc.iconWrap, { backgroundColor: item.iconBg }]}>
-          <Feather name={item.icon} size={18} color={item.iconColor} />
-        </View>
-
-        {/* Content */}
-        <View style={nc.content}>
-          <View style={nc.topRow}>
-            <Text style={[nc.title, !item.read && nc.titleBold]} numberOfLines={1}>
-              {item.title}
-            </Text>
-            <TouchableOpacity
-              onPress={onDismiss}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Feather name="x" size={14} color={C.textMut} />
-            </TouchableOpacity>
+          {/* Icon */}
+          <View style={[nc.iconWrap, { backgroundColor: item.iconBg }]}>
+            <Feather name={item.icon} size={18} color={item.iconColor} />
           </View>
 
-          <Text style={nc.body} numberOfLines={2}>{item.body}</Text>
+          {/* Content */}
+          <View style={nc.content}>
+            <View style={nc.topRow}>
+              <Text style={[nc.title, !item.read && nc.titleBold]} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <TouchableOpacity
+                onPress={onDismiss}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Feather name="x" size={14} color={C.textMut} />
+              </TouchableOpacity>
+            </View>
 
-          <View style={nc.metaRow}>
-            <Text style={nc.time}>{formatTs(item.ts)}</Text>
-            {/* Status badge */}
-            {st && (
-              <View style={[nc.badge, { backgroundColor: st.bg }]}>
-                <View style={[nc.badgeDot, { backgroundColor: st.color }]} />
-                <Text style={[nc.badgeText, { color: st.color }]}>{st.label}</Text>
-              </View>
+            <Text style={nc.body} numberOfLines={2}>{item.body}</Text>
+
+            <View style={nc.metaRow}>
+              <Text style={nc.time}>{formatTs(item.ts)}</Text>
+              {/* Status badge */}
+              {st && (
+                <View style={[nc.badge, { backgroundColor: st.bg }]}>
+                  <View style={[nc.badgeDot, { backgroundColor: st.color }]} />
+                  <Text style={[nc.badgeText, { color: st.color }]}>{st.label}</Text>
+                </View>
+              )}
+            </View>
+
+            {/* CTA button */}
+            {item.cta && (
+              <TouchableOpacity style={nc.ctaBtn} onPress={handleCTA} activeOpacity={0.8}>
+                <Text style={nc.ctaText}>{item.cta.label}</Text>
+                <Feather name="arrow-right" size={11} color={C.info} />
+              </TouchableOpacity>
             )}
           </View>
-
-          {/* CTA button */}
-          {item.cta && (
-            <TouchableOpacity style={nc.ctaBtn} onPress={handleCTA} activeOpacity={0.8}>
-              <Text style={nc.ctaText}>{item.cta.label}</Text>
-              <Feather name="arrow-right" size={11} color={C.info} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </TouchableOpacity>
-      <View style={nc.separator} />
+        </TouchableOpacity>
+        <View style={nc.separator} />
+      </Swipeable>
     </Animated.View>
   );
 }
@@ -621,6 +643,10 @@ const nc = StyleSheet.create({
   ctaText:   { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.info },
 
   separator: { height: 1, backgroundColor: C.border, marginHorizontal: 20 },
+
+  /* Swipe-to-dismiss */
+  swipeAction:     { justifyContent: "center", alignItems: "center", width: 80, backgroundColor: C.danger, gap: 4 },
+  swipeActionText: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF" },
 });
 
 const sk = StyleSheet.create({

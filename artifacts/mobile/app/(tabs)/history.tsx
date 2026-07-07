@@ -1,6 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { apiFetch } from "@/utils/api";
@@ -426,6 +428,138 @@ function TxDetailSheet({ tx, visible, onClose }: {
     } catch {}
   }, [tx]);
 
+  const handleDownloadPDF = useCallback(async () => {
+    if (!tx) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+    /** Escape HTML-significant chars so user/API text can't break the PDF layout */
+    const esc = (s: string) =>
+      s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const sign    = tx.positive ? "+" : "-";
+    const feeNum  = parseInt(tx.fee.replace(/[₦,]/g, "")) || 0;
+    const netNum  = tx.positive ? tx.amountRaw - feeNum : tx.amountRaw + feeNum;
+    const netStr  = "₦" + netNum.toLocaleString("en-NG");
+    const st      = STATUS_STYLE[tx.status];
+    const txId    = `TXN-${tx.id.padStart(6, "0")}`;
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; background: #fff; color: #0B0A0A; padding: 48px 40px; }
+    .logo { font-size: 22px; font-weight: 900; color: #061941; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .logo span { color: #00D9A0; }
+    .tagline { font-size: 11px; color: #AAAFB5; margin-bottom: 32px; }
+    .divider { border: none; border-top: 1.5px solid #F0F0F0; margin: 20px 0; }
+    .divider-strong { border-top-color: #E5E7EB; }
+    .receipt-title { font-size: 13px; font-weight: 700; color: #AAAFB5; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; }
+    .hero { text-align: center; margin-bottom: 28px; }
+    .hero-amount { font-size: 36px; font-weight: 900; color: ${tx.positive ? "#00B03C" : "#EF4444"}; letter-spacing: -1px; }
+    .hero-name { font-size: 15px; color: #595F67; margin-top: 4px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; border-radius: 20px; background: ${st.bg}; margin-top: 10px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: ${st.color}; }
+    .status-text { font-size: 12px; font-weight: 700; color: ${st.color}; }
+    .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
+    .row-label { font-size: 12px; color: #595F67; }
+    .row-value { font-size: 12px; font-weight: 600; color: #0B0A0A; text-align: right; }
+    .row-value.green { color: #00B03C; }
+    .row-value.red { color: #EF4444; }
+    .row-value.bold { font-weight: 800; font-size: 13px; }
+    .section { margin-bottom: 20px; }
+    .footer { margin-top: 36px; text-align: center; font-size: 10px; color: #AAAFB5; line-height: 1.6; }
+    .ref-box { background: #F8F9FA; border: 1px solid #F0F0F0; border-radius: 8px; padding: 10px 14px; margin-top: 8px; font-size: 11px; color: #595F67; font-family: monospace; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="logo">PAY<span>VORA</span></div>
+  <div class="tagline">Official Transaction Receipt</div>
+
+  <div class="hero">
+    <div class="hero-amount">${sign}${esc(tx.amount)}</div>
+    <div class="hero-name">${esc(tx.name)}</div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span class="status-text">${esc(st.label)}</span>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="receipt-title">Receipt Breakdown</div>
+    <div class="row">
+      <span class="row-label">Amount</span>
+      <span class="row-value ${tx.positive ? "green" : "red"}">${sign}${esc(tx.amount)}</span>
+    </div>
+    <hr class="divider"/>
+    <div class="row">
+      <span class="row-label">Fee</span>
+      <span class="row-value ${tx.fee === "₦0" ? "green" : ""}">${tx.fee === "₦0" ? "Free" : "-" + esc(tx.fee)}</span>
+    </div>
+    <hr class="divider divider-strong"/>
+    <div class="row">
+      <span class="row-label">Net Total</span>
+      <span class="row-value bold ${tx.positive ? "green" : "red"}">${sign}${esc(netStr)}</span>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="receipt-title">Transaction Details</div>
+    <div class="row"><span class="row-label">Date</span><span class="row-value">${esc(tx.date)}</span></div>
+    <hr class="divider"/>
+    <div class="row"><span class="row-label">Time</span><span class="row-value">${esc(tx.time)}</span></div>
+    <hr class="divider"/>
+    <div class="row"><span class="row-label">Category</span><span class="row-value">${esc(tx.cat)}</span></div>
+    <hr class="divider"/>
+    <div class="row"><span class="row-label">Type</span><span class="row-value">${tx.positive ? "Credit" : "Debit"}</span></div>
+    <hr class="divider"/>
+    <div class="row"><span class="row-label">Payment Method</span><span class="row-value">${tx.cat === "Wallet" ? "PAYVORA Wallet" : esc(tx.cat) + " transaction"}</span></div>
+    ${tx.note ? `<hr class="divider"/><div class="row"><span class="row-label">Note</span><span class="row-value" style="max-width:55%;text-align:right;">${esc(tx.note)}</span></div>` : ""}
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="section">
+    <div class="receipt-title">Reference</div>
+    <div class="ref-box">Reference ID: ${esc(tx.ref)}</div>
+    <div class="ref-box" style="margin-top:6px;">Transaction ID: ${esc(txId)}</div>
+  </div>
+
+  <div class="footer">
+    Generated by PAYVORA · payvora.org<br/>
+    This is an official receipt. Keep for your records.<br/>
+    ${new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}
+  </div>
+</body>
+</html>`;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html, base64: false });
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, {
+          mimeType: "application/pdf",
+          dialogTitle: `PAYVORA Receipt — ${tx.ref}`,
+          UTI: "com.adobe.pdf",
+        });
+      } else {
+        // Sharing not available (e.g. some Android emulators) — fall back to text share
+        await Share.share({
+          message: `PAYVORA Transaction Receipt\n${tx.name}\n${sign}${tx.amount}\nRef: ${tx.ref}\n${tx.date} ${tx.time}`,
+          title: `PAYVORA Receipt — ${tx.ref}`,
+        });
+      }
+    } catch (err) {
+      console.warn("PDF generation failed:", err);
+    }
+  }, [tx]);
+
   if (!tx) return null;
 
   const feeNum  = parseInt(tx.fee.replace(/[₦,]/g, "")) || 0;
@@ -530,10 +664,16 @@ function TxDetailSheet({ tx, visible, onClose }: {
 
         {/* ── Actions ── */}
         <View style={ds.actions}>
-          <TouchableOpacity style={ds.shareBtn} onPress={handleShare} activeOpacity={0.82}>
-            <Feather name="share-2" size={16} color="#FFFFFF" />
-            <Text style={ds.shareBtnText}>Share Receipt</Text>
-          </TouchableOpacity>
+          <View style={ds.actionsRow}>
+            <TouchableOpacity style={[ds.shareBtn, { flex: 1 }]} onPress={handleShare} activeOpacity={0.82}>
+              <Feather name="share-2" size={15} color="#FFFFFF" />
+              <Text style={ds.shareBtnText}>Share</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[ds.pdfBtn, { flex: 1 }]} onPress={handleDownloadPDF} activeOpacity={0.82}>
+              <Feather name="download" size={15} color={C.navy} />
+              <Text style={ds.pdfBtnText}>Download PDF</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Repeat transaction */}
           {(tx.status === "completed") && (
@@ -587,8 +727,11 @@ const ds = StyleSheet.create({
 
   /* Actions */
   actions:       { gap: 8, marginTop: 2 },
+  actionsRow:    { flexDirection: "row", gap: 10 },
   shareBtn:      { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 44, borderRadius: 12, backgroundColor: C.navy },
-  shareBtnText:  { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  shareBtnText:  { fontSize: rf(13), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
+  pdfBtn:        { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 44, borderRadius: 12, backgroundColor: "#F0F4FF", borderWidth: 1, borderColor: "#C7D5F5" },
+  pdfBtnText:    { fontSize: rf(13), fontFamily: "Manrope_700Bold", color: C.navy },
   cancelBtn:     { height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
   cancelBtnText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.danger },
   repeatBtn:     { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 42, borderRadius: 12, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },

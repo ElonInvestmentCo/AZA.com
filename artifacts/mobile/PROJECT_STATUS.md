@@ -69,9 +69,38 @@ Expo DevTools at `http://localhost:8081`. Scan QR with Expo Go or run on simulat
 
 ---
 
+---
+
+### UI/UX Gap Closes (July 7, 2026 — follow-up)
+
+#### Notifications — Swipe-to-Dismiss (`app/(app)/notifications.tsx`)
+- **`Swipeable` from react-native-gesture-handler** wraps each notification row
+- Swipe left reveals a red "Delete" action (trash icon + label, 80px wide)
+- Full swipe triggers haptic + 180ms delay then calls `onDismiss()` for a clean exit animation
+- Tap-X dismiss still present as secondary affordance
+- `rightThreshold: 72`, `friction: 1.8`, `overshootRight: false` for polished feel
+
+#### Transaction History — PDF Receipt Download (`app/(tabs)/history.tsx`)
+- **`expo-print` + `expo-sharing`** installed (`npx expo install expo-print expo-sharing`)
+- `handleDownloadPDF` builds a full-bleed HTML receipt (PAYVORA branding, amounts, status, breakdown, ref IDs, legal footer)
+- `Print.printToFileAsync({ html })` renders to a temp PDF file
+- `Sharing.shareAsync(uri, { mimeType: "application/pdf" })` opens native share sheet for Save/AirDrop/email
+- Actions row updated: **Share** + **Download PDF** buttons sit side-by-side (flex row)
+
+#### AnimatedSheet — Backdrop Blur (`components/AnimatedSheet.tsx`)
+- **`expo-blur` BlurView** (already installed, now used) replaces plain black overlay
+- `intensity={35}`, `tint="dark"` gives frosted-glass effect on iOS/Android 12+
+- Falls back gracefully on web (Platform check → renders plain dark overlay)
+- Added 28% dark tint overlay on top of blur for sheet contrast and readability
+- Opacity animation unchanged — BlurView inside the Animated.View wrapper
+
+---
+
 ## Known Issues / TODOs
 - [ ] Push notifications (real) — Expo Notifications integration needed
 - [ ] Real notification API endpoint — currently uses mock data
 - [ ] Blog article detail pages (`/blog/[slug]`) not yet built on the website
 - [ ] Apple Sign-in security hardening (proposed task #2)
 - [ ] Password reset link TTL (proposed task #3)
+- [ ] Infinite scroll / pagination in transaction history
+- [ ] Notification preferences screen (`app/(app)/notification-preferences.tsx`)
