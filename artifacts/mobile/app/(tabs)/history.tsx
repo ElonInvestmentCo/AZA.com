@@ -156,6 +156,42 @@ const ALL_TX: Transaction[] = [
   },
 ];
 
+/* ─── Skeleton loader ────────────────────────────────────────────────────── */
+function TxSkeleton({ count = 6 }: { count?: number }) {
+  const opacity = useSharedValue(1);
+  React.useEffect(() => {
+    const loop = () => {
+      opacity.value = withTiming(0.4, { duration: 700 }, () => {
+        opacity.value = withTiming(1, { duration: 700 }, loop);
+      });
+    };
+    loop();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <Animated.View key={i} style={[sk.row, style]}>
+          <View style={sk.icon} />
+          <View style={sk.lines}>
+            <View style={[sk.line, { width: `${55 + (i % 4) * 10}%` }]} />
+            <View style={[sk.line, { width: `${35 + (i % 3) * 8}%`, marginTop: 6 }]} />
+          </View>
+          <View style={sk.amount} />
+        </Animated.View>
+      ))}
+    </>
+  );
+}
+
+const sk = StyleSheet.create({
+  row:    { flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingVertical: 14, gap: 12 },
+  icon:   { width: 50, height: 50, borderRadius: 16, backgroundColor: "#F0F0F0", flexShrink: 0 },
+  lines:  { flex: 1, gap: 0 },
+  line:   { height: 11, borderRadius: 5, backgroundColor: "#F0F0F0" },
+  amount: { width: 64, height: 14, borderRadius: 5, backgroundColor: "#F0F0F0" },
+});
+
 /* ─── API transaction type + mapper ─────────────────────────────────────── */
 interface ApiTransaction {
   id:          string;
@@ -620,6 +656,10 @@ function TxDetailSheet({ tx, visible, onClose }: {
             <ReceiptRow label="Amount"    value={`${sign}${tx.amount}`} valueColor={tx.positive ? C.success : C.danger} />
             <View style={ds.rowDivider} />
             <ReceiptRow label="Fee"       value={tx.fee === "₦0" ? "Free" : `-${tx.fee}`} valueColor={tx.fee === "₦0" ? C.success : undefined} />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Wallet used" value="PAYVORA Main Wallet" />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Cashback earned" value={tx.positive ? "₦0" : "₦0"} valueColor={C.success} />
             <View style={[ds.rowDivider, ds.rowDividerStrong]} />
             <ReceiptRow label="Net total" value={`${sign}${netStr}`} bold valueColor={tx.positive ? C.success : C.danger} />
           </View>
@@ -693,6 +733,20 @@ function TxDetailSheet({ tx, visible, onClose }: {
             </TouchableOpacity>
           )}
 
+          {/* Report issue */}
+          <TouchableOpacity
+            style={ds.reportBtn}
+            activeOpacity={0.82}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onClose();
+              setTimeout(() => router.push("/(app)/help-support" as any), 320);
+            }}
+          >
+            <Feather name="flag" size={14} color={C.textSec} />
+            <Text style={ds.reportBtnText}>Report an issue</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={ds.closeBtn} onPress={onClose} activeOpacity={0.72}>
             <Text style={ds.closeBtnText}>Close</Text>
           </TouchableOpacity>
@@ -736,6 +790,9 @@ const ds = StyleSheet.create({
   cancelBtnText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.danger },
   repeatBtn:     { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 42, borderRadius: 12, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
   repeatBtnText: { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: C.primary },
+  reportBtn:     { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 38, borderRadius: 12, backgroundColor: "#F8F9FA", borderWidth: 1, borderColor: C.border },
+  reportBtnText: { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textSec },
+
   closeBtn:      { height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   closeBtnText:  { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textMut },
 });
@@ -746,24 +803,36 @@ export default function HistoryScreen() {
   const topPad = Platform.OS === "web" ? 40 : insets.top;
   const { user } = useAuth();
 
-  const [txData,     setTxData]     = useState<Transaction[]>(ALL_TX);
-  const [txFilter,   setTxFilter]   = useState<TxFilter>("All");
-  const [dateRange,  setDateRange]  = useState<DateRange>("all");
-  const [searchText, setSearchText] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [selected,   setSelected]   = useState<Transaction | null>(null);
-  const [sheetOpen,  setSheetOpen]  = useState(false);
+  const [txData,       setTxData]       = useState<Transaction[]>(ALL_TX);
+  const [txFilter,     setTxFilter]     = useState<TxFilter>("All");
+  const [dateRange,    setDateRange]    = useState<DateRange>("all");
+  const [searchText,   setSearchText]   = useState("");
+  const [searchOpen,   setSearchOpen]   = useState(false);
+  const [selected,     setSelected]     = useState<Transaction | null>(null);
+  const [sheetOpen,    setSheetOpen]    = useState(false);
+  /* Loading / error / pagination state */
+  const [initialLoad,  setInitialLoad]  = useState(false);
+  const [loadError,    setLoadError]    = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [loadingMore,  setLoadingMore]  = useState(false);
 
   /* ─── Fetch real transactions from API ── */
-  useEffect(() => {
+  const fetchTransactions = useCallback(() => {
+    setLoadError(false);
+    setInitialLoad(true);
     apiFetch<{ transactions: ApiTransaction[] }>("/wallet/transactions")
       .then(({ transactions }) => {
         if (transactions.length > 0) {
           setTxData(transactions.map(apiTxToLocal));
         }
       })
-      .catch(() => { /* keep mock data on error */ });
-  }, [user?.id]);
+      .catch(() => { setLoadError(true); /* keep mock data */ })
+      .finally(() => setInitialLoad(false));
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const searchRef = useRef<TextInput>(null);
 
@@ -837,11 +906,32 @@ export default function HistoryScreen() {
     setSheetOpen(false);
   }, []);
 
-  /* ─── Group by time period ── */
+  /* ─── Reset pagination when filters change ── */
+  useEffect(() => {
+    setVisibleCount(20);
+    setLoadingMore(false);
+  }, [txFilter, dateRange, searchText]);
+
+  /* ─── Infinite scroll ── */
+  const onEndReached = useCallback(() => {
+    if (loadingMore || visibleCount >= filtered.length) return;
+    setLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount(prev => prev + 15);
+      setLoadingMore(false);
+    }, 400);
+  }, [loadingMore, visibleCount, filtered.length]);
+
+  /* ─── Group by time period (apply pagination) ── */
+  const visibleFiltered = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount],
+  );
+
   const grouped = useMemo(() => {
     const now = Date.now();
     const buckets: Record<string, Transaction[]> = {};
-    for (const t of filtered) {
+    for (const t of visibleFiltered) {
       const days = (now - t.ts) / 86400000;
       const key =
         days < 1  ? "Today" :
@@ -853,7 +943,7 @@ export default function HistoryScreen() {
     }
     const order = ["Today", "This week", "This month", "Last 3 months", "Older"];
     return order.flatMap(k => buckets[k]?.length ? [{ title: k, data: buckets[k] }] : []);
-  }, [filtered]);
+  }, [visibleFiltered]);
 
   type ListItem =
     | { type: "header"; title: string; key: string }
@@ -989,75 +1079,101 @@ export default function HistoryScreen() {
         )}
       </View>
 
+      {/* ── Offline error state ── */}
+      {loadError && (
+        <Animated.View entering={FadeIn.duration(200)} style={s.errorBanner}>
+          <Feather name="wifi-off" size={14} color={C.danger} />
+          <Text style={s.errorText}>Couldn't load latest transactions.</Text>
+          <TouchableOpacity onPress={fetchTransactions} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <Text style={s.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+
       {/* ── Transaction list ── */}
-      <FlatList
-        data={listData}
-        keyExtractor={item => item.key}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 110 }]}
-        ListEmptyComponent={
-          <View style={s.empty}>
-            <View style={s.emptyIconWrap}>
-              <Feather name="search" size={24} color={C.textMut} />
+      {initialLoad ? (
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 110 }]}>
+          <TxSkeleton count={8} />
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={listData}
+          keyExtractor={item => item.key}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 110 }]}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.25}
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={s.loadingMoreWrap}>
+                <TxSkeleton count={3} />
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            <View style={s.empty}>
+              <View style={s.emptyIconWrap}>
+                <Feather name="search" size={24} color={C.textMut} />
+              </View>
+              <Text style={s.emptyTitle}>No results found</Text>
+              <Text style={s.emptySubtitle}>
+                {searchText
+                  ? `No transactions matching "${searchText}"`
+                  : "Try adjusting your filters"}
+              </Text>
+              {activeFilters > 0 && (
+                <TouchableOpacity style={s.emptyBtn} onPress={clearAll}>
+                  <Text style={s.emptyBtnText}>Clear all filters</Text>
+                </TouchableOpacity>
+              )}
             </View>
-            <Text style={s.emptyTitle}>No results found</Text>
-            <Text style={s.emptySubtitle}>
-              {searchText
-                ? `No transactions matching "${searchText}"`
-                : "Try adjusting your filters"}
-            </Text>
-            {activeFilters > 0 && (
-              <TouchableOpacity style={s.emptyBtn} onPress={clearAll}>
-                <Text style={s.emptyBtnText}>Clear all filters</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        }
-        renderItem={({ item, index }) => {
-          if (item.type === "header") {
+          }
+          renderItem={({ item, index }) => {
+            if (item.type === "header") {
+              return (
+                <Animated.View entering={FadeInDown.duration(200).delay(index * 12)}>
+                  <Text style={s.sectionHeader}>{item.title}</Text>
+                </Animated.View>
+              );
+            }
+
+            const { tx, isLast } = item;
             return (
-              <Animated.View entering={FadeInDown.duration(200).delay(index * 12)}>
-                <Text style={s.sectionHeader}>{item.title}</Text>
+              <Animated.View entering={FadeInDown.duration(240).delay(Math.min(index * 18, 300))}>
+                <TouchableOpacity
+                  style={s.txRow}
+                  activeOpacity={0.72}
+                  onPress={() => openDetail(tx)}
+                >
+                  <View style={[s.txIcon, { backgroundColor: tx.iconBg }]}>
+                    <Feather name={tx.icon} size={20} color={tx.iconColor} />
+                  </View>
+                  <View style={s.txInfo}>
+                    <HighlightText text={tx.name} query={searchText} style={s.txName} />
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <Text style={s.txDate}>{tx.date}</Text>
+                      <Text style={s.txDot}>·</Text>
+                      <Text style={[s.txCat, { color: tx.iconColor }]}>{tx.cat}</Text>
+                    </View>
+                  </View>
+                  <View style={s.txRight}>
+                    <Text style={[s.txAmount, { color: tx.positive ? C.success : C.danger }]}>
+                      {tx.positive ? "+" : "-"}{tx.amount}
+                    </Text>
+                    <View style={[s.statusBadge, { backgroundColor: STATUS_STYLE[tx.status].bg }]}>
+                      <Text style={[s.statusText, { color: STATUS_STYLE[tx.status].color }]}>
+                        {STATUS_STYLE[tx.status].label}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                {!isLast && <View style={s.divider} />}
               </Animated.View>
             );
-          }
-
-          const { tx, isLast } = item;
-          return (
-            <Animated.View entering={FadeInDown.duration(240).delay(Math.min(index * 18, 300))}>
-              <TouchableOpacity
-                style={s.txRow}
-                activeOpacity={0.72}
-                onPress={() => openDetail(tx)}
-              >
-                <View style={[s.txIcon, { backgroundColor: tx.iconBg }]}>
-                  <Feather name={tx.icon} size={20} color={tx.iconColor} />
-                </View>
-                <View style={s.txInfo}>
-                  <HighlightText text={tx.name} query={searchText} style={s.txName} />
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                    <Text style={s.txDate}>{tx.date}</Text>
-                    <Text style={s.txDot}>·</Text>
-                    <Text style={[s.txCat, { color: tx.iconColor }]}>{tx.cat}</Text>
-                  </View>
-                </View>
-                <View style={s.txRight}>
-                  <Text style={[s.txAmount, { color: tx.positive ? C.success : C.danger }]}>
-                    {tx.positive ? "+" : "-"}{tx.amount}
-                  </Text>
-                  <View style={[s.statusBadge, { backgroundColor: STATUS_STYLE[tx.status].bg }]}>
-                    <Text style={[s.statusText, { color: STATUS_STYLE[tx.status].color }]}>
-                      {STATUS_STYLE[tx.status].label}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              {!isLast && <View style={s.divider} />}
-            </Animated.View>
-          );
-        }}
-      />
+          }}
+        />
+      )}
 
       {/* ── Detail bottom sheet ── */}
       <TxDetailSheet tx={selected} visible={sheetOpen} onClose={closeDetail} />
@@ -1123,10 +1239,15 @@ const s = StyleSheet.create({
   statusText:  { fontSize: 10, fontFamily: "Manrope_600SemiBold" },
   divider:     { height: 1, backgroundColor: C.border },
 
-  empty:        { alignItems: "center", paddingTop: 60, gap: 10 },
-  emptyIconWrap:{ width: 60, height: 60, borderRadius: 20, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center", marginBottom: 4 },
-  emptyTitle:   { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text },
-  emptySubtitle:{ fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textMut, textAlign: "center", paddingHorizontal: 32 },
-  emptyBtn:     { marginTop: 8, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
-  emptyBtnText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.primary },
+  empty:          { alignItems: "center", paddingTop: 60, gap: 10 },
+  emptyIconWrap:  { width: 60, height: 60, borderRadius: 20, backgroundColor: "#F8F9FA", alignItems: "center", justifyContent: "center", marginBottom: 4 },
+  emptyTitle:     { fontSize: 16, fontFamily: "Manrope_700Bold", color: C.text },
+  emptySubtitle:  { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textMut, textAlign: "center", paddingHorizontal: 32 },
+  emptyBtn:       { marginTop: 8, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
+  emptyBtnText:   { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.primary },
+
+  errorBanner:    { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 20, marginBottom: 6, backgroundColor: "#FFF0F0", borderRadius: 10, borderWidth: 1, borderColor: "#FECACA", paddingHorizontal: 12, paddingVertical: 8 },
+  errorText:      { flex: 1, fontSize: 12, fontFamily: "Manrope_500Medium", color: C.danger },
+  retryText:      { fontSize: 12, fontFamily: "Manrope_700Bold", color: C.primary },
+  loadingMoreWrap:{ paddingVertical: 4 },
 });

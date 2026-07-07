@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+  FlatList,
   Platform,
   RefreshControl,
   ScrollView,
@@ -93,10 +94,32 @@ const STATUS_STYLE: Record<TxStatus, { label: string; bg: string; color: string 
   failed:    { label: "Failed",    bg: "#FFF0F0", color: C.danger  },
 };
 
-/* ─── Helper: time-ago relative to "now" ────────────────────────────────── */
+/* ─── Helper: time ───────────────────────────────────────────────────────── */
 const NOW = Date.now();
 const D   = (daysAgo: number, h = 0, m = 0) =>
   NOW - daysAgo * 86_400_000 - h * 3_600_000 - m * 60_000;
+
+function formatRelative(ts: number): string {
+  const msAgo   = NOW - ts;
+  const minsAgo = Math.floor(msAgo / 60_000);
+  if (minsAgo < 1)  return "Just now";
+  if (minsAgo < 60) return `${minsAgo}m ago`;
+  const hAgo = Math.floor(minsAgo / 60);
+  if (hAgo < 24) return `${hAgo}h ago`;
+  const dAgo = Math.floor(hAgo / 24);
+  if (dAgo === 1) return "Yesterday";
+  if (dAgo < 7)  return `${dAgo} days ago`;
+  const date = new Date(ts);
+  return date.toLocaleDateString("en-NG", { day: "numeric", month: "short" });
+}
+
+function formatExact(ts: number): string {
+  const date = new Date(ts);
+  return date.toLocaleString("en-NG", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit", hour12: true,
+  });
+}
 
 /* ─── Mock dataset ───────────────────────────────────────────────────────── */
 const MOCK: Notification[] = [
@@ -216,7 +239,7 @@ const MOCK: Notification[] = [
 type Group = "Today" | "Yesterday" | "Earlier This Week" | "Earlier This Month" | "Older";
 
 function getGroup(ts: number): Group {
-  const msAgo = NOW - ts;
+  const msAgo  = NOW - ts;
   const daysAgo = msAgo / 86_400_000;
   if (daysAgo < 1)  return "Today";
   if (daysAgo < 2)  return "Yesterday";
@@ -231,6 +254,11 @@ const GROUP_ORDER: Group[] = [
 
 const FILTER_ALL = "All";
 type FilterOption = typeof FILTER_ALL | NotifCategory;
+
+/* ─── FlatList item types ────────────────────────────────────────────────── */
+type ListItem =
+  | { kind: "header"; title: Group; key: string }
+  | { kind: "notif";  notif: Notification; key: string };
 
 /* ─── Skeleton row ───────────────────────────────────────────────────────── */
 function SkeletonRow({ index }: { index: number }) {
@@ -258,11 +286,21 @@ function SkeletonRow({ index }: { index: number }) {
 
 /* ─── Notification card ──────────────────────────────────────────────────── */
 function NotifCard({
-  item, index, onPress, onDismiss,
+  item, index, selected, multiSelectMode,
+  onPress, onDismiss, onMarkUnread, onLongPress, onToggleSelect,
 }: {
-  item: Notification; index: number; onPress: () => void; onDismiss: () => void;
+  item: Notification;
+  index: number;
+  selected: boolean;
+  multiSelectMode: boolean;
+  onPress: () => void;
+  onDismiss: () => void;
+  onMarkUnread: () => void;
+  onLongPress: () => void;
+  onToggleSelect: () => void;
 }) {
-  const router  = useRouter();
+  const router     = useRouter();
+  const swipeRef   = useRef<Swipeable>(null);
   const st = item.status ? STATUS_STYLE[item.status] : null;
 
   const handleCTA = () => {
@@ -270,35 +308,86 @@ function NotifCard({
     if (item.cta?.action) router.push(`/(app)/${item.cta.action}` as any);
   };
 
+  /* ── Right actions: Delete ── */
   const renderRightActions = useCallback(() => (
-    <View style={nc.swipeAction}>
+    <TouchableOpacity
+      style={nc.swipeDeleteAction}
+      onPress={() => {
+        swipeRef.current?.close();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        setTimeout(() => onDismiss(), 120);
+      }}
+      activeOpacity={0.85}
+    >
       <Feather name="trash-2" size={20} color="#FFFFFF" />
       <Text style={nc.swipeActionText}>Delete</Text>
-    </View>
-  ), []);
+    </TouchableOpacity>
+  ), [onDismiss]);
 
-  const handleSwipeOpen = useCallback(() => {
+  /* ── Left actions: Mark Unread ── */
+  const renderLeftActions = useCallback(() => (
+    <TouchableOpacity
+      style={nc.swipeUnreadAction}
+      onPress={() => {
+        swipeRef.current?.close();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onMarkUnread();
+      }}
+      activeOpacity={0.85}
+    >
+      <Feather name="mail" size={20} color="#FFFFFF" />
+      <Text style={nc.swipeActionText}>
+        {item.read ? "Mark\nUnread" : "Mark\nRead"}
+      </Text>
+    </TouchableOpacity>
+  ), [onMarkUnread, item.read]);
+
+  const handleSwipeRightOpen = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Small delay so the swipe animation completes before removing
     setTimeout(() => onDismiss(), 180);
   }, [onDismiss]);
 
   return (
-    <Animated.View entering={FadeInDown.duration(260).delay(index * 25).springify()}>
+    <Animated.View entering={FadeInDown.duration(260).delay(Math.min(index * 20, 280)).springify()}>
       <Swipeable
+        ref={swipeRef}
         renderRightActions={renderRightActions}
-        onSwipeableOpen={handleSwipeOpen}
+        renderLeftActions={renderLeftActions}
+        onSwipeableOpen={(dir) => {
+          if (dir === "right") handleSwipeRightOpen();
+        }}
         rightThreshold={72}
+        leftThreshold={72}
         friction={1.8}
         overshootRight={false}
+        overshootLeft={false}
+        enabled={!multiSelectMode}
       >
         <TouchableOpacity
-          style={[nc.card, !item.read && nc.cardUnread]}
+          style={[nc.card, !item.read && nc.cardUnread, selected && nc.cardSelected]}
           activeOpacity={0.78}
-          onPress={() => { Haptics.selectionAsync(); onPress(); }}
+          onPress={() => {
+            if (multiSelectMode) { onToggleSelect(); return; }
+            Haptics.selectionAsync();
+            onPress();
+          }}
+          onLongPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            onLongPress();
+          }}
+          delayLongPress={380}
         >
+          {/* Multi-select checkbox */}
+          {multiSelectMode && (
+            <Animated.View entering={FadeIn.duration(160)} style={nc.checkbox}>
+              <View style={[nc.checkboxInner, selected && nc.checkboxChecked]}>
+                {selected && <Feather name="check" size={11} color="#FFFFFF" />}
+              </View>
+            </Animated.View>
+          )}
+
           {/* Unread blue dot */}
-          {!item.read && <View style={nc.unreadDot} />}
+          {!item.read && !multiSelectMode && <View style={nc.unreadDot} />}
 
           {/* Icon */}
           <View style={[nc.iconWrap, { backgroundColor: item.iconBg }]}>
@@ -311,18 +400,24 @@ function NotifCard({
               <Text style={[nc.title, !item.read && nc.titleBold]} numberOfLines={1}>
                 {item.title}
               </Text>
-              <TouchableOpacity
-                onPress={onDismiss}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Feather name="x" size={14} color={C.textMut} />
-              </TouchableOpacity>
+              {!multiSelectMode && (
+                <TouchableOpacity
+                  onPress={onDismiss}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Feather name="x" size={14} color={C.textMut} />
+                </TouchableOpacity>
+              )}
             </View>
 
             <Text style={nc.body} numberOfLines={2}>{item.body}</Text>
 
             <View style={nc.metaRow}>
-              <Text style={nc.time}>{formatTs(item.ts)}</Text>
+              {/* Relative time */}
+              <Text style={nc.time}>{formatRelative(item.ts)}</Text>
+              {/* Exact timestamp */}
+              <Text style={nc.timeSep}>·</Text>
+              <Text style={nc.timeExact}>{formatExact(item.ts)}</Text>
               {/* Status badge */}
               {st && (
                 <View style={[nc.badge, { backgroundColor: st.bg }]}>
@@ -333,7 +428,7 @@ function NotifCard({
             </View>
 
             {/* CTA button */}
-            {item.cta && (
+            {item.cta && !multiSelectMode && (
               <TouchableOpacity style={nc.ctaBtn} onPress={handleCTA} activeOpacity={0.8}>
                 <Text style={nc.ctaText}>{item.cta.label}</Text>
                 <Feather name="arrow-right" size={11} color={C.info} />
@@ -347,40 +442,30 @@ function NotifCard({
   );
 }
 
-function formatTs(ts: number): string {
-  const msAgo = NOW - ts;
-  const minsAgo = Math.floor(msAgo / 60_000);
-  if (minsAgo < 1)  return "Just now";
-  if (minsAgo < 60) return `${minsAgo}m ago`;
-  const hAgo = Math.floor(minsAgo / 60);
-  if (hAgo < 24) return `${hAgo}h ago`;
-  const dAgo = Math.floor(hAgo / 24);
-  if (dAgo === 1) return "Yesterday";
-  if (dAgo < 7)  return `${dAgo} days ago`;
-  const date = new Date(ts);
-  return date.toLocaleDateString("en-NG", { day: "numeric", month: "short" });
-}
-
 /* ─── Main screen ────────────────────────────────────────────────────────── */
 export default function NotificationsScreen() {
   const router  = useRouter();
   const insets  = useSafeAreaInsets();
   const topPad  = Platform.OS === "web" ? 20 : insets.top;
 
-  const [items,       setItems]       = useState<Notification[]>(MOCK);
-  const [loading,     setLoading]     = useState(false);
-  const [refreshing,  setRefreshing]  = useState(false);
-  const [searchText,  setSearchText]  = useState("");
-  const [searchOpen,  setSearchOpen]  = useState(false);
-  const [activeFilter, setFilter]     = useState<FilterOption>(FILTER_ALL);
+  const [items,           setItems]           = useState<Notification[]>(MOCK);
+  const [loading,         setLoading]         = useState(false);
+  const [refreshing,      setRefreshing]       = useState(false);
+  const [searchText,      setSearchText]       = useState("");
+  const [searchOpen,      setSearchOpen]       = useState(false);
+  const [activeFilter,    setFilter]           = useState<FilterOption>(FILTER_ALL);
+  const [multiSelectMode, setMultiSelectMode]  = useState(false);
+  const [selectedIds,     setSelectedIds]      = useState<Set<string>>(new Set());
+  /* Infinite scroll: items shown */
+  const [visibleCount,    setVisibleCount]     = useState(20);
 
   const searchRef = useRef<TextInput>(null);
   const searchH   = useSharedValue(0);
   const searchOp  = useSharedValue(0);
 
   const searchBarStyle = useAnimatedStyle(() => ({
-    height:  searchH.value,
-    opacity: searchOp.value,
+    height:   searchH.value,
+    opacity:  searchOp.value,
     overflow: "hidden",
   }));
 
@@ -393,10 +478,16 @@ export default function NotificationsScreen() {
     else { setSearchText(""); searchRef.current?.blur(); }
   }, [searchOpen, searchH, searchOp]);
 
-  /* ── Refresh (simulate API call) ── */
+  /* ── Refresh ── */
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    setVisibleCount(20);
     setTimeout(() => setRefreshing(false), 1200);
+  }, []);
+
+  /* ── Infinite scroll ── */
+  const onEndReached = useCallback(() => {
+    setVisibleCount(prev => prev + 15);
   }, []);
 
   /* ── Derived data ── */
@@ -406,10 +497,51 @@ export default function NotificationsScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setItems(prev => prev.map(n => ({ ...n, read: true })));
   };
-  const markRead  = (id: string) => setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-  const dismiss   = (id: string) => {
+
+  const markRead = (id: string) =>
+    setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+
+  const toggleReadState = (id: string) =>
+    setItems(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+
+  const dismiss = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setItems(prev => prev.filter(n => n.id !== id));
+  };
+
+  /* ── Multi-select helpers ── */
+  const enterMultiSelect = (id: string) => {
+    if (multiSelectMode) {
+      // Already in multi-select: long press toggles the tapped item
+      toggleSelect(id);
+      return;
+    }
+    setMultiSelectMode(true);
+    setSelectedIds(new Set([id]));
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedIds(new Set(filtered.map(n => n.id)));
+  };
+
+  const cancelMultiSelect = () => {
+    setMultiSelectMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const deleteSelected = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setItems(prev => prev.filter(n => !selectedIds.has(n.id)));
+    cancelMultiSelect();
   };
 
   /* ── Filtered + grouped ── */
@@ -422,105 +554,195 @@ export default function NotificationsScreen() {
     });
   }, [items, activeFilter, searchText]);
 
+  /* Reset pagination when search/filter changes */
+  React.useEffect(() => {
+    setVisibleCount(20);
+  }, [searchText, activeFilter]);
+
+  /* Apply visible count (infinite scroll) */
+  const visibleFiltered = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount],
+  );
+
   const grouped = useMemo(() => {
     const buckets: Partial<Record<Group, Notification[]>> = {};
-    for (const n of filtered) {
+    for (const n of visibleFiltered) {
       const g = getGroup(n.ts);
       if (!buckets[g]) buckets[g] = [];
       buckets[g]!.push(n);
     }
     return GROUP_ORDER.filter(g => buckets[g]?.length).map(g => ({ title: g, data: buckets[g]! }));
-  }, [filtered]);
+  }, [visibleFiltered]);
+
+  /* Build flat list data */
+  const listData = useMemo<ListItem[]>(() => {
+    const result: ListItem[] = [];
+    for (const sec of grouped) {
+      result.push({ kind: "header", title: sec.title, key: `h-${sec.title}` });
+      for (const notif of sec.data) {
+        result.push({ kind: "notif", notif, key: `n-${notif.id}` });
+      }
+    }
+    return result;
+  }, [grouped]);
+
+  const hasMore = visibleCount < filtered.length;
 
   /* ── Filter chips ── */
   const filterOptions: FilterOption[] = [FILTER_ALL, ...Object.keys(CAT_META) as NotifCategory[]];
+
+  const renderItem = useCallback(({ item, index }: { item: ListItem; index: number }) => {
+    if (item.kind === "header") {
+      return (
+        <Animated.View entering={FadeIn.duration(220)}>
+          <Text style={s.sectionLabel}>{item.title}</Text>
+        </Animated.View>
+      );
+    }
+    const { notif } = item;
+    return (
+      <NotifCard
+        item={notif}
+        index={index}
+        selected={selectedIds.has(notif.id)}
+        multiSelectMode={multiSelectMode}
+        onPress={() => markRead(notif.id)}
+        onDismiss={() => dismiss(notif.id)}
+        onMarkUnread={() => toggleReadState(notif.id)}
+        onLongPress={() => enterMultiSelect(notif.id)}
+        onToggleSelect={() => toggleSelect(notif.id)}
+      />
+    );
+  }, [selectedIds, multiSelectMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <View style={[s.root, { paddingTop: topPad }]}>
 
       {/* ── Header ── */}
       <Animated.View entering={FadeInDown.duration(280)} style={s.header}>
-        <TouchableOpacity
-          style={s.iconBtn}
-          onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Feather name="arrow-left" size={22} color={C.navy} />
-        </TouchableOpacity>
-
-        <View style={s.headerCenter}>
-          <Text style={s.title}>Notifications</Text>
-          {unreadCount > 0 && (
-            <View style={s.badge}>
-              <Text style={s.badgeText}>{unreadCount}</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={s.headerActions}>
-          <TouchableOpacity
-            style={s.iconBtn}
-            onPress={toggleSearch}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Feather name={searchOpen ? "x" : "search"} size={18} color={C.navy} />
-          </TouchableOpacity>
-          {unreadCount > 0 && (
-            <TouchableOpacity onPress={markAllRead} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <Text style={s.markAll}>Mark all read</Text>
+        {multiSelectMode ? (
+          /* Multi-select header */
+          <>
+            <TouchableOpacity
+              style={s.iconBtn}
+              onPress={cancelMultiSelect}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="x" size={20} color={C.navy} />
             </TouchableOpacity>
-          )}
-        </View>
+
+            <Text style={s.title}>
+              {selectedIds.size} selected
+            </Text>
+
+            <View style={s.headerActions}>
+              <TouchableOpacity
+                onPress={selectAll}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={s.markAll}>Select all</Text>
+              </TouchableOpacity>
+              {selectedIds.size > 0 && (
+                <TouchableOpacity
+                  onPress={deleteSelected}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={[s.markAll, { color: C.danger }]}>Delete</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
+        ) : (
+          /* Normal header */
+          <>
+            <TouchableOpacity
+              style={s.iconBtn}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Feather name="arrow-left" size={22} color={C.navy} />
+            </TouchableOpacity>
+
+            <View style={s.headerCenter}>
+              <Text style={s.title}>Notifications</Text>
+              {unreadCount > 0 && (
+                <View style={s.badge}>
+                  <Text style={s.badgeText}>{unreadCount}</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={s.headerActions}>
+              <TouchableOpacity
+                style={s.iconBtn}
+                onPress={toggleSearch}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Feather name={searchOpen ? "x" : "search"} size={18} color={C.navy} />
+              </TouchableOpacity>
+              {unreadCount > 0 && (
+                <TouchableOpacity onPress={markAllRead} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={s.markAll}>Mark all read</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </>
+        )}
       </Animated.View>
 
       {/* ── Search bar ── */}
-      <Animated.View style={[s.searchWrap, searchBarStyle]}>
-        <View style={s.searchBox}>
-          <Feather name="search" size={15} color={C.textMut} />
-          <TextInput
-            ref={searchRef}
-            style={s.searchInput}
-            placeholder="Search notifications…"
-            placeholderTextColor={C.textMut}
-            value={searchText}
-            onChangeText={setSearchText}
-            returnKeyType="search"
-          />
-          {searchText.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchText("")}>
-              <Feather name="x-circle" size={15} color={C.textMut} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </Animated.View>
+      {!multiSelectMode && (
+        <Animated.View style={[s.searchWrap, searchBarStyle]}>
+          <View style={s.searchBox}>
+            <Feather name="search" size={15} color={C.textMut} />
+            <TextInput
+              ref={searchRef}
+              style={s.searchInput}
+              placeholder="Search notifications…"
+              placeholderTextColor={C.textMut}
+              value={searchText}
+              onChangeText={setSearchText}
+              returnKeyType="search"
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchText("")}>
+                <Feather name="x-circle" size={15} color={C.textMut} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </Animated.View>
+      )}
 
       {/* ── Filter chips ── */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={s.chipScroll}
-        contentContainerStyle={s.chipContent}
-      >
-        {filterOptions.map(f => {
-          const isActive = activeFilter === f;
-          const meta = f !== FILTER_ALL ? CAT_META[f as NotifCategory] : null;
-          return (
-            <TouchableOpacity
-              key={f}
-              style={[s.chip, isActive && s.chipActive]}
-              onPress={() => { Haptics.selectionAsync(); setFilter(f); }}
-              activeOpacity={0.75}
-            >
-              {meta && (
-                <View style={[s.chipDot, { backgroundColor: isActive ? "#FFFFFF" : meta.iconColor }]} />
-              )}
-              <Text style={[s.chipText, isActive && s.chipTextActive]}>
-                {f === FILTER_ALL ? "All" : meta!.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      {!multiSelectMode && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={s.chipScroll}
+          contentContainerStyle={s.chipContent}
+        >
+          {filterOptions.map(f => {
+            const isActive = activeFilter === f;
+            const meta = f !== FILTER_ALL ? CAT_META[f as NotifCategory] : null;
+            return (
+              <TouchableOpacity
+                key={f}
+                style={[s.chip, isActive && s.chipActive]}
+                onPress={() => { Haptics.selectionAsync(); setFilter(f); }}
+                activeOpacity={0.75}
+              >
+                {meta && (
+                  <View style={[s.chipDot, { backgroundColor: isActive ? "#FFFFFF" : meta.iconColor }]} />
+                )}
+                <Text style={[s.chipText, isActive && s.chipTextActive]}>
+                  {f === FILTER_ALL ? "All" : meta!.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      )}
 
       <View style={s.divider} />
 
@@ -554,9 +776,15 @@ export default function NotificationsScreen() {
           )}
         </Animated.View>
       ) : (
-        <ScrollView
+        <FlatList
+          data={listData}
+          keyExtractor={item => item.key}
+          renderItem={renderItem}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 60 }]}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.25}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -565,22 +793,16 @@ export default function NotificationsScreen() {
               colors={[C.accent]}
             />
           }
-        >
-          {grouped.map((section, si) => (
-            <Animated.View key={section.title} entering={FadeIn.duration(260).delay(si * 40)}>
-              <Text style={s.sectionLabel}>{section.title}</Text>
-              {section.data.map((notif, i) => (
-                <NotifCard
-                  key={notif.id}
-                  item={notif}
-                  index={i}
-                  onPress={() => markRead(notif.id)}
-                  onDismiss={() => dismiss(notif.id)}
-                />
-              ))}
-            </Animated.View>
-          ))}
-        </ScrollView>
+          ListFooterComponent={
+            hasMore ? (
+              <View style={s.loadingMore}>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <SkeletonRow key={i} index={i} />
+                ))}
+              </View>
+            ) : null
+          }
+        />
       )}
     </View>
   );
@@ -592,7 +814,7 @@ const s = StyleSheet.create({
   header:        { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 10, paddingTop: 8 },
   iconBtn:       { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   headerCenter:  { flexDirection: "row", alignItems: "center", gap: 6, flex: 1, justifyContent: "center" },
-  headerActions: { flexDirection: "row", alignItems: "center", gap: 6 },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 10 },
   title:         { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.navy },
   badge:         { backgroundColor: C.danger, borderRadius: 10, minWidth: 20, height: 20, alignItems: "center", justifyContent: "center", paddingHorizontal: 5 },
   badgeText:     { fontSize: 11, fontFamily: "Manrope_700Bold", color: "#FFF" },
@@ -614,6 +836,8 @@ const s = StyleSheet.create({
   scroll:       { paddingTop: 4 },
   sectionLabel: { fontSize: 11, fontFamily: "Manrope_700Bold", color: C.textMut, textTransform: "uppercase", letterSpacing: 0.7, paddingHorizontal: 20, paddingTop: 16, paddingBottom: 6 },
 
+  loadingMore: { paddingVertical: 8 },
+
   emptyState: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 40, gap: 10 },
   emptyIcon:  { width: 72, height: 72, borderRadius: 36, backgroundColor: "#F0F0F0", alignItems: "center", justifyContent: "center", marginBottom: 4 },
   emptyTitle: { fontSize: 17, fontFamily: "Manrope_700Bold", color: C.text },
@@ -623,30 +847,40 @@ const s = StyleSheet.create({
 });
 
 const nc = StyleSheet.create({
-  card:       { flexDirection: "row", alignItems: "flex-start", paddingHorizontal: 20, paddingVertical: 13, gap: 12, position: "relative" },
-  cardUnread: { backgroundColor: "#F8FCFF" },
-  unreadDot:  { position: "absolute", top: 19, left: 7, width: 6, height: 6, borderRadius: 3, backgroundColor: C.info },
-  iconWrap:   { width: 42, height: 42, borderRadius: 13, alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 },
-  content:    { flex: 1, gap: 2 },
-  topRow:     { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  title:      { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
-  titleBold:  { fontFamily: "Manrope_700Bold" },
-  body:       { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec, lineHeight: 17 },
+  card:        { flexDirection: "row", alignItems: "flex-start", paddingHorizontal: 20, paddingVertical: 13, gap: 12, position: "relative", backgroundColor: C.bg },
+  cardUnread:  { backgroundColor: "#F8FCFF" },
+  cardSelected:{ backgroundColor: "#EFF6FF" },
+  unreadDot:   { position: "absolute", top: 19, left: 7, width: 6, height: 6, borderRadius: 3, backgroundColor: C.info },
+  iconWrap:    { width: 42, height: 42, borderRadius: 13, alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 },
+  content:     { flex: 1, gap: 2 },
+  topRow:      { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  title:       { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.text, flex: 1 },
+  titleBold:   { fontFamily: "Manrope_700Bold" },
+  body:        { fontSize: 12, fontFamily: "Manrope_400Regular", color: C.textSec, lineHeight: 17 },
 
-  metaRow:    { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2 },
-  time:       { fontSize: 11, fontFamily: "Manrope_400Regular", color: C.textMut },
-  badge:      { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8 },
-  badgeDot:   { width: 5, height: 5, borderRadius: 3 },
-  badgeText:  { fontSize: 10, fontFamily: "Manrope_600SemiBold" },
+  metaRow:     { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 2, flexWrap: "wrap" },
+  time:        { fontSize: 11, fontFamily: "Manrope_500Medium", color: C.textMut },
+  timeSep:     { fontSize: 11, color: C.textMut },
+  timeExact:   { fontSize: 10, fontFamily: "Manrope_400Regular", color: C.textMut, opacity: 0.7 },
 
-  ctaBtn:    { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6, alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
-  ctaText:   { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.info },
+  badge:       { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8 },
+  badgeDot:    { width: 5, height: 5, borderRadius: 3 },
+  badgeText:   { fontSize: 10, fontFamily: "Manrope_600SemiBold" },
+
+  ctaBtn:      { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6, alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
+  ctaText:     { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: C.info },
 
   separator: { height: 1, backgroundColor: C.border, marginHorizontal: 20 },
 
-  /* Swipe-to-dismiss */
-  swipeAction:     { justifyContent: "center", alignItems: "center", width: 80, backgroundColor: C.danger, gap: 4 },
-  swipeActionText: { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF" },
+  /* Checkbox for multi-select */
+  checkbox:        { justifyContent: "center", marginTop: 1, flexShrink: 0 },
+  checkboxInner:   { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, borderColor: C.textMut, alignItems: "center", justifyContent: "center" },
+  checkboxChecked: { backgroundColor: C.info, borderColor: C.info },
+
+  /* Swipe actions */
+  swipeDeleteAction: { justifyContent: "center", alignItems: "center", width: 80, backgroundColor: C.danger, gap: 4, borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+  swipeUnreadAction: { justifyContent: "center", alignItems: "center", width: 80, backgroundColor: C.info, gap: 4 },
+  swipeActionText:   { fontSize: 11, fontFamily: "Manrope_600SemiBold", color: "#FFFFFF", textAlign: "center" },
 });
 
 const sk = StyleSheet.create({
