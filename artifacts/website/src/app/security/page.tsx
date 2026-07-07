@@ -12,15 +12,15 @@ export const metadata: Metadata = {
 export default function SecurityPage() {
   return (
     <>
-      <section className="pt-32 pb-16 bg-[#0A0A0F]">
+      <section className="pt-32 pb-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
             <Shield size={14} /> Bank-grade security
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
             Your money is <span className="text-[#00D9A0]">protected.</span>
           </h1>
-          <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto">
+          <p className="text-gray-500 text-xl max-w-2xl mx-auto">
             We&apos;ve built multiple layers of security so you can transact with confidence. Every feature, every transaction, every account is protected.
           </p>
         </div>
@@ -29,9 +29,9 @@ export default function SecurityPage() {
       <SecuritySection />
 
       {/* How we protect you */}
-      <section className="py-24 bg-[#14141F]">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
             How we protect you
           </h2>
           <div className="space-y-6">
@@ -52,13 +52,13 @@ export default function SecurityPage() {
                 body: "Our AI-powered fraud engine analyzes every transaction in real-time. Unusual patterns trigger automatic holds and instant notifications. You can freeze your account or card with one tap.",
               },
             ].map(({ icon: Icon, title, body }) => (
-              <div key={title} className="bg-[#1C1C2A] border border-[#2A2A3D] rounded-2xl p-8 flex gap-6">
-                <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.12)] flex items-center justify-center flex-shrink-0">
+              <div key={title} className="bg-white border border-gray-100 rounded-2xl p-8 flex gap-6 shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center flex-shrink-0">
                   <Icon size={22} className="text-[#00D9A0]" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-xl mb-3">{title}</h3>
-                  <p className="text-[#8F8FA3] leading-relaxed">{body}</p>
+                  <h3 className="text-gray-900 font-bold text-xl mb-3">{title}</h3>
+                  <p className="text-gray-500 leading-relaxed">{body}</p>
                 </div>
               </div>
             ))}

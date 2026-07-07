@@ -54,7 +54,7 @@ export default function CookiePolicyPage() {
   }));
 
   return (
-    <main className="pt-32 pb-24 bg-[#0A0A0F] min-h-screen">
+    <main className="pt-32 pb-24 bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -63,13 +63,13 @@ export default function CookiePolicyPage() {
             <span className="w-2 h-2 rounded-full bg-[#00D9A0]" />
             <span className="text-[#00D9A0] text-sm font-semibold">Legal Document</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 leading-tight">
             Cookie Policy
           </h1>
-          <p className="text-[#8F8FA3] text-base">
-            Last updated: <span className="text-white font-medium">July 6, 2026</span>
+          <p className="text-gray-500 text-base">
+            Last updated: <span className="text-gray-900 font-medium">July 6, 2026</span>
           </p>
-          <p className="text-[#8F8FA3] mt-4 leading-relaxed max-w-2xl">
+          <p className="text-gray-500 mt-4 leading-relaxed max-w-2xl">
             This policy explains how PAYVORA uses cookies and similar technologies on our website, and how you can control them.
           </p>
         </div>
@@ -77,8 +77,8 @@ export default function CookiePolicyPage() {
         <div className="lg:grid lg:grid-cols-[280px_1fr] gap-16 items-start">
           {/* Table of Contents */}
           <aside className="hidden lg:block sticky top-28">
-            <div className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6">
-              <h2 className="text-xs font-bold text-[#8F8FA3] uppercase tracking-widest mb-4">
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                 Contents
               </h2>
               <nav className="space-y-1">
@@ -86,7 +86,7 @@ export default function CookiePolicyPage() {
                   <a
                     key={item.anchor}
                     href={`#${item.anchor}`}
-                    className="block text-sm text-[#8F8FA3] hover:text-[#00D9A0] py-1.5 transition-colors leading-snug"
+                    className="block text-sm text-gray-500 hover:text-[#00D9A0] py-1.5 transition-colors leading-snug"
                   >
                     {item.label}
                   </a>
@@ -101,11 +101,11 @@ export default function CookiePolicyPage() {
               const anchor = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
               return (
                 <section key={title} id={anchor} className="scroll-mt-32">
-                  <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
                     <span className="w-1 h-6 rounded-full bg-[#00D9A0] flex-shrink-0" />
                     {title}
                   </h2>
-                  <p className="text-[#8F8FA3] leading-relaxed whitespace-pre-line pl-4 border-l border-[#2A2A3D]">
+                  <p className="text-gray-500 leading-relaxed whitespace-pre-line pl-4 border-l border-gray-100">
                     {body}
                   </p>
                 </section>
@@ -113,8 +113,8 @@ export default function CookiePolicyPage() {
             })}
 
             {/* Links to other policies */}
-            <div className="pt-8 border-t border-[#2A2A3D]">
-              <p className="text-[#8F8FA3] text-sm">
+            <div className="pt-8 border-t border-gray-100">
+              <p className="text-gray-500 text-sm">
                 For information about how we handle your personal data, see our{" "}
                 <Link href="/privacy" className="text-[#00D9A0] hover:underline">Privacy Policy</Link>.
                 {" "}For our full legal terms, see our{" "}

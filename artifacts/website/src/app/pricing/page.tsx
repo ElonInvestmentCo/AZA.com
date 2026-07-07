@@ -94,16 +94,16 @@ export default function PricingPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-[#0A0A0F]">
+      <section className="pt-32 pb-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
             Transparent pricing
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
             No hidden fees.{" "}
             <span className="text-[#00D9A0]">Ever.</span>
           </h1>
-          <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-gray-500 text-xl max-w-2xl mx-auto leading-relaxed">
             PAYVORA is free to download and free to use for most services. Where fees apply, they&apos;re shown clearly before you confirm — no surprises.
           </p>
         </div>
@@ -124,21 +124,21 @@ export default function PricingPage() {
       </section>
 
       {/* Fee table */}
-      <section className="py-24 bg-[#0A0A0F]">
+      <section className="py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-black text-white mb-3">Fee schedule</h2>
-          <p className="text-[#8F8FA3] mb-12">
+          <h2 className="text-3xl font-black text-gray-900 mb-3">Fee schedule</h2>
+          <p className="text-gray-500 mb-12">
             All fees shown are the maximum possible. Many transactions have zero fees.
           </p>
           <div className="space-y-10">
             {feeTable.map(({ category, items }) => (
               <div key={category}>
-                <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+                <h3 className="text-gray-900 font-bold text-lg mb-4 flex items-center gap-2">
                   <span className="w-1 h-5 rounded-full bg-[#00D9A0]" />
                   {category}
                 </h3>
-                <div className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl overflow-hidden">
-                  <div className="grid grid-cols-3 px-6 py-3 border-b border-[#2A2A3D] text-xs font-bold text-[#8F8FA3] uppercase tracking-widest">
+                <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="grid grid-cols-3 px-6 py-3 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-50">
                     <span>Service</span>
                     <span className="text-center">Fee</span>
                     <span className="text-right">Note</span>
@@ -146,15 +146,15 @@ export default function PricingPage() {
                   {items.map(({ service, fee, note }, i) => (
                     <div
                       key={service}
-                      className={`grid grid-cols-3 px-6 py-4 ${i < items.length - 1 ? "border-b border-[#2A2A3D]" : ""}`}
+                      className={`grid grid-cols-3 px-6 py-4 ${i < items.length - 1 ? "border-b border-gray-100" : ""}`}
                     >
-                      <span className="text-white text-sm">{service}</span>
+                      <span className="text-gray-900 text-sm">{service}</span>
                       <span
-                        className={`text-center text-sm font-bold ${fee === "Free" ? "text-[#00D9A0]" : "text-white"}`}
+                        className={`text-center text-sm font-bold ${fee === "Free" ? "text-[#00D9A0]" : "text-gray-900"}`}
                       >
                         {fee}
                       </span>
-                      <span className="text-right text-[#8F8FA3] text-xs">{note}</span>
+                      <span className="text-right text-gray-400 text-xs">{note}</span>
                     </div>
                   ))}
                 </div>
@@ -165,11 +165,11 @@ export default function PricingPage() {
       </section>
 
       {/* KYC tiers */}
-      <section className="py-24 bg-[#14141F]">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-white mb-4">Account limits by KYC tier</h2>
-            <p className="text-[#8F8FA3] text-lg max-w-2xl mx-auto">
+            <h2 className="text-4xl font-black text-gray-900 mb-4">Account limits by KYC tier</h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
               Verify your identity to unlock higher limits. Upgrading takes less than 5 minutes.
             </p>
           </div>
@@ -179,21 +179,21 @@ export default function PricingPage() {
                 key={tier}
                 className={`rounded-2xl p-8 border ${
                   highlight
-                    ? "bg-[rgba(0,217,160,0.08)] border-[rgba(0,217,160,0.35)]"
-                    : "bg-[#1C1C2A] border-[#2A2A3D]"
+                    ? "bg-white border-[#00D9A0]/40 shadow-md"
+                    : "bg-white border-gray-100 shadow-sm"
                 }`}
               >
                 {highlight && (
-                  <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#00D9A0] text-[#0A0A0F] text-xs font-bold mb-4">
+                  <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#00D9A0] text-white text-xs font-bold mb-4">
                     Most popular
                   </div>
                 )}
                 <div className="text-[#00D9A0] text-xs font-bold uppercase tracking-widest mb-2">{tier}</div>
-                <h3 className="text-white font-black text-2xl mb-1">{label}</h3>
-                <p className="text-[#8F8FA3] text-sm mb-6">{description}</p>
+                <h3 className="text-gray-900 font-black text-2xl mb-1">{label}</h3>
+                <p className="text-gray-500 text-sm mb-6">{description}</p>
                 <ul className="space-y-3">
                   {limits.map((limit) => (
-                    <li key={limit} className="flex items-start gap-3 text-sm text-[#8F8FA3]">
+                    <li key={limit} className="flex items-start gap-3 text-sm text-gray-500">
                       <Check size={14} className="text-[#00D9A0] mt-0.5 flex-shrink-0" />
                       {limit}
                     </li>
@@ -206,23 +206,23 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ note */}
-      <section className="py-16 bg-[#0A0A0F] border-t border-[#2A2A3D]">
+      <section className="py-16 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <HelpCircle size={32} className="text-[#00D9A0] mx-auto mb-4" />
-          <h2 className="text-2xl font-black text-white mb-3">Still have questions?</h2>
-          <p className="text-[#8F8FA3] mb-6">
+          <h2 className="text-2xl font-black text-gray-900 mb-3">Still have questions?</h2>
+          <p className="text-gray-500 mb-6">
             Our support team is available 24/7 to help with any pricing questions.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="/faq"
-              className="px-6 py-3 bg-[#14141F] border border-[#2A2A3D] text-white rounded-xl text-sm font-semibold hover:border-[#00D9A0] transition-colors"
+              className="px-6 py-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-xl text-sm font-semibold hover:border-gray-300 transition-colors"
             >
               Read the FAQ
             </a>
             <a
               href="mailto:support@payvora.com"
-              className="px-6 py-3 bg-[#00D9A0] text-[#0A0A0F] rounded-xl text-sm font-bold hover:bg-[#00C490] transition-colors"
+              className="px-6 py-3 bg-black text-white rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors"
             >
               Contact support
             </a>

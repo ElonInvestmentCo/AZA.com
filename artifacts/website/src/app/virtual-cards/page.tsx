@@ -39,19 +39,19 @@ const cardTypes = [
 export default function VirtualCardsPage() {
   return (
     <>
-      <section className="pt-32 pb-24 bg-[#0A0A0F]">
+      <section className="pt-32 pb-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
                 Free virtual card
               </div>
-              <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+              <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
                 Your USD card for{" "}
                 <span className="text-[#00D9A0]">the world.</span>
               </h1>
-              <p className="text-[#8F8FA3] text-xl leading-relaxed mb-8">
+              <p className="text-gray-500 text-xl leading-relaxed mb-8">
                 Get a free virtual USD Visa card instantly. Shop on any international website, pay for subscriptions, and make cross-border payments — all funded from your PAYVORA wallet.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
@@ -63,7 +63,7 @@ export default function VirtualCardsPage() {
                   { icon: Shield, text: "Fraud protection included" },
                   { icon: Zap, text: "Issued in seconds" },
                 ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-3 text-[#8F8FA3] text-sm">
+                  <div key={text} className="flex items-center gap-3 text-gray-500 text-sm">
                     <Icon size={16} className="text-[#00D9A0] flex-shrink-0" />
                     {text}
                   </div>
@@ -71,27 +71,25 @@ export default function VirtualCardsPage() {
               </div>
             </div>
 
-            {/* Card visual */}
+            {/* Card visual — keep dark for contrast/realism */}
             <div className="flex justify-center">
               <div className="relative w-80 space-y-4">
-                {/* Card */}
                 <div
                   className="w-full aspect-[1.586/1] rounded-3xl p-8 flex flex-col justify-between shadow-2xl"
                   style={{
                     background: "linear-gradient(145deg, #141414 0%, #1C1C2A 60%, #0A1A12 100%)",
                     border: "1px solid rgba(0,217,160,0.3)",
-                    boxShadow: "0 0 60px rgba(0,217,160,0.1), 0 20px 60px rgba(0,0,0,0.5)",
+                    boxShadow: "0 0 60px rgba(0,217,160,0.1), 0 20px 60px rgba(0,0,0,0.3)",
                   }}
                 >
-                  {/* Watermark */}
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] font-black text-white opacity-[0.04] select-none pointer-events-none leading-none">P</div>
                   <div className="flex justify-between items-start relative z-10">
                     <div>
-                      <p className="text-[#8F8FA3] text-xs">Virtual Card</p>
+                      <p className="text-gray-400 text-xs">Virtual Card</p>
                       <p className="text-white font-bold text-lg">PAYVORA</p>
                     </div>
                     <div className="w-12 h-12 rounded-xl bg-[#00D9A0] flex items-center justify-center">
-                      <span className="text-[#0A0A0F] font-black">P</span>
+                      <span className="text-gray-900 font-black">P</span>
                     </div>
                   </div>
                   <div className="relative z-10">
@@ -100,11 +98,11 @@ export default function VirtualCardsPage() {
                     </p>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-[#8F8FA3] text-xs mb-0.5">Card Holder</p>
+                        <p className="text-gray-400 text-xs mb-0.5">Card Holder</p>
                         <p className="text-white font-semibold">JOHN DOE</p>
                       </div>
                       <div>
-                        <p className="text-[#8F8FA3] text-xs mb-0.5">Expires</p>
+                        <p className="text-gray-400 text-xs mb-0.5">Expires</p>
                         <p className="text-white font-semibold">12/28</p>
                       </div>
                       <p className="text-[#00D9A0] font-black text-2xl">VISA</p>
@@ -119,9 +117,9 @@ export default function VirtualCardsPage() {
                     { label: "Spent", value: "$43.99" },
                     { label: "Status", value: "Active" },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-[#14141F] border border-[#2A2A3D] rounded-xl p-3 text-center">
-                      <p className="text-[#8F8FA3] text-xs mb-1">{label}</p>
-                      <p className="text-white text-sm font-bold">{value}</p>
+                    <div key={label} className="bg-white border border-gray-100 rounded-xl p-3 text-center shadow-sm">
+                      <p className="text-gray-400 text-xs mb-1">{label}</p>
+                      <p className="text-gray-900 text-sm font-bold">{value}</p>
                     </div>
                   ))}
                 </div>
@@ -131,14 +129,14 @@ export default function VirtualCardsPage() {
 
           {/* Card types */}
           <div className="mb-24">
-            <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-10">
               Choose your card type
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {cardTypes.map(({ title, desc, badge, badgeColor, features }) => (
-                <div key={title} className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6 hover:border-[#3A3A4D] transition-all">
+                <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.12)] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center">
                       <CreditCard size={22} className="text-[#00D9A0]" />
                     </div>
                     <span
@@ -148,11 +146,11 @@ export default function VirtualCardsPage() {
                       {badge}
                     </span>
                   </div>
-                  <h3 className="text-white font-bold text-xl mb-2">{title}</h3>
-                  <p className="text-[#8F8FA3] text-sm leading-relaxed mb-5">{desc}</p>
+                  <h3 className="text-gray-900 font-bold text-xl mb-2">{title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-5">{desc}</p>
                   <ul className="space-y-2">
                     {features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-[#8F8FA3]">
+                      <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
                         <CheckCircle2 size={14} className="text-[#00D9A0] flex-shrink-0" />
                         {f}
                       </li>
@@ -165,14 +163,14 @@ export default function VirtualCardsPage() {
 
           {/* Use cases */}
           <div className="mb-16">
-            <h2 className="text-3xl font-black text-white text-center mb-10">
+            <h2 className="text-3xl font-black text-gray-900 text-center mb-10">
               Works everywhere you shop
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {usecases.map((u) => (
-                <div key={u} className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-4 flex items-center gap-3 hover:border-[#00D9A0] transition-all group">
+                <div key={u} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:border-[#00D9A0] hover:shadow-md transition-all group">
                   <CheckCircle2 size={16} className="text-[#00D9A0] flex-shrink-0" />
-                  <span className="text-[#8F8FA3] text-sm group-hover:text-white transition-colors">{u}</span>
+                  <span className="text-gray-500 text-sm group-hover:text-gray-900 transition-colors">{u}</span>
                 </div>
               ))}
             </div>
@@ -180,12 +178,12 @@ export default function VirtualCardsPage() {
 
           {/* Security note */}
           <div className="bg-[rgba(0,217,160,0.06)] border border-[rgba(0,217,160,0.2)] rounded-2xl p-8 flex gap-6 items-start">
-            <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.12)] flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center flex-shrink-0">
               <Lock size={22} className="text-[#00D9A0]" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-xl mb-2">Your card is protected</h3>
-              <p className="text-[#8F8FA3] leading-relaxed">
+              <h3 className="text-gray-900 font-bold text-xl mb-2">Your card is protected</h3>
+              <p className="text-gray-500 leading-relaxed">
                 Every PAYVORA virtual card is protected with real-time fraud monitoring, instant freeze capability, and full transaction history. If you ever notice unauthorized charges, freeze your card instantly from the app and contact our 24/7 support.
               </p>
             </div>

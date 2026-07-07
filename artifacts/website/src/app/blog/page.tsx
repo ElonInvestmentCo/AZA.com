@@ -80,23 +80,23 @@ export default function BlogPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 pb-16 bg-[#0A0A0F]">
+      <section className="pt-32 pb-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
             PAYVORA Blog
           </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
             Fintech tips for{" "}
             <span className="text-[#00D9A0]">everyday Nigerians.</span>
           </h1>
-          <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto">
+          <p className="text-gray-500 text-xl max-w-2xl mx-auto">
             Guides, insights, and news to help you get more from your money.
           </p>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="py-6 bg-[#14141F] border-y border-[#2A2A3D] sticky top-16 z-10">
+      <section className="py-4 bg-white border-y border-gray-100 sticky top-16 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {categories.map((cat) => (
@@ -104,8 +104,8 @@ export default function BlogPage() {
                 key={cat}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   cat === "All"
-                    ? "bg-[#00D9A0] text-[#0A0A0F]"
-                    : "bg-[#1C1C2A] border border-[#2A2A3D] text-[#8F8FA3] hover:text-white"
+                    ? "bg-black text-white"
+                    : "bg-gray-50 border border-gray-200 text-gray-500 hover:text-gray-900"
                 }`}
               >
                 {cat}
@@ -115,35 +115,35 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-[#0A0A0F]">
+      <section className="py-16 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Featured post */}
           <div className="mb-12">
             <Link
               href={`/blog/${featured.slug}`}
-              className="block bg-[#14141F] border border-[#2A2A3D] rounded-3xl p-8 sm:p-10 hover:border-[#00D9A0]/40 transition-all group relative overflow-hidden"
+              className="block bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 hover:border-[#00D9A0]/40 hover:shadow-md transition-all group relative overflow-hidden shadow-sm"
             >
               <div
                 className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none"
-                style={{ background: "rgba(0,217,160,0.06)" }}
+                style={{ background: "rgba(0,217,160,0.04)" }}
               />
               <div className="relative">
                 <div className="flex items-center gap-3 mb-5">
                   <span className="text-xs font-bold text-[#00D9A0] bg-[rgba(0,217,160,0.1)] px-2.5 py-1 rounded-lg">
                     {featured.category}
                   </span>
-                  <span className="text-xs text-[#8F8FA3] bg-[#0A0A0F] px-2.5 py-1 rounded-lg border border-[#2A2A3D]">
+                  <span className="text-xs text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100">
                     Featured
                   </span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 group-hover:text-[#00D9A0] transition-colors">
+                <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-4 group-hover:text-[#00D9A0] transition-colors">
                   {featured.title}
                 </h2>
-                <p className="text-[#8F8FA3] leading-relaxed mb-6 max-w-2xl">
+                <p className="text-gray-500 leading-relaxed mb-6 max-w-2xl">
                   {featured.excerpt}
                 </p>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-xs text-[#8F8FA3]">
+                  <div className="flex items-center gap-4 text-xs text-gray-400">
                     <div className="flex items-center gap-1.5">
                       <Clock size={12} /> {featured.readTime}
                     </div>
@@ -163,16 +163,16 @@ export default function BlogPage() {
               <Link
                 key={slug}
                 href={`/blog/${slug}`}
-                className="block bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-7 hover:border-[#00D9A0]/40 transition-all group"
+                className="block bg-white border border-gray-100 rounded-2xl p-7 hover:border-[#00D9A0]/40 hover:shadow-md transition-all group shadow-sm"
               >
                 <span className="text-xs font-bold text-[#00D9A0] bg-[rgba(0,217,160,0.1)] px-2.5 py-1 rounded-lg mb-4 inline-block">
                   {category}
                 </span>
-                <h3 className="text-white font-bold text-lg mb-3 group-hover:text-[#00D9A0] transition-colors leading-snug">
+                <h3 className="text-gray-900 font-bold text-lg mb-3 group-hover:text-[#00D9A0] transition-colors leading-snug">
                   {title}
                 </h3>
-                <p className="text-[#8F8FA3] text-sm leading-relaxed mb-5">{excerpt}</p>
-                <div className="flex items-center gap-3 text-xs text-[#8F8FA3]">
+                <p className="text-gray-500 text-sm leading-relaxed mb-5">{excerpt}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-400">
                   <div className="flex items-center gap-1.5">
                     <Clock size={11} /> {readTime}
                   </div>
@@ -186,21 +186,21 @@ export default function BlogPage() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-20 bg-[#14141F] border-t border-[#2A2A3D]">
+      <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-black text-white mb-3">Get the latest posts</h2>
-          <p className="text-[#8F8FA3] mb-8">
+          <h2 className="text-3xl font-black text-gray-900 mb-3">Get the latest posts</h2>
+          <p className="text-gray-500 mb-8">
             New guides and fintech tips every week. No spam, unsubscribe any time.
           </p>
           <form className="flex gap-2">
             <input
               type="email"
               placeholder="your@email.com"
-              className="flex-1 px-4 py-3 bg-[#1C1C2A] border border-[#2A2A3D] rounded-xl text-white text-sm placeholder:text-[#8F8FA3] focus:outline-none focus:border-[#00D9A0] transition-colors"
+              className="flex-1 px-4 py-3 bg-[#F7F8FA] border border-gray-200 rounded-xl text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:border-[#00D9A0] transition-colors"
             />
             <button
               type="submit"
-              className="px-5 py-3 bg-[#00D9A0] text-[#0A0A0F] font-bold rounded-xl text-sm hover:bg-[#00C490] transition-colors"
+              className="px-5 py-3 bg-black text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition-colors"
             >
               Subscribe
             </button>

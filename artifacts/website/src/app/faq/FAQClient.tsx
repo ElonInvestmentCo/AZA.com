@@ -142,14 +142,14 @@ export function FAQClient() {
     categories.find((c) => c.title === activeCategory)?.faqs ?? [];
 
   return (
-    <main className="pt-32 pb-24 bg-[#0A0A0F] min-h-screen">
+    <main className="pt-32 pb-24 bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-4">
+          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-4">
             Frequently Asked Questions
           </h1>
-          <p className="text-[#8F8FA3] text-xl">
+          <p className="text-gray-500 text-xl">
             Everything you need to know about PAYVORA.
           </p>
         </div>
@@ -165,8 +165,8 @@ export function FAQClient() {
               }}
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
                 activeCategory === title
-                  ? "bg-[#00D9A0] text-[#0A0A0F]"
-                  : "bg-[#14141F] border border-[#2A2A3D] text-[#8F8FA3] hover:text-white"
+                  ? "bg-black text-white"
+                  : "bg-gray-50 border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300"
               }`}
             >
               {title}
@@ -179,7 +179,7 @@ export function FAQClient() {
           {activeFaqs.map(({ q, a }) => (
             <div
               key={q}
-              className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl overflow-hidden"
+              className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm"
             >
               <button
                 className="w-full flex items-center justify-between px-6 py-5 text-left"
@@ -187,17 +187,17 @@ export function FAQClient() {
                   setOpenQuestion(openQuestion === q ? null : q)
                 }
               >
-                <span className="text-white font-semibold pr-4">{q}</span>
+                <span className="text-gray-900 font-semibold pr-4">{q}</span>
                 <ChevronDown
                   size={18}
-                  className={`text-[#8F8FA3] flex-shrink-0 transition-transform duration-200 ${
+                  className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${
                     openQuestion === q ? "rotate-180" : ""
                   }`}
                 />
               </button>
               {openQuestion === q && (
                 <div className="px-6 pb-5">
-                  <p className="text-[#8F8FA3] leading-relaxed">{a}</p>
+                  <p className="text-gray-500 leading-relaxed">{a}</p>
                 </div>
               )}
             </div>

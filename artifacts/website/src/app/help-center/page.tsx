@@ -103,25 +103,25 @@ export default function HelpCenterPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 pb-20 bg-[#0A0A0F]">
+      <section className="pt-32 pb-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
             How can we{" "}
             <span className="text-[#00D9A0]">help you?</span>
           </h1>
-          <p className="text-[#8F8FA3] text-xl mb-10">
+          <p className="text-gray-500 text-xl mb-10">
             Search our knowledge base or browse by category.
           </p>
           {/* Search bar */}
           <div className="relative max-w-xl mx-auto">
             <Search
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8F8FA3] pointer-events-none"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
             />
             <input
               type="search"
               placeholder="Search for answers…"
-              className="w-full pl-11 pr-4 py-4 bg-[#14141F] border border-[#2A2A3D] rounded-2xl text-white placeholder:text-[#8F8FA3] focus:outline-none focus:border-[#00D9A0] transition-colors text-sm"
+              className="w-full pl-11 pr-4 py-4 bg-[#F7F8FA] border border-gray-200 rounded-2xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#00D9A0] transition-colors text-sm shadow-sm"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default function HelpCenterPage() {
             {popularArticles.slice(0, 4).map((article) => (
               <button
                 key={article}
-                className="text-xs text-[#8F8FA3] border border-[#2A2A3D] rounded-full px-3 py-1.5 hover:text-white hover:border-[#00D9A0]/40 transition-colors"
+                className="text-xs text-gray-500 border border-gray-200 rounded-full px-3 py-1.5 hover:text-gray-900 hover:border-gray-300 transition-colors bg-white"
               >
                 {article}
               </button>
@@ -140,21 +140,21 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Categories */}
-      <section className="py-20 bg-[#14141F] border-y border-[#2A2A3D]">
+      <section className="py-20 bg-gray-50 border-y border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-black text-white mb-10">Browse by category</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-10">Browse by category</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {categories.map(({ icon, title, count, href, articles }) => (
               <div
                 key={title}
                 id={href.replace("#", "")}
-                className="bg-[#1C1C2A] border border-[#2A2A3D] rounded-2xl p-6 hover:border-[#00D9A0]/40 transition-colors"
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-[#00D9A0]/40 transition-colors"
               >
                 <div className="flex items-center gap-3 mb-5">
                   <span className="text-2xl">{icon}</span>
                   <div>
-                    <h3 className="text-white font-bold">{title}</h3>
-                    <p className="text-[#8F8FA3] text-xs">{count} articles</p>
+                    <h3 className="text-gray-900 font-bold">{title}</h3>
+                    <p className="text-gray-400 text-xs">{count} articles</p>
                   </div>
                 </div>
                 <ul className="space-y-2.5">
@@ -162,7 +162,7 @@ export default function HelpCenterPage() {
                     <li key={article}>
                       <a
                         href={`mailto:support@payvora.com?subject=${encodeURIComponent(article)}`}
-                        className="flex items-center gap-2 text-sm text-[#8F8FA3] hover:text-[#00D9A0] transition-colors group"
+                        className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#00D9A0] transition-colors group"
                       >
                         <ChevronRight
                           size={13}
@@ -180,11 +180,11 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Contact support */}
-      <section className="py-20 bg-[#0A0A0F]">
+      <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black text-white mb-3">Still need help?</h2>
-            <p className="text-[#8F8FA3]">
+            <h2 className="text-3xl font-black text-gray-900 mb-3">Still need help?</h2>
+            <p className="text-gray-500">
               Our support team is available 24/7 and responds within 2 hours on average.
             </p>
           </div>
@@ -215,13 +215,13 @@ export default function HelpCenterPage() {
               <a
                 key={title}
                 href={href}
-                className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-7 hover:border-[#00D9A0]/40 transition-all group text-left"
+                className="bg-white border border-gray-100 rounded-2xl p-7 hover:border-[#00D9A0]/40 hover:shadow-md transition-all group text-left shadow-sm"
               >
-                <div className="w-11 h-11 rounded-xl bg-[rgba(0,217,160,0.12)] flex items-center justify-center mb-4">
+                <div className="w-11 h-11 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center mb-4">
                   <Icon size={20} className="text-[#00D9A0]" />
                 </div>
-                <h3 className="text-white font-bold mb-2">{title}</h3>
-                <p className="text-[#8F8FA3] text-sm leading-relaxed mb-4">{desc}</p>
+                <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-4">{desc}</p>
                 <span className="text-[#00D9A0] text-sm font-semibold group-hover:underline">{action}</span>
               </a>
             ))}
@@ -230,15 +230,15 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Quick link to FAQ */}
-      <section className="py-12 bg-[#14141F] border-t border-[#2A2A3D]">
+      <section className="py-12 bg-gray-50 border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <p className="text-white font-bold">Looking for our FAQ?</p>
-            <p className="text-[#8F8FA3] text-sm">Quick answers to the most common questions.</p>
+            <p className="text-gray-900 font-bold">Looking for our FAQ?</p>
+            <p className="text-gray-500 text-sm">Quick answers to the most common questions.</p>
           </div>
           <Link
             href="/faq"
-            className="flex items-center gap-2 px-6 py-3 bg-[#1C1C2A] border border-[#2A2A3D] rounded-xl text-white text-sm font-semibold hover:border-[#00D9A0] transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm font-semibold hover:border-[#00D9A0] transition-colors shadow-sm"
           >
             Visit FAQ <ChevronRight size={14} />
           </Link>

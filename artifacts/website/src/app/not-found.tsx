@@ -17,26 +17,26 @@ export default function NotFound() {
         justifyContent: "center",
         textAlign: "center",
         padding: "2rem",
-        background: "#0A0A0F",
-        color: "#FFFFFF",
+        background: "#ffffff",
+        color: "#111827",
       }}
     >
       <h1 style={{ fontSize: "6rem", fontWeight: 900, margin: 0, color: "#00D9A0" }}>
         404
       </h1>
-      <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginTop: "1rem" }}>
+      <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginTop: "1rem", color: "#111827" }}>
         Page Not Found
       </h2>
-      <p style={{ color: "#8F8FA3", marginTop: "0.75rem", maxWidth: "400px" }}>
-        The page you're looking for doesn't exist or has been moved.
+      <p style={{ color: "#6B7280", marginTop: "0.75rem", maxWidth: "400px" }}>
+        The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <Link
         href="/"
         style={{
           marginTop: "2rem",
           padding: "0.75rem 2rem",
-          background: "#00D9A0",
-          color: "#0A0A0F",
+          background: "#111827",
+          color: "#ffffff",
           borderRadius: "9999px",
           fontWeight: 700,
           textDecoration: "none",

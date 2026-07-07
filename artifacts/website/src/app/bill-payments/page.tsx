@@ -53,18 +53,18 @@ const steps = [
 export default function BillPaymentsPage() {
   return (
     <>
-      <section className="pt-32 pb-24 bg-[#0A0A0F]">
+      <section className="pt-32 pb-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero */}
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
               All bills, one app
             </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-white tracking-tight mb-6">
+            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
               Pay every bill{" "}
               <span className="text-[#00D9A0]">in seconds.</span>
             </h1>
-            <p className="text-[#8F8FA3] text-xl max-w-2xl mx-auto mb-10">
+            <p className="text-gray-500 text-xl max-w-2xl mx-auto mb-10">
               No more queues, no more USSD codes, no more stress. PAYVORA lets you pay every utility bill from your phone in under 30 seconds.
             </p>
 
@@ -76,7 +76,7 @@ export default function BillPaymentsPage() {
                 { icon: Shield, label: "100% secure" },
                 { icon: CheckCircle2, label: "Instant confirmation" },
               ].map(({ icon: Icon, label }) => (
-                <span key={label} className="flex items-center gap-1.5 text-[#8F8FA3]">
+                <span key={label} className="flex items-center gap-1.5 text-gray-500">
                   <Icon size={15} className="text-[#00D9A0]" />
                   {label}
                 </span>
@@ -87,19 +87,19 @@ export default function BillPaymentsPage() {
           {/* Bill type cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-24">
             {billTypes.map(({ icon: Icon, title, color, desc, providers }) => (
-              <div key={title} className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6 hover:bg-[#1C1C2A] transition-all">
+              <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${color}20` }}>
                     <Icon size={22} style={{ color }} />
                   </div>
-                  <h3 className="text-white font-bold text-xl">{title}</h3>
+                  <h3 className="text-gray-900 font-bold text-xl">{title}</h3>
                 </div>
-                <p className="text-[#8F8FA3] text-sm mb-5 leading-relaxed">{desc}</p>
+                <p className="text-gray-500 text-sm mb-5 leading-relaxed">{desc}</p>
                 <div className="flex flex-wrap gap-2">
                   {providers.map((p) => (
                     <span
                       key={p}
-                      className="flex items-center gap-1.5 text-xs text-[#8F8FA3] bg-[#0A0A0F] border border-[#2A2A3D] rounded-lg px-2.5 py-1"
+                      className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1"
                     >
                       <CheckCircle2 size={11} className="text-[#00D9A0]" />
                       {p}
@@ -112,19 +112,18 @@ export default function BillPaymentsPage() {
 
           {/* How it works */}
           <div>
-            <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
               How it works
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 relative">
-              {/* Connector line */}
-              <div className="hidden sm:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-[#2A2A3D]" />
+              <div className="hidden sm:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-gray-100" />
               {steps.map(({ step, title, desc }) => (
                 <div key={step} className="text-center relative">
-                  <div className="w-12 h-12 rounded-full bg-[rgba(0,217,160,0.12)] border border-[rgba(0,217,160,0.3)] flex items-center justify-center mx-auto mb-4 relative z-10 bg-[#0A0A0F]">
+                  <div className="w-12 h-12 rounded-full bg-white border border-[rgba(0,217,160,0.4)] flex items-center justify-center mx-auto mb-4 relative z-10 shadow-sm">
                     <span className="text-[#00D9A0] font-black">{step}</span>
                   </div>
-                  <h3 className="text-white font-bold mb-2">{title}</h3>
-                  <p className="text-[#8F8FA3] text-sm leading-relaxed">{desc}</p>
+                  <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
