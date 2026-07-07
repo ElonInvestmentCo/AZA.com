@@ -1099,6 +1099,7 @@ export default function HistoryScreen() {
         <FlatList
           data={listData}
           keyExtractor={item => item.key}
+          extraData={selected?.id}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 110 }]}
@@ -1176,7 +1177,15 @@ export default function HistoryScreen() {
       )}
 
       {/* ── Detail bottom sheet ── */}
-      <TxDetailSheet tx={selected} visible={sheetOpen} onClose={closeDetail} />
+      {/* key on selected.id forces a full remount when a different transaction
+          is opened, preventing CopyChip's internal `copied` state and any
+          other child state from leaking across transactions. */}
+      <TxDetailSheet
+        key={selected?.id ?? "__empty__"}
+        tx={selected}
+        visible={sheetOpen}
+        onClose={closeDetail}
+      />
     </View>
   );
 }

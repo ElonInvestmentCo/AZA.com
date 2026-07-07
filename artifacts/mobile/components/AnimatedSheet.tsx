@@ -18,7 +18,6 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDecay,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
@@ -207,13 +206,17 @@ export function AnimatedSheet({
         e.velocityY > DISMISS_VELOCITY;
 
       if (shouldDismiss) {
-        isClosing.value  = true;
-        translateY.value = withDecay(
-          {
-            velocity:     Math.max(e.velocityY, DISMISS_VELOCITY),
-            clamp:        [translateY.value, screenHSV.value + 300],
-            deceleration: 0.997,
-          },
+        isClosing.value = true;
+        // Use withTiming for a clean, predictable fall-off.
+        // withDecay(deceleration≈1) barely slows down — the sheet crawls
+        // asymptotically toward the clamp and visibly hangs at the bottom
+        // before the finished callback fires. A short ease-in timing curve
+        // disappears crisply off the bottom without any pause.
+        const remaining = screenHSV.value - translateY.value;
+        const duration  = Math.max(160, Math.min(300, remaining * 0.38));
+        translateY.value = withTiming(
+          screenHSV.value + 80,
+          { duration, easing: Easing.in(Easing.cubic) },
           (finished) => {
             if (finished) runOnJS(finaliseClose)();
           },
@@ -272,22 +275,26 @@ export function AnimatedSheet({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* Animated backdrop with blur */}
+      {/* Animated backdrop with blur.
+          NOTE: do NOT include a static { opacity: 0 } here — it fights the
+          Reanimated worklet-driven opacity and keeps the backdrop invisible.
+          The interpolate in backdropStyle already starts at 0 when translateY
+          equals screenH, so no static override is needed. */}
       <Animated.View
-        style={[StyleSheet.absoluteFillObject, { opacity: 0 }, backdropStyle]}
+        style={[StyleSheet.absoluteFillObject, backdropStyle]}
         pointerEvents="none"
       >
         {Platform.OS !== "web" ? (
           <BlurView
             style={StyleSheet.absoluteFillObject}
-            intensity={35}
+            intensity={60}
             tint="dark"
           />
         ) : null}
         <View
           style={[
             StyleSheet.absoluteFillObject,
-            { backgroundColor: Platform.OS === "web" ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.28)" },
+            { backgroundColor: Platform.OS === "web" ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.38)" },
           ]}
         />
       </Animated.View>

@@ -1,0 +1,40 @@
+Excellent scan. Now that we have the exact layout of the PayVora monorepo, let's inject our advanced Firebase architectural layers directly into the codebase. 
+
+Do NOT write a high-level guide or placeholders. Act as our Principal Engineer and implement the raw, un-truncated production source code directly into the following target files:
+
+### 1. MOBILE CONFIG: Update artifacts/mobile/app.json
+Update the Expo configuration to cleanly include the official Expo config plugins and the required deep linking structure for our email OTP domain:
+- Add plugins: `@react-native-firebase/app`, `@react-native-firebase/auth`, `@react-native-google-signin/google-signin`, and `expo-apple-authentication`.
+- Set up associated domains (iOS) and intent filters (Android) targeting "https://payvora-2026.web.app/__/auth/action" to catch incoming passwordless magic links.
+
+### 2. FRONTEND MOBILE: Implement Passwordless Auth Screen
+Rewrite/Update `artifacts/mobile/app/(auth)/login.tsx` to handle our secure Passwordless Email Link Authentication flow:
+- Use `@react-native-firebase/auth`'s `sendSignInLinkToEmail` to dispatch magic links, storing the email string in AsyncStorage.
+- Use `expo-linking` to watch for deep links.
+- Intercept the incoming URL via `signInWithEmailLink` to validate the user session, and immediately initialize their profile record at the Firestore collection `/users/{userId}` with default metadata (`walletBalanceNaira: 0`, `createdAt: ServerTimestamp`).
+
+### 3. BACKEND MIDDLEWARE: Create artifacts/api-server/src/middleware/firebaseAuth.ts
+Create a new Express middleware to verify incoming Firebase ID tokens alongside our existing JWT setup:
+- Parse the `Authorization: Bearer <Firebase_ID_Token>` header.
+- Use the `firebase-admin` SDK instance to execute `admin.auth().verifyIdToken(idToken)`.
+- Attach the verified properties to `req.user` and proceed via `next()`. Return a clear 401 JSON error on signature failure.
+
+### 4. DATABASE SECURITY: Create /firestore.rules
+Write a `firestore.rules` file directly into the root directory with the exact syntax to secure client-side updates using map-diffing:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId 
+                    && !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['walletBalanceNaira']));
+    }
+  }
+}
+
+### 5. REAL-TIME BALANCES: Implement Live Balance Sync Hook
+Create a new custom hook at `artifacts/mobile/hooks/useLiveBalance.ts` that uses Firestore snapshots (`onSnapshot`) to listen to `/users/{userId}` updates. This ensures the app dashboard mirrors changes to `walletBalanceNaira` in real-time when our AWS/Render backend uses the Firebase Admin SDK to update balances.
+
+Write the complete code blocks for these five items now. Do not truncate the files.
