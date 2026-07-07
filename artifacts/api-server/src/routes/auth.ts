@@ -427,8 +427,10 @@ router.post("/auth/forgot-password", async (req, res) => {
   otpStore.set(key, { code, expiresAt: Date.now() + 10 * 60 * 1000 });
 
   /* In production: send via email (SendGrid / Mailgun / Resend).
-   * For now, log to console so developers can complete the reset flow. */
-  console.log(`[PAYVORA OTP] Reset code for ${key}: ${code}`);
+   * Only log the OTP in non-production environments for developer convenience. */
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[PAYVORA OTP - DEV ONLY] Reset code for ${key}: ${code}`);
+  }
 
   res.json({ ok: true, message: "If that email exists, a reset code has been sent." });
 });

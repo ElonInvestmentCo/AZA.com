@@ -6,8 +6,8 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 
 ### Workflows (Replit)
 - **PayVora Website** — Next.js 15 landing page on port 5000 (preview pane)
+- **API Server** — Express API on port 3001 (internal; website proxies to it via INTERNAL_API_URL)
 - **artifacts/mobile: expo** — Expo dev server on port 19000; scan QR code with Expo Go app
-- **artifacts/api-server: API Server** — Express API on port 8080
 - **artifacts/mockup-sandbox: Component Preview Server** — Vite canvas/design preview on port 8081
 
 ### Commands
@@ -19,9 +19,10 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- Required secret: `JWT_SECRET` — secret key for signing/verifying JWT auth tokens (set in Replit Secrets)
+- Required secret: `FIREBASE_SERVICE_ACCOUNT` — full Firebase service account JSON string (set in Replit Secrets)
 - Required env: `DATABASE_URL` — Postgres connection string (runtime-managed by Replit)
-- Required env: `JWT_SECRET` — secret key for signing/verifying JWT auth tokens
-- Required env: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` — Google OAuth credentials (server-side)
+- Required secret: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` — Google OAuth credentials (server-side; set in Replit Secrets)
 - Required env: `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — Google OAuth client ID for mobile/web
 - Required env: `GOOGLE_CALLBACK_URL` — Google OAuth redirect URI (set in shared env, e.g. `https://www.payvora.org/api/auth/google/callback`)
 - Required env: `RELOADLY_CLIENT_ID` + `RELOADLY_CLIENT_SECRET` — needed for bill payment and eSIM routes (`/api/bills/*`, `/api/esim/*`)
