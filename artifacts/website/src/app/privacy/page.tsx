@@ -23,7 +23,7 @@ const sections = [
   },
   {
     title: "4. How We Share Your Information",
-    body: `We do not sell your personal information to third parties. We may share it with:\n\n• Service Providers: Trusted third-party companies that help us operate our Services (payment processors, cloud infrastructure providers, analytics tools, and KYC verification vendors), under strict data processing agreements that prohibit them from using your data for any other purpose.\n\n• Regulatory Authorities: Government agencies and regulators as required by Nigerian law, including the Central Bank of Nigeria (CBN) and the Economic and Financial Crimes Commission (EFCC).\n\n• Law Enforcement: When required by valid court order, subpoena, or to prevent imminent harm to users or the public.\n\n• Business Transfers: In the event of a merger, acquisition, or sale of all or a portion of our assets, your data may be transferred. We will notify you before your data becomes subject to a different privacy policy.\n\nAll third parties are contractually obligated to maintain appropriate security standards and are prohibited from using your data beyond what is necessary to perform their services.`,
+    body: `We do not sell your personal information to third parties. We may share it with:\n\n• Service Providers: Trusted third-party companies that help us operate our Services (payment processors, cloud infrastructure providers, analytics tools, and KYC verification vendors), under strict data processing agreements that prohibit them from using your data for any other purpose.\n\n• Regulatory Authorities: Government agencies and regulators as required by Nigerian law, including the Central Bank of Nigeria (CBN) and the Economic and Financial Crimes Commission (EFCC).\n\n• Law Enforcement: When required by valid court order, subpoena, or to prevent imminent harm to users or the public.\n\n• Business Transfers: In the event of a merger, acquisition, or sale of all or a portion of our assets, your data may be transferred. We will notify you before your data becomes subject to a different privacy policy.`,
   },
   {
     title: "5. Data Security",
@@ -43,23 +43,19 @@ const sections = [
   },
   {
     title: "9. Cookies & Tracking Technologies",
-    body: `Our website uses cookies and similar tracking technologies to:\n\n• Maintain your session and remember your preferences\n• Analyse website traffic and usage patterns (using anonymized data)\n• Improve the performance and functionality of our Services\n\nWe do not use cookies for cross-site advertising or tracking. You may disable cookies in your browser settings; however, some features of the website may not function correctly without them.\n\nThe PAYVORA mobile app does not use browser cookies but may use device identifiers and analytics SDKs for crash reporting and usage analytics.`,
+    body: `Our website uses cookies and similar tracking technologies to:\n\n• Maintain your session and remember your preferences\n• Analyse website traffic and usage patterns (using anonymized data)\n• Improve the performance and functionality of our Services\n\nWe do not use cookies for cross-site advertising or tracking. You may disable cookies in your browser settings; however, some features of the website may not function correctly without them.`,
   },
   {
     title: "10. International Data Transfers",
-    body: `Your data may be processed on servers located outside Nigeria (including in the European Union and United States) by our cloud infrastructure and service providers. Where we transfer data internationally, we ensure appropriate safeguards are in place, including standard contractual clauses approved by the relevant data protection authorities, to protect your information in accordance with Nigerian data protection law.`,
+    body: `Your data may be processed on servers located outside Nigeria (including in the European Union and United States) by our cloud infrastructure and service providers. Where we transfer data internationally, we ensure appropriate safeguards are in place to protect your information in accordance with Nigerian data protection law.`,
   },
   {
-    title: "11. Third-Party Links",
-    body: `Our Services may contain links to third-party websites or services. We are not responsible for the privacy practices of those third parties. We encourage you to review the privacy policies of any third-party sites you visit. This Privacy Policy applies solely to information collected by PAYVORA.`,
+    title: "11. Changes to This Policy",
+    body: `We may update this Privacy Policy from time to time to reflect changes in our practices or applicable law. We will notify you of material changes via email or in-app notification at least 14 days before the changes take effect. Continued use of the Services after the effective date constitutes your acceptance of the updated policy.`,
   },
   {
-    title: "12. Changes to This Policy",
-    body: `We may update this Privacy Policy from time to time to reflect changes in our practices or applicable law. We will notify you of material changes via email or in-app notification at least 14 days before the changes take effect. The "Last updated" date at the top of this page indicates when the policy was last revised. Continued use of the Services after the effective date constitutes your acceptance of the updated policy.`,
-  },
-  {
-    title: "13. Contact Us",
-    body: `If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your data, please contact us:\n\nPrivacy Team: privacy@payvora.com\nGeneral Support: support@payvora.com\nLegal: legal@payvora.com\n\nWe aim to respond to all privacy-related inquiries within 72 hours. For formal data subject requests under the NDPA, we will respond within 30 days.`,
+    title: "12. Contact Us",
+    body: `If you have any questions, concerns, or requests regarding this Privacy Policy:\n\nPrivacy Team: privacy@payvora.com\nGeneral Support: support@payvora.com\nLegal: legal@payvora.com\n\nWe aim to respond to all privacy-related inquiries within 72 hours.`,
   },
 ];
 
@@ -70,7 +66,7 @@ export default function PrivacyPage() {
   }));
 
   return (
-    <main className="pt-32 pb-24 bg-[#0A0A0F] min-h-screen">
+    <main className="pt-32 pb-24 bg-white min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -79,23 +75,23 @@ export default function PrivacyPage() {
             <span className="w-2 h-2 rounded-full bg-[#00D9A0]" />
             <span className="text-[#00D9A0] text-sm font-semibold">Legal Document</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white mb-4 leading-tight">
+          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 leading-tight">
             Privacy Policy
           </h1>
-          <p className="text-[#8F8FA3] text-base">
-            Last updated: <span className="text-white font-medium">July 6, 2026</span>
+          <p className="text-gray-500 text-base">
+            Last updated: <span className="text-gray-900 font-medium">July 6, 2026</span>
           </p>
-          <p className="text-[#8F8FA3] mt-4 leading-relaxed max-w-2xl">
+          <p className="text-gray-500 mt-4 leading-relaxed max-w-2xl">
             PAYVORA is committed to protecting your privacy. This policy explains how we collect,
             use, and safeguard your information when you use our app and website.
           </p>
         </div>
 
         <div className="lg:grid lg:grid-cols-[280px_1fr] gap-16 items-start">
-          {/* Table of Contents (sticky on desktop) */}
+          {/* Table of Contents */}
           <aside className="hidden lg:block sticky top-28">
-            <div className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-6">
-              <h2 className="text-xs font-bold text-[#8F8FA3] uppercase tracking-widest mb-4">
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
                 Contents
               </h2>
               <nav className="space-y-1">
@@ -103,7 +99,7 @@ export default function PrivacyPage() {
                   <a
                     key={item.anchor}
                     href={`#${item.anchor}`}
-                    className="block text-sm text-[#8F8FA3] hover:text-[#00D9A0] py-1.5 transition-colors leading-snug"
+                    className="block text-sm text-gray-500 hover:text-[#00D9A0] py-1.5 transition-colors leading-snug"
                   >
                     {item.label}
                   </a>
@@ -118,11 +114,11 @@ export default function PrivacyPage() {
               const anchor = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
               return (
                 <section key={title} id={anchor} className="scroll-mt-32">
-                  <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
                     <span className="w-1 h-6 rounded-full bg-[#00D9A0] flex-shrink-0" />
                     {title}
                   </h2>
-                  <div className="text-[#8F8FA3] leading-relaxed whitespace-pre-line pl-4 border-l border-[#2A2A3D]">
+                  <div className="text-gray-500 leading-relaxed whitespace-pre-line pl-4 border-l border-gray-100">
                     {body}
                   </div>
                 </section>
@@ -130,29 +126,29 @@ export default function PrivacyPage() {
             })}
 
             {/* Contact card */}
-            <div className="bg-[#14141F] border border-[#2A2A3D] rounded-2xl p-8 mt-8">
-              <h2 className="text-lg font-bold text-white mb-2">Questions about your privacy?</h2>
-              <p className="text-[#8F8FA3] text-sm mb-6">
+            <div className="bg-gray-50 border border-gray-100 rounded-2xl p-8 mt-8">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Questions about your privacy?</h2>
+              <p className="text-gray-500 text-sm mb-6">
                 Our privacy team is here to help. Reach out and we&apos;ll respond within 72 hours.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href="mailto:privacy@payvora.com"
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#00D9A0] text-[#0A0A0F] text-sm font-semibold rounded-xl hover:bg-[#00C490] transition-colors"
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors"
                 >
                   privacy@payvora.com
                 </a>
                 <a
                   href="mailto:support@payvora.com"
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1C1C2A] border border-[#2A2A3D] text-[#8F8FA3] text-sm font-semibold rounded-xl hover:text-white hover:border-[#3A3A5D] transition-colors"
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:border-gray-300 transition-colors"
                 >
                   support@payvora.com
                 </a>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-[#2A2A3D]">
-              <p className="text-[#8F8FA3] text-sm">
+            <div className="pt-8 border-t border-gray-100">
+              <p className="text-gray-500 text-sm">
                 This Privacy Policy applies to all users of the PAYVORA mobile application and website.
                 For our full legal terms, see our{" "}
                 <Link href="/terms" className="text-[#00D9A0] hover:underline">Terms of Service</Link>.
