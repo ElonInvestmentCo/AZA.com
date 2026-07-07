@@ -154,7 +154,7 @@ export default function HelpCenterPage() {
                   <span className="text-2xl">{icon}</span>
                   <div>
                     <h3 className="text-gray-900 font-bold">{title}</h3>
-                    <p className="text-gray-400 text-xs">{count} articles</p>
+                    <p className="text-gray-500 text-xs">{count} articles</p>
                   </div>
                 </div>
                 <ul className="space-y-2.5">

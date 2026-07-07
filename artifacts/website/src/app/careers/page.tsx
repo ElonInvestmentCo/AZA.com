@@ -130,7 +130,7 @@ export default function CareersPage() {
                     </div>
                     <h3 className="text-gray-900 font-bold text-xl mb-2">{title}</h3>
                     <p className="text-gray-500 text-sm leading-relaxed mb-4">{description}</p>
-                    <div className="flex flex-wrap gap-4 text-xs text-gray-400">
+                    <div className="flex flex-wrap gap-4 text-xs text-gray-500">
                       <div className="flex items-center gap-1.5">
                         <MapPin size={12} />
                         {location}

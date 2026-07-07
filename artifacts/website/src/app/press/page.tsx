@@ -118,17 +118,17 @@ export default function PressPage() {
               >
                 <div>
                   <p className="text-gray-900 font-semibold text-sm">{name}</p>
-                  <p className="text-gray-400 text-xs mt-0.5">
+                  <p className="text-gray-500 text-xs mt-0.5">
                     {type} · {size}
                   </p>
                 </div>
-                <button
-                  onClick={() => {}}
-                  aria-label={`Download ${name}`}
-                  className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#00D9A0] hover:border-[#00D9A0] transition-all"
+                <span
+                  aria-label={`${name} (coming soon)`}
+                  title="Download available soon"
+                  className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-300 cursor-not-allowed"
                 >
                   <Download size={15} />
-                </button>
+                </span>
               </div>
             ))}
           </div>
@@ -160,7 +160,7 @@ export default function PressPage() {
                   <p className="text-gray-900 font-semibold leading-snug mb-1 group-hover:text-[#00D9A0] transition-colors">
                     {headline}
                   </p>
-                  <p className="text-gray-400 text-xs">{date}</p>
+                  <p className="text-gray-500 text-xs">{date}</p>
                 </div>
                 <ExternalLink size={15} className="text-gray-400 flex-shrink-0 mt-1" />
               </a>

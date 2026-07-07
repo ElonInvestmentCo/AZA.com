@@ -132,7 +132,7 @@ export default function BlogPage() {
                   <span className="text-xs font-bold text-[#00D9A0] bg-[rgba(0,217,160,0.1)] px-2.5 py-1 rounded-lg">
                     {featured.category}
                   </span>
-                  <span className="text-xs text-gray-400 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100">
+                  <span className="text-xs text-gray-500 bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100">
                     Featured
                   </span>
                 </div>
@@ -143,7 +143,7 @@ export default function BlogPage() {
                   {featured.excerpt}
                 </p>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-xs text-gray-400">
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
                     <div className="flex items-center gap-1.5">
                       <Clock size={12} /> {featured.readTime}
                     </div>
@@ -172,7 +172,7 @@ export default function BlogPage() {
                   {title}
                 </h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-5">{excerpt}</p>
-                <div className="flex items-center gap-3 text-xs text-gray-400">
+                <div className="flex items-center gap-3 text-xs text-gray-500">
                   <div className="flex items-center gap-1.5">
                     <Clock size={11} /> {readTime}
                   </div>
