@@ -1,0 +1,90 @@
+URGENT: Fix the mobile authentication flow immediately.
+
+Current issue:
+
+After tapping "Google Login", the in-app browser opens but immediately displays "Internal Server Error" instead of the Google sign-in page.
+
+This is a blocking production issue.
+
+Perform a complete root-cause analysis instead of applying temporary fixes.
+
+Verify the following in order:
+
+1. Google OAuth configuration
+- Verify the correct Google Web Client ID is being used.
+- Verify all OAuth environment variables are loaded correctly.
+- Ensure no placeholder or incorrect client IDs are being used.
+- Confirm the OAuth consent screen is configured correctly.
+
+2. Backend authentication
+- Verify the Google callback endpoint exists and is reachable.
+- Verify the callback returns the expected response.
+- Check server logs for the exact error and stack trace.
+- Fix any 500 Internal Server Errors.
+- Ensure all required middleware is configured.
+
+3. Website and API
+- Verify https://www.payvora.org/api/auth/google
+- Verify https://www.payvora.org/api/auth/google/callback
+- Verify every authentication endpoint returns the expected status code.
+- Confirm Railway is running the latest deployment.
+- Confirm the API is healthy.
+
+4. Environment variables
+Verify every required variable exists and is loaded:
+
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+- EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+- JWT_SECRET
+- SESSION_SECRET
+- APPLE_BUNDLE_ID (if required)
+- EXPO_PUBLIC_API_URL
+- Any OAuth redirect URLs
+
+If any are missing, stop and ask me in chat.
+
+5. Redirect URIs
+Verify every redirect URI matches exactly.
+
+Examples:
+
+https://www.payvora.org/api/auth/google/callback
+
+Verify there are no old Replit URLs, localhost URLs, or outdated callback URLs remaining anywhere in the project.
+
+6. Mobile authentication flow
+Trace the entire flow:
+
+Login button
+→ OAuth request
+→ Google
+→ Callback
+→ Token exchange
+→ Session creation
+→ Return to app
+
+Identify exactly where it fails.
+
+7. Logging
+Add detailed logging for:
+
+- OAuth request
+- Callback
+- Token exchange
+- Session creation
+- Authentication errors
+
+Do not expose secrets in logs.
+
+8. Production verification
+After fixing:
+
+- Test Google Login from the mobile app.
+- Confirm the Google sign-in page loads successfully.
+- Confirm successful login.
+- Confirm user session persists.
+- Confirm logout works.
+- Confirm no Internal Server Error occurs.
+
+Do not use workarounds or disable authentication. Find and fix the underlying cause, then explain exactly what was wrong, what was changed, and how it was verified.

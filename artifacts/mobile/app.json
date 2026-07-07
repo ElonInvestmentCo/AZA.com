@@ -49,7 +49,8 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "webClientId": "419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq.apps.googleusercontent.com"
+          "webClientId": "419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq.apps.googleusercontent.com",
+          "iosUrlScheme": "com.googleusercontent.apps.419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq"
         }
       ],
       "expo-apple-authentication"
