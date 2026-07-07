@@ -76,7 +76,12 @@ packages = ["nano", "lsof"]
 PORT = "8080"
 EXPO_PUBLIC_DOMAIN = "www.payvora.org"
 RELOADLY_ENV = "topup-prod"
-NODE_ENV = "development"
 INTERNAL_API_URL = "http://localhost:8080"
 GOOGLE_CALLBACK_URL = "https://www.payvora.org/api/auth/google/callback"
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID = "419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq.apps.googleusercontent.com"
+
+[userenv.development]
+NODE_ENV = "development"
+
+[userenv.production]
+NODE_ENV = "production"

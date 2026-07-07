@@ -19,8 +19,14 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Required env: `DATABASE_URL` — Postgres connection string (runtime-managed by Replit)
+- Required env: `JWT_SECRET` — secret key for signing/verifying JWT auth tokens
+- Required env: `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` — Google OAuth credentials (server-side)
+- Required env: `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — Google OAuth client ID for mobile/web
+- Required env: `GOOGLE_CALLBACK_URL` — Google OAuth redirect URI (set in shared env, e.g. `https://www.payvora.org/api/auth/google/callback`)
 - Required env: `RELOADLY_CLIENT_ID` + `RELOADLY_CLIENT_SECRET` — needed for bill payment and eSIM routes (`/api/bills/*`, `/api/esim/*`)
+- Optional env: `GOOGLE_SITE_VERIFICATION` — Google Search Console meta tag for the website
+- Note: `NODE_ENV` is set to `development` in the shared env (for local workflows) and `production` in the production env (for deployments)
 
 ## Stack
 
