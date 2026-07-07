@@ -70,7 +70,7 @@ const SERVICES = [
   { id: "elec",    label: "Electricity",   bg: "#FFF7ED", iconColor: "#D97706", route: "/(app)/electricity"  as const        },
   { id: "cable",   label: "Cable TV",      bg: "#FFF1F2", iconColor: "#E11D48", route: "/(app)/cable"        as const        },
   { id: "rates",   label: "Rates",         bg: "#F5F3FF", iconColor: "#7C3AED", route: "/(app)/rates"        as const        },
-  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(app)/transactions" as const        },
+  { id: "txn",     label: "Transactions",  bg: "#EFF6FF", iconColor: "#2563EB", route: "/(tabs)/history"     as const        },
   { id: "bet",     label: "Betting",       bg: "#ECFEFF", iconColor: "#0891B2", route: "/(app)/betting"      as const        },
   { id: "funding", label: "Funding",       bg: "#EBF3FF", iconColor: "#1D6ECC", route: "/(app)/dashboard"   as const        },
   { id: "more",    label: "More",          bg: "#F0EEFF", iconColor: "#7C3AED", route: "/(app)/more"         as const        },
@@ -362,7 +362,7 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInUp.duration(300).springify().delay(220)}>
           <View style={s.secHdr}>
             <Text style={s.secTitle}>Recent Transaction</Text>
-            <TouchableOpacity onPress={press(() => router.push("/(app)/transactions" as any))}>
+            <TouchableOpacity onPress={press(() => router.push("/(tabs)/history" as any))}>
               <Text style={s.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -375,7 +375,7 @@ export default function HomeScreen() {
               >
                 <TxRow
                   item={item}
-                  onPress={press(() => router.push("/(app)/transactions" as any))}
+                  onPress={press(() => router.push("/(tabs)/history" as any))}
                 />
                 {i < TRANSACTIONS.length - 1 && <View style={s.txDivider} />}
               </Animated.View>
@@ -389,6 +389,7 @@ export default function HomeScreen() {
         visible={giftModalVisible}
         onClose={() => setGiftModalVisible(false)}
         sheetStyle={gm.sheet}
+        maxHeight="50%"
       >
         <View style={gm.sheetHeader}>
           <Text style={gm.sheetTitle}>I want to?</Text>

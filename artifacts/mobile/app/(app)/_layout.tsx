@@ -9,6 +9,7 @@ export default function AppLayout() {
       <Stack.Screen name="confirm-transaction" />
       <Stack.Screen name="submitted" />
       <Stack.Screen name="rejected" />
+      {/* transactions screen → redirects to (tabs)/history */}
       <Stack.Screen name="transactions" />
       <Stack.Screen name="card-status" />
       <Stack.Screen name="sell-gift-card" />

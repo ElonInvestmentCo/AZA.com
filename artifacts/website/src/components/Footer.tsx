@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Twitter, Instagram, Facebook, Youtube } from "lucide-react";
 
@@ -48,11 +49,12 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center mb-4">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/payvora-wordmark.svg"
                 alt="PAYVORA"
-                style={{ height: "38px", width: "auto", filter: "brightness(0)" }}
+                width={140}
+                height={38}
+                style={{ filter: "brightness(0)" }}
               />
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs mb-6">

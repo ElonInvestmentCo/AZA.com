@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -43,11 +44,13 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/payvora-wordmark.svg"
               alt="PAYVORA"
-              style={{ height: "72px", width: "auto", filter: "brightness(0)" }}
+              width={180}
+              height={72}
+              style={{ filter: "brightness(0)" }}
+              priority
             />
           </Link>
 
