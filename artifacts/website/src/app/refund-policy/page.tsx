@@ -51,17 +51,17 @@ const sections = [
 
 export default function RefundPolicyPage() {
   return (
-    <main className="pt-32 pb-24 bg-[#0A0A0F] min-h-screen">
+    <main className="pt-32 pb-24 bg-white min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
           Refund Policy
         </h1>
-        <p className="text-[#8F8FA3] mb-12">Last updated: June 30, 2026</p>
+        <p className="text-gray-500 mb-12">Last updated: June 30, 2026</p>
         <div className="space-y-10">
           {sections.map(({ title, body }) => (
             <section key={title}>
-              <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
-              <p className="text-[#8F8FA3] leading-relaxed whitespace-pre-line">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
+              <p className="text-gray-500 leading-relaxed whitespace-pre-line">
                 {body}
               </p>
             </section>

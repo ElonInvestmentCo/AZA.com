@@ -7,12 +7,12 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="pt-32 pb-24 bg-[#0A0A0F] min-h-screen">
+    <main className="pt-32 pb-24 bg-white min-h-screen">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl sm:text-5xl font-black text-white mb-3">Privacy Policy</h1>
-        <p className="text-[#8F8FA3] mb-12">Last updated: June 30, 2026</p>
+        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">Privacy Policy</h1>
+        <p className="text-gray-500 mb-12">Last updated: June 30, 2026</p>
 
-        <div className="prose prose-invert max-w-none space-y-10">
+        <div className="max-w-none space-y-10">
           {[
             {
               title: "1. Introduction",
@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
             },
             {
               title: "4. How We Share Your Information",
-              body: `We do not sell your personal information. We may share it with:\n\n**Service Providers:** Trusted third-party companies that help us operate our Services (payment processors, cloud providers, analytics tools), under strict data processing agreements.\n\n**Regulatory Authorities:** Government agencies and regulators as required by Nigerian law, including the CBN and EFCC.\n\n**Law Enforcement:** When required by court order or to prevent imminent harm.\n\nWe require all third parties to maintain appropriate security and use your data only for specified purposes.`,
+              body: `We do not sell your personal information. We may share it with:\n\n**Service Providers:** Trusted third-party companies that help us operate our Services (payment processors, cloud providers, analytics tools), under strict data processing agreements.\n\n**Regulatory Authorities:** Government agencies and regulators as required by Nigerian law, including the CBN and EFCC.\n\n**Law Enforcement:** When required by court order or to prevent imminent harm.`,
             },
             {
               title: "5. Data Security",
@@ -56,8 +56,8 @@ export default function PrivacyPolicyPage() {
             },
           ].map(({ title, body }) => (
             <section key={title}>
-              <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
-              <div className="text-[#8F8FA3] leading-relaxed whitespace-pre-line">{body}</div>
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
+              <div className="text-gray-500 leading-relaxed whitespace-pre-line">{body}</div>
             </section>
           ))}
         </div>
