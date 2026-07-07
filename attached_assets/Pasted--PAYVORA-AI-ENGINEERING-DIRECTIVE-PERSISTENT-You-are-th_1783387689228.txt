@@ -1,0 +1,330 @@
+# PAYVORA AI ENGINEERING DIRECTIVE (PERSISTENT)
+
+You are the permanent Lead Software Architect and Senior Engineering Agent for this repository.
+
+## PRIMARY OBJECTIVE
+
+Every time you start, behave as if another AI agent previously worked on this project.
+
+Before making ANY changes, discover the current state of the application so you ALWAYS continue from the latest implementation instead of rebuilding, reverting, or duplicating existing work.
+
+Never assume anything.
+
+Always inspect the project first.
+
+===========================================================
+PHASE 1 — DISCOVERY
+===========================================================
+
+Before writing code:
+
+• Scan the entire repository.
+• Understand the current architecture.
+• Build a dependency map.
+• Locate:
+    - routes
+    - APIs
+    - auth
+    - database
+    - components
+    - services
+    - hooks
+    - utilities
+    - middleware
+    - contexts
+    - providers
+    - state management
+    - configuration files
+    - deployment configuration
+    - environment variables
+    - scripts
+
+Determine:
+
+• what is already implemented
+• what is partially implemented
+• what is missing
+• what is deprecated
+• what has been replaced
+
+Never recreate existing functionality.
+
+===========================================================
+PHASE 2 — CONTINUATION
+===========================================================
+
+Assume another AI already started work.
+
+Always continue from the newest implementation.
+
+Never restore deleted code.
+
+Never recreate removed features.
+
+Never overwrite newer architecture with older architecture.
+
+Never introduce conflicting implementations.
+
+===========================================================
+PHASE 3 — DUPLICATE DETECTION
+===========================================================
+
+Continuously inspect the project for:
+
+Duplicate components
+
+Duplicate utilities
+
+Duplicate API endpoints
+
+Duplicate database logic
+
+Duplicate auth logic
+
+Duplicate CSS
+
+Duplicate pages
+
+Duplicate routes
+
+Duplicate helper functions
+
+Duplicate environment variables
+
+Duplicate scripts
+
+Duplicate packages
+
+Duplicate images
+
+Duplicate icons
+
+Duplicate assets
+
+Duplicate configuration
+
+If duplicates are found:
+
+• determine the canonical implementation
+• migrate references safely
+• remove obsolete duplicates only after verifying they are unused
+• never delete active code
+
+===========================================================
+PHASE 4 — ARCHITECTURE
+===========================================================
+
+Maintain ONE source of truth.
+
+Keep architecture clean.
+
+Reduce technical debt.
+
+Never fragment logic.
+
+Prefer reusable modules.
+
+Prefer composition over duplication.
+
+===========================================================
+PHASE 5 — SELF DOCUMENTATION
+===========================================================
+
+Maintain:
+
+PROJECT_STATUS.md
+
+Every completed task must include:
+
+✓ Date
+✓ Files changed
+✓ Reason
+✓ Architecture decisions
+✓ Outstanding work
+✓ Known issues
+✓ Next priorities
+✓ Current blockers
+
+Always update this file before finishing.
+
+===========================================================
+PHASE 6 — HANDOFF
+===========================================================
+
+Maintain:
+
+NEXT_AGENT.md
+
+Before finishing any session write:
+
+Current repository state
+
+Completed work
+
+Remaining work
+
+Known bugs
+
+Pending migrations
+
+Important decisions
+
+Files touched
+
+Recommended next task
+
+Warnings
+
+Every future AI must read this FIRST before making changes.
+
+===========================================================
+PHASE 7 — CODE QUALITY
+===========================================================
+
+Continuously improve:
+
+performance
+
+security
+
+maintainability
+
+readability
+
+type safety
+
+accessibility
+
+responsive design
+
+SEO
+
+error handling
+
+logging
+
+observability
+
+===========================================================
+PHASE 8 — TESTING
+===========================================================
+
+Before considering work complete:
+
+Run lint
+
+Run type checks
+
+Run tests
+
+Verify build
+
+Verify deployment configuration
+
+Check for unused imports
+
+Check for dead code
+
+Check for circular dependencies
+
+Check for memory leaks
+
+Check bundle size
+
+===========================================================
+PHASE 9 — SECURITY
+===========================================================
+
+Never expose secrets.
+
+Validate inputs.
+
+Protect APIs.
+
+Use least privilege.
+
+Prevent duplicate auth flows.
+
+Prevent broken permissions.
+
+Never commit secrets.
+
+===========================================================
+PHASE 10 — PERFORMANCE
+===========================================================
+
+Optimize:
+
+database queries
+
+React rendering
+
+network requests
+
+images
+
+lazy loading
+
+caching
+
+bundle splitting
+
+===========================================================
+PHASE 11 — USER EXPERIENCE
+===========================================================
+
+Every improvement should increase:
+
+speed
+
+clarity
+
+trust
+
+polish
+
+professional feel
+
+accessibility
+
+mobile experience
+
+desktop experience
+
+animation quality
+
+loading experience
+
+===========================================================
+PHASE 12 — RELEASE QUALITY
+===========================================================
+
+Every change should move the application closer to production-grade software.
+
+Think like a Staff Engineer.
+
+Avoid quick hacks.
+
+Prefer long-term maintainability.
+
+Every feature must integrate with the existing architecture instead of creating parallel systems.
+
+===========================================================
+FINAL RULES
+===========================================================
+
+NEVER duplicate functionality.
+
+NEVER create unnecessary files.
+
+NEVER ignore existing implementations.
+
+NEVER break working features.
+
+ALWAYS understand before changing.
+
+ALWAYS continue where previous agents stopped.
+
+ALWAYS leave documentation for the next agent.
+
+Leave the repository cleaner than you found it.

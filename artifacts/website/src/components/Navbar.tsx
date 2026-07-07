@@ -11,10 +11,18 @@ const products = [
   { label: "Airtime & Data", href: "/airtime-data" },
 ];
 
+const company = [
+  { label: "About", href: "/about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Careers", href: "/careers" },
+  { label: "Press", href: "/press" },
+];
+
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -45,13 +53,13 @@ export function Navbar() {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
             {/* Products Dropdown */}
-            <div className="relative group">
+            <div className="relative">
               <button
                 className="flex items-center gap-1 text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
                 onMouseEnter={() => setProductsOpen(true)}
                 onMouseLeave={() => setProductsOpen(false)}
               >
-                Products <ChevronDown size={14} />
+                Products <ChevronDown size={14} className={`transition-transform ${productsOpen ? "rotate-180" : ""}`} />
               </button>
               {productsOpen && (
                 <div
@@ -63,7 +71,7 @@ export function Navbar() {
                     <Link
                       key={p.href}
                       href={p.href}
-                      className="block px-4 py-2.5 text-sm text-[#8F8FA3] hover:text-white hover:bg-[#2A2A3D] transition-colors"
+                      className="block px-4 py-2.5 text-sm text-[#8F8FA3] hover:text-white hover:bg-[#2A2A3D] transition-colors rounded-xl mx-1"
                     >
                       {p.label}
                     </Link>
@@ -71,6 +79,7 @@ export function Navbar() {
                 </div>
               )}
             </div>
+
             <Link
               href="/features"
               className="text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
@@ -78,22 +87,45 @@ export function Navbar() {
               Features
             </Link>
             <Link
-              href="/security"
+              href="/pricing"
               className="text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
             >
-              Security
+              Pricing
             </Link>
+
+            {/* Company Dropdown */}
+            <div className="relative">
+              <button
+                className="flex items-center gap-1 text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
+                onMouseEnter={() => setCompanyOpen(true)}
+                onMouseLeave={() => setCompanyOpen(false)}
+              >
+                Company <ChevronDown size={14} className={`transition-transform ${companyOpen ? "rotate-180" : ""}`} />
+              </button>
+              {companyOpen && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-40 bg-[#1C1C2A] border border-[#2A2A3D] rounded-2xl shadow-2xl py-2 z-50"
+                  onMouseEnter={() => setCompanyOpen(true)}
+                  onMouseLeave={() => setCompanyOpen(false)}
+                >
+                  {company.map((p) => (
+                    <Link
+                      key={p.href}
+                      href={p.href}
+                      className="block px-4 py-2.5 text-sm text-[#8F8FA3] hover:text-white hover:bg-[#2A2A3D] transition-colors rounded-xl mx-1"
+                    >
+                      {p.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <Link
-              href="/faq"
+              href="/help-center"
               className="text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
             >
-              FAQ
-            </Link>
-            <Link
-              href="/contact"
-              className="text-[#8F8FA3] hover:text-white transition-colors text-sm font-medium"
-            >
-              Contact
+              Help
             </Link>
           </nav>
 
@@ -122,6 +154,7 @@ export function Navbar() {
       {open && (
         <div className="lg:hidden bg-[#14141F] border-t border-[#2A2A3D]">
           <div className="px-4 py-6 space-y-1">
+            <p className="px-4 pt-2 pb-1 text-xs font-bold text-[#8F8FA3] uppercase tracking-widest">Products</p>
             {products.map((p) => (
               <Link
                 key={p.href}
@@ -132,34 +165,38 @@ export function Navbar() {
                 {p.label}
               </Link>
             ))}
-            <Link
-              href="/features"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
-            >
-              Features
-            </Link>
-            <Link
-              href="/security"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
-            >
-              Security
-            </Link>
-            <Link
-              href="/faq"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
-            >
-              FAQ
-            </Link>
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
-            >
-              Contact
-            </Link>
+            <div className="pt-2">
+              <p className="px-4 pt-2 pb-1 text-xs font-bold text-[#8F8FA3] uppercase tracking-widest">Explore</p>
+              {[
+                { label: "Features", href: "/features" },
+                { label: "Pricing", href: "/pricing" },
+                { label: "Security", href: "/security" },
+                { label: "FAQ", href: "/faq" },
+                { label: "Help Center", href: "/help-center" },
+              ].map((p) => (
+                <Link
+                  key={p.href}
+                  href={p.href}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
+                >
+                  {p.label}
+                </Link>
+              ))}
+            </div>
+            <div className="pt-2">
+              <p className="px-4 pt-2 pb-1 text-xs font-bold text-[#8F8FA3] uppercase tracking-widest">Company</p>
+              {company.map((p) => (
+                <Link
+                  key={p.href}
+                  href={p.href}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-3 text-[#8F8FA3] hover:text-white hover:bg-[#1C1C2A] rounded-xl transition-colors"
+                >
+                  {p.label}
+                </Link>
+              ))}
+            </div>
             <div className="pt-4">
               <Link
                 href="/download"

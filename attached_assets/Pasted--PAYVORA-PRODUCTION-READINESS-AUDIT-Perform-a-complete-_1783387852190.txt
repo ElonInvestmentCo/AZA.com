@@ -1,0 +1,396 @@
+# PAYVORA PRODUCTION READINESS AUDIT
+
+Perform a complete end-to-end production audit of the entire application.
+
+Do NOT assume anything.
+Verify every configuration directly from the codebase, environment variables, build configuration, deployment settings, and production endpoints.
+
+If something is missing, fix it safely.
+If something is incorrect, explain why before changing it.
+Never duplicate existing functionality.
+Never overwrite newer implementations.
+Never remove code unless it has been verified as completely unused.
+
+====================================================
+1. DOMAIN & REDIRECTS
+====================================================
+
+Verify:
+
+✓ https://payvora.org permanently redirects (301) to https://www.payvora.org
+✓ http://payvora.org redirects to https://www.payvora.org
+✓ http://www.payvora.org redirects to https://www.payvora.org
+✓ No redirect loops
+✓ No mixed-content warnings
+✓ Canonical domain is https://www.payvora.org
+✓ All internal links use the canonical domain
+
+====================================================
+2. HTTPS & SSL
+====================================================
+
+Verify:
+
+✓ HTTPS certificate is valid
+✓ Certificate chain is correct
+✓ No browser SSL warnings
+✓ HSTS enabled
+✓ HTTPS enforced everywhere
+
+====================================================
+3. GOOGLE AUTH
+====================================================
+
+Verify the entire Google OAuth flow.
+
+Confirm:
+
+✓ GOOGLE_CLIENT_ID
+✓ GOOGLE_CLIENT_SECRET
+✓ GOOGLE_CALLBACK_URL
+✓ EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+
+Verify:
+
+✓ Google Sign In
+✓ Google Sign Up
+✓ Existing user login
+✓ New account creation
+✓ Session persistence
+✓ Logout
+✓ Refresh token handling
+
+Ensure callback URLs exactly match Google Cloud Console.
+
+====================================================
+4. ENVIRONMENT VARIABLES
+====================================================
+
+Compare Replit Secrets and Railway Variables.
+
+Report:
+
+Missing variables
+
+Extra variables
+
+Duplicate variables
+
+Incorrect values
+
+Unused variables
+
+Sensitive variables accidentally exposed
+
+Generate a production environment report.
+
+====================================================
+5. SEO
+====================================================
+
+Verify:
+
+✓ Metadata
+✓ Canonical URLs
+✓ Open Graph
+✓ Twitter Cards
+✓ Structured Data (Schema.org)
+✓ Favicons
+✓ Apple Touch Icons
+✓ robots.txt
+✓ sitemap.xml
+✓ Manifest
+✓ Theme colors
+✓ Social preview images
+
+====================================================
+6. PWA
+====================================================
+
+Verify:
+
+✓ installability
+✓ offline support
+✓ service worker
+✓ manifest.json
+✓ splash screens
+✓ adaptive icons
+✓ app icons
+✓ shortcuts
+✓ display mode
+✓ standalone behavior
+
+====================================================
+7. SECURITY
+====================================================
+
+Verify:
+
+✓ CSP
+✓ HSTS
+✓ X-Frame-Options
+✓ X-Content-Type-Options
+✓ Referrer Policy
+✓ Permissions Policy
+✓ CSRF protection
+✓ Rate limiting
+✓ Input validation
+✓ Authentication
+✓ Authorization
+✓ Secure cookies
+✓ CORS configuration
+
+Report any vulnerabilities.
+
+====================================================
+8. PERFORMANCE
+====================================================
+
+Audit:
+
+✓ bundle size
+✓ lazy loading
+✓ image optimization
+✓ code splitting
+✓ caching
+✓ API response time
+✓ database queries
+✓ React rendering
+✓ memory usage
+✓ unnecessary re-renders
+✓ unused packages
+
+Optimize where possible.
+
+====================================================
+9. CODE QUALITY
+====================================================
+
+Search the ENTIRE repository for:
+
+Duplicate pages
+
+Duplicate routes
+
+Duplicate components
+
+Duplicate hooks
+
+Duplicate utilities
+
+Duplicate APIs
+
+Duplicate middleware
+
+Duplicate providers
+
+Duplicate context
+
+Duplicate auth logic
+
+Duplicate environment variables
+
+Duplicate services
+
+Duplicate assets
+
+Duplicate icons
+
+Duplicate styles
+
+Duplicate database logic
+
+Duplicate scripts
+
+Report every duplicate.
+
+Only remove duplicates after verifying they are completely unused.
+
+====================================================
+10. UNUSED CODE
+====================================================
+
+Detect:
+
+Dead code
+
+Unused imports
+
+Unused exports
+
+Unused components
+
+Unused routes
+
+Unused images
+
+Unused icons
+
+Unused packages
+
+Unused dependencies
+
+Unused environment variables
+
+Unused CSS
+
+Remove only after verification.
+
+====================================================
+11. BUILD HEALTH
+====================================================
+
+Run:
+
+✓ lint
+✓ type check
+✓ unit tests
+✓ integration tests
+✓ production build
+
+Fix:
+
+Warnings
+
+Errors
+
+Broken imports
+
+Type issues
+
+Hydration issues
+
+Runtime exceptions
+
+====================================================
+12. USER EXPERIENCE
+====================================================
+
+Verify every screen for:
+
+Responsive layout
+
+Dark mode
+
+Animations
+
+Loading states
+
+Empty states
+
+Error states
+
+Accessibility
+
+Keyboard navigation
+
+Touch gestures
+
+Tablet compatibility
+
+Desktop compatibility
+
+====================================================
+13. FINANCIAL APP EXPERIENCE
+====================================================
+
+Verify that Notifications and Transaction History behave like a premium banking/trading application.
+
+Notifications:
+
+✓ grouped by date
+✓ unread indicator
+✓ mark as read
+✓ delete
+✓ archive
+✓ pull-to-refresh
+✓ infinite scrolling
+✓ search
+✓ filters
+
+Transactions:
+
+✓ grouped by month/date
+✓ status timeline
+✓ merchant icons
+✓ receipt download
+✓ search
+✓ advanced filters
+✓ pagination
+✓ export support
+
+====================================================
+14. FINAL REPORT
+====================================================
+
+Generate a Production Readiness Report including:
+
+Production Score (/100)
+
+Critical Issues
+
+High Priority Issues
+
+Medium Priority Issues
+
+Low Priority Issues
+
+Security Score
+
+Performance Score
+
+Accessibility Score
+
+SEO Score
+
+PWA Score
+
+Code Quality Score
+
+Architecture Score
+
+Technical Debt Summary
+
+Deployment Readiness
+
+Estimated App Store Readiness
+
+Estimated Google Play Readiness
+
+====================================================
+15. DOCUMENTATION
+====================================================
+
+Before finishing:
+
+Update PROJECT_STATUS.md
+
+Update NEXT_AGENT.md
+
+Update CHANGELOG.md
+
+Document:
+
+Everything verified
+
+Everything fixed
+
+Everything remaining
+
+Recommendations
+
+Future improvements
+
+====================================================
+FINAL RULES
+====================================================
+
+Never recreate existing functionality.
+
+Never revert newer implementations.
+
+Never introduce duplicate systems.
+
+Always continue from the current architecture.
+
+Leave the repository cleaner, faster, safer, and more maintainable than you found it.
