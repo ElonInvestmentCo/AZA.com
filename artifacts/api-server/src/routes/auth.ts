@@ -317,7 +317,7 @@ router.get("/auth/google/callback", async (req, res) => {
     res.redirect(`mobile://auth?token=${encodeURIComponent(token)}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Authentication failed";
-    logger.error({ err }, "[Google OAuth callback] error");
+    try { logger.error({ err }, "[Google OAuth callback] error"); } catch { console.error("[Google OAuth callback] error", err); }
     res.redirect(`mobile://auth?error=${encodeURIComponent(msg)}`);
   }
 });

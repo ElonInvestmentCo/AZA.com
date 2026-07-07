@@ -1,5 +1,5 @@
 [build]
-buildCommand = "pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/website run build && pnpm --filter payvora-landing run build"
+buildCommand = "pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/website run build"
 
 [deploy]
 startCommand = "node start.mjs"

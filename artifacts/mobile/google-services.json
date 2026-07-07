@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "361130131715",
+    "project_id": "payvora-2026",
+    "storage_bucket": "payvora-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361130131715:android:f4c0288436699c58c5e936",
+        "android_client_info": {
+          "package_name": "com.payvora.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIpCrs2lQdaUM29x3xPIhe_CraREHWKJM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
