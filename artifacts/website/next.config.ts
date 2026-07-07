@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@payvora/ui", "@payvora/theme", "@payvora/shared", "@payvora/icons"],
   images: {
     remotePatterns: [],
   },

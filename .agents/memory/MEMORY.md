@@ -8,3 +8,4 @@
 - [Monorepo website architecture](monorepo-website-arch.md) — artifacts/website is Next.js 15 + Tailwind v4 + @tailwindcss/postcss on port 5000; replaces "AZA Mobile Web" workflow; all legacy Expo web files (server/, static-build/, web-proxy.mjs) preserved — audit before removal.
 - [Reloadly Utility API](reloadly-utility-api.md) — utility bill payments need `Accept: application/com.reloadly.utilities-v1+json` or 406s silently; also biller availability is per-merchant-account, not universal.
 - [DB schema layout](db-schema-layout.md) — four tables: users, sessions, wallets, transactions; all amounts in kobo (÷100 = naira); sessions.token stored plaintext (hash it before prod auth); FK indexes on sessions.user_id and transactions.user_id/created_at.
+- [Next.js build NODE_ENV fix](nextjs-build-node-env.md) — build script MUST be `NODE_ENV=production next build`; Replit dev env poisons Next.js's Html context check causing 500 on /404 prerender.
