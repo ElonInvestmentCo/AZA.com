@@ -1,0 +1,138 @@
+Redesign the website to use a bright, premium white interface instead of the current dark theme.
+
+The goal is to create a clean, modern fintech experience that immediately feels trustworthy, premium, fast and easy to use.
+
+DESIGN DIRECTION
+
+• Replace the dark background with a clean white background throughout the website.
+• Use generous white space to make every section feel open and premium.
+• Keep the PayVora brand colors as accent colors instead of making the interface dark.
+• Use black or dark charcoal text for readability.
+• Use very light gray (#F7F8FA or similar) for section backgrounds where contrast is needed.
+• Add soft shadows instead of dark borders.
+• Use subtle rounded corners (14–20px) consistently.
+
+LAYOUT
+
+Create a simple hierarchy:
+
+• Sticky navigation with plenty of spacing.
+• Large hero section.
+• Clean feature sections.
+• Premium cards.
+• Professional footer.
+• Consistent vertical spacing between sections.
+
+TYPOGRAPHY
+
+• Large bold headings.
+• Clean modern font.
+• Comfortable line spacing.
+• Short readable paragraphs.
+• Strong visual hierarchy.
+
+BUTTONS
+
+Primary button
+
+• Brand green background
+• White text
+• Rounded corners
+• Smooth hover animation
+• Slight elevation on hover
+
+Secondary button
+
+• White background
+• Thin gray border
+• Dark text
+• Soft hover state
+
+CARDS
+
+Every card should have:
+
+• White background
+• Large border radius
+• Soft shadow
+• Thin light-gray border
+• Smooth hover elevation
+• Plenty of internal padding
+
+INPUTS
+
+Use premium authentication-style inputs.
+
+• White fill
+• Very light gray border
+• Large rounded corners
+• Comfortable height
+• Clean placeholder text
+• Subtle focus glow using the brand color
+
+NAVIGATION
+
+The navigation should feel minimal.
+
+• White background
+• Sticky
+• Soft bottom border
+• Smooth dropdowns
+• Premium hover animations
+
+HERO SECTION
+
+Design a premium fintech landing page featuring:
+
+• Large headline
+• Supporting description
+• Primary and secondary call-to-action buttons
+• Modern phone mockup
+• Floating UI cards
+• Soft gradients
+• Minimal decorative elements
+
+VISUAL STYLE
+
+Use:
+
+• White
+• Soft gray
+• Brand green
+• Dark charcoal
+• Minimal gradients
+
+Avoid heavy dark backgrounds.
+
+ANIMATIONS
+
+Use subtle animations only.
+
+• Fade in on scroll
+• Smooth hover effects
+• Button micro-interactions
+• Card lift
+• Smooth page transitions
+
+OVERALL FEEL
+
+The interface should feel:
+
+• Premium
+• Minimal
+• Luxury fintech
+• Clean
+• Modern
+• Fast
+• Professional
+• High-end
+• Trustworthy
+
+QUALITY REQUIREMENTS
+
+• Remove the previous dark theme completely.
+• Ensure every page follows the same design system.
+• Eliminate inconsistent spacing, colors, and typography.
+• Reuse shared components instead of creating duplicates.
+• Maintain excellent responsiveness across desktop, tablet, and mobile.
+• Ensure accessibility, fast performance, and a production-ready build with zero errors.

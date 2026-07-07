@@ -45,7 +45,7 @@ const C = {
 };
 
 /* ─── Transaction type ───────────────────────────────────────────────────── */
-type TxStatus = "completed" | "pending" | "failed";
+type TxStatus = "completed" | "pending" | "failed" | "processing" | "cancelled" | "refunded" | "reversed";
 
 interface Transaction {
   id:        string;
@@ -186,6 +186,16 @@ function apiTxToLocal(t: ApiTransaction): Transaction {
 
   const meta = catMap[t.category] ?? { cat: "Other", icon: "circle" as Icon, iconBg: "#F0F0F0", iconColor: "#888" };
 
+  const statusMap: Record<string, TxStatus> = {
+    pending:    "pending",
+    completed:  "completed",
+    failed:     "failed",
+    processing: "processing",
+    cancelled:  "cancelled",
+    refunded:   "refunded",
+    reversed:   "reversed",
+  };
+
   return {
     id:        t.id,
     name:      t.description || meta.cat,
@@ -198,7 +208,7 @@ function apiTxToLocal(t: ApiTransaction): Transaction {
     fee:       "₦0",
     ref:       t.externalRef || `TXN-${t.id.slice(0, 8).toUpperCase()}`,
     positive:  t.type === "credit",
-    status:    t.status as TxStatus,
+    status:    statusMap[t.status] ?? "completed",
     note:      t.description,
     icon:      meta.icon,
     iconBg:    meta.iconBg,
@@ -219,9 +229,24 @@ const DATE_RANGES: { key: DateRange; label: string }[] = [
 ];
 
 const STATUS_STYLE: Record<TxStatus, { bg: string; color: string; label: string }> = {
-  completed: { bg: "#E8F7EF", color: "#00B03C", label: "Completed" },
-  pending:   { bg: "#FFFBEB", color: "#D97706", label: "Pending"   },
-  failed:    { bg: "#FFF0F0", color: "#EF4444", label: "Failed"    },
+  completed:  { bg: "#E8F7EF", color: "#00B03C", label: "Completed"  },
+  pending:    { bg: "#FFFBEB", color: "#D97706", label: "Pending"    },
+  failed:     { bg: "#FFF0F0", color: "#EF4444", label: "Failed"     },
+  processing: { bg: "#EFF6FF", color: "#2563EB", label: "Processing" },
+  cancelled:  { bg: "#F5F5F5", color: "#6B7280", label: "Cancelled"  },
+  refunded:   { bg: "#F5F3FF", color: "#7C3AED", label: "Refunded"   },
+  reversed:   { bg: "#FFF0F0", color: "#DC2626", label: "Reversed"   },
+};
+
+/** Steps shown in the status timeline for each status */
+const STATUS_TIMELINE: Record<TxStatus, { label: string; done: boolean }[]> = {
+  pending:    [{ label: "Initiated", done: true  }, { label: "Processing", done: false }, { label: "Completed", done: false }],
+  processing: [{ label: "Initiated", done: true  }, { label: "Processing", done: true  }, { label: "Completed", done: false }],
+  completed:  [{ label: "Initiated", done: true  }, { label: "Processing", done: true  }, { label: "Completed", done: true  }],
+  failed:     [{ label: "Initiated", done: true  }, { label: "Processing", done: true  }, { label: "Failed",    done: true  }],
+  cancelled:  [{ label: "Initiated", done: true  }, { label: "Cancelled",  done: true  }],
+  refunded:   [{ label: "Initiated", done: true  }, { label: "Completed",  done: true  }, { label: "Refunded",  done: true  }],
+  reversed:   [{ label: "Initiated", done: true  }, { label: "Completed",  done: true  }, { label: "Reversed",  done: true  }],
 };
 
 /* ─── Highlight matched search text ─────────────────────────────────────── */
@@ -298,6 +323,56 @@ const cc = StyleSheet.create({
   text: { fontSize: 12, fontFamily: "Manrope_600SemiBold" },
 });
 
+/* ─── Status timeline ────────────────────────────────────────────────────── */
+function StatusTimeline({ status }: { status: TxStatus }) {
+  const steps = STATUS_TIMELINE[status];
+  const failureStep = status === "failed" || status === "cancelled" || status === "reversed" || status === "refunded";
+  return (
+    <View style={tl.wrap}>
+      {steps.map((step, i) => {
+        const isLast    = i === steps.length - 1;
+        const isFailed  = failureStep && i === steps.length - 1;
+        const dotColor  = !step.done
+          ? "#E5E7EB"
+          : isFailed
+          ? STATUS_STYLE[status].color
+          : "#00B03C";
+        const lineColor = i < steps.length - 1 && steps[i + 1].done ? "#00B03C" : "#E5E7EB";
+        return (
+          <View key={step.label} style={tl.stepRow}>
+            <View style={tl.rail}>
+              <View style={[tl.dot, { backgroundColor: dotColor, borderColor: step.done ? dotColor : "#D1D5DB" }]}>
+                {step.done && (
+                  <Feather
+                    name={isFailed ? "x" : "check"}
+                    size={10}
+                    color="#FFFFFF"
+                  />
+                )}
+              </View>
+              {!isLast && <View style={[tl.line, { backgroundColor: lineColor }]} />}
+            </View>
+            <View style={tl.stepInfo}>
+              <Text style={[tl.stepLabel, step.done && tl.stepLabelDone]}>{step.label}</Text>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const tl = StyleSheet.create({
+  wrap:         { paddingVertical: 4 },
+  stepRow:      { flexDirection: "row", alignItems: "flex-start", minHeight: 36 },
+  rail:         { alignItems: "center", width: 24, marginRight: 10 },
+  dot:          { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, alignItems: "center", justifyContent: "center" },
+  line:         { width: 2, flex: 1, minHeight: 14, borderRadius: 1 },
+  stepInfo:     { flex: 1, paddingTop: 1, paddingBottom: 10 },
+  stepLabel:    { fontSize: 13, fontFamily: "Manrope_400Regular", color: C.textMut },
+  stepLabelDone:{ fontFamily: "Manrope_600SemiBold", color: C.text },
+});
+
 /* ─── Transaction detail sheet ───────────────────────────────────────────── */
 function TxDetailSheet({ tx, visible, onClose }: {
   tx: Transaction | null;
@@ -305,6 +380,22 @@ function TxDetailSheet({ tx, visible, onClose }: {
   onClose: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  const handleRepeat = useCallback(() => {
+    if (!tx) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Route to the relevant service based on category
+    const routeMap: Record<string, string> = {
+      "Airtime":    "/(app)/airtime",
+      "Bills":      "/(app)/bills",
+      "Gift Card":  "/(app)/sell-gift-card",
+      "Crypto":     "/(app)/crypto",
+      "Wallet":     "/(app)/withdraw",
+    };
+    const route = routeMap[tx.cat];
+    if (route) { onClose(); setTimeout(() => router.push(route as any), 320); }
+  }, [tx, onClose, router]);
 
   const handleShare = useCallback(async () => {
     if (!tx) return;
@@ -380,6 +471,14 @@ function TxDetailSheet({ tx, visible, onClose }: {
           </View>
         ) : null}
 
+        {/* ── Status timeline ── */}
+        <View style={ds.section}>
+          <Text style={ds.sectionTitle}>Transaction Progress</Text>
+          <View style={[ds.card, { paddingHorizontal: 14, paddingTop: 10, paddingBottom: 2 }]}>
+            <StatusTimeline status={tx.status} />
+          </View>
+        </View>
+
         {/* ── Receipt breakdown ── */}
         <View style={ds.section}>
           <Text style={ds.sectionTitle}>Receipt</Text>
@@ -396,21 +495,36 @@ function TxDetailSheet({ tx, visible, onClose }: {
         <View style={ds.section}>
           <Text style={ds.sectionTitle}>Details</Text>
           <View style={ds.card}>
-            <ReceiptRow label="Date"      value={tx.date} />
+            <ReceiptRow label="Date"          value={tx.date} />
             <View style={ds.rowDivider} />
-            <ReceiptRow label="Time"      value={tx.time} />
+            <ReceiptRow label="Time"          value={tx.time} />
             <View style={ds.rowDivider} />
-            <ReceiptRow label="Category"  value={tx.cat}  />
+            <ReceiptRow label="Category"      value={tx.cat}  />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Type"          value={tx.positive ? "Credit" : "Debit"} />
+            <View style={ds.rowDivider} />
+            <ReceiptRow
+              label={tx.positive ? "Sender" : "Recipient"}
+              value={tx.positive ? "External transfer" : tx.note.split(" — ")[0] || "PAYVORA"}
+            />
+            <View style={ds.rowDivider} />
+            <ReceiptRow label="Payment method" value={tx.cat === "Wallet" ? "PAYVORA Wallet" : `${tx.cat} transaction`} />
             <View style={ds.rowDivider} />
             <View style={[r.row, { paddingVertical: 9 }]}>
-              <Text style={r.label}>Reference</Text>
+              <Text style={r.label}>Reference ID</Text>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "flex-end" }}>
                 <Text style={[r.value, { flex: 0 }]} numberOfLines={1}>{tx.ref}</Text>
                 <CopyChip value={tx.ref} label="Copy" />
               </View>
             </View>
             <View style={ds.rowDivider} />
-            <ReceiptRow label="Type"      value={tx.positive ? "Credit" : "Debit"} />
+            <View style={[r.row, { paddingVertical: 9 }]}>
+              <Text style={r.label}>Transaction ID</Text>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1, justifyContent: "flex-end" }}>
+                <Text style={[r.value, { flex: 0 }]} numberOfLines={1}>{`TXN-${tx.id.padStart(6, "0")}`}</Text>
+                <CopyChip value={`TXN-${tx.id.padStart(6, "0")}`} label="Copy" />
+              </View>
+            </View>
           </View>
         </View>
 
@@ -420,6 +534,14 @@ function TxDetailSheet({ tx, visible, onClose }: {
             <Feather name="share-2" size={16} color="#FFFFFF" />
             <Text style={ds.shareBtnText}>Share Receipt</Text>
           </TouchableOpacity>
+
+          {/* Repeat transaction */}
+          {(tx.status === "completed") && (
+            <TouchableOpacity style={ds.repeatBtn} onPress={handleRepeat} activeOpacity={0.82}>
+              <Feather name="repeat" size={15} color={C.primary} />
+              <Text style={ds.repeatBtnText}>Repeat Transaction</Text>
+            </TouchableOpacity>
+          )}
 
           {tx.status === "pending" && (
             <TouchableOpacity
@@ -469,6 +591,8 @@ const ds = StyleSheet.create({
   shareBtnText:  { fontSize: rf(14), fontFamily: "Manrope_700Bold", color: "#FFFFFF" },
   cancelBtn:     { height: 40, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF0F0", borderWidth: 1, borderColor: "#FECACA" },
   cancelBtnText: { fontSize: 13, fontFamily: "Manrope_600SemiBold", color: C.danger },
+  repeatBtn:     { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, height: 42, borderRadius: 12, backgroundColor: "#EFF6FF", borderWidth: 1, borderColor: "#BFDBFE" },
+  repeatBtnText: { fontSize: rf(13), fontFamily: "Manrope_600SemiBold", color: C.primary },
   closeBtn:      { height: 38, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   closeBtnText:  { fontSize: 13, fontFamily: "Manrope_500Medium", color: C.textMut },
 });
@@ -544,7 +668,7 @@ export default function HistoryScreen() {
       if (q && !t.name.toLowerCase().includes(q) && !t.cat.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [txFilter, dateFrom, searchText]);
+  }, [txData, txFilter, dateFrom, searchText]);
 
   /* ─── Totals (filtered) ── */
   const totalIn  = filtered.filter(t =>  t.positive).reduce((s, t) => s + t.amountRaw, 0);
@@ -711,11 +835,11 @@ export default function HistoryScreen() {
       {/* ── Result count ── */}
       <View style={s.resultRow}>
         <Text style={s.resultText}>
-          {filtered.length === ALL_TX.length
+          {filtered.length === txData.length
             ? `${filtered.length} transactions`
-            : `${filtered.length} of ${ALL_TX.length} transactions`}
+            : `${filtered.length} of ${txData.length} transactions`}
         </Text>
-        {filtered.length !== ALL_TX.length && (
+        {filtered.length !== txData.length && (
           <Animated.View entering={FadeIn.duration(160)}>
             <Text style={s.resultFiltered}>· filtered</Text>
           </Animated.View>
