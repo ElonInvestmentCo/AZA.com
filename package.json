@@ -96,6 +96,15 @@
       "@expo/ngrok-bin>@expo/ngrok-bin-win32-x64": "-",
       "@esbuild-kit/esm-loader": "npm:tsx@^4.21.0",
       "esbuild": "0.27.3"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@firebase/util",
+      "@swc/core",
+      "esbuild",
+      "msw",
+      "protobufjs",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
