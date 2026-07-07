@@ -1,6 +1,6 @@
 ---
 name: Railway start.mjs fix
-description: Why start.mjs must use ./node_modules/.bin/next relative to artifacts/website, not ../../node_modules/.bin/next from the repo root.
+description: Why start.mjs must use node_modules/next/dist/bin/next (not the .bin shim) to start Next.js on Railway.
 ---
 
 # Railway start.mjs — Next.js binary path
@@ -8,19 +8,26 @@ description: Why start.mjs must use ./node_modules/.bin/next relative to artifac
 ## The rule
 In `start.mjs`, the Next.js website process must be started as:
 ```js
-run("web", "node", ["./node_modules/.bin/next", "start"], { ... }, path.join(__dirname, "artifacts/website"));
+run("web", "node", ["node_modules/next/dist/bin/next", "start"], { ... }, path.join(__dirname, "artifacts/website"));
 ```
 
-**NOT** the previous form:
+**NOT** via the .bin shim:
 ```js
-run("web", "node", ["../../node_modules/.bin/next", "start"], ...);  // WRONG
+run("web", "node", ["./node_modules/.bin/next", "start"], ...);  // WRONG — shell script, not JS
+```
+
+**NOT** via the root node_modules:
+```js
+run("web", "node", ["../../node_modules/.bin/next", "start"], ...);  // WRONG — not hoisted
 ```
 
 ## Why
-Railway uses pnpm with monorepo isolation. The `next` binary is NOT hoisted to the repo root `node_modules/.bin/` — it only exists in the workspace's own `node_modules/.bin/` (`artifacts/website/node_modules/.bin/next`). Using the root-relative path causes a fatal `MODULE_NOT_FOUND` crash at container startup, making every healthcheck fail.
+In Railway's pnpm container, `node_modules/.bin/next` is a `#!/bin/sh` shell script shim, NOT a JavaScript file. Passing it as an argument to `node` causes an immediate `SyntaxError: missing ) after argument list` crash on line 2 (`basedir=$(dirname ...)`). The real JS entry point is `node_modules/next/dist/bin/next` — always use that directly with `cwd` set to `artifacts/website`.
 
-## Next.js standalone mode — do NOT use
-`output: "standalone"` in next.config.ts causes a Pages Router `<Html>` conflict during the static 404 page generation, failing the build. Standalone mode is not needed — the workspace binary approach works.
+**Why:** `next` is NOT hoisted to the repo root `node_modules/.bin/` in pnpm monorepos. It only exists in the workspace's own `node_modules`. Using the root-relative path causes `MODULE_NOT_FOUND`; using the `.bin` shim causes `SyntaxError`. Both crash the container and make every Railway healthcheck fail.
 
 ## How to apply
-Any time `start.mjs` is modified or the Next.js startup is reconfigured for Railway, ensure the `cwd` is set to `artifacts/website` and the binary path is `./node_modules/.bin/next`.
+Any time `start.mjs` is modified or the Next.js startup is reconfigured for Railway:
+- Set `cwd` to `artifacts/website`
+- Use `"node_modules/next/dist/bin/next"` as the path argument to `node`
+- Never pass any `.bin/` shim script as a `node` argument — they are bash wrappers, not JS

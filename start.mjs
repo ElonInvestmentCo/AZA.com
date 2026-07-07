@@ -52,12 +52,13 @@ run(
 );
 
 // ── Next.js website ──────────────────────────────────────────────────────────
-// Run `next start` using the binary inside the website workspace's own
-// node_modules — pnpm always puts it there regardless of hoisting config.
+// Run `next start` via the real JS entrypoint, NOT the .bin shell-script
+// wrapper.  In Railway's pnpm container the .bin/next shim is a bash script;
+// passing it to `node` as a JS argument causes an immediate SyntaxError crash.
 run(
   "web",
   "node",
-  ["./node_modules/.bin/next", "start"],
+  ["node_modules/next/dist/bin/next", "start"],
   {
     PORT: WEB_PORT,
     HOSTNAME: "0.0.0.0",
