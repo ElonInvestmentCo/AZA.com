@@ -1,0 +1,130 @@
+AUTHENTICATION & LANDING PAGE DESIGN LANGUAGE
+
+Adopt a minimalist fintech aesthetic with a bright white interface.
+
+LAYOUT
+
+• Center the content vertically with generous whitespace.
+• Keep the interface uncluttered.
+• Use a narrow content width so everything feels balanced and easy to scan.
+• Avoid oversized sections and unnecessary graphics.
+
+LOGO
+
+• Place the PayVora logo near the top with generous top spacing.
+• Keep the logo modest in size.
+• Maintain ample breathing room around it.
+
+INPUT FIELDS
+
+• Use large rounded input fields.
+• Very light gray background (#F7F8FA or similar).
+• Thin subtle border.
+• Comfortable height.
+• Soft placeholder text.
+• Smooth focus animation using the brand accent color.
+• Add clean icons only where appropriate.
+• Avoid heavy outlines.
+
+PRIMARY BUTTON
+
+• Full-width.
+• Black background.
+• White text.
+• Large rounded corners.
+• Bold typography.
+• Height around 54–58px.
+• Smooth hover and press animations.
+• Slight shadow for depth.
+
+SOCIAL SIGN-IN
+
+Place authentication providers beneath the primary action.
+
+• Display a subtle divider with text such as "Or continue with".
+• Equal-width buttons.
+• White cards with light borders.
+• Rounded corners.
+• Official provider icons.
+• Apple button may use a dark background while Google remains light.
+
+LINKS
+
+Secondary actions such as "Forgot Password?" should:
+
+• Use smaller typography.
+• Right-align where appropriate.
+• Use subtle gray text.
+• Transition to the brand color on hover.
+
+ACCOUNT PROMPT
+
+Place the account creation prompt near the bottom.
+
+• Neutral dark text.
+• Brand-colored call-to-action.
+• Slightly bolder weight for the action link.
+
+SPACING
+
+Prioritize whitespace.
+
+• Consistent spacing between sections.
+• Comfortable margins.
+• Balanced alignment.
+• Nothing should feel crowded.
+
+COLORS
+
+Primary Background:
+White
+
+Cards:
+White
+
+Inputs:
+Very light gray
+
+Primary Text:
+Near black
+
+Secondary Text:
+Medium gray
+
+Accent:
+PayVora brand green
+
+Primary Action:
+Black with white text
+
+VISUAL STYLE
+
+Avoid:
+
+• Heavy gradients
+• Large colorful backgrounds
+• Busy illustrations
+• Excessive shadows
+• Glassmorphism
+• Neon effects
+
+Instead use:
+
+• Flat premium surfaces
+• Soft shadows
+• Clean typography
+• Minimal decorative elements
+• High contrast
+• Elegant spacing
+
+MICRO INTERACTIONS
+
+• Smooth button presses.
+• Gentle input focus transitions.
+• Fade-in page transitions.
+• Soft hover states.
+• Fast, responsive interactions.
+
+FINAL GOAL
+
+The website should feel like a premium banking application rather than a traditional marketing website. Every page should share this clean, minimal, trustworthy aesthetic with consistent spacing, typography, and reusable components.

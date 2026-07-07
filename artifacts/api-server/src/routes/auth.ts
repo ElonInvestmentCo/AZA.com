@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { db, usersTable, walletsTable } from "@workspace/db";
 import { signToken, verifyToken } from "../lib/jwt.js";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 

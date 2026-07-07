@@ -6,8 +6,9 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 
 ### Workflows (Replit)
 - **PayVora Website** — Next.js 15 landing page on port 5000 (preview pane)
-- **PAYVORA Mobile (Expo Go)** — Expo dev server on port 19000; scan QR code with Expo Go app
+- **artifacts/mobile: expo** — Expo dev server on port 19000; scan QR code with Expo Go app
 - **artifacts/api-server: API Server** — Express API on port 8080
+- **artifacts/mockup-sandbox: Component Preview Server** — Vite canvas/design preview on port 8081
 
 ### Commands
 - `pnpm install` — install all workspace dependencies (run this after cloning)
@@ -70,7 +71,7 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 
 ## Gotchas
 
-- Expo runs via tunnel (`--tunnel` flag) — use the Expo QR code to preview on a device
+- Expo runs in LAN mode on port 19000 — use the Expo Go app on the same network, or the web preview
 - The API server runs on port 8080, not 5000 — `PORT=8080` env var is set
 - `/(app)/dashboard.tsx` is named "dashboard" but is actually the Fund Wallet screen
 - Social auth (Google/Apple) skips OTP and goes directly to `/(tabs)` — this is intentional
