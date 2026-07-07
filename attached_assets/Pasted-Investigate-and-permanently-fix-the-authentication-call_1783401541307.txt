@@ -1,0 +1,48 @@
+Investigate and permanently fix the authentication callback configuration.
+
+Requirements:
+
+1. Access Railway using the existing `RAILWAY_TOKEN` stored in Replit Secrets.
+2. Inspect all Railway environment variables, domains, services, and deployment settings related to authentication.
+3. Find the production callback URL, redirect URL, and any authentication endpoints currently configured.
+4. Ensure every authentication callback uses ONLY the production domain:
+   https://payvora.org
+
+   Never use any Replit preview URL, temporary URL, localhost URL, or generated development URL for production authentication.
+
+5. Update Firebase Authentication (Email Link/Auth), backend environment variables, OAuth providers, and any other authentication configuration so every redirect, continue URL, callback URL, and authorized domain points to the production configuration.
+
+6. Remove or disable any configuration that automatically rewrites authentication callbacks to Replit URLs during deployment.
+
+7. Verify:
+   - Firebase Authorized Domains
+   - Email Action Settings
+   - OAuth redirect URIs
+   - Backend callback URLs
+   - Railway environment variables
+   - Reverse proxy configuration
+   - CORS configuration
+   - API base URLs
+
+8. Test the complete authentication flow end-to-end:
+   - Register
+   - Login
+   - Email verification
+   - Password reset
+   - Passwordless email links (if enabled)
+
+9. Resolve the "Internal Server Error" currently occurring during authentication by identifying the root cause from Railway logs and applying the required backend fix instead of masking the error.
+
+10. Produce an implementation that is deployment-safe:
+    - Production values must come from Railway environment variables.
+    - Development values must remain isolated.
+    - Future deployments must not overwrite the production callback URL with Replit URLs.
+    - Do not hardcode secrets into source code.
+    - Do not modify unrelated infrastructure.
+
+After making changes:
+- Redeploy the affected Railway service.
+- Verify the production site at https://payvora.org works correctly.
+- Confirm authentication succeeds without HTTP 500 errors.
+- Confirm no Replit URL exists anywhere in the production authentication configuration.
+- Provide a summary of every configuration changed and why.

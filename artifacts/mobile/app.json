@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "payvora",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -14,9 +14,27 @@
       "backgroundColor": "#0A0A0F"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "associatedDomains": [
+        "applinks:payvora-2026.web.app"
+      ]
     },
-    "android": {},
+    "android": {
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "payvora-2026.web.app",
+              "pathPrefix": "/__/auth/action"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
     "plugins": [
       [
         "expo-router",
@@ -25,7 +43,16 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "webClientId": "YOUR_GOOGLE_WEB_CLIENT_ID"
+        }
+      ],
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

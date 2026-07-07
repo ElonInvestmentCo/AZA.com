@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Clients may create their own document, but walletBalanceNaira MUST
+      // be 0 at creation time — only the server (Firebase Admin SDK) is
+      // permitted to credit the wallet.
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.walletBalanceNaira == 0;
+
+      // Clients may update their own profile fields, but walletBalanceNaira
+      // is immutable from the client side — map-diffing rejects any write
+      // that touches that key.
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['walletBalanceNaira']));
+    }
+  }
+}

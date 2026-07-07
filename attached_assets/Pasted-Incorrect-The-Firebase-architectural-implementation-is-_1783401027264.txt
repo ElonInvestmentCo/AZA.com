@@ -1,0 +1,53 @@
+Incorrect. The Firebase architectural implementation is NOT "just context"—it is a direct requirement of this task, alongside the UI/UX bug fixes. As our Principal Full-Stack Engineer, you are required to implement BOTH the Firebase architecture and the Transaction History bug fixes simultaneously. 
+
+Do not write guides, summaries, or explanations. Actively write and inject the un-truncated, production source code files directly into the workspace for all of the following requirements:
+
+### PHASE 1: FIREBASE ARCHITECTURE IMPLEMENTATION
+
+1. CONFIG MODULE: Update artifacts/mobile/app.json
+- Add plugins: `@react-native-firebase/app`, `@react-native-firebase/auth`, `@react-native-google-signin/google-signin`, and `expo-apple-authentication`.
+- Set up associated domains (iOS) and intent filters (Android) targeting "https://payvora-2026.web.app/__/auth/action" to catch incoming passwordless magic links.
+
+2. MOBILE AUTH: Update artifacts/mobile/app/(auth)/login.tsx
+- Rewrite to handle Passwordless Email Link Authentication using `sendSignInLinkToEmail` and caching the email payload in AsyncStorage.
+- Intercept incoming deep links with `expo-linking` and finalize sessions using `signInWithEmailLink`.
+- Upon successful session completion, initialize the Firestore collection document at `/users/{userId}` with fields: `{ uid, email, displayName: "Valued PayVora Member", walletBalanceNaira: 0, createdAt: serverTimestamp() }`.
+
+3. BACKEND AUTH: Create artifacts/api-server/src/middleware/firebaseAuth.ts
+- Create a Express middleware that parses the `Authorization: Bearer <Firebase_ID_Token>` header.
+- Use `admin.auth().verifyIdToken(idToken)` to decode and authenticate the token, injecting `req.user` or returning a clean 401 error code.
+
+4. DATABASE SECURITY: Create /firestore.rules
+Write out this exact working syntax at the project root directory:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId 
+                    && !(request.resource.data.diff(resource.data).affectedKeys().hasAny(['walletBalanceNaira']));
+    }
+  }
+}
+
+5. SYNC HOOK: Create artifacts/mobile/hooks/useLiveBalance.ts
+- Create a hook utilizing Firestore `onSnapshot` to listen to realtime balance updates inside `/users/{userId}` so our frontend balance state dynamically maps server changes automatically.
+
+
+### PHASE 2: TRANSACTION HISTORY UI/UX BUG FIXES
+
+6. FIX DISMISSAL HANG: Update artifacts/mobile/components/AnimatedSheet.tsx
+- Remove `withDecay(deceleration: 0.997)` inside the drag gesture handler release logic.
+- Implement a crisp `withTiming` transition utilizing `Easing.in(Easing.cubic)` with a clean 160–300ms timeline to ensure the modal drops off the screen cleanly without lingering at the bottom.
+
+7. FIX BACKDROP BLUR: Update artifacts/mobile/components/AnimatedSheet.tsx
+- Locate and remove the conflicting static style property `{ opacity: 0 }` inside the styles array that overrides the Reanimated worklet animation.
+- Bump up the underlying `BlurView` component's intensity property from `35` to `60` and shift the overlay tint color opacity to `rgba(0,0,0,0.38)` for optimal visual separation.
+
+8. FIX DATA SYNCING & FLICKER: Update artifacts/mobile/app/(tabs)/history.tsx
+- Inject a distinct key parameter `key={selected?.id ?? '__empty__'}` to the `TxDetailSheet` initialization block to force a complete component remount when swapping rows.
+- Append an `extraData={selected?.id}` or `extraData={selected}` property to the primary tracking layout `FlatList` component to force clean item state re-renders.
+
+Do not stop to summarize or explain your process. Directly modify and output the full, operational codebase for these 8 tasks across the monorepo right now.
