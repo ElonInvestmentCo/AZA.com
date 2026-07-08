@@ -25,7 +25,6 @@ const queryClient = new QueryClient();
 const RAW_ASSETS = [
   require("@/assets/images/fingerprint.png"),
   require("@/assets/images/3d_avatar_16.png"),
-  require("@/assets/images/slide1.png"),
   require("@/assets/images/slide3-bills.png"),
   require("@/assets/images/gift-card.png"),
   require("@/assets/images/gift-card-visa.png"),
