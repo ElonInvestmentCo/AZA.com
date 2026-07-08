@@ -22,7 +22,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const successmarkImg = require("../../assets/images/successmark.svg");
+const successmarkImg = require("../../assets/images/successmark.png");
 
 const C = {
   bg:        "#FFFFFF",
