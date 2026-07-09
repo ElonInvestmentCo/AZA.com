@@ -10,6 +10,9 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 - **artifacts/mobile: expo** — Expo dev server on port 19000; scan QR code with Expo Go app
 - **artifacts/mockup-sandbox: Component Preview Server** — Vite canvas/design preview on port 8081
 
+### Note on extra workflows
+The platform auto-detected artifacts and created additional workflows (`artifacts/api-server: API Server` on port 8080, `artifacts/mobile: expo` on port 19000, `artifacts/mockup-sandbox: Component Preview Server` on port 8081). These run alongside the original `PayVora Website`/`API Server` workflows without port conflicts. The canonical, documented setup remains **PayVora Website** (port 5000) + **API Server** (port 3001, `dist/index.mjs`), which is what the website's `INTERNAL_API_URL` points to.
+
 ### Commands
 - `pnpm install` — install all workspace dependencies (run this after cloning)
 - `pnpm --filter @workspace/api-server run dev` — build + start API server (port 8080)
