@@ -1,5 +1,3 @@
-import path from "path";
-import { fileURLToPath } from "url";
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -98,17 +96,19 @@ app.get("/api/status", (_req: Request, res: Response) => {
   res.json({ name: "Payvora API", version: "1.0.0", status: "ok" });
 });
 
-/* ── Static site (production) / QR dev page (development) ────────────────── */
+/* ── Root route ────────────────────────────────────────────────────────────
+ * The public website is served by Next.js (artifacts/website), which proxies
+ * /api/* to this Express server (see start.mjs + next.config.ts rewrites).
+ * This server is never reached directly by browser traffic in production, so
+ * it does not need to serve any static site itself. In development it serves
+ * a small QR-code page for scanning into Expo Go. ─────────────────────────── */
 if (IS_PROD) {
-  /* Serve the pre-built Vite landing site.
-   * process.cwd() is the project root in Railway (/app).
-   * All non-/api routes fall back to index.html for client-side routing. */
-  const landingDist = path.join(process.cwd(), "artifacts", "landing", "dist");
+  app.get("/", (_req: Request, res: Response) => {
+    res.json({ name: "Payvora API", version: "1.0.0", status: "ok" });
+  });
 
-  app.use(express.static(landingDist, { index: "index.html" }));
-
-  app.get("/*splat", (_req: Request, res: Response) => {
-    res.sendFile(path.join(landingDist, "index.html"));
+  app.use((_req: Request, res: Response) => {
+    res.status(404).json({ error: "Not found" });
   });
 } else {
   /* Dev: serve Expo QR scanner at root for easy mobile testing. */

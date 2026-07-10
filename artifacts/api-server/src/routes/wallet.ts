@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { eq, desc } from "drizzle-orm";
-import { db, walletsTable, transactionsTable } from "@workspace/db";
+import { db, walletsTable, transactionsTable, type Transaction } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
 import { randomUUID } from "crypto";
 
@@ -40,7 +40,7 @@ router.get("/wallet/transactions", requireAuth, async (req: AuthRequest, res) =>
     .offset(offset);
 
   res.json({
-    transactions: rows.map((t) => ({
+    transactions: rows.map((t: Transaction) => ({
       id:          t.id,
       type:        t.type,
       status:      t.status,
