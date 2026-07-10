@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   Linking,
   Platform,
   ScrollView,
@@ -58,7 +57,7 @@ export default function HelpSupportScreen() {
         Linking.openURL("https://wa.me/2348000000000").catch(() => {});
         break;
       case "chat":
-        Alert.alert("Live Chat", "Our support agents are online 9am–6pm WAT.\n\nA chat window would open here.");
+        router.push("/(app)/live-chat" as any);
         break;
     }
   };

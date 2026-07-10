@@ -28,6 +28,7 @@ export default function AppLayout() {
       <Stack.Screen name="language" />
       <Stack.Screen name="app-info" />
       <Stack.Screen name="help-support" />
+      <Stack.Screen name="live-chat" />
     </Stack>
   );
 }

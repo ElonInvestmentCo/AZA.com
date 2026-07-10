@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   Platform,
@@ -18,6 +19,16 @@ import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 
+const LANGUAGE_KEY = "payvora_language";
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  fr: "French",
+  ha: "Hausa",
+  ig: "Igbo",
+  yo: "Yoruba",
+  pt: "Portuguese",
+};
+
 const C = {
   bg:      "#FFFFFF",
   text:    "#0B0A0A",
@@ -28,7 +39,7 @@ const C = {
   chevron: "#C5C6CC",
 };
 
-const ROWS = [
+const BASE_ROWS = [
   { id: "password",  label: "Change password",       sublabel: "Change E-wallet account's login password",   icon: "lock"        as const, color: "#7C3AED" },
   { id: "pin",       label: "Set PIN code",           sublabel: "Change, reset PIN code used in transaction", icon: "grid"        as const, color: "#2563EB" },
   { id: "quick",     label: "Quick payment setting",  sublabel: "Payment without authentication",             icon: "zap"         as const, color: "#D97706" },
@@ -45,11 +56,25 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const topPad = Platform.OS === "web" ? 48 : insets.top + 8;
   const [query, setQuery] = useState("");
+  const [language, setLanguage] = useState("English");
+
+  // Re-read the stored language every time Settings gains focus so the
+  // sublabel reflects the current choice instead of always showing "English".
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      AsyncStorage.getItem(LANGUAGE_KEY).then(code => {
+        if (!cancelled) setLanguage(LANGUAGE_NAMES[code ?? "en"] ?? "English");
+      });
+      return () => { cancelled = true; };
+    }, []),
+  );
 
   const firstName = (user?.name ?? "User").split(" ")[0];
   const email = user?.email ?? "user@payvora.app";
 
-  const filteredRows = ROWS.filter(r =>
+  const rows = BASE_ROWS.map(r => r.id === "language" ? { ...r, sublabel: language } : r);
+  const filteredRows = rows.filter(r =>
     query === "" || r.label.toLowerCase().includes(query.toLowerCase())
   );
 
@@ -102,13 +127,13 @@ export default function SettingsScreen() {
   return (
     <View style={[s.root, { paddingTop: topPad }]}>
 
-      {/* Header */}
+      {/* Header — title is absolutely centered so it never shifts off-center
+          if the back button's hit area or safe-area insets differ by device. */}
       <Animated.View entering={FadeInDown.duration(280)} style={s.header}>
         <TouchableOpacity style={s.backBtn} onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); router.back(); }} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Feather name="arrow-left" size={22} color={C.text} />
         </TouchableOpacity>
-        <Text style={s.title}>Setting</Text>
-        <View style={{ width: 40 }} />
+        <Text style={s.title} numberOfLines={1}>Setting</Text>
       </Animated.View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 40 }]}>
@@ -179,9 +204,14 @@ export default function SettingsScreen() {
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: C.bg, paddingHorizontal: 20 },
 
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
-  backBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
-  title: { fontSize: 18, fontFamily: "Manrope_700Bold", color: C.text },
+  header: { flexDirection: "row", alignItems: "center", position: "relative", height: 40, marginBottom: 20 },
+  backBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center", zIndex: 1 },
+  title: {
+    position: "absolute",
+    left: 40, right: 40,
+    textAlign: "center",
+    fontSize: 18, fontFamily: "Manrope_700Bold", color: C.text,
+  },
 
   scroll: { gap: 16 },
 

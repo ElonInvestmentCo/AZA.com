@@ -205,10 +205,14 @@ interface ApiTransaction {
 }
 
 function apiTxToLocal(t: ApiTransaction): Transaction {
-  const date     = new Date(t.createdAt);
+  // Guard against missing/malformed createdAt from the API — calling
+  // toLocaleDateString/toLocaleTimeString on an Invalid Date throws a
+  // RangeError on Hermes and crashes the whole History screen on mount.
+  const parsedDate = new Date(t.createdAt);
+  const date       = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
   const dateStr  = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const timeStr  = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-  const amtNaira = t.amountKobo / 100;
+  const amtNaira = (Number.isFinite(t.amountKobo) ? t.amountKobo : 0) / 100;
   const amtStr   = "₦" + amtNaira.toLocaleString("en-NG");
 
   type Icon = React.ComponentProps<typeof Feather>["name"];
@@ -247,7 +251,7 @@ function apiTxToLocal(t: ApiTransaction): Transaction {
     ref:       t.externalRef || `TXN-${t.id.slice(0, 8).toUpperCase()}`,
     positive:  t.type === "credit",
     status:    statusMap[t.status] ?? "completed",
-    note:      t.description,
+    note:      t.description || "",
     icon:      meta.icon,
     iconBg:    meta.iconBg,
     iconColor: meta.iconColor,
