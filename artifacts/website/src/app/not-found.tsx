@@ -1,50 +1,27 @@
-import Link from "next/link";
-import type { Metadata } from "next";
+import { Metadata } from "next";
+import { Container } from "@/components/ui/core";
+import { Button } from "@/components/ui/core";
 
 export const metadata: Metadata = {
-  title: "Page Not Found | PAYVORA",
-  description: "The page you are looking for does not exist.",
+  title: "404 - Page Not Found",
 };
 
 export default function NotFound() {
   return (
-    <div
-      style={{
-        minHeight: "70vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        padding: "2rem",
-        background: "#ffffff",
-        color: "#111827",
-      }}
-    >
-      <h1 style={{ fontSize: "6rem", fontWeight: 900, margin: 0, color: "#00D9A0" }}>
-        404
-      </h1>
-      <h2 style={{ fontSize: "1.5rem", fontWeight: 600, marginTop: "1rem", color: "#111827" }}>
-        Page Not Found
-      </h2>
-      <p style={{ color: "#6B7280", marginTop: "0.75rem", maxWidth: "400px" }}>
-        The page you&apos;re looking for doesn&apos;t exist or has been moved.
-      </p>
-      <Link
-        href="/"
-        style={{
-          marginTop: "2rem",
-          padding: "0.75rem 2rem",
-          background: "#111827",
-          color: "#ffffff",
-          borderRadius: "9999px",
-          fontWeight: 700,
-          textDecoration: "none",
-          display: "inline-block",
-        }}
-      >
-        Back to Home
-      </Link>
+    <div className="min-h-[80vh] flex items-center justify-center pt-24 pb-12">
+      <Container className="text-center flex flex-col items-center max-w-2xl">
+        <div className="w-24 h-24 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center mb-8 shadow-[0_0_50px_var(--color-accent-dim)]">
+          <span className="text-4xl font-bold text-[var(--color-accent)]">404</span>
+        </div>
+        <h1 className="h2 mb-4">Page Not Found</h1>
+        <p className="text-[var(--color-text-sec)] text-lg mb-8 max-w-md">
+          We couldn't find the page you're looking for. It might have been moved or doesn't exist.
+        </p>
+        <div className="flex gap-4">
+          <Button href="/">Return Home</Button>
+          <Button href="/contact" variant="outline">Contact Support</Button>
+        </div>
+      </Container>
     </div>
   );
 }

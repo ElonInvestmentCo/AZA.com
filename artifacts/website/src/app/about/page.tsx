@@ -1,206 +1,76 @@
-import type { Metadata } from "next";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Users, Target, Heart, Zap, Globe, TrendingUp } from "lucide-react";
+import { Metadata } from "next";
+import { Container } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Building2, Users, Rocket, Target } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About PAYVORA – Nigeria's Premium Fintech Platform",
-  description:
-    "Learn about PAYVORA's mission, team, and story. We're building Nigeria's most trusted fintech platform for everyday financial services.",
-  alternates: { canonical: "https://www.payvora.org/about" },
+  title: "About Us",
+  description: "Learn about PAYVORA's mission to build the premium financial ecosystem for Nigeria.",
 };
-
-const values = [
-  {
-    icon: Heart,
-    title: "Built for Nigerians",
-    desc: "Every feature is designed around the real financial needs of Nigerians — from gift card trading to instant bill payments.",
-  },
-  {
-    icon: Zap,
-    title: "Speed first",
-    desc: "We obsess over every millisecond. Transactions that used to take hours now take seconds on PAYVORA.",
-  },
-  {
-    icon: Target,
-    title: "Radical transparency",
-    desc: "No hidden fees. No fine print traps. Every rate, every charge is shown before you confirm.",
-  },
-  {
-    icon: Globe,
-    title: "Global reach, local feel",
-    desc: "Trade gift cards from Amazon, iTunes, Steam and more — all converted to Naira instantly in your wallet.",
-  },
-  {
-    icon: Users,
-    title: "Community driven",
-    desc: "We listen to our users. Our roadmap is shaped by the 50,000+ Nigerians who use PAYVORA every day.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Always improving",
-    desc: "We ship new features every week. If something doesn't work perfectly, we fix it — fast.",
-  },
-];
-
-const stats = [
-  { value: "50K+", label: "Active users" },
-  { value: "₦2B+", label: "Transactions processed" },
-  { value: "99.9%", label: "Platform uptime" },
-  { value: "4.9★", label: "App store rating" },
-];
-
-const team = [
-  {
-    name: "Adewale Okonkwo",
-    role: "Co-founder & CEO",
-    bio: "Former product lead at Flutterwave. Passionate about making financial services accessible to every Nigerian.",
-  },
-  {
-    name: "Chidinma Eze",
-    role: "Co-founder & CTO",
-    bio: "10 years of engineering experience across fintech and e-commerce. Built systems handling millions of transactions.",
-  },
-  {
-    name: "Emeka Nwosu",
-    role: "Head of Product",
-    bio: "UX researcher and product strategist. Previously at PiggyVest. Obsessed with delightful user experiences.",
-  },
-  {
-    name: "Fatima Bello",
-    role: "Head of Compliance",
-    bio: "Regulatory expert with deep knowledge of Nigerian fintech law, AML, and KYC compliance frameworks.",
-  },
-];
 
 export default function AboutPage() {
   return (
-    <>
-      {/* Hero */}
-      <section className="pt-32 pb-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-            Our story
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-            We&apos;re building the financial{" "}
-            <span className="text-[#00D9A0]">OS for Nigeria.</span>
-          </h1>
-          <p className="text-gray-500 text-xl max-w-2xl mx-auto leading-relaxed">
-            PAYVORA was founded with a simple belief: every Nigerian deserves fast, safe, and fair access to financial services — no bank queues, no hidden fees, no frustration.
-          </p>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-16 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map(({ value, label }) => (
-              <div key={label} className="text-center">
-                <div className="text-4xl font-black text-[#00D9A0] mb-2">{value}</div>
-                <div className="text-gray-500 text-sm">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Mission */}
-      <section className="py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 border border-gray-100 rounded-3xl p-10 sm:p-16 relative overflow-hidden">
-            <div
-              className="absolute -top-20 -right-20 w-64 h-64 rounded-full blur-3xl pointer-events-none"
-              style={{ background: "rgba(0,217,160,0.06)" }}
-            />
-            <div className="relative">
-              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-6">Our mission</h2>
-              <p className="text-gray-500 text-lg leading-relaxed mb-6">
-                Financial services in Nigeria have historically been slow, expensive, and exclusionary. Long queues, multiple apps, hidden fees, and unreliable infrastructure left millions underserved.
-              </p>
-              <p className="text-gray-500 text-lg leading-relaxed mb-6">
-                PAYVORA exists to change that. We&apos;re building a single platform where every Nigerian can trade gift cards, pay bills, buy airtime, get a virtual dollar card, and manage their wallet — all in one beautifully designed app that just works.
-              </p>
-              <p className="text-gray-900 font-semibold text-lg">
-                Fast. Transparent. Yours.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-gray-900 mb-4">What we stand for</h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-              These aren&apos;t just values on a wall. They shape every product decision, every hire, and every line of code we write.
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="max-w-3xl mb-24">
+          <FadeIn>
+            <h1 className="h1 mb-6">Building borderless finance for Africa.</h1>
+            <p className="text-xl text-[var(--color-text-sec)] leading-relaxed">
+              We started PAYVORA because we were tired of failed transactions, blocked international payments, and clunky banking apps. We believed Nigerians deserved a premium, reliable financial experience.
             </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {values.map(({ icon: Icon, title, desc }) => (
-              <div
-                key={title}
-                className="bg-white border border-gray-100 rounded-2xl p-7 shadow-sm hover:border-[#00D9A0]/40 transition-colors"
-              >
-                <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center mb-5">
-                  <Icon size={22} className="text-[#00D9A0]" />
-                </div>
-                <h3 className="text-gray-900 font-bold text-lg mb-3">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
+          </FadeIn>
         </div>
-      </section>
 
-      {/* Team */}
-      <section className="py-24 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-gray-900 mb-4">Meet the team</h2>
-            <p className="text-gray-500 text-lg max-w-xl mx-auto">
-              A small, focused team of builders obsessed with making financial services better for Nigeria.
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-32">
+          <FadeIn className="glass p-10 rounded-3xl border border-[var(--color-border)]">
+            <Target className="w-10 h-10 text-[var(--color-accent)] mb-6" />
+            <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
+            <p className="text-[var(--color-text-sec)] leading-relaxed">
+              To dismantle financial borders for everyday Nigerians by providing a single, powerful platform for local utility payments, global virtual cards, and seamless digital asset conversion.
             </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {team.map(({ name, role, bio }) => (
-              <div
-                key={name}
-                className="bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:border-[#00D9A0]/30 transition-colors"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center mb-5">
-                  <span className="text-[#00D9A0] font-black text-xl">
-                    {name.split(" ").map((n) => n[0]).join("")}
-                  </span>
-                </div>
-                <h3 className="text-gray-900 font-bold text-xl mb-1">{name}</h3>
-                <p className="text-[#00D9A0] text-sm font-medium mb-4">{role}</p>
-                <p className="text-gray-500 text-sm leading-relaxed">{bio}</p>
-              </div>
-            ))}
-          </div>
+          </FadeIn>
+          <FadeIn delay={0.2} className="glass p-10 rounded-3xl border border-[var(--color-border)]">
+            <Rocket className="w-10 h-10 text-[var(--color-accent)] mb-6" />
+            <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
+            <p className="text-[var(--color-text-sec)] leading-relaxed">
+              We envision an ecosystem where geographic location no longer dictates financial access. A world where anyone can participate in the global digital economy with confidence.
+            </p>
+          </FadeIn>
         </div>
-      </section>
 
-      {/* Hiring CTA */}
-      <section className="py-16 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-black text-gray-900 mb-4">We&apos;re hiring</h2>
-          <p className="text-gray-500 text-lg mb-8">
-            Want to help build Nigeria&apos;s most trusted fintech platform? We&apos;re looking for engineers, designers, and operators who care deeply about their craft.
+        <FadeIn className="mb-16">
+          <h2 className="h2 mb-10 text-center">By the numbers</h2>
+        </FadeIn>
+        
+        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-32">
+          {[
+            { label: "Active Users", value: "250K+" },
+            { label: "Transactions Processed", value: "$50M+" },
+            { label: "App Store Rating", value: "4.8/5" },
+            { label: "Supported Countries", value: "Global" },
+          ].map((stat, i) => (
+            <StaggerItem key={i} className="text-center p-8 glass rounded-2xl border border-[var(--color-border)]">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</div>
+              <div className="text-[var(--color-text-sec)] text-sm font-medium uppercase tracking-wider">{stat.label}</div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <div className="glass rounded-[3rem] p-10 md:p-20 border border-[var(--color-border)] text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-[var(--color-accent)] opacity-5 blur-[100px]"></div>
+          <Building2 className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-8 relative z-10" />
+          <h2 className="h2 mb-6 relative z-10">Backed by the best</h2>
+          <p className="text-lg text-[var(--color-text-sec)] max-w-2xl mx-auto mb-10 relative z-10">
+            PAYVORA is partnered with tier-1 licensed financial institutions and leading technology providers to ensure your money is always safe, secure, and accessible.
           </p>
-          <a
-            href="/careers"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-colors"
-          >
-            See open positions
-          </a>
+          {/* Faux logos area */}
+          <div className="flex flex-wrap justify-center gap-8 relative z-10 opacity-50 grayscale">
+            <div className="text-2xl font-bold tracking-tighter">FINTECH PARTNER</div>
+            <div className="text-2xl font-bold tracking-tighter">GLOBAL BANK</div>
+            <div className="text-2xl font-bold tracking-tighter">SECURITY FIRM</div>
+          </div>
         </div>
-      </section>
-
-      <DownloadCTA />
-    </>
+      </Container>
+    </div>
   );
 }

@@ -1,140 +1,92 @@
-import type { Metadata } from "next";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Clock, TrendingUp, ShieldCheck, Zap, CheckCircle2 } from "lucide-react";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Tag, ArrowLeftRight, TrendingUp, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Gift Card Trading – PAYVORA",
-  description:
-    "Trade Amazon, iTunes, Google Play, Steam, and 50+ gift card brands for instant Naira. Best rates in Nigeria.",
+  title: "Buy & Sell Gift Cards",
+  description: "Trade Amazon, iTunes, Steam, and other gift cards instantly at the best market rates in Nigeria.",
 };
 
-const brands = [
-  { name: "Amazon", color: "#FF9900" },
-  { name: "iTunes", color: "#FA233B" },
-  { name: "Google Play", color: "#34A853" },
-  { name: "Steam", color: "#1B2838" },
-  { name: "Razer Gold", color: "#44D62C" },
-  { name: "Walmart", color: "#0071CE" },
-  { name: "eBay", color: "#E53238" },
-  { name: "Visa Gift", color: "#1A1F71" },
-  { name: "Netflix", color: "#E50914" },
-  { name: "Xbox", color: "#107C10" },
-  { name: "PlayStation", color: "#003791" },
-  { name: "Footlocker", color: "#D32F2F" },
-  { name: "Nike", color: "#111111" },
-  { name: "Target", color: "#CC0000" },
-  { name: "Best Buy", color: "#0046BE" },
-  { name: "Nordstrom", color: "#000000" },
-  { name: "Sephora", color: "#D4145A" },
-  { name: "GameStop", color: "#AC2012" },
-  { name: "JCPenney", color: "#8B0000" },
-  { name: "American Express", color: "#007BC1" },
-];
-
-const steps = [
-  { step: "1", title: "Select your card", desc: "Choose the gift card brand and enter the denomination." },
-  { step: "2", title: "Upload the card", desc: "Photo the card code or enter it manually in the app." },
-  { step: "3", title: "Get your rate", desc: "See the exact Naira value before confirming — no surprises." },
-  { step: "4", title: "Receive cash", desc: "Funds hit your wallet in under 60 seconds. Withdraw anytime." },
-];
-
 export default function GiftCardsPage() {
+  const brands = ["Amazon", "Apple", "Steam", "Google Play", "PlayStation", "Xbox", "Sephora", "Razer Gold"];
+
   return (
-    <>
-      <section className="pt-32 pb-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-              Best rates in Nigeria
+    <div className="pt-32 pb-24 overflow-hidden">
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
+          <FadeIn className="order-2 lg:order-1 relative">
+            <div className="absolute inset-0 bg-[#8b5cf6] blur-[100px] opacity-20 rounded-full"></div>
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden glass border border-[var(--color-border)] flex items-center justify-center bg-[var(--color-surface)]">
+              <Image 
+                src="/images/feature-gift-cards.png" 
+                alt="Digital Gift Cards Stack" 
+                fill 
+                className="object-cover object-center opacity-90 mix-blend-screen"
+                priority
+              />
             </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-              Trade gift cards,{" "}
-              <span className="text-[#00D9A0]">get cash instantly.</span>
+          </FadeIn>
+          
+          <FadeIn className="order-1 lg:order-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm font-semibold mb-6">
+              <Tag className="w-4 h-4" /> Top Rates Guaranteed
+            </div>
+            <h1 className="h1 mb-6">
+              Trade gift cards at <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-[var(--color-accent)]">unbeatable rates.</span>
             </h1>
-            <p className="text-gray-500 text-xl max-w-2xl mx-auto mb-12">
-              Upload your gift card, get the best market rate, and receive Naira in your wallet within 60 seconds. No stress. No delays. No guessing.
+            <p className="text-xl text-[var(--color-text-sec)] mb-8 leading-relaxed">
+              Have an unused gift card? Convert it to Naira instantly. Need to buy a gift card for a friend abroad? Buy it seamlessly from your PAYVORA wallet.
             </p>
-
-            {/* Key benefits */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto mb-16">
-              {[
-                { icon: Clock, title: "60-second settlement", desc: "Funds hit your wallet in under a minute." },
-                { icon: TrendingUp, title: "Real-time rates", desc: "Rates updated live based on market conditions." },
-                { icon: ShieldCheck, title: "Verified & secure", desc: "Every card verified by our expert team." },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 text-center shadow-sm hover:border-[#00D9A0] hover:shadow-md transition-all">
-                  <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center mx-auto mb-4">
-                    <Icon size={22} className="text-[#00D9A0]" />
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm">{desc}</p>
-                </div>
-              ))}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button href="/download" icon>Trade Now</Button>
             </div>
-          </div>
+          </FadeIn>
+        </div>
 
-          {/* Brands */}
-          <div className="mb-24">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 text-center mb-8">
-              50+ brands accepted
-            </h2>
-            <div className="flex flex-wrap gap-3 justify-center">
-              {brands.map(({ name }) => (
-                <div
-                  key={name}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-500 hover:border-[#00D9A0] hover:text-gray-900 transition-all cursor-default group"
-                >
-                  <CheckCircle2 size={13} className="text-[#00D9A0] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  {name}
-                </div>
-              ))}
-              <div className="flex items-center gap-2 px-4 py-2 bg-[rgba(0,217,160,0.08)] border border-[rgba(0,217,160,0.2)] rounded-xl text-sm text-[#00D9A0] font-semibold">
-                <Zap size={13} />
-                + many more
+        {/* Brand Marquee (Static layout for now) */}
+        <div className="mb-32">
+          <p className="text-center text-[var(--color-muted)] text-sm font-medium uppercase tracking-wider mb-8">Supported Brands</p>
+          <div className="flex flex-wrap justify-center gap-4 lg:gap-8">
+            {brands.map(brand => (
+              <div key={brand} className="px-6 py-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-white font-medium">
+                {brand}
               </div>
-            </div>
-          </div>
-
-          {/* How it works */}
-          <div className="mb-16">
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
-              How it works
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 relative">
-              <div className="hidden sm:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-gray-100" />
-              {steps.map(({ step, title, desc }) => (
-                <div key={step} className="text-center relative">
-                  <div className="w-12 h-12 rounded-full bg-white border-2 border-[rgba(0,217,160,0.4)] flex items-center justify-center mx-auto mb-4 relative z-10 shadow-sm">
-                    <span className="text-[#00D9A0] font-black">{step}</span>
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Trust signals */}
-          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-8 text-center">
-            <h3 className="text-gray-900 font-bold text-xl mb-6">Trusted by traders across Nigeria</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              {[
-                { value: "50K+", label: "Happy traders" },
-                { value: "₦2B+", label: "Gift cards traded" },
-                { value: "< 60s", label: "Avg. settlement" },
-                { value: "4.9★", label: "Average rating" },
-              ].map(({ value, label }) => (
-                <div key={label}>
-                  <p className="text-[#00D9A0] text-2xl font-black mb-1">{value}</p>
-                  <p className="text-gray-500 text-sm">{label}</p>
-                </div>
-              ))}
+            ))}
+            <div className="px-6 py-3 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-sec)] font-medium">
+              + 50 more
             </div>
           </div>
         </div>
-      </section>
-      <DownloadCTA />
-    </>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+          <StaggerContainer className="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <StaggerItem className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <ArrowLeftRight className="w-10 h-10 text-[var(--color-accent)] mb-6" />
+              <h3 className="text-xl font-bold text-white mb-3">Buy & Sell</h3>
+              <p className="text-[var(--color-text-sec)]">
+                Complete flexibility. Purchase global gift cards directly from your wallet, or sell unused cards for instant Naira to your bank.
+              </p>
+            </StaggerItem>
+            <StaggerItem className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <TrendingUp className="w-10 h-10 text-[var(--color-accent)] mb-6" />
+              <h3 className="text-xl font-bold text-white mb-3">Premium Rates</h3>
+              <p className="text-[var(--color-text-sec)]">
+                Our rates are updated in real-time to ensure you always get the highest value in the market for your trade.
+              </p>
+            </StaggerItem>
+            <StaggerItem className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <CheckCircle2 className="w-10 h-10 text-[var(--color-accent)] mb-6" />
+              <h3 className="text-xl font-bold text-white mb-3">Instant Payout</h3>
+              <p className="text-[var(--color-text-sec)]">
+                No delays. Once your gift card is verified (usually under 2 minutes), your funds are immediately available for withdrawal.
+              </p>
+            </StaggerItem>
+          </StaggerContainer>
+        </div>
+
+      </Container>
+    </div>
   );
 }

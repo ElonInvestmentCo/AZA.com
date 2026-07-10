@@ -1,72 +1,111 @@
-import type { Metadata } from "next";
-import { SecuritySection } from "@/components/sections/SecuritySection";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Shield, Lock, Eye } from "lucide-react";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { ShieldCheck, Lock, Eye, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Security",
-  description:
-    "PAYVORA uses bank-grade 256-bit encryption, biometric authentication, 2FA, and AI fraud detection to keep your money safe.",
+  title: "Security & AML/KYC",
+  description: "Learn how PAYVORA protects your funds and personal information.",
 };
 
 export default function SecurityPage() {
   return (
-    <>
-      <section className="pt-32 pb-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-            <Shield size={14} /> Bank-grade security
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-            Your money is <span className="text-[#00D9A0]">protected.</span>
-          </h1>
-          <p className="text-gray-500 text-xl max-w-2xl mx-auto">
-            We&apos;ve built multiple layers of security so you can transact with confidence. Every feature, every transaction, every account is protected.
-          </p>
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="max-w-3xl mb-20">
+          <FadeIn>
+            <h1 className="h1 mb-6">Bank-grade security. <br/>Zero compromises.</h1>
+            <p className="text-xl text-[var(--color-text-sec)] leading-relaxed">
+              We take the security of your funds and data seriously. PAYVORA employs state-of-the-art encryption, rigorous compliance, and advanced fraud detection.
+            </p>
+          </FadeIn>
         </div>
-      </section>
 
-      <SecuritySection />
-
-      {/* How we protect you */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
-            How we protect you
-          </h2>
-          <div className="space-y-6">
-            {[
-              {
-                icon: Lock,
-                title: "End-to-end encryption",
-                body: "All communication between your device and PAYVORA servers is encrypted using TLS 1.3. Your data is stored with AES-256 encryption. No one — not even our engineers — can read your personal data.",
-              },
-              {
-                icon: Shield,
-                title: "Secure payment processing",
-                body: "All payment transactions are processed through PCI-DSS compliant infrastructure. Card details are tokenized and never stored on our servers. Your virtual card details are masked by default.",
-              },
-              {
-                icon: Eye,
-                title: "Fraud detection & prevention",
-                body: "Our AI-powered fraud engine analyzes every transaction in real-time. Unusual patterns trigger automatic holds and instant notifications. You can freeze your account or card with one tap.",
-              },
-            ].map(({ icon: Icon, title, body }) => (
-              <div key={title} className="bg-white border border-gray-100 rounded-2xl p-8 flex gap-6 shadow-sm">
-                <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center flex-shrink-0">
-                  <Icon size={22} className="text-[#00D9A0]" />
-                </div>
-                <div>
-                  <h3 className="text-gray-900 font-bold text-xl mb-3">{title}</h3>
-                  <p className="text-gray-500 leading-relaxed">{body}</p>
-                </div>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+          {[
+            {
+              icon: <Lock className="w-8 h-8 text-[var(--color-accent)]" />,
+              title: "End-to-End Encryption",
+              desc: "All traffic and personal data is encrypted using AES-256 and TLS 1.3 protocols before it leaves your device.",
+            },
+            {
+              icon: <ShieldCheck className="w-8 h-8 text-[var(--color-accent)]" />,
+              title: "Regulatory Compliance",
+              desc: "We strictly adhere to global AML and KYC regulations to prevent fraud and ensure a safe trading environment.",
+            },
+            {
+              icon: <Eye className="w-8 h-8 text-[var(--color-accent)]" />,
+              title: "Continuous Monitoring",
+              desc: "Our automated systems monitor transactions 24/7 to detect and block suspicious activity in real-time.",
+            },
+          ].map((feature, i) => (
+            <StaggerItem key={i} className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--color-accent-dim)] flex items-center justify-center mb-6">
+                {feature.icon}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+              <p className="text-[var(--color-text-sec)] leading-relaxed">{feature.desc}</p>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
 
-      <DownloadCTA />
-    </>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
+          <FadeIn>
+            <h2 className="h3 mb-6">KYC & AML Policy</h2>
+            <div className="prose prose-invert max-w-none text-[var(--color-text-sec)]">
+              <p className="mb-4">
+                To maintain a secure ecosystem and comply with international regulations, PAYVORA implements a robust Know Your Customer (KYC) and Anti-Money Laundering (AML) policy.
+              </p>
+              <h3 className="text-white font-semibold text-lg mt-8 mb-4">Verification Tiers</h3>
+              <ul className="space-y-4">
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-[var(--color-accent)] shrink-0" />
+                  <div>
+                    <strong className="text-white block">Tier 1 (Basic)</strong>
+                    <span>Email verification, phone number, and basic demographic data. Allows limited transaction volumes.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-[var(--color-accent)] shrink-0" />
+                  <div>
+                    <strong className="text-white block">Tier 2 (Standard)</strong>
+                    <span>Government-issued ID and facial verification. Unlocks standard limits and virtual cards.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-[var(--color-accent)] shrink-0" />
+                  <div>
+                    <strong className="text-white block">Tier 3 (Premium)</strong>
+                    <span>Proof of address. Unlocks maximum account limits for high-volume users.</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.2} className="glass p-10 rounded-3xl border border-[var(--color-border)] flex flex-col justify-center">
+            <h3 className="h3 mb-4">Account Protection</h3>
+            <p className="text-[var(--color-text-sec)] mb-8">
+              You are in control of your account security. We provide the tools you need to lock down your wallet.
+            </p>
+            <ul className="space-y-4 mb-10">
+              {[
+                "Two-Factor Authentication (2FA) support",
+                "Biometric login (FaceID / TouchID)",
+                "Instant virtual card freezing",
+                "New device login alerts",
+                "PIN protection for all transactions"
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[var(--color-accent)]"></div>
+                  <span className="text-white">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Button href="/contact" variant="outline">Report a Security Issue</Button>
+          </FadeIn>
+        </div>
+      </Container>
+    </div>
   );
 }

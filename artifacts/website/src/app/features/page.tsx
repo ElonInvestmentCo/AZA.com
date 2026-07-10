@@ -1,69 +1,94 @@
-import type { Metadata } from "next";
-import { Features } from "@/components/sections/Features";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import {
-  CreditCard, Zap, Wifi, Lightbulb, Tv, Dice6,
-  ArrowLeftRight, Gift, Wallet, ArrowRight,
-} from "lucide-react";
-import Link from "next/link";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Shield, Zap, Globe, Coins, Layers, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Features",
-  description:
-    "Explore all PAYVORA features: gift cards, virtual cards, airtime, data, electricity, cable TV, betting, and bank transfers.",
+  title: "All Features | PAYVORA",
+  description: "Explore everything you can do with your PAYVORA account. From virtual cards to crypto conversion.",
 };
 
-const featurePages = [
-  { icon: Gift, title: "Gift Cards", href: "/gift-cards", desc: "Trade 50+ gift card brands for instant cash." },
-  { icon: CreditCard, title: "Virtual Cards", href: "/virtual-cards", desc: "USD virtual card for international payments." },
-  { icon: Lightbulb, title: "Bill Payments", href: "/bill-payments", desc: "Pay electricity, water, and more bills instantly." },
-  { icon: Zap, title: "Airtime & Data", href: "/airtime-data", desc: "Recharge any network at the best rates." },
-  { icon: Tv, title: "Cable TV", href: "/bill-payments", desc: "Renew DStv, GOtv, Showmax and more." },
-  { icon: Dice6, title: "Betting Wallet", href: "/bill-payments", desc: "Fund your betting platforms seamlessly." },
-  { icon: ArrowLeftRight, title: "Bank Transfers", href: "/features", desc: "Instant transfers to any Nigerian bank." },
-  { icon: Wallet, title: "Digital Wallet", href: "/features", desc: "Fund, store, and withdraw Naira easily." },
-  { icon: Wifi, title: "Data Bundles", href: "/airtime-data", desc: "Cheapest data plans for all networks." },
-];
-
 export default function FeaturesPage() {
-  return (
-    <>
-      {/* Hero */}
-      <section className="pt-32 pb-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-            Everything in one app
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-            Features built for{" "}
-            <span className="text-[#00D9A0]">real Nigerians.</span>
-          </h1>
-          <p className="text-gray-500 text-xl max-w-2xl mx-auto mb-12">
-            PAYVORA combines every financial service you need into one app that&apos;s fast, reliable, and beautifully designed.
-          </p>
+  const features = [
+    {
+      icon: <Globe className="w-6 h-6" />,
+      title: "Global USD Cards",
+      desc: "Create 3D-secure virtual dollar cards instantly. Fund with Naira and spend on any international website without limits.",
+      link: "/virtual-cards"
+    },
+    {
+      icon: <Layers className="w-6 h-6" />,
+      title: "Gift Card Trading",
+      desc: "Convert unused gift cards (Amazon, Steam, Apple, etc.) to Naira at the most competitive market rates.",
+      link: "/gift-cards"
+    },
+    {
+      icon: <Zap className="w-6 h-6" />,
+      title: "Utility Payments",
+      desc: "Pay electricity bills and TV subscriptions instantly with zero service charges or hidden fees.",
+      link: "/bill-payments"
+    },
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "Bank-Grade Security",
+      desc: "Protect your funds with biometric login, 2FA, and instant card freezing directly from the app.",
+      link: "/security"
+    },
+    {
+      icon: <Coins className="w-6 h-6" />,
+      title: "Airtime & Data",
+      desc: "Recharge your phone or buy data bundles for any Nigerian network in seconds.",
+      link: "/airtime-data"
+    },
+    {
+      icon: <ArrowRight className="w-6 h-6" />,
+      title: "Instant Withdrawals",
+      desc: "Move funds from your PAYVORA wallet to any local bank account instantly, 24/7.",
+      link: "/download"
+    }
+  ];
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-left">
-            {featurePages.map(({ icon: Icon, title, href, desc }) => (
-              <Link
-                key={title}
-                href={href}
-                className="group bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-[#00D9A0] hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center mb-4">
-                  <Icon size={22} className="text-[#00D9A0]" />
-                </div>
-                <h3 className="text-gray-900 font-bold text-lg mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4">{desc}</p>
-                <div className="flex items-center gap-1 text-[#00D9A0] text-sm font-semibold group-hover:gap-2 transition-all">
-                  Learn more <ArrowRight size={14} />
-                </div>
-              </Link>
-            ))}
-          </div>
+  return (
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="text-center max-w-3xl mx-auto mb-24">
+          <FadeIn>
+            <h1 className="h1 mb-6">Everything you need. <br/>Nothing you don't.</h1>
+            <p className="text-xl text-[var(--color-text-sec)]">
+              A powerful suite of financial tools designed for speed, reliability, and global access.
+            </p>
+          </FadeIn>
         </div>
-      </section>
-      <Features />
-      <DownloadCTA />
-    </>
+
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-32">
+          {features.map((feature, i) => (
+            <StaggerItem key={i} className="glass p-8 rounded-3xl border border-[var(--color-border)] hover:border-[var(--color-border-light)] transition-colors group">
+              <div className="w-14 h-14 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center mb-6 text-[var(--color-accent)] group-hover:bg-[var(--color-accent-dim)] transition-colors">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+              <p className="text-[var(--color-text-sec)] mb-6 leading-relaxed flex-1">
+                {feature.desc}
+              </p>
+              <Button href={feature.link} variant="ghost" className="px-0 hover:bg-transparent hover:text-[var(--color-accent)] justify-start">
+                Explore feature <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <FadeIn className="glass rounded-[3rem] p-10 md:p-16 border border-[var(--color-border)] relative overflow-hidden flex flex-col items-center text-center">
+          <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-accent-dim)] to-transparent opacity-30"></div>
+          <div className="relative z-10 max-w-2xl">
+            <h2 className="h2 mb-6">Experience it yourself</h2>
+            <p className="text-[var(--color-text-sec)] text-lg mb-8">
+              Download the app today and join thousands of users enjoying seamless digital finance.
+            </p>
+            <Button href="/download" size="lg" icon>Get Started</Button>
+          </div>
+        </FadeIn>
+      </Container>
+    </div>
   );
 }

@@ -1,73 +1,48 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
+import { Container } from "@/components/ui/core";
+import { FadeIn } from "@/components/ui/animations";
 
 export const metadata: Metadata = {
-  title: "Refund Policy – PAYVORA",
-  description:
-    "Understand PAYVORA's refund policy for gift card trades, bill payments, virtual cards, and wallet transactions.",
+  title: "Refund & Cancellation Policy",
 };
 
-const sections = [
-  {
-    title: "1. Overview",
-    body: "PAYVORA processes all transactions in real-time and most are irreversible once confirmed. This policy explains the specific circumstances under which refunds are issued and the process to request one.\n\nAll refund requests must be submitted within 72 hours of the original transaction unless otherwise stated below.",
-  },
-  {
-    title: "2. Gift Card Trades",
-    body: "**Non-refundable:** Gift card trades are final once confirmed. The rate and amount shown at submission are what you receive. We do not offer refunds for:\n\n• Change of mind after confirmation\n• Rates changing after your trade was confirmed\n• Cards submitted with incorrect denominations\n\n**Eligible for refund:** If our system incorrectly credits a lower amount than the confirmed rate due to a platform error, we will refund the difference within 24 hours upon verification. Report errors to support@payvora.com with your transaction ID.",
-  },
-  {
-    title: "3. Bill Payments",
-    body: "**Electricity (DISCO payments):** If payment is confirmed in our system but the token is not delivered within 30 minutes, you are entitled to a full refund or re-attempt. Contact support with your meter number and transaction ID.\n\n**Cable TV:** Subscriptions are activated directly with the provider. If activation fails within 1 hour of confirmed payment, a full refund will be issued.\n\n**Airtime & Data:** Airtime and data are delivered instantly. No refunds are offered once delivery is confirmed. If delivery fails, we will credit your wallet within 24 hours.\n\n**Betting Wallets:** Funds credited to betting platforms cannot be reversed once confirmed by the platform.",
-  },
-  {
-    title: "4. Virtual Card Transactions",
-    body: "**Card top-ups:** If you top up your virtual card but funds are not credited within 5 minutes due to a platform error, contact support for a full refund.\n\n**Merchant charges:** PAYVORA cannot reverse charges made by third-party merchants. For disputed merchant charges, contact the merchant directly. We can provide transaction evidence for chargebacks if needed.\n\n**Unused card balance:** Virtual card balances can be withdrawn back to your PAYVORA wallet at any time at no charge.",
-  },
-  {
-    title: "5. Wallet Deposits",
-    body: "If you fund your PAYVORA wallet via bank transfer and funds do not reflect within 30 minutes, contact support with your bank transaction reference. We will investigate and credit your wallet within 2 hours of confirmation from your bank.",
-  },
-  {
-    title: "6. Wallet Withdrawals",
-    body: "Once a withdrawal is initiated and confirmed, it cannot be cancelled or reversed. If a withdrawal is debited from your wallet but not received by your bank within 24 hours, contact support immediately. We will investigate and resolve within 1 business day.",
-  },
-  {
-    title: "7. How to Request a Refund",
-    body: "To request a refund:\n\n1. Contact support@payvora.com with subject line: 'Refund Request – [Transaction ID]'\n2. Include your account email, transaction ID, amount, date, and a description of the issue.\n3. Our team will acknowledge within 2 hours and resolve within 24–72 hours depending on the transaction type.\n\nAlternatively, use the live chat in the PAYVORA app for faster response.",
-  },
-  {
-    title: "8. Refund Processing",
-    body: "Approved refunds are credited to your PAYVORA wallet balance. We do not refund directly to bank accounts unless the original payment was made by bank transfer and the wallet has since been suspended or closed.",
-  },
-  {
-    title: "9. Fraudulent Refund Claims",
-    body: "Submitting false refund claims is a violation of our Terms of Service and may constitute fraud under Nigerian law. Accounts found submitting fraudulent claims will be permanently banned and may be reported to the EFCC and relevant authorities.",
-  },
-  {
-    title: "10. Contact",
-    body: "Refund support: support@payvora.com\nBusiness hours: Monday–Sunday, 8 AM – 10 PM WAT\nEmergency (account freeze): Available 24/7 via in-app live chat",
-  },
-];
-
-export default function RefundPolicyPage() {
+export default function RefundPage() {
   return (
-    <main className="pt-32 pb-24 bg-white min-h-screen">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
-          Refund Policy
-        </h1>
-        <p className="text-gray-500 mb-12">Last updated: June 30, 2026</p>
-        <div className="space-y-10">
-          {sections.map(({ title, body }) => (
-            <section key={title}>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{title}</h2>
-              <p className="text-gray-500 leading-relaxed whitespace-pre-line">
-                {body}
-              </p>
-            </section>
-          ))}
-        </div>
-      </div>
-    </main>
+    <div className="pt-32 pb-24">
+      <Container className="max-w-4xl">
+        <FadeIn>
+          <div className="mb-12 border-b border-[var(--color-border)] pb-8">
+            <h1 className="h1 mb-4">Refund Policy</h1>
+            <p className="text-[var(--color-text-sec)]">Last Updated: October 2024</p>
+          </div>
+
+          <div className="prose prose-invert max-w-none text-[var(--color-text-sec)]">
+            <p className="text-lg mb-8">
+              This policy outlines the conditions under which PAYVORA processes refunds and cancellations for various transactions on our platform.
+            </p>
+
+            <h3 className="text-xl text-white font-bold mt-10 mb-4">1. General Rule</h3>
+            <p className="mb-6">
+              Due to the immediate and digital nature of our services, most transactions processed on PAYVORA are final and non-refundable once successfully completed.
+            </p>
+
+            <h3 className="text-xl text-white font-bold mt-10 mb-4">2. Airtime & Data Purchases</h3>
+            <p className="mb-6">
+              Purchases of airtime, data bundles, and electricity tokens are instant and irreversible. If you provide the wrong phone number or meter number, PAYVORA cannot issue a refund. Refunds are only issued if the transaction fails on our end but your wallet is debited.
+            </p>
+
+            <h3 className="text-xl text-white font-bold mt-10 mb-4">3. Virtual Cards</h3>
+            <p className="mb-6">
+              Virtual Card creation fees ($2) are non-refundable. If you cancel or delete your virtual card, any remaining balance on the card will be converted back to your main Naira or USD wallet at the prevailing exchange rate, minus any applicable network fees.
+            </p>
+
+            <h3 className="text-xl text-white font-bold mt-10 mb-4">4. Failed Transactions</h3>
+            <p className="mb-6">
+              If a transaction fails or times out (e.g., bank network issues) but your PAYVORA wallet is debited, the system will automatically attempt to reverse the charge within 24 hours. If the funds are not returned automatically, please contact support with your transaction ID.
+            </p>
+          </div>
+        </FadeIn>
+      </Container>
+    </div>
   );
 }

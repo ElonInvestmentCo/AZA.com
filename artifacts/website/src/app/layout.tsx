@@ -32,9 +32,6 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "PAYVORA" }],
   creator: "PAYVORA",
-  verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION,
-  },
   openGraph: {
     type: "website",
     locale: "en_NG",
@@ -86,6 +83,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#00D9A0" />
       </head>
       <body>
+        <div className="noise-overlay"></div>
         <Navbar />
         <main>{children}</main>
         <Footer />

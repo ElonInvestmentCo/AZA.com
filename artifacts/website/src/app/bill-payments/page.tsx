@@ -1,136 +1,74 @@
-import type { Metadata } from "next";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Lightbulb, Tv, Droplets, Dice6, CheckCircle2, Zap, Clock, Shield } from "lucide-react";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Phone, Wifi, Zap, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Bill Payments – PAYVORA",
-  description:
-    "Pay electricity, cable TV, water, internet and betting wallet bills instantly with PAYVORA. No queues, no delays.",
+  title: "Bill Payments & Airtime",
+  description: "Recharge airtime, buy data, and pay utility bills across Nigeria directly from your PAYVORA wallet.",
 };
-
-const billTypes = [
-  {
-    icon: Lightbulb,
-    title: "Electricity",
-    color: "#F59E0B",
-    desc: "Pay your prepaid or postpaid electricity bills across all 11 Nigerian DISCOs. Token delivered in 30 seconds.",
-    providers: [
-      "EKEDC (Eko)", "IKEDC (Ikeja)", "AEDC (Abuja)", "PHED (Port Harcourt)",
-      "EEDC (Enugu)", "KEDCO (Kano)", "YEDC (Yola)", "JED (Jos)",
-      "BEDC (Benin)", "IBEDC (Ibadan)", "KSEDC (Kaduna)",
-    ],
-  },
-  {
-    icon: Tv,
-    title: "Cable TV",
-    color: "#00b8ff",
-    desc: "Renew all your cable TV and streaming subscriptions with one tap. Auto-renew available.",
-    providers: ["DStv", "GOtv", "StarTimes", "Showmax", "Netflix", "YouTube Premium"],
-  },
-  {
-    icon: Droplets,
-    title: "Water Bills",
-    color: "#00D9A0",
-    desc: "Pay water utility bills across major Nigerian states without visiting any office.",
-    providers: ["Lagos Water Corporation", "Abuja FCDA Water", "State water boards"],
-  },
-  {
-    icon: Dice6,
-    title: "Betting Wallets",
-    color: "#FF5B7A",
-    desc: "Fund any betting platform directly from your PAYVORA wallet. No bank delays.",
-    providers: ["Sportybet", "Bet9ja", "1xBet", "BetWay", "MSport", "Melbet", "NairaBet", "AccessBet"],
-  },
-];
-
-const steps = [
-  { step: "1", title: "Open PAYVORA", desc: "Launch the app and go to Bills from your home screen." },
-  { step: "2", title: "Select category", desc: "Choose from Electricity, Cable TV, Water, or Betting." },
-  { step: "3", title: "Enter your details", desc: "Input your meter number, decoder, or account ID." },
-  { step: "4", title: "Confirm & pay", desc: "Review the amount and tap confirm. Done in under 30 seconds." },
-];
 
 export default function BillPaymentsPage() {
   return (
-    <>
-      <section className="pt-32 pb-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-              All bills, one app
-            </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-              Pay every bill{" "}
-              <span className="text-[#00D9A0]">in seconds.</span>
-            </h1>
-            <p className="text-gray-500 text-xl max-w-2xl mx-auto mb-10">
-              No more queues, no more USSD codes, no more stress. PAYVORA lets you pay every utility bill from your phone in under 30 seconds.
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="text-center max-w-3xl mx-auto mb-20">
+          <FadeIn>
+            <h1 className="h1 mb-6">Life admin, <span className="text-gradient-accent">sorted.</span></h1>
+            <p className="text-xl text-[var(--color-text-sec)]">
+              Pay electricity bills, TV subscriptions, and recharge airtime directly from your app. Fast, reliable, and absolutely zero hidden fees.
             </p>
+          </FadeIn>
+        </div>
 
-            {/* Quick stats */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              {[
-                { icon: Zap, label: "30-second payment" },
-                { icon: Clock, label: "24/7 availability" },
-                { icon: Shield, label: "100% secure" },
-                { icon: CheckCircle2, label: "Instant confirmation" },
-              ].map(({ icon: Icon, label }) => (
-                <span key={label} className="flex items-center gap-1.5 text-gray-500">
-                  <Icon size={15} className="text-[#00D9A0]" />
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Bill type cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-24">
-            {billTypes.map(({ icon: Icon, title, color, desc, providers }) => (
-              <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${color}20` }}>
-                    <Icon size={22} style={{ color }} />
-                  </div>
-                  <h3 className="text-gray-900 font-bold text-xl">{title}</h3>
-                </div>
-                <p className="text-gray-500 text-sm mb-5 leading-relaxed">{desc}</p>
-                <div className="flex flex-wrap gap-2">
-                  {providers.map((p) => (
-                    <span
-                      key={p}
-                      className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-1"
-                    >
-                      <CheckCircle2 size={11} className="text-[#00D9A0]" />
-                      {p}
-                    </span>
-                  ))}
-                </div>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
+          {[
+            {
+              icon: <Phone className="w-8 h-8 text-[#00D9A0]" />,
+              title: "Airtime Recharge",
+              desc: "Top up MTN, Airtel, GLO, and 9Mobile instantly. Earn cashback on your personal recharges.",
+            },
+            {
+              icon: <Wifi className="w-8 h-8 text-[#00D9A0]" />,
+              title: "Data Bundles",
+              desc: "Stay connected. Buy data plans for any network directly from your wallet balance.",
+            },
+            {
+              icon: <Zap className="w-8 h-8 text-[#00D9A0]" />,
+              title: "Electricity (Prepaid)",
+              desc: "Buy tokens for Ikeja, Eko, Abuja, Kano, and all major DisCos in Nigeria without service interruptions.",
+            },
+            {
+              icon: <FileText className="w-8 h-8 text-[#00D9A0]" />,
+              title: "Cable TV",
+              desc: "Renew DSTV, GOTV, and Startimes subscriptions instantly so you never miss a match.",
+            }
+          ].map((feature, i) => (
+            <StaggerItem key={i} className="glass p-10 rounded-3xl border border-[var(--color-border)] flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-16 h-16 rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border-light)] flex items-center justify-center shrink-0">
+                {feature.icon}
               </div>
-            ))}
-          </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-[var(--color-text-sec)] leading-relaxed">{feature.desc}</p>
+              </div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
 
-          {/* How it works */}
-          <div>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
-              How it works
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 relative">
-              <div className="hidden sm:block absolute top-6 left-[12.5%] right-[12.5%] h-px bg-gray-100" />
-              {steps.map(({ step, title, desc }) => (
-                <div key={step} className="text-center relative">
-                  <div className="w-12 h-12 rounded-full bg-white border border-[rgba(0,217,160,0.4)] flex items-center justify-center mx-auto mb-4 relative z-10 shadow-sm">
-                    <span className="text-[#00D9A0] font-black">{step}</span>
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
+        <div className="bg-[var(--color-accent)] rounded-[3rem] p-10 md:p-16 text-black text-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Set auto-renew and relax</h2>
+            <p className="text-lg md:text-xl font-medium mb-10 text-black/80">
+              Schedule your data and TV subscriptions to renew automatically every month. Never get disconnected again.
+            </p>
+            <Button href="/download" className="bg-black text-white hover:bg-black/90 px-8 py-4 text-lg">
+              Download the App
+            </Button>
           </div>
         </div>
-      </section>
-      <DownloadCTA />
-    </>
+      </Container>
+    </div>
   );
 }

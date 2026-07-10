@@ -1,173 +1,60 @@
-import type { Metadata } from "next";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { Zap, Wifi, CheckCircle2, Clock, Shield, Smartphone } from "lucide-react";
+import { Metadata } from "next";
+import { Container } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Phone, Wifi, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Airtime & Data – PAYVORA",
-  description:
-    "Recharge MTN, Airtel, Glo, and 9mobile airtime and data bundles at the cheapest rates in Nigeria.",
+  title: "Airtime & Data Recharge",
+  description: "Instant mobile recharge for all Nigerian networks.",
 };
-
-const networks = [
-  {
-    name: "MTN",
-    color: "#FFCC00",
-    textColor: "#0A0A0F",
-    plans: [
-      { size: "500MB", price: "₦100" },
-      { size: "1GB", price: "₦200" },
-      { size: "2GB", price: "₦500" },
-      { size: "5GB", price: "₦1,000" },
-      { size: "10GB", price: "₦2,000" },
-      { size: "20GB", price: "₦3,500" },
-    ],
-  },
-  {
-    name: "Airtel",
-    color: "#FF0000",
-    textColor: "#FFFFFF",
-    plans: [
-      { size: "500MB", price: "₦100" },
-      { size: "1.5GB", price: "₦200" },
-      { size: "3GB", price: "₦500" },
-      { size: "6GB", price: "₦1,000" },
-      { size: "12GB", price: "₦2,000" },
-      { size: "24GB", price: "₦3,500" },
-    ],
-  },
-  {
-    name: "Glo",
-    color: "#00A651",
-    textColor: "#FFFFFF",
-    plans: [
-      { size: "1GB", price: "₦100" },
-      { size: "2.5GB", price: "₦200" },
-      { size: "5GB", price: "₦500" },
-      { size: "10GB", price: "₦1,000" },
-      { size: "18.25GB", price: "₦2,000" },
-      { size: "38GB", price: "₦3,500" },
-    ],
-  },
-  {
-    name: "9mobile",
-    color: "#006B3F",
-    textColor: "#FFFFFF",
-    plans: [
-      { size: "150MB", price: "₦100" },
-      { size: "500MB", price: "₦200" },
-      { size: "1.5GB", price: "₦500" },
-      { size: "3.5GB", price: "₦1,000" },
-      { size: "7.5GB", price: "₦2,000" },
-      { size: "15GB", price: "₦3,500" },
-    ],
-  },
-];
-
-const perks = [
-  { icon: Zap, label: "Instant airtime delivery" },
-  { icon: Wifi, label: "All data bundle sizes" },
-  { icon: Smartphone, label: "Any phone number" },
-  { icon: CheckCircle2, label: "No USSD codes needed" },
-  { icon: Clock, label: "24/7 availability" },
-  { icon: Shield, label: "Secure transactions" },
-];
-
-const steps = [
-  { step: "1", title: "Open PAYVORA", desc: "Go to Airtime or Data from your home dashboard." },
-  { step: "2", title: "Pick your network", desc: "Select MTN, Airtel, Glo, or 9mobile." },
-  { step: "3", title: "Enter number & amount", desc: "Type the phone number and choose a plan." },
-  { step: "4", title: "Done!", desc: "Airtime or data lands on the number instantly." },
-];
 
 export default function AirtimeDataPage() {
   return (
-    <>
-      <section className="pt-32 pb-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-              All networks supported
-            </div>
-            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-              Stay connected,{" "}
-              <span className="text-[#00D9A0]">always.</span>
-            </h1>
-            <p className="text-gray-500 text-xl max-w-2xl mx-auto mb-12">
-              Recharge airtime or buy data bundles for any Nigerian network in seconds. The cheapest rates, guaranteed — no USSD, no queues.
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
+          <FadeIn>
+            <h1 className="h1 mb-6">Stay connected, <br/><span className="text-gradient-accent">always.</span></h1>
+            <p className="text-xl text-[var(--color-text-sec)] mb-8 leading-relaxed">
+              Top up your phone or buy data bundles for MTN, Airtel, GLO, and 9Mobile. Fast, reliable, and directly from your wallet balance.
             </p>
-
-            {/* Perks */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-xl mx-auto mb-16">
-              {perks.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-gray-500 text-sm bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5">
-                  <Icon size={15} className="text-[#00D9A0] flex-shrink-0" />
-                  {label}
-                </div>
+            <ul className="space-y-4 mb-8">
+              {["Zero hidden fees", "Instant delivery to any number", "All major networks supported"].map((item, i) => (
+                <li key={i} className="flex gap-3 text-white font-medium">
+                  <CheckCircle2 className="w-6 h-6 text-[var(--color-accent)] shrink-0" />
+                  <span>{item}</span>
+                </li>
               ))}
-            </div>
-          </div>
-
-          {/* Network data plans */}
-          <div className="mb-24">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 text-center mb-10">
-              Data bundle prices
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {networks.map(({ name, color, textColor, plans }) => (
-                <div key={name} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-                  {/* Network header */}
-                  <div className="flex items-center gap-3 p-5 border-b border-gray-100" style={{ background: `${color}12` }}>
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
-                      style={{ background: color, color: textColor }}
-                    >
-                      {name[0]}
-                    </div>
-                    <h3 className="text-gray-900 font-bold text-xl">{name}</h3>
-                    <span className="ml-auto text-xs text-[#00D9A0] font-semibold">Best rates</span>
-                  </div>
-
-                  {/* Plans */}
-                  <div className="p-4 space-y-1">
-                    {plans.map(({ size, price }) => (
-                      <div
-                        key={size}
-                        className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-gray-50 transition-colors group cursor-default"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                          <span className="text-gray-900 text-sm font-medium">{size}</span>
-                        </div>
-                        <span className="text-[#00D9A0] text-sm font-bold">{price}</span>
-                      </div>
-                    ))}
-                  </div>
+            </ul>
+          </FadeIn>
+          
+          <FadeIn delay={0.2} className="glass p-8 md:p-12 rounded-[3rem] border border-[var(--color-border)] shadow-[0_0_50px_var(--color-accent-dim)] relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-accent)] blur-[100px] opacity-20"></div>
+            
+            <div className="relative z-10 space-y-8">
+              <div className="flex items-center gap-4 border-b border-[var(--color-border)] pb-6">
+                <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-[var(--color-accent)]" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* How it works */}
-          <div>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
-              Recharge in 4 easy steps
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-              {steps.map(({ step, title, desc }) => (
-                <div key={step} className="text-center">
-                  <div className="w-12 h-12 rounded-full bg-white border border-[rgba(0,217,160,0.4)] flex items-center justify-center mx-auto mb-4 shadow-sm">
-                    <span className="text-[#00D9A0] font-black">{step}</span>
-                  </div>
-                  <h3 className="text-gray-900 font-bold mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                <div>
+                  <h3 className="font-bold text-lg">Airtime Recharge</h3>
+                  <p className="text-sm text-[var(--color-text-sec)]">Any amount, any network</p>
                 </div>
-              ))}
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] flex items-center justify-center">
+                  <Wifi className="w-5 h-5 text-[var(--color-accent)]" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Data Bundles</h3>
+                  <p className="text-sm text-[var(--color-text-sec)]">Daily, weekly, or monthly plans</p>
+                </div>
+              </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
-      </section>
-      <DownloadCTA />
-    </>
+      </Container>
+    </div>
   );
 }

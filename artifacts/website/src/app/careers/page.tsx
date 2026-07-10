@@ -1,172 +1,69 @@
-import type { Metadata } from "next";
-import { Briefcase, MapPin, Clock, ArrowRight } from "lucide-react";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { Briefcase, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Careers at PAYVORA – Join Our Team",
-  description:
-    "Help build Nigeria's most trusted fintech platform. See open roles in engineering, design, product, and operations at PAYVORA.",
-  alternates: { canonical: "https://www.payvora.org/careers" },
+  title: "Careers",
+  description: "Join the PAYVORA team and help build the future of African finance.",
 };
 
-const openRoles = [
-  {
-    title: "Senior Backend Engineer",
-    department: "Engineering",
-    location: "Lagos, Nigeria (Hybrid)",
-    type: "Full-time",
-    description:
-      "Build the systems that process millions of naira in transactions every day. You'll work on our Node.js/TypeScript API, PostgreSQL database, and third-party payment integrations.",
-  },
-  {
-    title: "Product Designer",
-    department: "Design",
-    location: "Lagos, Nigeria (Hybrid)",
-    type: "Full-time",
-    description:
-      "Shape the experience of PAYVORA for 50,000+ users. You'll own the end-to-end design of new features — from user research through to polished Figma handoffs.",
-  },
-  {
-    title: "Mobile Engineer (React Native)",
-    department: "Engineering",
-    location: "Remote (Nigeria)",
-    type: "Full-time",
-    description:
-      "Own the PAYVORA mobile app on iOS and Android. You'll build new features, optimize performance, and work closely with our design team to bring beautiful interfaces to life.",
-  },
-  {
-    title: "Customer Support Lead",
-    department: "Operations",
-    location: "Lagos, Nigeria",
-    type: "Full-time",
-    description:
-      "Be the voice of PAYVORA for our users. You'll build and lead a support team that resolves issues fast and collects feedback that shapes our product roadmap.",
-  },
-  {
-    title: "Compliance Officer",
-    department: "Legal & Compliance",
-    location: "Lagos, Nigeria",
-    type: "Full-time",
-    description:
-      "Keep PAYVORA on the right side of Nigerian fintech regulation. You'll manage AML monitoring, KYC processes, regulatory reporting, and relationships with our compliance partners.",
-  },
-  {
-    title: "Growth Marketer",
-    department: "Marketing",
-    location: "Lagos, Nigeria (Hybrid)",
-    type: "Full-time",
-    description:
-      "Drive user acquisition and retention for PAYVORA. You'll run campaigns across social, email, referral, and paid channels — measuring everything and doubling down on what works.",
-  },
-];
-
-const perks = [
-  { emoji: "💰", label: "Competitive salary", desc: "Top-of-market pay for Nigeria, paid in Naira" },
-  { emoji: "🏥", label: "Health insurance", desc: "Comprehensive HMO cover for you and your family" },
-  { emoji: "🌴", label: "Flexible leave", desc: "25 days annual leave + Nigerian public holidays" },
-  { emoji: "📚", label: "Learning budget", desc: "₦200,000/year for courses, books, and conferences" },
-  { emoji: "🏠", label: "Remote flexibility", desc: "Most roles support hybrid or fully remote arrangements" },
-  { emoji: "🚀", label: "Equity options", desc: "Share in the company's success as we grow" },
+const jobs = [
+  { title: "Senior Frontend Engineer", dept: "Engineering", location: "Remote / Lagos" },
+  { title: "Product Designer", dept: "Design", location: "Remote" },
+  { title: "Compliance Officer", dept: "Legal", location: "Lagos, Nigeria" },
+  { title: "Customer Success Specialist", dept: "Support", location: "Remote" },
 ];
 
 export default function CareersPage() {
   return (
-    <>
-      {/* Hero */}
-      <section className="pt-32 pb-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-            We&apos;re hiring
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-            Build something that{" "}
-            <span className="text-[#00D9A0]">matters for Nigeria.</span>
-          </h1>
-          <p className="text-gray-500 text-xl max-w-2xl mx-auto leading-relaxed">
-            At PAYVORA, you&apos;ll work on hard problems with a small, talented team that moves fast, ships often, and cares deeply about the people using our product.
-          </p>
+    <div className="pt-32 pb-24">
+      <Container>
+        <div className="max-w-3xl mb-20">
+          <FadeIn>
+            <h1 className="h1 mb-6">Build the future with us.</h1>
+            <p className="text-xl text-[var(--color-text-sec)]">
+              We are always looking for ambitious, talented individuals who are passionate about redefining digital finance for the next billion users.
+            </p>
+          </FadeIn>
         </div>
-      </section>
 
-      {/* Perks */}
-      <section className="py-20 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-black text-gray-900 text-center mb-12">Why work at PAYVORA?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {perks.map(({ emoji, label, desc }) => (
-              <div key={label} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-                <div className="text-3xl mb-4">{emoji}</div>
-                <h3 className="text-gray-900 font-bold mb-2">{label}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
-              </div>
-            ))}
+        <FadeIn delay={0.2} className="mb-20">
+          <h2 className="text-2xl font-bold mb-8">Why work at PAYVORA?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <h3 className="text-xl font-bold mb-3 text-white">Impact</h3>
+              <p className="text-[var(--color-text-sec)]">Your work will directly improve the financial lives of hundreds of thousands of people.</p>
+            </div>
+            <div className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <h3 className="text-xl font-bold mb-3 text-white">Autonomy</h3>
+              <p className="text-[var(--color-text-sec)]">We hire smart people and get out of their way. Own your projects from end to end.</p>
+            </div>
+            <div className="glass p-8 rounded-3xl border border-[var(--color-border)]">
+              <h3 className="text-xl font-bold mb-3 text-white">Benefits</h3>
+              <p className="text-[var(--color-text-sec)]">Competitive salary, comprehensive health coverage, flexible remote work, and learning stipends.</p>
+            </div>
           </div>
-        </div>
-      </section>
+        </FadeIn>
 
-      {/* Open roles */}
-      <section className="py-24 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-black text-gray-900 mb-3">Open roles</h2>
-          <p className="text-gray-500 mb-12">
-            Don&apos;t see a perfect fit?{" "}
-            <a href="mailto:careers@payvora.com" className="text-[#00D9A0] hover:underline">
-              Send us your CV anyway
-            </a>{" "}
-            — we hire great people even when we don&apos;t have a listed role.
-          </p>
-          <div className="space-y-4">
-            {openRoles.map(({ title, department, location, type, description }) => (
-              <a
-                key={title}
-                href={`mailto:careers@payvora.com?subject=Application: ${encodeURIComponent(title)}`}
-                className="block bg-white border border-gray-100 rounded-2xl p-7 hover:border-[#00D9A0]/40 hover:shadow-md transition-all group shadow-sm"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xs font-bold text-[#00D9A0] bg-[rgba(0,217,160,0.1)] px-2.5 py-1 rounded-lg">
-                        {department}
-                      </span>
-                    </div>
-                    <h3 className="text-gray-900 font-bold text-xl mb-2">{title}</h3>
-                    <p className="text-gray-500 text-sm leading-relaxed mb-4">{description}</p>
-                    <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                      <div className="flex items-center gap-1.5">
-                        <MapPin size={12} />
-                        {location}
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={12} />
-                        {type}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#00D9A0] text-sm font-semibold sm:pt-1 group-hover:gap-3 transition-all">
-                    Apply <ArrowRight size={14} />
+        <div>
+          <h2 className="text-2xl font-bold mb-8">Open Positions</h2>
+          <StaggerContainer className="flex flex-col gap-4">
+            {jobs.map((job, i) => (
+              <StaggerItem key={i} className="glass p-6 md:p-8 rounded-2xl border border-[var(--color-border)] hover:border-[var(--color-border-light)] transition-colors flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">{job.title}</h3>
+                  <div className="flex gap-4 text-sm text-[var(--color-text-sec)]">
+                    <span className="flex items-center gap-1"><Briefcase className="w-4 h-4" /> {job.dept}</span>
+                    <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {job.location}</span>
                   </div>
                 </div>
-              </a>
+                <Button variant="outline" href="/contact">Apply Now</Button>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
-      </section>
-
-      {/* No roles CTA */}
-      <section className="py-16 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Briefcase size={32} className="text-[#00D9A0] mx-auto mb-4" />
-          <h2 className="text-2xl font-black text-gray-900 mb-3">Didn&apos;t find your role?</h2>
-          <p className="text-gray-500 mb-6">
-            We&apos;re always open to exceptional people. Send us a note about yourself and what you&apos;d bring to PAYVORA.
-          </p>
-          <a
-            href="mailto:careers@payvora.com"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-black text-white font-bold rounded-2xl hover:bg-gray-800 transition-colors"
-          >
-            Get in touch
-          </a>
-        </div>
-      </section>
-    </>
+      </Container>
+    </div>
   );
 }

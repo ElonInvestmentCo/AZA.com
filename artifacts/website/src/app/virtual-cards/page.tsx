@@ -1,196 +1,124 @@
-import type { Metadata } from "next";
-import { DownloadCTA } from "@/components/sections/DownloadCTA";
-import { CheckCircle2, Globe, ShoppingBag, Repeat, Shield, Zap, CreditCard, Lock } from "lucide-react";
+import { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
+import { CreditCard, Globe, Zap, Shield, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Virtual Dollar Cards – PAYVORA",
-  description:
-    "Get a free USD virtual card with PAYVORA. Shop internationally, pay for subscriptions, and make online payments securely.",
+  title: "Virtual Dollar Cards",
+  description: "Get a virtual dollar card instantly. Pay on global platforms like Netflix, Apple, Amazon, and Spotify.",
 };
-
-const usecases = [
-  "Netflix, Spotify, Apple Music",
-  "Amazon, Alibaba, eBay",
-  "ChatGPT Plus, Midjourney",
-  "Google Ads, Meta Ads",
-  "Namecheap, GoDaddy domains",
-  "Upwork, Fiverr payments",
-  "Digital Ocean, AWS",
-  "Any international website",
-];
-
-const cardTypes = [
-  {
-    title: "Standard Virtual Card",
-    desc: "Your primary USD card for everyday international payments. Save it to Netflix, Spotify, ChatGPT and more.",
-    badge: "Free",
-    badgeColor: "#00D9A0",
-    features: ["Accepted on any Visa website", "Instant top-up from wallet", "Freeze/unfreeze anytime", "No monthly fee"],
-  },
-  {
-    title: "Disposable Virtual Card",
-    desc: "Single-use card for one-off payments. Expires after one transaction to keep your main balance safe.",
-    badge: "Secure",
-    badgeColor: "#00b8ff",
-    features: ["Expires after one use", "Perfect for untrusted sites", "Create as many as you need", "Minimal fee per card"],
-  },
-];
 
 export default function VirtualCardsPage() {
   return (
-    <>
-      <section className="pt-32 pb-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(0,217,160,0.1)] border border-[rgba(0,217,160,0.25)] text-[#00D9A0] text-sm font-medium mb-6">
-                Free virtual card
-              </div>
-              <h1 className="text-5xl sm:text-6xl font-black text-gray-900 tracking-tight mb-6">
-                Your USD card for{" "}
-                <span className="text-[#00D9A0]">the world.</span>
-              </h1>
-              <p className="text-gray-500 text-xl leading-relaxed mb-8">
-                Get a free virtual USD Visa card instantly. Shop on any international website, pay for subscriptions, and make cross-border payments — all funded from your PAYVORA wallet.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
-                {[
-                  { icon: Globe, text: "Accepted worldwide" },
-                  { icon: ShoppingBag, text: "No foreign transaction fees" },
-                  { icon: Repeat, text: "Instant top-up from wallet" },
-                  { icon: CheckCircle2, text: "Freeze/unfreeze anytime" },
-                  { icon: Shield, text: "Fraud protection included" },
-                  { icon: Zap, text: "Issued in seconds" },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-3 text-gray-500 text-sm">
-                    <Icon size={16} className="text-[#00D9A0] flex-shrink-0" />
-                    {text}
-                  </div>
-                ))}
+    <div className="pt-32 pb-24 overflow-hidden">
+      <Container>
+        {/* Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
+          <FadeIn>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-accent-dim)] text-[var(--color-accent)] text-sm font-semibold mb-6">
+              <CreditCard className="w-4 h-4" /> Global Payments
+            </div>
+            <h1 className="h1 mb-6">
+              Your <span className="text-gradient-accent">global card</span> for everything.
+            </h1>
+            <p className="text-xl text-[var(--color-text-sec)] mb-8 leading-relaxed">
+              Create a virtual USD card in seconds. Shop securely on international websites, pay for subscriptions, and manage your online expenses from Nigeria without FX limits.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button href="/download" icon>Get Your Card</Button>
+              <Button href="/pricing" variant="outline">View Pricing</Button>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.2} className="relative">
+            <div className="absolute inset-0 bg-[var(--color-accent)] blur-[100px] opacity-20 rounded-full"></div>
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden glass border border-[var(--color-border)] flex items-center justify-center bg-[var(--color-surface)]">
+              {/* This uses the generated image */}
+              <div className="absolute inset-0 w-full h-full">
+                <Image 
+                  src="/images/hero-card.png" 
+                  alt="Premium Virtual Card" 
+                  fill 
+                  className="object-cover object-center mix-blend-screen opacity-90"
+                  priority
+                />
               </div>
             </div>
+          </FadeIn>
+        </div>
 
-            {/* Card visual — keep dark for contrast/realism */}
-            <div className="flex justify-center">
-              <div className="relative w-80 space-y-4">
-                <div
-                  className="w-full aspect-[1.586/1] rounded-3xl p-8 flex flex-col justify-between shadow-2xl"
-                  style={{
-                    background: "linear-gradient(145deg, #141414 0%, #1C1C2A 60%, #0A1A12 100%)",
-                    border: "1px solid rgba(0,217,160,0.3)",
-                    boxShadow: "0 0 60px rgba(0,217,160,0.1), 0 20px 60px rgba(0,0,0,0.3)",
-                  }}
-                >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[120px] font-black text-white opacity-[0.04] select-none pointer-events-none leading-none">P</div>
-                  <div className="flex justify-between items-start relative z-10">
-                    <div>
-                      <p className="text-gray-400 text-xs">Virtual Card</p>
-                      <p className="text-white font-bold text-lg">PAYVORA</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-xl bg-[#00D9A0] flex items-center justify-center">
-                      <span className="text-gray-900 font-black">P</span>
-                    </div>
-                  </div>
-                  <div className="relative z-10">
-                    <p className="text-white font-mono text-xl tracking-widest mb-3">
-                      •••• •••• •••• 4891
-                    </p>
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <p className="text-gray-400 text-xs mb-0.5">Card Holder</p>
-                        <p className="text-white font-semibold">JOHN DOE</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-xs mb-0.5">Expires</p>
-                        <p className="text-white font-semibold">12/28</p>
-                      </div>
-                      <p className="text-[#00D9A0] font-black text-2xl">VISA</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick stats below card */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: "Balance", value: "$250.00" },
-                    { label: "Spent", value: "$43.99" },
-                    { label: "Status", value: "Active" },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="bg-white border border-gray-100 rounded-xl p-3 text-center shadow-sm">
-                      <p className="text-gray-400 text-xs mb-1">{label}</p>
-                      <p className="text-gray-900 text-sm font-bold">{value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+        {/* Features Grid */}
+        <div className="mb-32">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="h2 mb-4">Made for borderless spending</h2>
+            <p className="text-[var(--color-text-sec)] text-lg">
+              Say goodbye to transaction failures and steep conversion fees.
+            </p>
           </div>
 
-          {/* Card types */}
-          <div className="mb-24">
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-10">
-              Choose your card type
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {cardTypes.map(({ title, desc, badge, badgeColor, features }) => (
-                <div key={title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center">
-                      <CreditCard size={22} className="text-[#00D9A0]" />
-                    </div>
-                    <span
-                      className="text-xs font-black px-3 py-1 rounded-full"
-                      style={{ background: `${badgeColor}20`, color: badgeColor }}
-                    >
-                      {badge}
-                    </span>
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                icon: <Zap />,
+                title: "Instant Creation",
+                desc: "Fund your account and generate a ready-to-use virtual card instantly. No waiting for physical delivery."
+              },
+              {
+                icon: <Globe />,
+                title: "Accepted Everywhere",
+                desc: "Works perfectly on AWS, Apple Music, Netflix, Facebook Ads, Aliexpress, and millions of global merchants."
+              },
+              {
+                icon: <Shield />,
+                title: "Maximum Security",
+                desc: "Freeze your card anytime. View exact transaction details and set spending limits to protect your balance."
+              },
+              {
+                icon: <CreditCard />,
+                title: "Transparent Rates",
+                desc: "Fund with Naira via bank transfer or USDT. We offer the most competitive market rates with zero hidden fees."
+              }
+            ].map((item, i) => (
+              <StaggerItem key={i} className="glass p-8 rounded-3xl border border-[var(--color-border)] group hover:border-[var(--color-accent)] transition-colors">
+                <div className="w-12 h-12 rounded-full bg-[var(--color-surface)] border border-[var(--color-border-light)] flex items-center justify-center mb-6 text-white group-hover:text-[var(--color-accent)] transition-colors">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-[var(--color-text-sec)]">{item.desc}</p>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </div>
+
+        {/* How it works */}
+        <div className="glass rounded-[3rem] p-10 md:p-20 border border-[var(--color-border)] relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[var(--color-accent)] blur-[150px] opacity-10"></div>
+          
+          <div className="relative z-10">
+            <h2 className="h2 mb-12">Get started in 3 steps</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { step: "01", title: "Create Account", desc: "Download PAYVORA and complete a quick KYC verification." },
+                { step: "02", title: "Fund Wallet", desc: "Deposit Naira directly from your bank or crypto wallet." },
+                { step: "03", title: "Create Card", desc: "Tap 'Virtual Cards', fund it, and start spending globally." }
+              ].map((step, i) => (
+                <div key={i} className="relative">
+                  <div className="text-6xl font-bold text-[var(--color-surface)] absolute -top-4 -left-4 z-0 pointer-events-none">
+                    {step.step}
                   </div>
-                  <h3 className="text-gray-900 font-bold text-xl mb-2">{title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed mb-5">{desc}</p>
-                  <ul className="space-y-2">
-                    {features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
-                        <CheckCircle2 size={14} className="text-[#00D9A0] flex-shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="relative z-10 pt-4">
+                    <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
+                    <p className="text-[var(--color-text-sec)]">{step.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Use cases */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-black text-gray-900 text-center mb-10">
-              Works everywhere you shop
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {usecases.map((u) => (
-                <div key={u} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:border-[#00D9A0] hover:shadow-md transition-all group">
-                  <CheckCircle2 size={16} className="text-[#00D9A0] flex-shrink-0" />
-                  <span className="text-gray-500 text-sm group-hover:text-gray-900 transition-colors">{u}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Security note */}
-          <div className="bg-[rgba(0,217,160,0.06)] border border-[rgba(0,217,160,0.2)] rounded-2xl p-8 flex gap-6 items-start">
-            <div className="w-12 h-12 rounded-xl bg-[rgba(0,217,160,0.1)] flex items-center justify-center flex-shrink-0">
-              <Lock size={22} className="text-[#00D9A0]" />
-            </div>
-            <div>
-              <h3 className="text-gray-900 font-bold text-xl mb-2">Your card is protected</h3>
-              <p className="text-gray-500 leading-relaxed">
-                Every PAYVORA virtual card is protected with real-time fraud monitoring, instant freeze capability, and full transaction history. If you ever notice unauthorized charges, freeze your card instantly from the app and contact our 24/7 support.
-              </p>
+            <div className="mt-16 pt-8 border-t border-[var(--color-border-light)] flex justify-center">
+              <Button href="/download" size="lg" icon>Create Your Card Now</Button>
             </div>
           </div>
         </div>
-      </section>
-      <DownloadCTA />
-    </>
+      </Container>
+    </div>
   );
 }
