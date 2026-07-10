@@ -8,29 +8,27 @@
 
 ## Current Status
 
-**Current Phase:** Production Stabilization + Firebase Integration
+**Current Phase:** Production readiness audit + core auth stabilization
 
-**Current Task:** Firebase Auth ↔ JWT Auth sync (custom token minting not yet implemented)
+**Production Completion:** ~80% (see Production Readiness Report in `NEXT_AGENT.md` for the scored breakdown)
 
-**Current Blocker:** Firebase custom tokens require Firebase Admin SDK on the Express API + service account key secret. Not yet implemented.
+**Last Updated:** 2026-07-10
 
-**Next Task:** Add Firebase Admin SDK to Express API so it mints a Firebase custom token on every JWT login — enabling `useLiveBalance` (Firestore real-time balance) for all users.
-
-**Production Completion:** 88%
-
-**Last Updated:** 2026-07-07
+**This file was out of date** as of the previous entry (referenced `packages/db`, a Firebase custom-token plan, and `railway.toml` fixes that no longer match the codebase). It has been rewritten below to match what is actually in the repo today.
 
 ---
 
-## Open Tasks
+## What Was Just Fixed (this session)
 
-- [ ] **CRITICAL** — Firebase custom token minting: Express `/api/auth/login` and `/api/auth/register` should also return a `firebaseToken` (minted via Firebase Admin SDK) so the mobile app can call `firebase.auth().signInWithCustomToken(firebaseToken)` and activate `useLiveBalance`
-- [ ] Trigger Railway redeploy — user must click "Redeploy" in Railway dashboard (automatic on next GitHub push to `ElonInvestmentCo/AZA.com`)
-- [ ] Add SHA-1 fingerprint to Firebase for native Android Google Sign-In (not required for current web-based OAuth flow)
-- [ ] Firestore security rules — block direct client writes to `walletBalanceNaira` field
-- [ ] Register iOS app in Firebase (only Android registered so far — iOS `GoogleService-Info.plist` was generated but verify `GOOGLE_APP_ID` is correct)
-- [ ] Add `GOOGLE_CALLBACK_URL` env var to Railway (needed for web Google OAuth: `https://www.payvora.org/api/auth/google/callback`)
-- [ ] Set `NODE_ENV=production` on Railway service if not already set
+1. **Login always failed with "Invalid credentials"** — the Postgres schema had never been pushed to the live `DATABASE_URL` (no `users`/`sessions`/`wallets`/`transactions` tables existed). Every login/register DB query threw a 500, which the mobile client's generic error handling displayed as "Invalid credentials." Fixed by running `pnpm --filter @workspace/db run push-force`. **Any accounts created before this fix were never actually persisted — those users must register again.**
+2. **Transaction History "Couldn't load latest transactions" banner** — same root cause; stale/invalid tokens issued before the schema existed now fail auth cleanly. Resolved by re-logging in.
+3. Five mobile bugs fixed: Biometrics kicked authenticated users back to the tabs (auth-group redirect guard didn't exempt `face-id`), Settings language sublabel didn't reflect the actual stored language, History tab crashed on malformed `createdAt`/amount/note fields from the API, Settings header could misalign (now absolutely centered), Live Chat was a placeholder alert (now a real, if backend-less, chat screen).
+4. **Production audit fixes:**
+   - Removed dead code in `artifacts/api-server/src/app.ts` that tried to serve a static site from `artifacts/landing/dist` in production — this path was never reachable (Railway's `start.mjs` runs Next.js directly and only proxies `/api/*` to Express; nothing routes public traffic to the Express server's root).
+   - Deleted `artifacts/landing/` entirely — a fully orphaned legacy Vite landing page, not referenced by any workflow, the Railway build command, or any other code. Verified via full-repo grep before removal.
+   - Added baseline security headers (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy) via `next.config.ts` `headers()`.
+   - Fixed stale TypeScript project-reference build outputs (`lib/db`, `lib/api-zod` composite `dist/` was never built, breaking `tsc --noEmit` in `api-server`) and an implicit-`any` in `wallet.ts`.
+   - `api-server` typecheck, `website` typecheck + production build all pass clean.
 
 ---
 
@@ -38,210 +36,91 @@
 
 ### Monorepo Structure
 ```
-pnpm workspaces (Node 24, TypeScript 5.9)
-├── artifacts/api-server/     Express 5 API — port 8080 (dev) / 3001 (prod via start.mjs)
-├── artifacts/website/        Next.js 15 + Tailwind v4 — port 5000 (dev) / Railway PORT (prod)
+pnpm workspaces (Node 20, TypeScript 5.9)
+├── artifacts/api-server/     Express 5 API — port 8080 (dev workflow) / 3001 (prod, internal only)
+├── artifacts/website/        Next.js 15 + Tailwind v4 — port 5000 (dev) / Railway PORT (prod, public)
 ├── artifacts/mobile/         Expo (React Native) — port 19000 (Expo Go)
-├── packages/db/              Drizzle ORM + PostgreSQL schema
-└── packages/api-spec/        OpenAPI spec + Orval codegen
+├── artifacts/mockup-sandbox/ Canvas component-preview sandbox (design tool only, not shipped)
+├── lib/db/                   Drizzle ORM + PostgreSQL schema (source-only package, no build step needed at runtime)
+├── lib/api-zod/              Shared Zod schemas
+├── lib/api-client-react/     Generated API client
+└── lib/api-spec/             OpenAPI spec
 ```
+Note: `lib/` was previously called `packages/` in older docs — the directory was renamed at some point; always check the actual filesystem, not old docs.
 
 ### Production Topology (Railway)
-- **Single Railway service** runs `node start.mjs` which spawns:
-  - Express API on internal port 3001
-  - Next.js on Railway's public PORT
-- Next.js rewrites `/api/*` → `http://localhost:3001/api/*`
-- Public domain: `www.payvora.org`
-- Railway build command: `pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/website run build`
-- Railway start command: `node start.mjs`
+- Single Railway service runs `node start.mjs`, which spawns:
+  - Express API on internal port 3001 (never exposed directly to the internet)
+  - Next.js on Railway's public `PORT`
+- Next.js `rewrites()` in `artifacts/website/next.config.ts` proxy `/api/*` → `http://localhost:3001/api/*`
+- Public domain: `www.payvora.org`; `payvora.org` 301-redirects to it (`next.config.ts` `redirects()`)
+- Railway build command (`railway.toml`): `pnpm install --no-frozen-lockfile && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/website run build`
 - Healthcheck: `GET /api/status`
 
-### Auth System (Dual — must stay in sync)
-1. **JWT Auth** (primary): Express `/api/auth/*` → bcryptjs passwords → JWT tokens → stored in AsyncStorage
-2. **Firebase Auth** (secondary, for Firestore real-time): `useLiveBalance` hook subscribes to Firestore `/users/{uid}` — requires `firebase.auth().signInWithCustomToken()` after JWT login. **NOT YET WIRED UP.**
+### Auth System
+- **JWT auth is the only active auth system**: Express `/api/auth/*` routes, bcryptjs password hashing, JWT signed with `JWT_SECRET`, stored client-side in AsyncStorage (mobile) via `context/AuthContext.tsx`.
+- Google Sign-In (mobile accessToken + web OAuth redirect flow) and Apple Sign-In are both wired to the same JWT issuance path.
+- **Dead/unused code found during this audit (not removed, flagged for a decision):**
+  - `artifacts/api-server/src/middleware/firebaseAuth.ts` — a Firebase Admin auth middleware that is never imported/mounted anywhere.
+  - `artifacts/mobile/hooks/useLiveBalance.ts` — a Firestore real-time balance hook that is never imported anywhere in `app/`.
+  - `SESSION_SECRET` — an available secret that is not referenced by any code.
+  - `sessionsTable` in `lib/db/src/schema/sessions.ts` — table exists in the DB but no route ever reads/writes it.
+  - These look like remnants of an earlier, abandoned Firebase-based real-time balance feature. Decide whether to finish wiring it up or delete it — do not silently delete a whole subsystem without confirming intent first.
 
 ### Database (PostgreSQL + Drizzle ORM)
-- Tables: `users`, `sessions`, `wallets`, `transactions`
+- Tables: `users`, `sessions` (unused, see above), `wallets`, `transactions`
 - All monetary amounts stored in **kobo** (÷100 = naira)
-- DB package: `packages/db/`
-- Push schema changes: `pnpm --filter @workspace/db run push`
+- Schema lives in `lib/db/src/schema/`; push changes with `pnpm --filter @workspace/db run push` (or `push-force`)
+- **No migration files** — schema is synced directly via `drizzle-kit push`, not versioned migrations. If a fresh `DATABASE_URL` is ever provisioned, someone must remember to run the push command, or every DB-backed route will 500.
 
 ---
 
-## Environment Variables
+## Environment Variables (as actually used in code — verified by grep, 2026-07-10)
 
-### Replit (dev + shared)
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | PostgreSQL connection string (auto-managed by Replit) |
-| `JWT_SECRET` | Signs/verifies JWT auth tokens |
-| `GOOGLE_CLIENT_ID` | Google OAuth (server-side) |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth (server-side) |
-| `GOOGLE_IOS_URL_SCHEME` | `com.googleusercontent.apps.419400712274-...` |
-| `RELOADLY_CLIENT_ID` | Reloadly bill payments + eSIM |
-| `RELOADLY_CLIENT_SECRET` | Reloadly bill payments + eSIM |
-| `RAILWAY_TOKEN` | Railway API token (user: laurabrady281@gmail.com) |
-
-### Railway (production — must be set in Railway dashboard)
-| Variable | Status | Value |
+| Variable | Used by | Status |
 |---|---|---|
-| `NODE_ENV` | Required | `production` |
-| `DATABASE_URL` | Auto-provided | PostgreSQL from Railway |
-| `PORT` | Auto-provided | Dynamic |
-| `JWT_SECRET` | Required | Same as Replit secret |
-| `GOOGLE_CLIENT_ID` | Required | Same as Replit secret |
-| `GOOGLE_CLIENT_SECRET` | Required | Same as Replit secret |
-| `GOOGLE_CALLBACK_URL` | **Required** | `https://www.payvora.org/api/auth/google/callback` |
-| `RELOADLY_CLIENT_ID` | Required | Same as Replit secret |
-| `RELOADLY_CLIENT_SECRET` | Required | Same as Replit secret |
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | **Pending** | Firebase Admin SDK service account (needed for custom tokens) |
+| `DATABASE_URL` | `lib/db` | Set (Replit-managed) |
+| `JWT_SECRET` | `artifacts/api-server/src/lib/jwt.ts` | Set |
+| `GOOGLE_CLIENT_ID` | Google OAuth (mobile + web) | Set |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth (web redirect flow) | Set |
+| `GOOGLE_CALLBACK_URL` | Web OAuth redirect client construction | Not confirmed set in this environment — required for the web OAuth flow to work at all; without it `makeWebOAuthClient()` returns null and `/api/auth/google` 503s |
+| `RELOADLY_CLIENT_ID` / `RELOADLY_CLIENT_SECRET` | Bill payments / eSIM (`lib/reloadly.ts`) | Set |
+| `FIREBASE_SERVICE_ACCOUNT` | Only `middleware/firebaseAuth.ts` (unused, see above) | Set but effectively unused |
+| `SESSION_SECRET` | Nothing references it | Set but unused — safe to leave, but do not rely on it for anything |
+| `EXPO_PUBLIC_API_URL` / `EXPO_PUBLIC_DOMAIN` | Mobile API base URL resolution | Configured per environment |
+| `CORS_ALLOWED_ORIGINS` / `ALLOWED_ORIGINS` | `app.ts` CORS allow-list | Optional, additive |
+| `GOOGLE_SITE_VERIFICATION` | Website `<head>` meta | Optional |
+| `LOG_LEVEL`, `NODE_ENV` | Standard | Set by workflow/deploy config |
+
+**Action item:** confirm `GOOGLE_CALLBACK_URL` is set in the Railway production environment and that it exactly matches the redirect URI registered in Google Cloud Console (`https://www.payvora.org/api/auth/google/callback`).
 
 ---
 
-## Firebase Configuration
-
-| Item | Status |
-|---|---|
-| Firebase project ID | `payvora-2026` |
-| Project number | `361130131715` |
-| Android app registered | ✅ `com.payvora.mobile` — `google-services.json` in `artifacts/mobile/` |
-| iOS app registered | ✅ `com.payvora.mobile` — `GoogleService-Info.plist` in `artifacts/mobile/` |
-| `app.json` wired | ✅ `googleServicesFile` set for both platforms |
-| Google Sign-In provider | ✅ Enabled in Firebase Auth console |
-| SHA-1 fingerprint (Android) | ❌ Not added — needed for native Google Sign-In |
-| Firestore rules | ❌ Default (open) — needs hardening |
-| Firebase Admin SDK (server) | ❌ Not implemented |
-
----
-
-## Known Bugs
-
-| Bug | Severity | Status | File |
-|---|---|---|---|
-| Google OAuth callback 500 (`logger is not defined`) | HIGH | ✅ Fixed in code, **pending Railway redeploy** | `artifacts/api-server/src/routes/auth.ts:323` |
-| `useLiveBalance` returns null for all JWT-auth users | MEDIUM | Known — Firebase Auth not signed in | `artifacts/mobile/hooks/useLiveBalance.ts` |
-| Firebase magic-link tab removed from login | LOW | ✅ Fixed — password-only login now | `artifacts/mobile/app/(auth)/login.tsx` |
-
----
-
-## Completed Features
-
-- [x] Onboarding (6-slide carousel)
-- [x] Auth: email/password login + registration + OTP
-- [x] Auth: Google OAuth (web-based, mobile WebBrowser)
-- [x] Auth: Apple Sign-In
-- [x] JWT session management (AsyncStorage)
-- [x] Home dashboard (wallet balance, quick actions, services grid)
-- [x] Gift card trading (sell flow, pending card status)
-- [x] Fund wallet (bank selection, amounts)
-- [x] Transaction history
-- [x] Bill payments (Reloadly integration)
-- [x] Virtual dollar card screen
-- [x] eSIM screen
-- [x] Next.js 15 marketing website
-- [x] Google OAuth website routes (`/api/auth/google`, `/api/auth/google/callback`)
-- [x] Firebase config files placed in mobile app
-
----
-
-## Partially Completed Features
-
-- [ ] **Real-time wallet balance** — `useLiveBalance` hook is Firebase Firestore-ready but Firebase Auth is not signed in after JWT login. Needs custom token minting.
-- [ ] **Google OAuth native Android** — web OAuth works; native needs SHA-1 fingerprint in Firebase
-- [ ] **Production deployment** — code is correct, Railway has NOT been redeployed yet after the `logger` fix
-
----
-
-## API Routes (Express)
+## API Routes (Express, all under `/api`)
 
 | Route | Method | Auth | Description |
 |---|---|---|---|
-| `/api/status` | GET | None | Health check |
-| `/api/auth/register` | POST | None | Register with email/password |
-| `/api/auth/login` | POST | None | Login → returns JWT |
-| `/api/auth/me` | GET | JWT | Get current user + wallet |
-| `/api/auth/google` | GET | None | Start Google OAuth web flow |
-| `/api/auth/google/callback` | GET | None | Google OAuth callback → JWT |
-| `/api/auth/apple` | POST | None | Apple Sign-In → JWT |
-| `/api/bills/*` | Various | JWT | Reloadly bill payments |
-| `/api/esim/*` | Various | JWT | Reloadly eSIM |
+| `/status` | GET | None | Health check |
+| `/auth/register` | POST | None | Register with email/password |
+| `/auth/login` | POST | None | Login → JWT |
+| `/auth/me` | GET | JWT | Current user + wallet |
+| `/auth/logout` | POST | JWT | No-op (stateless JWT) |
+| `/auth/google` | GET/POST | None | Web redirect flow / mobile accessToken exchange |
+| `/auth/google/callback` | GET | None | OAuth callback → JWT → deep link |
+| `/auth/apple` | POST | None | Apple Sign-In → JWT |
+| `/auth/forgot-password` | POST | None | Sends OTP (dev: logged to console, no real email provider wired up) |
+| `/auth/verify-otp`, `/auth/reset-password` | POST | None | Password reset flow |
+| `/wallet/balance`, `/wallet/transactions`, `/wallet/withdraw` | GET/POST | JWT | Wallet operations |
+| `/bills/*` | Various | JWT | Reloadly bill payments |
 
 ---
 
-## Deployment History
+## Known Gaps / Not Yet Production Ready
 
-------------------------------------------------------------
+- **Forgot-password OTP has no real email delivery** — codes are only logged to the server console outside of `NODE_ENV=production`. In production, users currently cannot actually receive their reset code. This needs a transactional email provider (SendGrid/Resend/etc.) before password reset is usable in production.
+- **No automated tests** — no unit or integration test suite exists in `api-server`, `website`, or `mobile`. Build health today relies solely on typecheck + build passing.
+- **CSP not configured** — HSTS/X-Frame-Options/etc. were added this session, but no Content-Security-Policy header exists yet; adding one requires auditing every inline script/style the site uses first to avoid breaking it.
+- **Rate limiting** — no rate limiting on `/api/auth/login`, `/api/auth/register`, or OTP endpoints. Recommend adding before public launch to prevent brute-force/credential-stuffing and OTP-spam.
+- **Firebase subsystem is half-built and unused** (see Auth System section above) — needs an explicit decision to finish or remove.
 
-Date: 2026-07-07
-AI Model: Claude (Replit Agent)
-Branch: main
-Commit: d802696c1e85c21bc01ab1ae0fa138e8024f08a0
-
-Completed:
-- Removed Firebase magic-link login from `artifacts/mobile/app/(auth)/login.tsx` (was crashing on module load — no Firebase config existed)
-- Restored `useLiveBalance.ts` to original Firebase Firestore real-time version (user requested)
-- Placed `artifacts/mobile/google-services.json` (Android Firebase config)
-- Placed `artifacts/mobile/GoogleService-Info.plist` (iOS Firebase config)
-- Updated `artifacts/mobile/app.json` with `googleServicesFile` for both iOS and Android
-- Fixed Google OAuth callback 500 crash: `logger.error` at line 323 of `auth.ts` wrapped in try/catch with `console.error` fallback — production was crashing with `ReferenceError: logger is not defined`
-- Fixed `railway.toml` build command: removed stale `pnpm --filter payvora-landing run build` (package doesn't exist; correct name is `@workspace/website`)
-- Rebuilt API server — compiles clean (3.2mb bundle)
-
-Currently Working On:
-- (Idle — awaiting user direction)
-
-Next Immediate Task:
-- Firebase Admin SDK + custom token minting on JWT login routes
-- Railway redeploy (user action required: click Redeploy in Railway dashboard)
-
-Pending Tasks:
-- Firebase custom token: add `FIREBASE_SERVICE_ACCOUNT_JSON` secret → mint token in `/api/auth/login`, `/api/auth/register`, `/api/auth/google/callback`
-- Firestore security rules (block direct client writes to walletBalanceNaira)
-- SHA-1 fingerprint for Android native Google Sign-In
-- iOS app bundle ID verification (app.json says `com.payvora.mobile`, memory says `org.payvora.app` — confirm correct one)
-
-Known Bugs:
-- Google OAuth callback 500 — FIXED IN CODE, not yet deployed to Railway
-- useLiveBalance returns null for all users (Firebase Auth not active)
-
-Blockers:
-- Railway redeploy requires user action (Railway API token doesn't have project list access via GraphQL)
-- Firebase custom tokens require Firebase Admin service account JSON (not yet in secrets)
-
-Files Modified:
-- artifacts/mobile/app/(auth)/login.tsx
-- artifacts/mobile/hooks/useLiveBalance.ts
-- artifacts/mobile/google-services.json (new)
-- artifacts/mobile/GoogleService-Info.plist (new)
-- artifacts/mobile/app.json
-- artifacts/api-server/src/routes/auth.ts
-- railway.toml
-
-Environment Variables Added/Changed:
-- None added this session (RAILWAY_TOKEN, GOOGLE_IOS_URL_SCHEME confirmed present)
-
-Database Changes:
-- None
-
-API Changes:
-- GET /api/auth/google/callback — no longer crashes on logger error; gracefully redirects to mobile://auth?error=... on failure
-
-Deployment Changes:
-- railway.toml build command fixed (removed payvora-landing)
-- Pending: Railway redeploy needed to apply auth.ts fix
-
-Testing Status:
-✅ API server builds clean
-✅ All 5 Replit workflows running
-⚠ Google OAuth callback fix not yet live on Railway (needs redeploy)
-⚠ Firebase real-time balance (useLiveBalance) not tested end-to-end
-
-Production Ready:
-NO — Google OAuth callback 500 still live on Railway until redeploy
-
-Notes:
-- The RAILWAY_TOKEN in Replit secrets is a valid user token (user: laurabrady281@gmail.com, id: b15490da-dd4c-4b11-998a-e498f2cd0ea9) but `me { projects }` GraphQL query returns empty — projects may be under a workspace/team. Railway CLI also rejects it. User must trigger redeploy manually from Railway dashboard.
-- Firebase project: payvora-2026 / project number 361130131715
-- Google webClientId in app.json: 419400712274-vioi4kdk4gg41ufsm2brjgtqmr8q2agq.apps.googleusercontent.com
-
-------------------------------------------------------------
+See `NEXT_AGENT.md` for the full scored production-readiness report and prioritized next steps.
