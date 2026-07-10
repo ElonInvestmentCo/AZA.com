@@ -7,12 +7,23 @@ export default function AuthLayout() {
   const router = useRouter();
   const segments = useSegments();
 
-  // "face-id" is reachable both from the pre-login auth flow AND from an
-  // already-authenticated user opening Settings → Biometrics. Only bounce
+  // Several screens in this (auth) group are reachable both from the
+  // pre-login auth flow AND from an already-authenticated user opening
+  // them from Settings ("face-id" via Biometrics, "forgot-password" /
+  // "new-password" / "password-changed" via Change Password). Only bounce
   // authenticated users out of the *login/register* screens — don't kick
-  // them out of a screen they navigated to on purpose.
+  // them out of a screen they navigated to on purpose. Without this
+  // exemption, opening Settings → Change Password immediately triggered
+  // this effect and replaced the stack with "/(tabs)" before the user
+  // could type anything.
   const currentScreen = segments[segments.length - 1];
-  const isExemptFromRedirect = currentScreen === "face-id";
+  const EXEMPT_SCREENS = new Set([
+    "face-id",
+    "forgot-password",
+    "new-password",
+    "password-changed",
+  ]);
+  const isExemptFromRedirect = EXEMPT_SCREENS.has(currentScreen as string);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && !isExemptFromRedirect) {

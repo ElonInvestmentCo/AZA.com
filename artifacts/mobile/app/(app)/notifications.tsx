@@ -25,6 +25,11 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  useNotifications,
+  type Notification as StoreNotification,
+  type NotifCategory as StoreNotifCategory,
+} from "@/context/NotificationsContext";
 
 /* ─── Design tokens ──────────────────────────────────────────────────────── */
 const C = {
@@ -43,28 +48,12 @@ const C = {
 };
 
 /* ─── Notification types ─────────────────────────────────────────────────── */
-type NotifCategory =
-  | "transaction" | "deposit" | "withdrawal" | "transfer"
-  | "virtual_card" | "security" | "login_alert" | "promotion"
-  | "cashback" | "reward" | "verification" | "referral" | "system";
-
-type TxStatus = "completed" | "pending" | "failed";
-
-interface Notification {
-  id:          string;
-  category:    NotifCategory;
-  title:       string;
-  body:        string;
-  /** Unix ms timestamp */
-  ts:          number;
-  read:        boolean;
-  icon:        keyof typeof Feather.glyphMap;
-  iconBg:      string;
-  iconColor:   string;
-  status?:     TxStatus;
-  /** CTA shown below body */
-  cta?:        { label: string; action: string };
-}
+// The shape and the actual data now live in NotificationsContext — the one
+// source of truth shared across the whole app — so this screen never keeps
+// its own local copy that could drift out of sync or get reset on remount.
+type NotifCategory = StoreNotifCategory;
+type Notification  = StoreNotification;
+type TxStatus       = "completed" | "pending" | "failed";
 
 /* ─── Category metadata ──────────────────────────────────────────────────── */
 const CAT_META: Record<NotifCategory, {
@@ -96,8 +85,6 @@ const STATUS_STYLE: Record<TxStatus, { label: string; bg: string; color: string 
 
 /* ─── Helper: time ───────────────────────────────────────────────────────── */
 const NOW = Date.now();
-const D   = (daysAgo: number, h = 0, m = 0) =>
-  NOW - daysAgo * 86_400_000 - h * 3_600_000 - m * 60_000;
 
 function formatRelative(ts: number): string {
   const msAgo   = NOW - ts;
@@ -120,121 +107,6 @@ function formatExact(ts: number): string {
     hour: "2-digit", minute: "2-digit", hour12: true,
   });
 }
-
-/* ─── Mock dataset ───────────────────────────────────────────────────────── */
-const MOCK: Notification[] = [
-  {
-    id: "1", category: "withdrawal", ts: D(0, 0, 3),  read: false,
-    title: "Withdrawal Successful",
-    body:  "₦5,000 has been sent to GTBank ending in 6789.",
-    status: "completed",
-    ...CAT_META.withdrawal,
-  },
-  {
-    id: "2", category: "login_alert", ts: D(0, 1, 45), read: false,
-    title: "New Device Login",
-    body:  "Your account was accessed from a new iPhone in Lagos. If this wasn't you, tap to secure your account.",
-    cta:  { label: "Secure account", action: "security" },
-    ...CAT_META.login_alert,
-  },
-  {
-    id: "3", category: "deposit", ts: D(0, 3, 0), read: false,
-    title: "Wallet Funded",
-    body:  "₦50,000 has been added to your PAYVORA wallet via bank transfer.",
-    status: "completed",
-    ...CAT_META.deposit,
-  },
-  {
-    id: "4", category: "virtual_card", ts: D(0, 5, 0), read: false,
-    title: "Card Transaction Declined",
-    body:  "Your virtual card was declined for $12.99 on Netflix. Check your card balance and try again.",
-    status: "failed",
-    cta:  { label: "View card", action: "cards" },
-    ...CAT_META.virtual_card,
-  },
-  {
-    id: "5", category: "transaction", ts: D(1, 2, 0), read: true,
-    title: "Airtime Purchase",
-    body:  "₦1,000 MTN airtime sent to 0812 345 6789.",
-    status: "completed",
-    ...CAT_META.transaction,
-  },
-  {
-    id: "6", category: "referral", ts: D(1, 5, 0), read: true,
-    title: "Referral Bonus Pending",
-    body:  "Your friend Chuka signed up with your code. ₦5,000 bonus will be credited once they complete KYC.",
-    cta:  { label: "Track referral", action: "referral" },
-    ...CAT_META.referral,
-  },
-  {
-    id: "7", category: "cashback", ts: D(2, 1, 0), read: true,
-    title: "Cashback Credited",
-    body:  "₦250 cashback has been added to your wallet for your electricity bill payment.",
-    ...CAT_META.cashback,
-  },
-  {
-    id: "8", category: "transaction", ts: D(2, 4, 0), read: true,
-    title: "Electricity Bill Payment",
-    body:  "₦10,000 EKEDC prepaid meter top-up was successful. Token: 4521-9845-7623-1290.",
-    status: "completed",
-    ...CAT_META.transaction,
-  },
-  {
-    id: "9", category: "security", ts: D(3, 2, 0), read: true,
-    title: "PIN Changed Successfully",
-    body:  "Your transaction PIN was changed. If you did not initiate this, contact support immediately.",
-    cta:  { label: "Contact support", action: "help" },
-    ...CAT_META.security,
-  },
-  {
-    id: "10", category: "verification", ts: D(3, 6, 0), read: true,
-    title: "Identity Verification Complete",
-    body:  "Your KYC verification has been approved. You now have full wallet access and higher limits.",
-    cta:  { label: "Explore features", action: "home" },
-    ...CAT_META.verification,
-  },
-  {
-    id: "11", category: "promotion", ts: D(4, 0, 0), read: true,
-    title: "Weekend Promo 🎉",
-    body:  "0% fee on all bill payments this weekend only. Save more with PAYVORA.",
-    ...CAT_META.promotion,
-  },
-  {
-    id: "12", category: "reward", ts: D(5, 3, 0), read: true,
-    title: "Points Milestone Reached",
-    body:  "You've earned 500 PAYVORA points! Redeem them for cashback or airtime.",
-    cta:  { label: "Redeem now", action: "rewards" },
-    ...CAT_META.reward,
-  },
-  {
-    id: "13", category: "transfer", ts: D(6, 1, 0), read: true,
-    title: "Transfer Received",
-    body:  "₦20,000 received from Adewale O. via PAYVORA Wallet.",
-    status: "completed",
-    ...CAT_META.transfer,
-  },
-  {
-    id: "14", category: "system", ts: D(8, 0, 0), read: true,
-    title: "App Update Available",
-    body:  "PAYVORA v2.4 is out — faster gift card processing, improved virtual card controls, and bug fixes.",
-    cta:  { label: "Update now", action: "app-info" },
-    ...CAT_META.system,
-  },
-  {
-    id: "15", category: "transaction", ts: D(10, 2, 0), read: true,
-    title: "Gift Card Trade Completed",
-    body:  "Your Amazon $50 gift card was traded successfully. ₦45,200 credited to your wallet.",
-    status: "completed",
-    ...CAT_META.transaction,
-  },
-  {
-    id: "16", category: "deposit", ts: D(22, 0, 0), read: true,
-    title: "Large Deposit Received",
-    body:  "₦200,000 has been added to your wallet. Daily withdrawal limit applies.",
-    status: "completed",
-    ...CAT_META.deposit,
-  },
-];
 
 type Group = "Today" | "Yesterday" | "Earlier This Week" | "Earlier This Month" | "Older";
 
