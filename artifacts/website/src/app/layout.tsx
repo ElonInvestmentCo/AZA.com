@@ -57,6 +57,15 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
     creator: "@payvora",
   },
+  icons: {
+    icon: [
+      { url: "/favicon-dark.png",  media: "(prefers-color-scheme: dark)" },
+      { url: "/favicon-light.png", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon-dark.png" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon-dark.png",
+  },
   robots: {
     index: true,
     follow: true,
@@ -78,8 +87,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#00D9A0" />
       </head>
       <body>
