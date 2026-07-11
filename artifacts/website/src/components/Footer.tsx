@@ -80,11 +80,15 @@ export function Footer() {
 
         <div className="pt-8 border-t border-[var(--color-border)] flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[var(--color-muted)] text-sm text-center md:text-left">
-            PAYVORA is a financial technology company.
+            PAYVORA is a financial technology company. &copy; 2026 PAYVORA Technologies Ltd. All rights reserved.
           </p>
-          <p className="text-[var(--color-muted)] text-sm">
-            &copy; 2026 PAYVORA. All rights reserved.
-          </p>
+          <div className="flex items-center gap-4 text-sm text-[var(--color-muted)]">
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>
+          </div>
         </div>
       </Container>
     </footer>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/core";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
 import { Apple, Play, Download, UserPlus, Fingerprint, Rocket } from "lucide-react";
@@ -25,7 +26,7 @@ export default function DownloadPage() {
                 Join thousands of Nigerians managing their money without borders. Download the app today and create your free account in minutes.
               </p>
               
-              <div className="flex flex-col sm:flex-row justify-center gap-4 mb-24">
+              <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
                 <a href="#" className="flex items-center justify-center gap-3 bg-white text-black px-8 py-4 rounded-full font-semibold hover:bg-gray-200 transition-colors">
                   <Apple className="w-6 h-6 fill-current" />
                   App Store
@@ -35,6 +36,13 @@ export default function DownloadPage() {
                   Google Play
                 </a>
               </div>
+
+              <p className="text-xs text-[var(--color-muted)] mb-24">
+                By downloading PAYVORA you agree to our{" "}
+                <Link href="/terms" className="text-[var(--color-accent)] hover:underline">Terms of Service</Link>
+                {" "}and acknowledge our{" "}
+                <Link href="/privacy-policy" className="text-[var(--color-accent)] hover:underline">Privacy Policy</Link>.
+              </p>
             </FadeIn>
 
             <StaggerContainer className="grid md:grid-cols-4 gap-8 text-left border-t border-[var(--color-border)] pt-16">
