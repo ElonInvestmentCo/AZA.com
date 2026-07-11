@@ -1,76 +1,87 @@
-import { Metadata } from "next";
-import { Container } from "@/components/ui/core";
+import type { Metadata } from "next";
+import { Container, Button } from "@/components/ui/core";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
-import { Building2, Users, Rocket, Target } from "lucide-react";
+import { Globe2, ShieldCheck, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About Us",
-  description: "Learn about PAYVORA's mission to build the premium financial ecosystem for Nigeria.",
+  title: "About Us | PAYVORA",
+  description: "We're building Africa's financial future.",
 };
 
 export default function AboutPage() {
   return (
-    <div className="pt-32 pb-24">
-      <Container>
-        <div className="max-w-3xl mb-24">
+    <div className="pt-32 pb-24 min-h-screen">
+      <section className="py-20">
+        <Container>
+          <FadeIn className="max-w-4xl">
+            <div className="inline-block px-3 py-1 bg-[var(--color-accent-dim)] border border-[var(--color-accent)]/20 text-[var(--color-accent)] text-xs font-bold tracking-wider uppercase rounded-full mb-6">
+              Our Mission
+            </div>
+            <h1 className="h1 mb-6">We're building Africa's financial future.</h1>
+            <p className="text-xl text-[var(--color-muted)] mb-10 leading-relaxed">
+              At PAYVORA, we believe that geographical borders shouldn't limit financial potential. We are designing the most robust and elegant financial infrastructure for Nigerians—giving them seamless access to the global digital economy.
+            </p>
+          </FadeIn>
+        </Container>
+      </section>
+
+      <section className="py-24 bg-[var(--color-surface)] border-y border-[var(--color-border)]">
+        <Container>
           <FadeIn>
-            <h1 className="h1 mb-6">Building borderless finance for Africa.</h1>
-            <p className="text-xl text-[var(--color-text-sec)] leading-relaxed">
-              We started PAYVORA because we were tired of failed transactions, blocked international payments, and clunky banking apps. We believed Nigerians deserved a premium, reliable financial experience.
-            </p>
+            <h2 className="h2 mb-16 text-center">Our Core Values</h2>
           </FadeIn>
-        </div>
+          <StaggerContainer className="grid md:grid-cols-3 gap-12">
+            {[
+              { icon: Globe2, title: "Borderless Mindset", desc: "We build tools that break down financial walls, allowing you to operate on a global scale." },
+              { icon: ShieldCheck, title: "Uncompromising Security", desc: "Trust is our currency. We employ bank-grade encryption to protect every kobo you entrust to us." },
+              { icon: Zap, title: "Relentless Speed", desc: "In the digital age, speed is a feature. Our transactions settle instantly, keeping you moving." },
+            ].map((v, i) => (
+              <StaggerItem key={i} className="text-center flex flex-col items-center">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-border)] flex items-center justify-center mb-6">
+                  <v.icon className="w-8 h-8 text-[var(--color-accent)]" />
+                </div>
+                <h3 className="text-2xl font-semibold text-white mb-4">{v.title}</h3>
+                <p className="text-[var(--color-muted)]">{v.desc}</p>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </Container>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-32">
-          <FadeIn className="glass p-10 rounded-3xl border border-[var(--color-border)]">
-            <Target className="w-10 h-10 text-[var(--color-accent)] mb-6" />
-            <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-            <p className="text-[var(--color-text-sec)] leading-relaxed">
-              To dismantle financial borders for everyday Nigerians by providing a single, powerful platform for local utility payments, global virtual cards, and seamless digital asset conversion.
-            </p>
+      <section className="py-24">
+        <Container>
+          <FadeIn>
+            <h2 className="h2 mb-16 text-center">Meet the Team</h2>
           </FadeIn>
-          <FadeIn delay={0.2} className="glass p-10 rounded-3xl border border-[var(--color-border)]">
-            <Rocket className="w-10 h-10 text-[var(--color-accent)] mb-6" />
-            <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
-            <p className="text-[var(--color-text-sec)] leading-relaxed">
-              We envision an ecosystem where geographic location no longer dictates financial access. A world where anyone can participate in the global digital economy with confidence.
-            </p>
-          </FadeIn>
-        </div>
-
-        <FadeIn className="mb-16">
-          <h2 className="h2 mb-10 text-center">By the numbers</h2>
-        </FadeIn>
-        
-        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-32">
-          {[
-            { label: "Active Users", value: "250K+" },
-            { label: "Transactions Processed", value: "$50M+" },
-            { label: "App Store Rating", value: "4.8/5" },
-            { label: "Supported Countries", value: "Global" },
-          ].map((stat, i) => (
-            <StaggerItem key={i} className="text-center p-8 glass rounded-2xl border border-[var(--color-border)]">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</div>
-              <div className="text-[var(--color-text-sec)] text-sm font-medium uppercase tracking-wider">{stat.label}</div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        <div className="glass rounded-[3rem] p-10 md:p-20 border border-[var(--color-border)] text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-[var(--color-accent)] opacity-5 blur-[100px]"></div>
-          <Building2 className="w-16 h-16 text-[var(--color-accent)] mx-auto mb-8 relative z-10" />
-          <h2 className="h2 mb-6 relative z-10">Backed by the best</h2>
-          <p className="text-lg text-[var(--color-text-sec)] max-w-2xl mx-auto mb-10 relative z-10">
-            PAYVORA is partnered with tier-1 licensed financial institutions and leading technology providers to ensure your money is always safe, secure, and accessible.
-          </p>
-          {/* Faux logos area */}
-          <div className="flex flex-wrap justify-center gap-8 relative z-10 opacity-50 grayscale">
-            <div className="text-2xl font-bold tracking-tighter">FINTECH PARTNER</div>
-            <div className="text-2xl font-bold tracking-tighter">GLOBAL BANK</div>
-            <div className="text-2xl font-bold tracking-tighter">SECURITY FIRM</div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: "Oluwaseun Adebayo", role: "Chief Executive Officer", initials: "OA" },
+              { name: "Chioma Nnadi", role: "Chief Technology Officer", initials: "CN" },
+              { name: "Emmanuel Osei", role: "Head of Product", initials: "EO" },
+            ].map((member, i) => (
+              <FadeIn key={i} delay={i * 0.1} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-3xl p-8 text-center flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full bg-[var(--color-bg)] border border-[var(--color-border)] flex items-center justify-center mb-6 text-2xl font-bold text-[var(--color-muted)]">
+                  {member.initials}
+                </div>
+                <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
+                <p className="text-[var(--color-accent)] font-medium text-sm">{member.role}</p>
+              </FadeIn>
+            ))}
           </div>
-        </div>
-      </Container>
+        </Container>
+      </section>
+
+      <section className="py-24">
+        <Container>
+          <FadeIn className="bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-bg)] border border-[var(--color-border)] rounded-3xl p-12 text-center max-w-4xl mx-auto">
+            <h2 className="h2 mb-6">Help us shape the future</h2>
+            <p className="text-lg text-[var(--color-muted)] mb-8">
+              We are constantly looking for brilliant minds to join our mission. If you're passionate about fintech and building great products, let's talk.
+            </p>
+            <Button href="/careers" size="lg">View Open Positions</Button>
+          </FadeIn>
+        </Container>
+      </section>
     </div>
   );
 }

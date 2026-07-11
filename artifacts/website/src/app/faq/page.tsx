@@ -1,84 +1,65 @@
-import { Metadata } from "next";
-import { Container, Button } from "@/components/ui/core";
+import type { Metadata } from "next";
+import { Container } from "@/components/ui/core";
 import { FadeIn } from "@/components/ui/animations";
-import { ChevronDown, Plus } from "lucide-react";
+import { FaqAccordion } from "./FaqAccordion";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions",
-  description: "Answers to common questions about PAYVORA accounts, cards, and transactions.",
+  title: "FAQ | PAYVORA",
+  description: "Frequently asked questions about PAYVORA.",
 };
 
 const faqs = [
   {
-    category: "Virtual Cards",
-    items: [
-      { q: "How do I create a virtual dollar card?", a: "Once your account is verified (Tier 2), navigate to the 'Cards' tab, select 'Create Virtual Card', and fund it from your Naira or crypto wallet balance. The card is generated instantly." },
-      { q: "Where can I use my PAYVORA virtual card?", a: "Your virtual card is accepted on millions of platforms globally, including Netflix, Apple Music, Spotify, Amazon, Facebook Ads, AWS, and AliExpress." },
-      { q: "What is the maintenance fee?", a: "Virtual cards have a minimal creation fee of $2 and a monthly maintenance fee of $1. There are zero transaction fees for purchases." }
-    ]
+    q: "How do I create a PAYVORA account?",
+    a: "Download the PAYVORA app from the Apple App Store or Google Play Store. Tap 'Sign Up', enter your details, verify your email and BVN, and you're good to go in less than 2 minutes."
   },
   {
-    category: "Account & Verification",
-    items: [
-      { q: "How long does KYC verification take?", a: "Automated verification usually takes less than 5 minutes. Ensure your ID document is clear and matches the face scan." },
-      { q: "Are there limits on my account?", a: "Yes. Tier 1 users have a maximum balance of ₦300,000. Upgrading to Tier 2 (Government ID) removes these limits." }
-    ]
+    q: "Is there a maintenance fee for the virtual dollar card?",
+    a: "No! Unlike traditional banks, we do not charge any monthly or annual maintenance fees for your virtual USD card. You only pay standard conversion rates when funding it."
   },
   {
-    category: "Transfers & Funding",
-    items: [
-      { q: "How do I fund my wallet?", a: "You can fund your wallet via bank transfer to your dedicated PAYVORA account number, or by depositing supported cryptocurrencies like USDT." },
-      { q: "How long do withdrawals take?", a: "Withdrawals to local Nigerian banks are processed instantly, usually arriving within seconds." }
-    ]
+    q: "How long do gift card trades take to settle?",
+    a: "Gift card trades are typically processed and settled to your Naira wallet instantly after verification. Some specific card brands might take up to 5 minutes."
+  },
+  {
+    q: "What is the daily transaction limit?",
+    a: "For unverified accounts (Tier 1), the daily transfer limit is ₦50,000. Once you verify your identity with a valid ID (Tier 3), your limit increases to ₦5,000,000 daily."
+  },
+  {
+    q: "Is my money safe with PAYVORA?",
+    a: "Absolutely. We use bank-grade AES-256 encryption, and our partner banks are fully insured and regulated by the Central Bank of Nigeria (CBN). We also require 2FA for all major transactions."
+  },
+  {
+    q: "Can I use my virtual card on Apple Pay and Google Pay?",
+    a: "Yes, your PAYVORA virtual dollar card can be linked to Apple Pay, Google Pay, and works on major platforms like Netflix, Spotify, Amazon, and Adobe."
+  },
+  {
+    q: "Are there fees for paying utility bills?",
+    a: "No. Paying for electricity, cable TV, and internet through PAYVORA is 100% free. We do not charge convenience fees."
+  },
+  {
+    q: "What if I have an issue with a transaction?",
+    a: "Our customer support team is available 24/7. You can reach out directly via the in-app live chat, or email us at support@payvora.org."
   }
 ];
 
-export default function FAQPage() {
+export default function FaqPage() {
   return (
-    <div className="pt-32 pb-24">
-      <Container>
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <FadeIn>
-            <h1 className="h1 mb-6">Frequently Asked Questions</h1>
-            <p className="text-xl text-[var(--color-text-sec)]">
-              Find quick answers to your questions about using PAYVORA.
+    <div className="pt-32 pb-24 min-h-screen">
+      <section className="py-20">
+        <Container>
+          <FadeIn className="max-w-3xl mx-auto text-center mb-16">
+            <h1 className="h1 mb-6">Frequently asked questions.</h1>
+            <p className="text-xl text-[var(--color-muted)]">
+              Everything you need to know about the product and how it works.
             </p>
           </FadeIn>
-        </div>
-
-        <div className="max-w-3xl mx-auto">
-          {faqs.map((group, groupIdx) => (
-            <FadeIn key={groupIdx} delay={groupIdx * 0.1} className="mb-12">
-              <h2 className="text-2xl font-bold text-white mb-6 pl-4 border-l-2 border-[var(--color-accent)]">
-                {group.category}
-              </h2>
-              <div className="flex flex-col gap-4">
-                {group.items.map((faq, i) => (
-                  <details key={i} className="group glass rounded-2xl border border-[var(--color-border)] [&_summary::-webkit-details-marker]:hidden">
-                    <summary className="flex items-center justify-between p-6 cursor-pointer text-white font-medium">
-                      {faq.q}
-                      <span className="w-8 h-8 rounded-full bg-[var(--color-surface)] flex items-center justify-center group-open:rotate-45 transition-transform duration-300">
-                        <Plus className="w-4 h-4" />
-                      </span>
-                    </summary>
-                    <div className="p-6 pt-0 text-[var(--color-text-sec)] leading-relaxed border-t border-[var(--color-border)] mt-2">
-                      {faq.a}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-
-        <FadeIn delay={0.4} className="mt-20 text-center glass rounded-3xl p-10 border border-[var(--color-border)] max-w-3xl mx-auto">
-          <h3 className="text-2xl font-bold mb-4">Still have questions?</h3>
-          <p className="text-[var(--color-text-sec)] mb-8">
-            Our support team is always ready to assist you with any inquiries.
-          </p>
-          <Button href="/contact">Contact Support</Button>
-        </FadeIn>
-      </Container>
+          
+          <FadeIn className="max-w-3xl mx-auto">
+            <FaqAccordion faqs={faqs} />
+          </FadeIn>
+        </Container>
+      </section>
     </div>
   );
 }

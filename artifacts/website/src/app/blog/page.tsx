@@ -1,75 +1,93 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import { Container } from "@/components/ui/core";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Blog & Updates",
-  description: "Latest news, company updates, and financial guides from PAYVORA.",
+  title: "Blog | PAYVORA",
+  description: "Latest news, product updates, and financial tips from PAYVORA.",
 };
 
 const posts = [
   {
-    title: "Introducing PAYVORA Virtual Dollar Cards",
-    excerpt: "Shop globally without limits. Learn how our new 3D-secure virtual cards work and how to get yours in minutes.",
-    date: "Oct 12, 2024",
-    category: "Product Update"
+    category: "Product Update",
+    title: "Introducing Virtual USD Cards: Global Payments Made Easy",
+    date: "Oct 12, 2026",
+    excerpt: "We're thrilled to announce the launch of our virtual dollar cards. Now you can pay for international subscriptions without limits.",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/20"
   },
   {
-    title: "How to safely trade Gift Cards online",
-    excerpt: "Avoid scams and get the best rates. A comprehensive guide to selling your digital gift cards safely.",
-    date: "Sep 28, 2024",
-    category: "Guide"
+    category: "Company News",
+    title: "PAYVORA secures Microfinance Bank License from CBN",
+    date: "Sep 28, 2026",
+    excerpt: "This milestone allows us to offer more robust financial products and strengthens our commitment to regulatory compliance.",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/20"
   },
   {
-    title: "Understanding the new KYC Verification Tiers",
-    excerpt: "We've updated our AML policy. See what's changed and how to upgrade your account tier easily.",
-    date: "Sep 15, 2024",
-    category: "Compliance"
+    category: "Tips & Tricks",
+    title: "How to spot and avoid P2P trading scams",
+    date: "Sep 15, 2026",
+    excerpt: "Your security is our priority. Learn the common red flags in peer-to-peer trading and how to keep your funds safe.",
+    color: "bg-green-500/10 text-green-400 border-green-500/20"
   },
   {
-    title: "Why we chose zero hidden fees",
-    excerpt: "Transparency isn't a feature, it's a foundation. A look into our pricing philosophy and business model.",
-    date: "Aug 02, 2024",
-    category: "Company"
+    category: "Product Update",
+    title: "Zero-fee Utility Bill Payments are live!",
+    date: "Aug 30, 2026",
+    excerpt: "Stop paying convenience fees. You can now pay your electricity and cable TV bills directly on PAYVORA for free.",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/20"
+  },
+  {
+    category: "Company News",
+    title: "We're expanding our customer support team to 24/7",
+    date: "Aug 10, 2026",
+    excerpt: "Money never sleeps, and neither do we. Our dedicated support team is now available around the clock.",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/20"
+  },
+  {
+    category: "Tips & Tricks",
+    title: "Understanding foreign exchange rates in Nigeria",
+    date: "Jul 22, 2026",
+    excerpt: "A simple guide to navigating the FX market, parallel market rates, and how to get the best value for your conversions.",
+    color: "bg-green-500/10 text-green-400 border-green-500/20"
   }
 ];
 
 export default function BlogPage() {
   return (
-    <div className="pt-32 pb-24">
-      <Container>
-        <div className="max-w-3xl mb-20">
-          <FadeIn>
-            <h1 className="h1 mb-6">Blog & Updates</h1>
-            <p className="text-xl text-[var(--color-text-sec)]">
-              The latest news, product releases, and thoughts from the PAYVORA team.
+    <div className="pt-32 pb-24 min-h-screen">
+      <section className="py-20">
+        <Container>
+          <FadeIn className="max-w-3xl mb-16">
+            <h1 className="h1 mb-6">Latest news & updates.</h1>
+            <p className="text-xl text-[var(--color-muted)]">
+              Product announcements, company news, and financial guides from the PAYVORA team.
             </p>
           </FadeIn>
-        </div>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {posts.map((post, i) => (
-            <StaggerItem key={i} className="glass p-8 rounded-3xl border border-[var(--color-border)] hover:border-[var(--color-border-light)] transition-colors group flex flex-col h-full">
-              <div className="flex items-center gap-4 mb-4 text-sm font-medium">
-                <span className="text-[var(--color-accent)]">{post.category}</span>
-                <span className="text-[var(--color-muted)]">&bull;</span>
-                <span className="text-[var(--color-muted)]">{post.date}</span>
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-4 group-hover:text-[var(--color-accent)] transition-colors">
-                {post.title}
-              </h2>
-              <p className="text-[var(--color-text-sec)] mb-8 leading-relaxed flex-1">
-                {post.excerpt}
-              </p>
-              <div className="inline-flex items-center text-white font-medium group-hover:text-[var(--color-accent)] transition-colors mt-auto">
-                Read article <ArrowRight className="ml-2 w-4 h-4" />
-              </div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      </Container>
+          <StaggerContainer className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {posts.map((post, i) => (
+              <StaggerItem key={i} className="group cursor-pointer flex flex-col h-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-3xl p-8 hover:border-[var(--color-border-light)] transition-colors">
+                <div className="mb-6 flex items-center justify-between">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase border ${post.color}`}>
+                    {post.category}
+                  </span>
+                  <span className="text-sm text-[var(--color-muted)]">{post.date}</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-4 group-hover:text-[var(--color-accent)] transition-colors line-clamp-2">
+                  {post.title}
+                </h3>
+                <p className="text-[var(--color-muted)] mb-8 flex-grow line-clamp-3">
+                  {post.excerpt}
+                </p>
+                <div className="flex items-center text-sm font-medium text-white group-hover:text-[var(--color-accent)] transition-colors mt-auto">
+                  Read Article <ArrowRight className="w-4 h-4 ml-2" />
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        </Container>
+      </section>
     </div>
   );
 }

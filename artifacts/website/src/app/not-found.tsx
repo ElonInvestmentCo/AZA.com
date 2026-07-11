@@ -1,26 +1,18 @@
-import { Metadata } from "next";
-import { Container } from "@/components/ui/core";
-import { Button } from "@/components/ui/core";
-
-export const metadata: Metadata = {
-  title: "404 - Page Not Found",
-};
+import { Container, Button } from "@/components/ui/core";
+import { Ghost } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center pt-24 pb-12">
-      <Container className="text-center flex flex-col items-center max-w-2xl">
-        <div className="w-24 h-24 rounded-full bg-[var(--color-surface)] border border-[var(--color-border)] flex items-center justify-center mb-8 shadow-[0_0_50px_var(--color-accent-dim)]">
-          <span className="text-4xl font-bold text-[var(--color-accent)]">404</span>
+    <div className="min-h-screen flex items-center justify-center pt-20">
+      <Container className="text-center">
+        <div className="w-24 h-24 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse-slow">
+          <Ghost className="w-12 h-12 text-[var(--color-accent)]" />
         </div>
-        <h1 className="h2 mb-4">Page Not Found</h1>
-        <p className="text-[var(--color-text-sec)] text-lg mb-8 max-w-md">
-          We couldn't find the page you're looking for. It might have been moved or doesn't exist.
+        <h1 className="h1 mb-4">Page not found</h1>
+        <p className="text-xl text-[var(--color-muted)] mb-10 max-w-md mx-auto">
+          Looks like this page doesn't exist, or it has been moved to a new location.
         </p>
-        <div className="flex gap-4">
-          <Button href="/">Return Home</Button>
-          <Button href="/contact" variant="outline">Contact Support</Button>
-        </div>
+        <Button href="/">Back to Homepage</Button>
       </Container>
     </div>
   );

@@ -1,78 +1,73 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/core";
+import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      setSubmitted(true);
+    }, 1500);
+  };
 
   if (submitted) {
     return (
-      <div className="text-center py-10">
-        <h3 className="text-xl font-bold mb-2">Message sent.</h3>
-        <p className="text-[var(--color-text-sec)]">
-          Thanks for reaching out — our support team will get back to you within 24 hours.
-        </p>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        className="bg-[var(--color-surface)] border border-[var(--color-border)] p-12 rounded-3xl text-center flex flex-col items-center"
+      >
+        <CheckCircle2 className="w-16 h-16 text-[var(--color-accent)] mb-6" />
+        <h3 className="text-2xl font-bold text-white mb-2">Message Received</h3>
+        <p className="text-[var(--color-muted)] mb-8">We'll get back to you as soon as possible.</p>
+        <Button onClick={() => setSubmitted(false)} variant="outline">Send another message</Button>
+      </motion.div>
     );
   }
 
   return (
-    <form
-      className="flex flex-col gap-6"
-      onSubmit={(e) => {
-        e.preventDefault();
-        setSubmitted(true);
-      }}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="name" className="text-sm font-medium text-[var(--color-text-sec)]">Full Name</label>
-          <input
-            type="text"
-            id="name"
-            required
-            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors"
-            placeholder="John Doe"
-          />
+    <form onSubmit={handleSubmit} className="bg-[var(--color-surface)] border border-[var(--color-border)] p-8 md:p-10 rounded-3xl">
+      <h3 className="text-2xl font-bold text-white mb-6">Send us a message</h3>
+      
+      <div className="space-y-6">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[var(--color-muted)]">Full Name</label>
+            <input required type="text" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors" placeholder="John Doe" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[var(--color-muted)]">Email Address</label>
+            <input required type="email" className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors" placeholder="john@example.com" />
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-[var(--color-text-sec)]">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            required
-            className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors"
-            placeholder="john@example.com"
-          />
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-[var(--color-muted)]">Subject</label>
+          <select className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none">
+            <option value="general">General Inquiry</option>
+            <option value="support">Technical Support</option>
+            <option value="partnership">Partnership</option>
+            <option value="press">Press</option>
+          </select>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="subject" className="text-sm font-medium text-[var(--color-text-sec)]">Subject</label>
-        <select
-          id="subject"
-          className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors appearance-none"
-        >
-          <option>Account Support</option>
-          <option>Transaction Issue</option>
-          <option>Partnership Inquiry</option>
-          <option>Other</option>
-        </select>
-      </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-[var(--color-muted)]">Message</label>
+          <textarea required rows={5} className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none" placeholder="How can we help you?"></textarea>
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="message" className="text-sm font-medium text-[var(--color-text-sec)]">Message</label>
-        <textarea
-          id="message"
-          rows={5}
-          required
-          className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[var(--color-accent)] transition-colors resize-none"
-          placeholder="How can we help you?"
-        ></textarea>
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Sending..." : "Send Message"}
+        </Button>
       </div>
-
-      <Button type="submit" className="w-full mt-4">Send Message</Button>
     </form>
   );
 }
