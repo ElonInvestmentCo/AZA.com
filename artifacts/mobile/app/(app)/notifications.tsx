@@ -320,7 +320,15 @@ export default function NotificationsScreen() {
   const insets  = useSafeAreaInsets();
   const topPad  = Platform.OS === "web" ? 20 : insets.top;
 
-  const [items,           setItems]           = useState<Notification[]>(MOCK);
+  const {
+    notifications: items,
+    dismiss: storeDismiss,
+    dismissMany: storeDismissMany,
+    markRead: storeMarkRead,
+    toggleReadState: storeToggleReadState,
+    markAllRead: storeMarkAllRead,
+    refresh: storeRefresh,
+  } = useNotifications();
   const [loading,         setLoading]         = useState(false);
   const [refreshing,      setRefreshing]       = useState(false);
   const [searchText,      setSearchText]       = useState("");
@@ -354,8 +362,8 @@ export default function NotificationsScreen() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setVisibleCount(20);
-    setTimeout(() => setRefreshing(false), 1200);
-  }, []);
+    storeRefresh().finally(() => setRefreshing(false));
+  }, [storeRefresh]);
 
   /* ── Infinite scroll ── */
   const onEndReached = useCallback(() => {
@@ -367,18 +375,16 @@ export default function NotificationsScreen() {
 
   const markAllRead = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setItems(prev => prev.map(n => ({ ...n, read: true })));
+    storeMarkAllRead();
   };
 
-  const markRead = (id: string) =>
-    setItems(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  const markRead = (id: string) => storeMarkRead(id);
 
-  const toggleReadState = (id: string) =>
-    setItems(prev => prev.map(n => n.id === id ? { ...n, read: !n.read } : n));
+  const toggleReadState = (id: string) => storeToggleReadState(id);
 
   const dismiss = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setItems(prev => prev.filter(n => n.id !== id));
+    storeDismiss(id);
   };
 
   /* ── Multi-select helpers ── */
@@ -412,7 +418,7 @@ export default function NotificationsScreen() {
 
   const deleteSelected = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setItems(prev => prev.filter(n => !selectedIds.has(n.id)));
+    storeDismissMany(Array.from(selectedIds));
     cancelMultiSelect();
   };
 
