@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Container } from "./ui/core";
 import { Twitter, Instagram, Linkedin, Youtube, Mail } from "lucide-react";
@@ -9,10 +10,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-16">
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-4">
-              <div className="text-2xl font-bold tracking-tighter flex items-center">
-                <span className="text-white">PAY</span>
-                <span className="text-[var(--color-accent)]">VORA</span>
-              </div>
+              <Image
+                src="/payvora-wordmark.svg"
+                alt="PAYVORA"
+                width={146}
+                height={15}
+                className="h-6 w-auto"
+              />
             </Link>
             <p className="text-[var(--color-muted)] mb-6 max-w-sm">
               Finance without borders. Send, receive, convert, and manage money in one premium app designed for Nigerians.

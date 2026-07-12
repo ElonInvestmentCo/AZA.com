@@ -91,3 +91,4 @@ There used to be two separate dev workflows running the Express API (a legacy ha
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
 - Figma design reference: `attached_assets/aza_export/src/imports/` for screen-level component specs (historical reference only)
 - CSS design specs: `attached_assets/Pasted--Gift-card-button-*` and similar pasted text files
+- Official brand package: `PAYVORA_Brand_Assets.zip` (repo root) — source of truth for logos/icons/favicons/splash; see `PAYVORA_PRODUCT_POLISH_REPORT.md` for the 2026-07-12 integration pass and `APP_STORE_CHECKLIST.md` for store-readiness status

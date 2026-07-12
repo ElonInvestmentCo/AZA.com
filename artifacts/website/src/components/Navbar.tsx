@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown } from "lucide-react";
@@ -61,11 +62,14 @@ export function Navbar() {
           <nav className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 relative z-50">
-              {/* Fallback text logo if SVG is missing/broken */}
-              <div className="text-2xl font-bold tracking-tighter flex items-center">
-                <span className="text-white">PAY</span>
-                <span className="text-[var(--color-accent)]">VORA</span>
-              </div>
+              <Image
+                src="/payvora-wordmark.svg"
+                alt="PAYVORA"
+                width={146}
+                height={15}
+                className="h-6 w-auto"
+                priority
+              />
             </Link>
 
             {/* Desktop Navigation */}
