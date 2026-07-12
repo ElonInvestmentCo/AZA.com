@@ -1,0 +1,1176 @@
+{
+  "package": "PAYVORA_Brand_Assets",
+  "generated": "2026-07-12",
+  "files": [
+    {
+      "filename": "PAYVORA-Primary-Logo-Dark-BG.png",
+      "path": "Logos/PAYVORA-Primary-Logo-Dark-BG.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1811x868",
+      "usage": "Primary logo for dark backgrounds (as supplied, unmodified)",
+      "bytes": 359501
+    },
+    {
+      "filename": "PAYVORA-Primary-Logo-Light-BG.png",
+      "path": "Logos/PAYVORA-Primary-Logo-Light-BG.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1820x864",
+      "usage": "Primary logo for light backgrounds (as supplied, unmodified)",
+      "bytes": 700086
+    },
+    {
+      "filename": "PAYVORA-Logomark-Dark.png",
+      "path": "Logos/PAYVORA-Logomark-Dark.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1254x1254",
+      "usage": "Logo mark only, black-on-white, as supplied",
+      "bytes": 639563
+    },
+    {
+      "filename": "PAYVORA-Logomark-Light.png",
+      "path": "Logos/PAYVORA-Logomark-Light.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1254x1254",
+      "usage": "Logo mark only, white-on-black, as supplied",
+      "bytes": 538238
+    },
+    {
+      "filename": "PAYVORA-Horizontal-Logo-Light.png",
+      "path": "Logos/PAYVORA-Horizontal-Logo-Light.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1811x868",
+      "usage": "Horizontal lockup for dark backgrounds",
+      "bytes": 359501
+    },
+    {
+      "filename": "PAYVORA-Horizontal-Logo-Dark.png",
+      "path": "Logos/PAYVORA-Horizontal-Logo-Dark.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1820x864",
+      "usage": "Horizontal lockup for light backgrounds",
+      "bytes": 700086
+    },
+    {
+      "filename": "PAYVORA-Vertical-Logo-Light-Transparent.png",
+      "path": "Logos/PAYVORA-Vertical-Logo-Light-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1538x1322",
+      "usage": "Vertical (stacked) lockup, white ink, transparent bg",
+      "bytes": 57466
+    },
+    {
+      "filename": "PAYVORA-Vertical-Logo-Dark-Transparent.png",
+      "path": "Logos/PAYVORA-Vertical-Logo-Dark-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1545x1434",
+      "usage": "Vertical (stacked) lockup, black ink, transparent bg",
+      "bytes": 53166
+    },
+    {
+      "filename": "PAYVORA-Version-For-Dark-Backgrounds.png",
+      "path": "Logos/PAYVORA-Version-For-Dark-Backgrounds.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1811x868",
+      "usage": "Use this version on dark UI / dark backgrounds",
+      "bytes": 359501
+    },
+    {
+      "filename": "PAYVORA-Version-For-Light-Backgrounds.png",
+      "path": "Logos/PAYVORA-Version-For-Light-Backgrounds.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1820x864",
+      "usage": "Use this version on light UI / light backgrounds",
+      "bytes": 700086
+    },
+    {
+      "filename": "PAYVORA-Monochrome-Black.png",
+      "path": "Logos/PAYVORA-Monochrome-Black.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "931x783",
+      "usage": "Single-color black mark, transparent background",
+      "bytes": 23694
+    },
+    {
+      "filename": "PAYVORA-Monochrome-White.png",
+      "path": "Logos/PAYVORA-Monochrome-White.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "725x573",
+      "usage": "Single-color white mark, transparent background",
+      "bytes": 16074
+    },
+    {
+      "filename": "PAYVORA-Logomark-Black-Transparent.png",
+      "path": "Logos/PAYVORA-Logomark-Black-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "931x783",
+      "usage": "Logo mark, transparent background, black ink",
+      "bytes": 23694
+    },
+    {
+      "filename": "PAYVORA-Logomark-White-Transparent.png",
+      "path": "Logos/PAYVORA-Logomark-White-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "725x573",
+      "usage": "Logo mark, transparent background, white ink",
+      "bytes": 16074
+    },
+    {
+      "filename": "PAYVORA-Wordmark-Black-Transparent.png",
+      "path": "Logos/PAYVORA-Wordmark-Black-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1594x270",
+      "usage": "Full lockup, transparent background, black ink",
+      "bytes": 25441
+    },
+    {
+      "filename": "PAYVORA-Wordmark-White-Transparent.png",
+      "path": "Logos/PAYVORA-Wordmark-White-Transparent.png",
+      "folder": "Logos",
+      "format": "PNG",
+      "dimensions": "1587x272",
+      "usage": "Full lockup, transparent background, white ink",
+      "bytes": 27961
+    },
+    {
+      "filename": "PAYVORA-Logo-BitmapEmbedded.svg",
+      "path": "Logos/PAYVORA-Logo-BitmapEmbedded.svg",
+      "folder": "Logos",
+      "format": "SVG",
+      "dimensions": "N/A",
+      "usage": "SVG export (bitmap-embedded SVG, not a true vector redraw)",
+      "bytes": 37747
+    },
+    {
+      "filename": "PAYVORA-Logo-Export.pdf",
+      "path": "Logos/PAYVORA-Logo-Export.pdf",
+      "folder": "Logos",
+      "format": "PDF",
+      "dimensions": "N/A",
+      "usage": "PDF export (raster embedded losslessly in PDF page, not redrawn)",
+      "bytes": 48921
+    },
+    {
+      "filename": "AppIcon-1024.png",
+      "path": "App Icons/AppIcon-1024.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "1024x1024",
+      "usage": "Master 1024x1024 app icon (opaque, full-bleed, no corner rounding)",
+      "bytes": 273647
+    },
+    {
+      "filename": "icon-20@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-20@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "40x40",
+      "usage": "iOS AppIcon.appiconset entry: iphone 20pt @2x = 40px",
+      "bytes": 786
+    },
+    {
+      "filename": "icon-20@3x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-20@3x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "60x60",
+      "usage": "iOS AppIcon.appiconset entry: iphone 20pt @3x = 60px",
+      "bytes": 1128
+    },
+    {
+      "filename": "icon-29@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-29@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "58x58",
+      "usage": "iOS AppIcon.appiconset entry: iphone 29pt @2x = 58px",
+      "bytes": 1099
+    },
+    {
+      "filename": "icon-29@3x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-29@3x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "87x87",
+      "usage": "iOS AppIcon.appiconset entry: iphone 29pt @3x = 87px",
+      "bytes": 1690
+    },
+    {
+      "filename": "icon-40@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-40@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "80x80",
+      "usage": "iOS AppIcon.appiconset entry: iphone 40pt @2x = 80px",
+      "bytes": 1542
+    },
+    {
+      "filename": "icon-40@3x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-40@3x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "120x120",
+      "usage": "iOS AppIcon.appiconset entry: iphone 40pt @3x = 120px",
+      "bytes": 2875
+    },
+    {
+      "filename": "icon-60@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-60@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "120x120",
+      "usage": "iOS AppIcon.appiconset entry: iphone 60pt @2x = 120px",
+      "bytes": 2875
+    },
+    {
+      "filename": "icon-60@3x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-60@3x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "180x180",
+      "usage": "iOS AppIcon.appiconset entry: iphone 60pt @3x = 180px",
+      "bytes": 5574
+    },
+    {
+      "filename": "icon-20@1x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-20@1x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "20x20",
+      "usage": "iOS AppIcon.appiconset entry: ipad 20pt @1x = 20px",
+      "bytes": 409
+    },
+    {
+      "filename": "icon-20@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-20@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "40x40",
+      "usage": "iOS AppIcon.appiconset entry: ipad 20pt @2x = 40px",
+      "bytes": 786
+    },
+    {
+      "filename": "icon-29@1x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-29@1x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "29x29",
+      "usage": "iOS AppIcon.appiconset entry: ipad 29pt @1x = 29px",
+      "bytes": 574
+    },
+    {
+      "filename": "icon-29@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-29@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "58x58",
+      "usage": "iOS AppIcon.appiconset entry: ipad 29pt @2x = 58px",
+      "bytes": 1099
+    },
+    {
+      "filename": "icon-40@1x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-40@1x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "40x40",
+      "usage": "iOS AppIcon.appiconset entry: ipad 40pt @1x = 40px",
+      "bytes": 786
+    },
+    {
+      "filename": "icon-40@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-40@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "80x80",
+      "usage": "iOS AppIcon.appiconset entry: ipad 40pt @2x = 80px",
+      "bytes": 1542
+    },
+    {
+      "filename": "icon-76@1x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-76@1x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "76x76",
+      "usage": "iOS AppIcon.appiconset entry: ipad 76pt @1x = 76px",
+      "bytes": 1412
+    },
+    {
+      "filename": "icon-76@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-76@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "152x152",
+      "usage": "iOS AppIcon.appiconset entry: ipad 76pt @2x = 152px",
+      "bytes": 4032
+    },
+    {
+      "filename": "icon-83.5@2x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-83.5@2x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "167x167",
+      "usage": "iOS AppIcon.appiconset entry: ipad 83.5pt @2x = 167px",
+      "bytes": 4835
+    },
+    {
+      "filename": "icon-1024@1x.png",
+      "path": "App Icons/iOS-AppIcon.appiconset/icon-1024@1x.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "1024x1024",
+      "usage": "iOS AppIcon.appiconset entry: ios-marketing 1024pt @1x = 1024px",
+      "bytes": 273647
+    },
+    {
+      "filename": "Contents.json",
+      "path": "App Icons/iOS-AppIcon.appiconset/Contents.json",
+      "folder": "App Icons",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "iOS Xcode asset catalog manifest",
+      "bytes": 2201
+    },
+    {
+      "filename": "ic_launcher_foreground.png",
+      "path": "App Icons/Android-Adaptive/ic_launcher_foreground.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "432x432",
+      "usage": "Android adaptive icon foreground layer (432x432, safe-zone scaled)",
+      "bytes": 9076
+    },
+    {
+      "filename": "ic_launcher_background.png",
+      "path": "App Icons/Android-Adaptive/ic_launcher_background.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "432x432",
+      "usage": "Android adaptive icon background layer (solid black, matches mark's native bg)",
+      "bytes": 1352
+    },
+    {
+      "filename": "ic_launcher_monochrome.png",
+      "path": "App Icons/Android-Adaptive/ic_launcher_monochrome.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "432x432",
+      "usage": "Android 13+ themed monochrome icon layer",
+      "bytes": 9076
+    },
+    {
+      "filename": "ic_launcher-mdpi-48.png",
+      "path": "App Icons/Android-Legacy/ic_launcher-mdpi-48.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "48x48",
+      "usage": "Android legacy launcher icon, mdpi bucket",
+      "bytes": 927
+    },
+    {
+      "filename": "ic_launcher-hdpi-72.png",
+      "path": "App Icons/Android-Legacy/ic_launcher-hdpi-72.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "72x72",
+      "usage": "Android legacy launcher icon, hdpi bucket",
+      "bytes": 1348
+    },
+    {
+      "filename": "ic_launcher-xhdpi-96.png",
+      "path": "App Icons/Android-Legacy/ic_launcher-xhdpi-96.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "96x96",
+      "usage": "Android legacy launcher icon, xhdpi bucket",
+      "bytes": 1878
+    },
+    {
+      "filename": "ic_launcher-xxhdpi-144.png",
+      "path": "App Icons/Android-Legacy/ic_launcher-xxhdpi-144.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "144x144",
+      "usage": "Android legacy launcher icon, xxhdpi bucket",
+      "bytes": 3784
+    },
+    {
+      "filename": "ic_launcher-xxxhdpi-192.png",
+      "path": "App Icons/Android-Legacy/ic_launcher-xxxhdpi-192.png",
+      "folder": "App Icons",
+      "format": "PNG",
+      "dimensions": "192x192",
+      "usage": "Android legacy launcher icon, xxxhdpi bucket",
+      "bytes": 6347
+    },
+    {
+      "filename": "favicon-16x16.png",
+      "path": "Favicons/favicon-16x16.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "16x16",
+      "usage": "16x16 favicon",
+      "bytes": 430
+    },
+    {
+      "filename": "favicon-32x32.png",
+      "path": "Favicons/favicon-32x32.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "32x32",
+      "usage": "32x32 favicon",
+      "bytes": 810
+    },
+    {
+      "filename": "favicon-48x48.png",
+      "path": "Favicons/favicon-48x48.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "48x48",
+      "usage": "48x48 favicon",
+      "bytes": 1197
+    },
+    {
+      "filename": "favicon.ico",
+      "path": "Favicons/favicon.ico",
+      "folder": "Favicons",
+      "format": "ICO",
+      "dimensions": "48x48",
+      "usage": "Multi-resolution favicon.ico (16/32/48, packaged with ImageMagick)",
+      "bytes": 7406
+    },
+    {
+      "filename": "apple-touch-icon.png",
+      "path": "Favicons/apple-touch-icon.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "180x180",
+      "usage": "180x180 Apple touch icon",
+      "bytes": 10096
+    },
+    {
+      "filename": "android-chrome-192x192.png",
+      "path": "Favicons/android-chrome-192x192.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "192x192",
+      "usage": "192x192 Android Chrome / PWA icon",
+      "bytes": 11949
+    },
+    {
+      "filename": "android-chrome-512x512.png",
+      "path": "Favicons/android-chrome-512x512.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "512x512 Android Chrome / PWA icon",
+      "bytes": 136574
+    },
+    {
+      "filename": "mstile-144x144.png",
+      "path": "Favicons/mstile-144x144.png",
+      "folder": "Favicons",
+      "format": "PNG",
+      "dimensions": "144x144",
+      "usage": "144x144 Windows tile icon (referenced by browserconfig.xml)",
+      "bytes": 5861
+    },
+    {
+      "filename": "site.webmanifest",
+      "path": "Favicons/site.webmanifest",
+      "folder": "Favicons",
+      "format": "WEBMANIFEST",
+      "dimensions": "N/A",
+      "usage": "Web app manifest for PWA installs",
+      "bytes": 371
+    },
+    {
+      "filename": "browserconfig.xml",
+      "path": "Favicons/browserconfig.xml",
+      "folder": "Favicons",
+      "format": "XML",
+      "dimensions": "N/A",
+      "usage": "Windows tile configuration for IE/Edge legacy",
+      "bytes": 220
+    },
+    {
+      "filename": "Splash-Logo-Dark.png",
+      "path": "Splash/Splash-Logo-Dark.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Splash screen, dark background, 1242x2688 (iPhone reference size)",
+      "bytes": 38363
+    },
+    {
+      "filename": "Splash-Logo-Light.png",
+      "path": "Splash/Splash-Logo-Light.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Splash screen, light background, 1242x2688",
+      "bytes": 39145
+    },
+    {
+      "filename": "Dark-Splash.png",
+      "path": "Splash/Dark-Splash.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Dark splash variant (alias of Splash-Logo-Dark)",
+      "bytes": 38363
+    },
+    {
+      "filename": "Light-Splash.png",
+      "path": "Splash/Light-Splash.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Light splash variant (alias of Splash-Logo-Light)",
+      "bytes": 39145
+    },
+    {
+      "filename": "Launch-Logo.png",
+      "path": "Splash/Launch-Logo.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "512x512 transparent launch logo for native launch-screen storyboards",
+      "bytes": 12911
+    },
+    {
+      "filename": "Launch-Background-Dark.png",
+      "path": "Splash/Launch-Background-Dark.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Solid dark launch background, no logo",
+      "bytes": 19128
+    },
+    {
+      "filename": "Launch-Background-Light.png",
+      "path": "Splash/Launch-Background-Light.png",
+      "folder": "Splash",
+      "format": "PNG",
+      "dimensions": "1242x2688",
+      "usage": "Solid light launch background, no logo",
+      "bytes": 19125
+    },
+    {
+      "filename": "OpenGraph-1200x630.png",
+      "path": "Website/OpenGraph-1200x630.png",
+      "folder": "Website",
+      "format": "PNG",
+      "dimensions": "1200x630",
+      "usage": "Open Graph share image (og:image), 1200x630",
+      "bytes": 16719
+    },
+    {
+      "filename": "TwitterCard-1200x630.png",
+      "path": "Website/TwitterCard-1200x630.png",
+      "folder": "Website",
+      "format": "PNG",
+      "dimensions": "1200x630",
+      "usage": "Twitter/X card image, 1200x630 (same artwork as Open Graph)",
+      "bytes": 16719
+    },
+    {
+      "filename": "pwa-icon-192.png",
+      "path": "Website/pwa-icon-192.png",
+      "folder": "Website",
+      "format": "PNG",
+      "dimensions": "192x192",
+      "usage": "PWA icon 192x192 (copy of Favicons/android-chrome-192x192.png)",
+      "bytes": 11949
+    },
+    {
+      "filename": "pwa-icon-512.png",
+      "path": "Website/pwa-icon-512.png",
+      "folder": "Website",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "PWA icon 512x512 (copy of Favicons/android-chrome-512x512.png)",
+      "bytes": 136574
+    },
+    {
+      "filename": "pwa-icon-512-maskable.png",
+      "path": "Website/pwa-icon-512-maskable.png",
+      "folder": "Website",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "512x512 maskable PWA icon (extra safe-zone padding for adaptive display)",
+      "bytes": 12543
+    },
+    {
+      "filename": "manifest-icons.json",
+      "path": "Website/manifest-icons.json",
+      "folder": "Website",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "PWA manifest icons array",
+      "bytes": 399
+    },
+    {
+      "filename": "Profile-Picture-Dark.png",
+      "path": "Social/Profile-Picture-Dark.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "800x800",
+      "usage": "800x800 profile picture, dark background",
+      "bytes": 25133
+    },
+    {
+      "filename": "Profile-Picture-Light.png",
+      "path": "Social/Profile-Picture-Light.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "800x800",
+      "usage": "800x800 profile picture, light background",
+      "bytes": 25671
+    },
+    {
+      "filename": "LinkedIn-Banner-1584x396.png",
+      "path": "Social/LinkedIn-Banner-1584x396.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "1584x396",
+      "usage": "LinkedIn company page banner",
+      "bytes": 9830
+    },
+    {
+      "filename": "Twitter-Header-1500x500.png",
+      "path": "Social/Twitter-Header-1500x500.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "1500x500",
+      "usage": "Twitter/X header image",
+      "bytes": 12220
+    },
+    {
+      "filename": "Facebook-Cover-820x312.png",
+      "path": "Social/Facebook-Cover-820x312.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "820x312",
+      "usage": "Facebook page cover photo",
+      "bytes": 6201
+    },
+    {
+      "filename": "Instagram-Highlight-Cover-1080x1080.png",
+      "path": "Social/Instagram-Highlight-Cover-1080x1080.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "1080x1080",
+      "usage": "Instagram Story highlight cover template",
+      "bytes": 29939
+    },
+    {
+      "filename": "Discord-Icon-512.png",
+      "path": "Social/Discord-Icon-512.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "512x512 transparent Discord server icon",
+      "bytes": 12911
+    },
+    {
+      "filename": "TikTok-Profile-200x200.png",
+      "path": "Social/TikTok-Profile-200x200.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "200x200",
+      "usage": "200x200 TikTok profile picture",
+      "bytes": 5038
+    },
+    {
+      "filename": "YouTube-Banner-2560x1440.png",
+      "path": "Social/YouTube-Banner-2560x1440.png",
+      "folder": "Social",
+      "format": "PNG",
+      "dimensions": "2560x1440",
+      "usage": "YouTube channel banner (2560x1440, keep text inside the 1546x423 safe area)",
+      "bytes": 37594
+    },
+    {
+      "filename": "Business-Card-1050x600.png",
+      "path": "Marketing/Business-Card-1050x600.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1050x600",
+      "usage": "Business card front template, 1050x600 (300dpi @ 3.5x2in)",
+      "bytes": 33811
+    },
+    {
+      "filename": "Letterhead-A4-2550x3300.png",
+      "path": "Marketing/Letterhead-A4-2550x3300.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "2550x3300",
+      "usage": "Letterhead template, 2550x3300 (300dpi Letter/A4)",
+      "bytes": 71659
+    },
+    {
+      "filename": "Invoice-Header-1600x400.png",
+      "path": "Marketing/Invoice-Header-1600x400.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1600x400",
+      "usage": "Invoice document header, 1600x400",
+      "bytes": 26758
+    },
+    {
+      "filename": "Presentation-Cover-1920x1080.png",
+      "path": "Marketing/Presentation-Cover-1920x1080.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1920x1080",
+      "usage": "Presentation cover slide, 1920x1080",
+      "bytes": 28737
+    },
+    {
+      "filename": "Investor-Deck-Cover-1920x1080.png",
+      "path": "Marketing/Investor-Deck-Cover-1920x1080.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1920x1080",
+      "usage": "Investor Deck cover slide, 1920x1080",
+      "bytes": 30607
+    },
+    {
+      "filename": "Press-Kit-Cover-1920x1080.png",
+      "path": "Marketing/Press-Kit-Cover-1920x1080.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1920x1080",
+      "usage": "Press Kit cover slide, 1920x1080",
+      "bytes": 27051
+    },
+    {
+      "filename": "Media-Kit-Cover-1920x1080.png",
+      "path": "Marketing/Media-Kit-Cover-1920x1080.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "1920x1080",
+      "usage": "Media Kit cover slide, 1920x1080",
+      "bytes": 27667
+    },
+    {
+      "filename": "Email-Signature-600x150.png",
+      "path": "Marketing/Email-Signature-600x150.png",
+      "folder": "Marketing",
+      "format": "PNG",
+      "dimensions": "600x150",
+      "usage": "HTML email signature template, 600x150",
+      "bytes": 17049
+    },
+    {
+      "filename": "App-Store-Icon-1024.png",
+      "path": "App Store/App-Store-Icon-1024.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "1024x1024",
+      "usage": "iOS App Store listing icon, 1024x1024, opaque no rounding",
+      "bytes": 277791
+    },
+    {
+      "filename": "Google-Play-Icon-512.png",
+      "path": "App Store/Google-Play-Icon-512.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "Google Play listing icon, 512x512",
+      "bytes": 72575
+    },
+    {
+      "filename": "Feature-Graphic-1024x500.png",
+      "path": "App Store/Feature-Graphic-1024x500.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "1024x500",
+      "usage": "Google Play feature graphic, 1024x500",
+      "bytes": 11370
+    },
+    {
+      "filename": "Promotional-Banner-1200x628.png",
+      "path": "App Store/Promotional-Banner-1200x628.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "1200x628",
+      "usage": "General promotional banner, 1200x628",
+      "bytes": 15628
+    },
+    {
+      "filename": "Store-Screenshot-Template-1-1284x2778.png",
+      "path": "App Store/Store-Screenshot-Template-1-1284x2778.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "1284x2778",
+      "usage": "App Store / Play Store screenshot template #1, 1284x2778",
+      "bytes": 35371
+    },
+    {
+      "filename": "Store-Screenshot-Template-2-1284x2778.png",
+      "path": "App Store/Store-Screenshot-Template-2-1284x2778.png",
+      "folder": "App Store",
+      "format": "PNG",
+      "dimensions": "1284x2778",
+      "usage": "App Store / Play Store screenshot template #2, 1284x2778",
+      "bytes": 36025
+    },
+    {
+      "filename": "Success-Icon.png",
+      "path": "UI Assets/Success-Icon.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "128x128",
+      "usage": "Success state icon, 128x128",
+      "bytes": 858
+    },
+    {
+      "filename": "Error-Icon.png",
+      "path": "UI Assets/Error-Icon.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "128x128",
+      "usage": "Error state icon, 128x128",
+      "bytes": 912
+    },
+    {
+      "filename": "Notification-Icon.png",
+      "path": "UI Assets/Notification-Icon.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "128x128",
+      "usage": "Notification bell icon, 128x128",
+      "bytes": 885
+    },
+    {
+      "filename": "Loading-Spinner.gif",
+      "path": "UI Assets/Loading-Spinner.gif",
+      "folder": "UI Assets",
+      "format": "GIF",
+      "dimensions": "128x128",
+      "usage": "Animated loading spinner, 128x128, 12-frame loop",
+      "bytes": 6891
+    },
+    {
+      "filename": "Loading-Spinner-Static.png",
+      "path": "UI Assets/Loading-Spinner-Static.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "128x128",
+      "usage": "Static single-frame loading spinner",
+      "bytes": 862
+    },
+    {
+      "filename": "Avatar-Placeholder-256.png",
+      "path": "UI Assets/Avatar-Placeholder-256.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "256x256",
+      "usage": "Default avatar placeholder, 256x256",
+      "bytes": 2305
+    },
+    {
+      "filename": "QR-Branding-512.png",
+      "path": "UI Assets/QR-Branding-512.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "512x512",
+      "usage": "Branded QR code (encodes www.payvora.org) with logo mark badge",
+      "bytes": 34307
+    },
+    {
+      "filename": "Payment-Card-Generic-1.png",
+      "path": "UI Assets/Payment-Card-Generic-1.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "400x250",
+      "usage": "Generic (non-trademarked) payment card icon placeholder",
+      "bytes": 1269
+    },
+    {
+      "filename": "Payment-Card-Generic-2.png",
+      "path": "UI Assets/Payment-Card-Generic-2.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "400x250",
+      "usage": "Generic (non-trademarked) payment card icon placeholder",
+      "bytes": 1264
+    },
+    {
+      "filename": "Payment-Card-Generic-3.png",
+      "path": "UI Assets/Payment-Card-Generic-3.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "400x250",
+      "usage": "Generic (non-trademarked) payment card icon placeholder",
+      "bytes": 1265
+    },
+    {
+      "filename": "Empty-State-Illustration-800x600.png",
+      "path": "UI Assets/Empty-State-Illustration-800x600.png",
+      "folder": "UI Assets",
+      "format": "PNG",
+      "dimensions": "800x600",
+      "usage": "Empty state illustration, 800x600",
+      "bytes": 13229
+    },
+    {
+      "filename": "Logo-Reveal.json",
+      "path": "Motion/Logo-Reveal.json",
+      "folder": "Motion",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "Lottie animation: Logo-Reveal (embeds the untouched source PNG as an image layer, animates opacity/scale only)",
+      "bytes": 15549
+    },
+    {
+      "filename": "Success-Animation.json",
+      "path": "Motion/Success-Animation.json",
+      "folder": "Motion",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "Lottie animation: Success-Animation (embeds the untouched source PNG as an image layer, animates opacity/scale only)",
+      "bytes": 2129
+    },
+    {
+      "filename": "Loading-Animation.json",
+      "path": "Motion/Loading-Animation.json",
+      "folder": "Motion",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "Lottie animation: Loading-Animation (embeds the untouched source PNG as an image layer, animates opacity/scale only)",
+      "bytes": 1754
+    },
+    {
+      "filename": "Payment-Animation.json",
+      "path": "Motion/Payment-Animation.json",
+      "folder": "Motion",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "Lottie animation: Payment-Animation (embeds the untouched source PNG as an image layer, animates opacity/scale only)",
+      "bytes": 2721
+    },
+    {
+      "filename": "Button-Micro-Interaction.json",
+      "path": "Motion/Button-Micro-Interaction.json",
+      "folder": "Motion",
+      "format": "JSON",
+      "dimensions": "N/A",
+      "usage": "Lottie animation: Button-Micro-Interaction (embeds the untouched source PNG as an image layer, animates opacity/scale only)",
+      "bytes": 3308
+    },
+    {
+      "filename": "Logo-Reveal-Preview.gif",
+      "path": "Motion/Logo-Reveal-Preview.gif",
+      "folder": "Motion",
+      "format": "GIF",
+      "dimensions": "400x400",
+      "usage": "GIF preview render of the Logo-Reveal motion concept",
+      "bytes": 37573
+    },
+    {
+      "filename": "Logo-Reveal-Preview.mp4",
+      "path": "Motion/Logo-Reveal-Preview.mp4",
+      "folder": "Motion",
+      "format": "MP4",
+      "dimensions": "N/A",
+      "usage": "MP4 preview render of the Logo-Reveal motion concept",
+      "bytes": 7799
+    },
+    {
+      "filename": "Loading-Animation-Preview.gif",
+      "path": "Motion/Loading-Animation-Preview.gif",
+      "folder": "Motion",
+      "format": "GIF",
+      "dimensions": "128x128",
+      "usage": "GIF preview render of the Loading-Animation motion concept",
+      "bytes": 17909
+    },
+    {
+      "filename": "Loading-Animation-Preview.mp4",
+      "path": "Motion/Loading-Animation-Preview.mp4",
+      "folder": "Motion",
+      "format": "MP4",
+      "dimensions": "N/A",
+      "usage": "MP4 preview render of the Loading-Animation motion concept",
+      "bytes": 3690
+    },
+    {
+      "filename": "Rive-Files-README.txt",
+      "path": "Motion/Rive-Files-README.txt",
+      "folder": "Motion",
+      "format": "TXT",
+      "dimensions": "N/A",
+      "usage": "Explains why .riv binaries are not included and how to produce them",
+      "bytes": 853
+    },
+    {
+      "filename": "Header.png",
+      "path": "Email/Header.png",
+      "folder": "Email",
+      "format": "PNG",
+      "dimensions": "600x160",
+      "usage": "Transactional email header, 600x160",
+      "bytes": 7660
+    },
+    {
+      "filename": "Footer.png",
+      "path": "Email/Footer.png",
+      "folder": "Email",
+      "format": "PNG",
+      "dimensions": "600x160",
+      "usage": "Transactional email footer, 600x160",
+      "bytes": 10132
+    },
+    {
+      "filename": "OTP-Template-Header.png",
+      "path": "Email/OTP-Template-Header.png",
+      "folder": "Email",
+      "format": "PNG",
+      "dimensions": "600x160",
+      "usage": "OTP email header, 600x160",
+      "bytes": 10467
+    },
+    {
+      "filename": "Receipt-Header.png",
+      "path": "Email/Receipt-Header.png",
+      "folder": "Email",
+      "format": "PNG",
+      "dimensions": "600x160",
+      "usage": "Receipt email header, 600x160",
+      "bytes": 10360
+    },
+    {
+      "filename": "Notification-Header.png",
+      "path": "Email/Notification-Header.png",
+      "folder": "Email",
+      "format": "PNG",
+      "dimensions": "600x160",
+      "usage": "General notification email header, 600x160",
+      "bytes": 9373
+    },
+    {
+      "filename": "Press-Logo-Transparent-Black.png",
+      "path": "Press Kit/Press-Logo-Transparent-Black.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "1594x270",
+      "usage": "Press logo for print/light backgrounds, transparent",
+      "bytes": 25441
+    },
+    {
+      "filename": "Transparent-Logo-Mark.png",
+      "path": "Press Kit/Transparent-Logo-Mark.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "725x573",
+      "usage": "Transparent logo mark for press use",
+      "bytes": 16074
+    },
+    {
+      "filename": "Company-Overview-Template.md",
+      "path": "Press Kit/Company-Overview-Template.md",
+      "folder": "Press Kit",
+      "format": "MD",
+      "dimensions": "N/A",
+      "usage": "Fill-in-the-blank company overview for press use",
+      "bytes": 549
+    },
+    {
+      "filename": "PAYVORA-Logomark-Black-Transparent.png",
+      "path": "Press Kit/Media Assets/PAYVORA-Logomark-Black-Transparent.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "931x783",
+      "usage": "Press-ready logo asset (duplicate of Logos/ for journalist convenience)",
+      "bytes": 23694
+    },
+    {
+      "filename": "PAYVORA-Logomark-White-Transparent.png",
+      "path": "Press Kit/Media Assets/PAYVORA-Logomark-White-Transparent.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "725x573",
+      "usage": "Press-ready logo asset (duplicate of Logos/ for journalist convenience)",
+      "bytes": 16074
+    },
+    {
+      "filename": "PAYVORA-Wordmark-Black-Transparent.png",
+      "path": "Press Kit/Media Assets/PAYVORA-Wordmark-Black-Transparent.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "1594x270",
+      "usage": "Press-ready logo asset (duplicate of Logos/ for journalist convenience)",
+      "bytes": 25441
+    },
+    {
+      "filename": "PAYVORA-Wordmark-White-Transparent.png",
+      "path": "Press Kit/Media Assets/PAYVORA-Wordmark-White-Transparent.png",
+      "folder": "Press Kit",
+      "format": "PNG",
+      "dimensions": "1587x272",
+      "usage": "Press-ready logo asset (duplicate of Logos/ for journalist convenience)",
+      "bytes": 27961
+    },
+    {
+      "filename": "README-Logo.png",
+      "path": "Documentation/README-Logo.png",
+      "folder": "Documentation",
+      "format": "PNG",
+      "dimensions": "800x300",
+      "usage": "Logo for use at the top of GitHub README.md (transparent, dark ink for light README backgrounds)",
+      "bytes": 6122
+    },
+    {
+      "filename": "GitHub-Social-Preview-1280x640.png",
+      "path": "Documentation/GitHub-Social-Preview-1280x640.png",
+      "folder": "Documentation",
+      "format": "PNG",
+      "dimensions": "1280x640",
+      "usage": "GitHub repository social preview image (Settings > Social preview)",
+      "bytes": 15048
+    },
+    {
+      "filename": "Developer-Docs-Header-1200x300.png",
+      "path": "Documentation/Developer-Docs-Header-1200x300.png",
+      "folder": "Documentation",
+      "format": "PNG",
+      "dimensions": "1200x300",
+      "usage": "Header banner for developer documentation sites",
+      "bytes": 6506
+    },
+    {
+      "filename": "API-Documentation-Logo-256.png",
+      "path": "Documentation/API-Documentation-Logo-256.png",
+      "folder": "Documentation",
+      "format": "PNG",
+      "dimensions": "256x256",
+      "usage": "Icon for API reference / OpenAPI docs, 256x256",
+      "bytes": 6737
+    },
+    {
+      "filename": "Brand-Guidelines.pdf",
+      "path": "Brand Guidelines/Brand-Guidelines.pdf",
+      "folder": "Brand Guidelines",
+      "format": "PDF",
+      "dimensions": "N/A",
+      "usage": "Full brand guidelines document (logo usage, colors, typography, spacing, export rules)",
+      "bytes": 33729
+    }
+  ]
+}

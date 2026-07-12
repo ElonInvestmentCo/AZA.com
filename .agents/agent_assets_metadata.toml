@@ -1,3 +1,8 @@
 uploads = []
 generated = []
-outputs = []
+
+[[outputs]]
+id = "nN90FwKnSyiypq3NcaJxM"
+uri = "file://PAYVORA_Brand_Assets.zip"
+type = "unspecified"
+title = "PAYVORA Brand Assets Package"
