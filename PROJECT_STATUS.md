@@ -124,3 +124,47 @@ Note: `lib/` was previously called `packages/` in older docs — the directory w
 - **Firebase subsystem is half-built and unused** (see Auth System section above) — needs an explicit decision to finish or remove.
 
 See `NEXT_AGENT.md` for the full scored production-readiness report and prioritized next steps.
+
+---
+
+## Fresh Import / Environment Bootstrap (2026-07-12)
+
+A fresh re-import of this repl wipes `node_modules` and every package's build
+output (`dist/`, `.next/`, Metro cache) since those are gitignored, so the
+"PayVora Website", "API Server", and "artifacts/mobile: expo" workflows will
+fail immediately after import with errors like `next: not found` or a
+missing `artifacts/api-server/dist/index.mjs`. This is expected, not a
+regression — re-run the bootstrap below (also see `scripts/setup.sh`):
+
+1. `pnpm install` — relinks all workspace packages from the pnpm store
+   (fast if the store cache is warm; the lockfile is never modified).
+2. `pnpm --filter @workspace/api-server run build` — regenerates
+   `artifacts/api-server/dist/index.mjs`, which the root **API Server**
+   workflow (`PORT=3001 node ... ./artifacts/api-server/dist/index.mjs`)
+   runs directly instead of building itself.
+3. Restart the **API Server** workflow once the build above exists.
+   **PayVora Website** and **artifacts/mockup-sandbox: Component Preview
+   Server** run `next dev` / `vite dev` directly and do not need a
+   pre-build step — just restart them.
+4. **artifacts/mobile: expo** can fail with
+   `Port 19000 is running this app in another window` /
+   `ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL` even right after import. This is a
+   stale Expo process left over from an earlier partial start still holding
+   port 19000 (`lsof -i :19000` will show a `node .../expo/bin/cli` process).
+   Kill it (`kill -9 <pid>` for the process bound to port 19000, and any
+   parent `pnpm exec expo`/`sh -c` processes from the same failed launch),
+   then restart the workflow — Expo's CLI runs `CI=1` (non-interactive) so
+   it refuses to auto-pick a fallback port and exits instead of retrying.
+5. Note there are two independent API server workflows —
+   **API Server** (root, pre-built, port 3001, what the website proxies to)
+   and **artifacts/api-server: API Server** (runs its own `pnpm run dev`,
+   which builds+starts itself) — both can run simultaneously without
+   conflict since they bind different ports, but see the open follow-up
+   task about consolidating them.
+
+Validated working end-to-end on 2026-07-12: `pnpm install` completed
+("Already up to date"), `pnpm --filter @workspace/api-server run build`
+produced `dist/index.mjs`, and all five workflows (`PayVora Website`,
+`API Server`, `artifacts/mockup-sandbox: Component Preview Server`,
+`artifacts/mobile: expo`, `artifacts/api-server: API Server`) came up
+`RUNNING` with no errors in their logs.
