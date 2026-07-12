@@ -22,10 +22,6 @@ author = "agent"
 task = "workflow.run"
 args = "PayVora Website"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "API Server"
-
 [[workflows.workflow]]
 name = "PayVora Website"
 author = "agent"
@@ -35,20 +31,8 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "INTERNAL_API_URL=http://localhost:3001 pnpm --filter @workspace/website run dev"
+args = "pnpm --filter @workspace/website run dev"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "API Server"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "PORT=3001 node --enable-source-maps ./artifacts/api-server/dist/index.mjs"
-waitForPort = 3001
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"

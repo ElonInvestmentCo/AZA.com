@@ -8,13 +8,28 @@
 
 ## Current Status
 
-**Current Phase:** Production readiness audit + core auth stabilization
+**Current Phase:** Production readiness audit + core auth stabilization + final cleanup pass
 
-**Production Completion:** ~80% (see Production Readiness Report in `NEXT_AGENT.md` for the scored breakdown)
+**Production Completion:** ~85% (see Production Readiness Report in `NEXT_AGENT.md` for the scored breakdown)
 
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-12
 
 **This file was out of date** as of the previous entry (referenced `packages/db`, a Firebase custom-token plan, and `railway.toml` fixes that no longer match the codebase). It has been rewritten below to match what is actually in the repo today.
+
+---
+
+## Final Cleanup Pass (2026-07-12)
+
+1. **Duplicate API Server workflow resolved.** Two dev workflows both ran the Express API (`API Server` on port 3001, hand-rolled pre-`dist/index.mjs`; `artifacts/api-server: API Server` on port 8080, artifact-managed with proper `services.production` build/run/health config in `artifact.toml`). The artifact-managed workflow is the one the platform can restart/manage automatically and matches `userenv.shared.INTERNAL_API_URL` (`http://localhost:8080`), so the legacy hand-rolled `API Server` workflow and its explicit `INTERNAL_API_URL=http://localhost:3001` override on the website workflow were removed from `.replit`. **`PayVora Website` now inherits `INTERNAL_API_URL` from the shared env (port 8080) instead of hardcoding 3001.** Production (Railway `start.mjs`, still fixed at internal port 3001) is untouched — this change only affects the Replit dev workflow topology, not the Railway deployment path.
+2. **`artifacts/mockup-sandbox` TypeScript conflict — left untouched, documented here instead of fixed.** `pnpm --filter @workspace/mockup-sandbox run typecheck` fails with "two different types with this name exist, but they are unrelated" on `@types/react`. Root cause: `artifacts/mobile`'s React Native/Expo dependency tree pins `@types/react@19.1.17` as a transitive peer, while the shared pnpm catalog (`pnpm-workspace.yaml`) pins `@types/react@^19.2.0` for `mockup-sandbox`/`website`/`packages/ui`, so two copies of `@types/react` end up in the store and TS treats their structurally-identical types as nominally different. There is no fix that stays isolated to `mockup-sandbox`: pnpm overrides and the shared catalog version are both workspace-global, so changing either would also change the `@types/react` version resolved for `artifacts/mobile` (shipped product code) or `artifacts/website`/`packages/ui`. Per the "don't risk production dependencies" instruction, this was left as-is. It only breaks `mockup-sandbox`'s own `typecheck` script (a dev-only design-preview tool, not shipped code) — `website` and `api-server` typecheck clean on their own. If this is ever prioritized, the safe fix is isolating `mockup-sandbox` out of the shared `@types/react` catalog entry with its own pinned resolution that matches `artifacts/mobile`'s version, then verifying no runtime type behavior differs.
+3. **Session token storage reviewed — no live code stores tokens unhashed, because no live code writes to the sessions table at all.** `lib/db/src/schema/sessions.ts` defines a `sessionsTable` with a plaintext `token` column, but a full-repo grep confirms nothing outside that schema file ever imports `sessionsTable` or `insertSessionSchema`. Auth is 100% stateless JWT (`artifacts/api-server/src/lib/jwt.ts`, `signToken`/`verifyToken`) — no route reads or writes the `sessions` table. This matches the "dead/unused code" flag already recorded above from the prior audit. No hashing migration was performed because there is no active write path to migrate; hashing an unused column would be a no-op with no security effect. **Recommendation, not yet acted on:** either delete the `sessions` table/schema file as dead code, or, if a future session-revocation feature is planned, store `sha256(token)` (not the raw JWT) in that column when it's actually wired up.
+4. **Full verification pass:**
+   - `pnpm install` — clean, all 14 workspace projects resolved.
+   - `pnpm --filter @workspace/api-server run build` — clean, produces `dist/index.mjs`.
+   - `NODE_ENV=production pnpm --filter @workspace/website run build` — clean, all 25 routes prerendered.
+   - `artifacts/mobile: expo` — Metro bundler starts, packager status `running`.
+   - `artifacts/api-server` typecheck — clean. `artifacts/website` typecheck — clean. `artifacts/mockup-sandbox` typecheck — fails only on the pre-existing `@types/react` issue in item 2 above.
+   - All four workflows (`PayVora Website`, `artifacts/api-server: API Server`, `artifacts/mobile: expo`, `artifacts/mockup-sandbox: Component Preview Server`) restarted clean with no errors in logs; `GET /api/status` → `{"status":"ok"}`; website homepage renders correctly (screenshot-verified).
 
 ---
 
@@ -155,16 +170,16 @@ regression — re-run the bootstrap below (also see `scripts/setup.sh`):
    parent `pnpm exec expo`/`sh -c` processes from the same failed launch),
    then restart the workflow — Expo's CLI runs `CI=1` (non-interactive) so
    it refuses to auto-pick a fallback port and exits instead of retrying.
-5. Note there are two independent API server workflows —
-   **API Server** (root, pre-built, port 3001, what the website proxies to)
-   and **artifacts/api-server: API Server** (runs its own `pnpm run dev`,
-   which builds+starts itself) — both can run simultaneously without
-   conflict since they bind different ports, but see the open follow-up
-   task about consolidating them.
+5. **Resolved 2026-07-12:** the two independent API server workflows noted
+   below (kept only as a historical note) have been consolidated — see
+   "Final Cleanup Pass" above. `API Server` (root, port 3001) was removed;
+   `artifacts/api-server: API Server` (port 8080, artifact-managed) is now
+   the sole dev API workflow, and `PayVora Website` points at it via the
+   shared env `INTERNAL_API_URL` instead of a hardcoded override.
 
 Validated working end-to-end on 2026-07-12: `pnpm install` completed
 ("Already up to date"), `pnpm --filter @workspace/api-server run build`
-produced `dist/index.mjs`, and all five workflows (`PayVora Website`,
-`API Server`, `artifacts/mockup-sandbox: Component Preview Server`,
+produced `dist/index.mjs`, and all four workflows (`PayVora Website`,
+`artifacts/mockup-sandbox: Component Preview Server`,
 `artifacts/mobile: expo`, `artifacts/api-server: API Server`) came up
 `RUNNING` with no errors in their logs.

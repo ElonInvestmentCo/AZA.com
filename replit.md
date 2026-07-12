@@ -5,13 +5,13 @@ A fintech platform for gift card trading, bill payments, airtime, and virtual do
 ## Run & Operate
 
 ### Workflows (Replit)
-- **PayVora Website** — Next.js 15 landing page on port 5000 (preview pane)
-- **API Server** — Express API on port 3001 (internal; website proxies to it via INTERNAL_API_URL)
+- **PayVora Website** — Next.js 15 landing page on port 5000 (preview pane); inherits `INTERNAL_API_URL` from the shared env (points at the API Server below)
+- **artifacts/api-server: API Server** — Express API on port 8080 (internal, artifact-managed); the sole API dev workflow
 - **artifacts/mobile: expo** — Expo dev server on port 19000; scan QR code with Expo Go app
 - **artifacts/mockup-sandbox: Component Preview Server** — Vite canvas/design preview on port 8081
 
-### Note on extra workflows
-The platform auto-detected artifacts and created additional workflows (`artifacts/api-server: API Server` on port 8080, `artifacts/mobile: expo` on port 19000, `artifacts/mockup-sandbox: Component Preview Server` on port 8081). These run alongside the original `PayVora Website`/`API Server` workflows without port conflicts. The canonical, documented setup remains **PayVora Website** (port 5000) + **API Server** (port 3001, `dist/index.mjs`), which is what the website's `INTERNAL_API_URL` points to.
+### Note on workflow consolidation (2026-07-12)
+There used to be two separate dev workflows running the Express API (a legacy hand-rolled `API Server` on port 3001, and the artifact-managed `artifacts/api-server: API Server` on port 8080). The legacy one was removed to avoid confusion — the artifact-managed workflow on port 8080 is now canonical for dev, matching `userenv.shared.INTERNAL_API_URL`. Production (Railway `start.mjs`) is unaffected — it still runs the API on a fixed internal port 3001 and the website on Railway's dynamic `PORT`; that's a separate, self-contained launcher unrelated to Replit dev workflow ports. See `PROJECT_STATUS.md` → "Final Cleanup Pass" for the full rationale.
 
 ### Commands
 - `pnpm install` — install all workspace dependencies (run this after cloning)
