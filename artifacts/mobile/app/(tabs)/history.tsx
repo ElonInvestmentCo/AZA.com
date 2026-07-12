@@ -68,94 +68,6 @@ interface Transaction {
   iconColor: string;
 }
 
-/* ─── Transaction dataset ────────────────────────────────────────────────── */
-const ALL_TX: Transaction[] = [
-  {
-    id:"1",  name:"Amazon Gift Card",   cat:"Gift Card", date:"Apr 28, 2024", time:"09:14 AM",
-    ts: new Date("2024-04-28").getTime(), amount:"₦200,040",  amountRaw:200040,
-    fee:"₦200", ref:"TXN-84920-GC", positive:true,  status:"completed",
-    note:"Amazon US $120 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
-  },
-  {
-    id:"2",  name:"Bitcoin Sale",       cat:"Crypto",    date:"Jun 23, 2025", time:"02:47 PM",
-    ts: new Date("2025-06-23").getTime(), amount:"₦185,000",  amountRaw:185000,
-    fee:"₦500", ref:"TXN-29183-CR", positive:true,  status:"completed",
-    note:"0.0021 BTC @ ₦88,095,238/BTC", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#F7931A",
-  },
-  {
-    id:"3",  name:"Electricity Bill",  cat:"Bills",     date:"Jun 22, 2025", time:"11:05 AM",
-    ts: new Date("2025-06-22").getTime(), amount:"₦5,000",    amountRaw:5000,
-    fee:"₦100", ref:"TXN-77641-BL", positive:false, status:"completed",
-    note:"EKEDC prepaid meter top-up", icon:"zap",              iconBg:"#FFFBEB", iconColor:"#D97706",
-  },
-  {
-    id:"4",  name:"MTN Airtime",        cat:"Airtime",   date:"Jun 22, 2025", time:"08:30 AM",
-    ts: new Date("2025-06-22").getTime(), amount:"₦2,000",    amountRaw:2000,
-    fee:"₦0",   ref:"TXN-55302-AT", positive:false, status:"completed",
-    note:"MTN 08012345678", icon:"phone",            iconBg:"#FEFCE8", iconColor:"#CA8A04",
-  },
-  {
-    id:"5",  name:"Wallet Withdrawal", cat:"Wallet",    date:"Jun 21, 2025", time:"04:22 PM",
-    ts: new Date("2025-06-21").getTime(), amount:"₦50,000",   amountRaw:50000,
-    fee:"₦50",  ref:"TXN-66128-WD", positive:false, status:"completed",
-    note:"Withdrawn to GTBank •••• 4821", icon:"arrow-up-circle",  iconBg:"#FFF0F0", iconColor:"#EF4444",
-  },
-  {
-    id:"6",  name:"iTunes Gift Card",  cat:"Gift Card", date:"Jun 20, 2025", time:"01:18 PM",
-    ts: new Date("2025-06-20").getTime(), amount:"₦92,400",   amountRaw:92400,
-    fee:"₦200", ref:"TXN-10293-GC", positive:true,  status:"pending",
-    note:"Apple iTunes US $50 gift card — under review", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
-  },
-  {
-    id:"7",  name:"DSTV Subscription", cat:"Bills",     date:"Jun 19, 2025", time:"10:00 AM",
-    ts: new Date("2025-06-19").getTime(), amount:"₦7,900",    amountRaw:7900,
-    fee:"₦100", ref:"TXN-38841-BL", positive:false, status:"completed",
-    note:"DSTV Premium — IUC 1234567890", icon:"tv",               iconBg:"#FFF1F2", iconColor:"#E11D48",
-  },
-  {
-    id:"8",  name:"Wallet Funding",    cat:"Wallet",    date:"Jun 17, 2025", time:"03:55 PM",
-    ts: new Date("2025-06-17").getTime(), amount:"₦100,000",  amountRaw:100000,
-    fee:"₦0",   ref:"TXN-92011-WF", positive:true,  status:"completed",
-    note:"Funded from GTBank via bank transfer", icon:"arrow-down-circle",iconBg:"#F0FFF4", iconColor:"#00B03C",
-  },
-  {
-    id:"9",  name:"Deposit Gift Card", cat:"Gift Card", date:"Feb 24, 2022", time:"05:40 PM",
-    ts: new Date("2022-02-24").getTime(), amount:"₦200,040",  amountRaw:200040,
-    fee:"₦200", ref:"TXN-40021-GC", positive:true,  status:"completed",
-    note:"Vanilla Visa $120 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
-  },
-  {
-    id:"10", name:"Withdrawal",        cat:"Wallet",    date:"Feb 24, 2022", time:"06:12 PM",
-    ts: new Date("2022-02-24").getTime(), amount:"₦400,000",  amountRaw:400000,
-    fee:"₦50",  ref:"TXN-73950-WD", positive:false, status:"completed",
-    note:"Withdrawn to Access Bank •••• 9934", icon:"arrow-up-right",   iconBg:"#FFF0F0", iconColor:"#EF4444",
-  },
-  {
-    id:"11", name:"Spotify Premium",   cat:"Bills",     date:"Jun 15, 2025", time:"12:00 PM",
-    ts: new Date("2025-06-15").getTime(), amount:"₦3,200",    amountRaw:3200,
-    fee:"₦0",   ref:"TXN-61122-BL", positive:false, status:"completed",
-    note:"Spotify Premium monthly — auto-renew", icon:"music",            iconBg:"#F5F3FF", iconColor:"#7C3AED",
-  },
-  {
-    id:"12", name:"Steam Gift Card",   cat:"Gift Card", date:"Jun 12, 2025", time:"11:31 AM",
-    ts: new Date("2025-06-12").getTime(), amount:"₦45,000",   amountRaw:45000,
-    fee:"₦200", ref:"TXN-58801-GC", positive:true,  status:"completed",
-    note:"Steam Wallet US $25 gift card", icon:"gift",             iconBg:"#FFF2CF", iconColor:"#5C4000",
-  },
-  {
-    id:"13", name:"Ethereum Sale",     cat:"Crypto",    date:"Jun 10, 2025", time:"09:03 AM",
-    ts: new Date("2025-06-10").getTime(), amount:"₦312,000",  amountRaw:312000,
-    fee:"₦500", ref:"TXN-14420-CR", positive:true,  status:"completed",
-    note:"0.1 ETH @ ₦3,120,000/ETH", icon:"trending-up",      iconBg:"#FFF7ED", iconColor:"#627EEA",
-  },
-  {
-    id:"14", name:"WAEC Data Bundle",  cat:"Airtime",   date:"Jun 8, 2025",  time:"07:45 AM",
-    ts: new Date("2025-06-08").getTime(), amount:"₦1,500",    amountRaw:1500,
-    fee:"₦0",   ref:"TXN-33672-AT", positive:false, status:"pending",
-    note:"1GB data — 09087654321", icon:"wifi",             iconBg:"#EFF6FF", iconColor:"#3B82F6",
-  },
-];
-
 /* ─── Skeleton loader ────────────────────────────────────────────────────── */
 function TxSkeleton({ count = 6 }: { count?: number }) {
   const opacity = useSharedValue(1);
@@ -807,7 +719,7 @@ export default function HistoryScreen() {
   const topPad = Platform.OS === "web" ? 40 : insets.top;
   const { user } = useAuth();
 
-  const [txData,       setTxData]       = useState<Transaction[]>(ALL_TX);
+  const [txData,       setTxData]       = useState<Transaction[]>([]);
   const [txFilter,     setTxFilter]     = useState<TxFilter>("All");
   const [dateRange,    setDateRange]    = useState<DateRange>("all");
   const [searchText,   setSearchText]   = useState("");
@@ -826,11 +738,16 @@ export default function HistoryScreen() {
     setInitialLoad(true);
     apiFetch<{ transactions: ApiTransaction[] }>("/wallet/transactions")
       .then(({ transactions }) => {
-        if (transactions.length > 0) {
-          setTxData(transactions.map(apiTxToLocal));
-        }
+        // Always reflect exactly what the API returns — including an empty
+        // array for a brand-new wallet — so a real "no transactions yet"
+        // empty state shows instead of stale placeholder data.
+        setTxData(transactions.map(apiTxToLocal));
       })
-      .catch(() => { setLoadError(true); /* keep mock data */ })
+      .catch(() => {
+        setLoadError(true);
+        // Keep whatever was already loaded (nothing on first load) rather
+        // than falling back to fabricated transactions.
+      })
       .finally(() => setInitialLoad(false));
   }, []);
 
@@ -1117,22 +1034,34 @@ export default function HistoryScreen() {
             ) : null
           }
           ListEmptyComponent={
-            <View style={s.empty}>
-              <View style={s.emptyIconWrap}>
-                <Feather name="search" size={24} color={C.textMut} />
+            activeFilters === 0 && txData.length === 0 && !loadError ? (
+              <View style={s.empty}>
+                <View style={s.emptyIconWrap}>
+                  <Feather name="inbox" size={24} color={C.textMut} />
+                </View>
+                <Text style={s.emptyTitle}>No transactions yet</Text>
+                <Text style={s.emptySubtitle}>
+                  Your gift card sales, bill payments, and transfers will show up here.
+                </Text>
               </View>
-              <Text style={s.emptyTitle}>No results found</Text>
-              <Text style={s.emptySubtitle}>
-                {searchText
-                  ? `No transactions matching "${searchText}"`
-                  : "Try adjusting your filters"}
-              </Text>
-              {activeFilters > 0 && (
-                <TouchableOpacity style={s.emptyBtn} onPress={clearAll}>
-                  <Text style={s.emptyBtnText}>Clear all filters</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            ) : (
+              <View style={s.empty}>
+                <View style={s.emptyIconWrap}>
+                  <Feather name="search" size={24} color={C.textMut} />
+                </View>
+                <Text style={s.emptyTitle}>No results found</Text>
+                <Text style={s.emptySubtitle}>
+                  {searchText
+                    ? `No transactions matching "${searchText}"`
+                    : "Try adjusting your filters"}
+                </Text>
+                {activeFilters > 0 && (
+                  <TouchableOpacity style={s.emptyBtn} onPress={clearAll}>
+                    <Text style={s.emptyBtnText}>Clear all filters</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )
           }
           renderItem={({ item, index }) => {
             if (item.type === "header") {

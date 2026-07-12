@@ -46,6 +46,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
+import { apiFetch } from "@/utils/api";
 
 const MAX_W = 430;
 const BAL_VIS_KEY = "payvora_balance_visible";
@@ -94,11 +95,38 @@ const PROMOS = [
   },
 ];
 
-const TRANSACTIONS = [
-  { id: "t1", title: "Amazon card",      ref: "3289HF-4378", date: "April 28, 2024",    amount: "₦200,040.00",  positive: true  },
-  { id: "t2", title: "Withdraws",        ref: "7812KJ-2901", date: "February 24, 2022", amount: "₦400,000.00",  positive: false },
-  { id: "t3", title: "Deposit Giftcard", ref: "5621AB-1122", date: "February 24, 2022", amount: "₦200,040.00",  positive: true  },
-];
+interface HomeTx {
+  id: string;
+  title: string;
+  ref: string;
+  date: string;
+  amount: string;
+  positive: boolean;
+}
+
+interface ApiTransaction {
+  id: string;
+  type: "credit" | "debit";
+  category: string;
+  amountKobo: number;
+  description: string;
+  externalRef?: string | null;
+  createdAt: string;
+}
+
+function apiTxToHomeTx(t: ApiTransaction): HomeTx {
+  const parsed = new Date(t.createdAt);
+  const date = isNaN(parsed.getTime()) ? new Date() : parsed;
+  const naira = (Number.isFinite(t.amountKobo) ? t.amountKobo : 0) / 100;
+  return {
+    id: t.id,
+    title: t.description || t.category,
+    ref: t.externalRef ?? t.id,
+    date: date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+    amount: "₦" + naira.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    positive: t.type === "credit",
+  };
+}
 
 function ServiceIconRenderer({ id, color, size = 20 }: { id: string; color: string; size?: number }) {
   switch (id) {
@@ -159,7 +187,7 @@ function PromoCard({ item, width: promoW }: { item: (typeof PROMOS)[number]; wid
   );
 }
 
-function TxRow({ item, onPress }: { item: (typeof TRANSACTIONS)[number]; onPress: () => void }) {
+function TxRow({ item, onPress }: { item: HomeTx; onPress: () => void }) {
   return (
     <TouchableOpacity style={tx.row} onPress={onPress} activeOpacity={0.75}>
       <View style={[tx.iconWrap, { backgroundColor: item.positive ? "#E8F7EF" : "#FFF0F0" }]}>
@@ -193,6 +221,8 @@ export default function HomeScreen() {
 
   const [balanceVisible,   setBalanceVisible]   = useState(true);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
+  const [recentTx,         setRecentTx]         = useState<HomeTx[]>([]);
+  const [txLoading,        setTxLoading]        = useState(true);
 
   /* Persist balance visibility preference */
   useEffect(() => {
@@ -200,6 +230,23 @@ export default function HomeScreen() {
       if (val !== null) setBalanceVisible(val === "true");
     }).catch(() => {});
   }, []);
+
+  /* Fetch the 3 most recent real transactions for the dashboard preview */
+  useEffect(() => {
+    let cancelled = false;
+    setTxLoading(true);
+    apiFetch<{ transactions: ApiTransaction[] }>("/wallet/transactions?limit=3")
+      .then(({ transactions }) => {
+        if (!cancelled) setRecentTx(transactions.map(apiTxToHomeTx));
+      })
+      .catch(() => {
+        if (!cancelled) setRecentTx([]);
+      })
+      .finally(() => {
+        if (!cancelled) setTxLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const toggleBalance = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -210,7 +257,7 @@ export default function HomeScreen() {
 
   /* Balance display */
   const firstName = (user?.name ?? "Dove").split(" ")[0];
-  const balance   = user?.balance ?? 200590;
+  const balance   = user?.balance ?? 0;
   const formatted = "₦" + balance.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const MASKED    = "₦••••••••";
 
@@ -368,18 +415,24 @@ export default function HomeScreen() {
           </View>
 
           <View style={s.txCard}>
-            {TRANSACTIONS.map((item, i) => (
-              <Animated.View
-                key={item.id}
-                entering={FadeInUp.duration(260).springify().delay(220 + i * 35)}
-              >
-                <TxRow
-                  item={item}
-                  onPress={press(() => router.push("/(tabs)/history" as any))}
-                />
-                {i < TRANSACTIONS.length - 1 && <View style={s.txDivider} />}
-              </Animated.View>
-            ))}
+            {txLoading ? (
+              <Text style={s.txEmptyText}>Loading…</Text>
+            ) : recentTx.length === 0 ? (
+              <Text style={s.txEmptyText}>No transactions yet</Text>
+            ) : (
+              recentTx.map((item, i) => (
+                <Animated.View
+                  key={item.id}
+                  entering={FadeInUp.duration(260).springify().delay(220 + i * 35)}
+                >
+                  <TxRow
+                    item={item}
+                    onPress={press(() => router.push("/(tabs)/history" as any))}
+                  />
+                  {i < recentTx.length - 1 && <View style={s.txDivider} />}
+                </Animated.View>
+              ))
+            )}
           </View>
         </Animated.View>
       </ScrollView>
@@ -525,6 +578,13 @@ const s = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   txDivider: { height: 1, backgroundColor: "#F5F5F5", marginHorizontal: 14 },
+  txEmptyText: {
+    paddingVertical: 24,
+    textAlign: "center",
+    fontSize: rf(13),
+    fontFamily: "Manrope_500Medium",
+    color: "#AAAFB5",
+  },
 });
 
 const sv = StyleSheet.create({

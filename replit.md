@@ -62,7 +62,7 @@ There used to be two separate dev workflows running the Express API (a legacy ha
 - Gift Card button on the home dashboard opens a bottom sheet modal with two tiles: "Sell Gift Card" → `/(app)/sell-gift-card` and "Check Pending" → `/(app)/card-status`
 - White background light theme (bg: `#FFFFFF`, text: `#0B0A0A`, accent: `#35C2C1` teal) for PAYVORA app
 - `/(app)/dashboard.tsx` is actually the "Fund Wallet" flow, not a real dashboard — the main home is at `/(tabs)/index.tsx`
-- AuthContext uses AsyncStorage to persist user session; login/register always succeed (mock auth)
+- AuthContext calls the real API (`/api/auth/*`, JWT-based) and persists the session (token + user) to AsyncStorage — not mock; `user.balance` is Naira (converted from the API's kobo at the point it enters the app)
 
 ## Product
 

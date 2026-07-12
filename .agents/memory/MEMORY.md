@@ -10,3 +10,6 @@
 - [DB schema layout](db-schema-layout.md) — four tables: users, sessions, wallets, transactions; all amounts in kobo (÷100 = naira); sessions.token stored plaintext (hash it before prod auth); FK indexes on sessions.user_id and transactions.user_id/created_at.
 - [Next.js build NODE_ENV fix](nextjs-build-node-env.md) — build script MUST be `NODE_ENV=production next build`; Replit dev env poisons Next.js's Html context check causing 500 on /404 prerender.
 - [DB schema never pushed](db-schema-never-pushed.md) — "Invalid credentials" can actually be a 500 from a missing table; verify tables exist before assuming an auth logic bug.
+- [JWT secret missing on fresh env](jwt-secret-missing.md) — auth 500s with "JWT_SECRET environment variable is required" if not set; check before assuming auth logic bug.
+    - [Kobo vs Naira balance bug](kobo-naira-balance.md) — API returns balanceKobo; convert to Naira once at the AuthContext entry point, not per-screen, or balances display 100x too large.
+    

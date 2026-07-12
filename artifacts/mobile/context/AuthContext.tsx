@@ -72,7 +72,12 @@ function toUser(apiUser: ApiUser, wallet: WalletData | null): User {
     email: apiUser.email,
     name: apiUser.fullName ?? apiUser.email.split("@")[0],
     avatarUrl: apiUser.avatarUrl,
-    balance: wallet ? wallet.balanceKobo : 0,
+    // `wallet.balanceKobo` is the smallest currency unit from the API.
+    // Every screen in the app (dashboard, withdraw, fund wallet, etc.)
+    // formats and does arithmetic on `user.balance` as whole Naira, so it
+    // must be converted here at the one place it enters the app — leaving
+    // it in kobo made every balance display 100x too large.
+    balance: wallet ? wallet.balanceKobo / 100 : 0,
   };
 }
 

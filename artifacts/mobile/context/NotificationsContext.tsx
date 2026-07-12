@@ -8,6 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 /**
  * Single source of truth for notifications.
@@ -51,7 +52,15 @@ export interface Notification {
   cta?:        { label: string; action: string };
 }
 
-const STORAGE_KEY = "payvora_notifications_v1";
+const STORAGE_PREFIX = "payvora_notifications_v1";
+
+// Scope storage per-account so logging out and into a different account on
+// the same device never shows (or lets you delete) another user's
+// notifications. Signed-out state gets its own bucket rather than reusing
+// whichever account last used the device.
+function storageKeyFor(userId: string | null | undefined): string {
+  return userId ? `${STORAGE_PREFIX}:${userId}` : `${STORAGE_PREFIX}:guest`;
+}
 
 const CAT_META: Record<NotifCategory, {
   icon:      keyof typeof Feather.glyphMap;
@@ -220,46 +229,65 @@ const NotificationsContext = createContext<NotificationsContextType>({
 });
 
 export function NotificationsProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   // Guards against writing to AsyncStorage with the initial empty state
   // before the persisted value has even been read — that would clobber a
   // real persisted list with an empty one on every cold start.
   const hydrated = useRef(false);
+  // Tracks which account's storage key is currently loaded, so we can
+  // detect a login/logout/account switch and re-hydrate from that
+  // account's own bucket instead of leaking the previous account's list.
+  const loadedFor = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
+    // Wait for auth to settle so we key storage by the real account (or
+    // the "guest" bucket) instead of hydrating once as guest and never
+    // re-reading once the real user id becomes available.
+    if (authLoading) return;
+    if (loadedFor.current === userId) return;
+
     let cancelled = false;
+    hydrated.current = false;
+    setIsLoading(true);
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        const raw = await AsyncStorage.getItem(storageKeyFor(userId));
         if (cancelled) return;
         if (raw) {
           setNotifications(JSON.parse(raw));
         } else {
-          setNotifications(SEED);
+          // Only a brand-new (never-persisted) account/guest bucket seeds
+          // the sample data; an existing account with zero notifications
+          // left over from real activity should just show empty.
+          setNotifications(userId ? [] : SEED);
         }
       } catch {
-        if (!cancelled) setNotifications(SEED);
+        if (!cancelled) setNotifications([]);
       } finally {
         if (!cancelled) {
+          loadedFor.current = userId;
           hydrated.current = true;
           setIsLoading(false);
         }
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [userId, authLoading]);
 
   // Persist on every change — this is the "centralized notification
   // store" that stays in sync with what's rendered; there's no separate
   // in-memory copy anywhere else in the app.
   useEffect(() => {
     if (!hydrated.current) return;
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(notifications)).catch(() => {
+    AsyncStorage.setItem(storageKeyFor(userId), JSON.stringify(notifications)).catch(() => {
       // Non-fatal — worst case a deletion doesn't survive an app restart,
       // it will still behave correctly for the remainder of this session.
     });
-  }, [notifications]);
+  }, [notifications, userId]);
 
   const dismiss = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
@@ -287,12 +315,12 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     // AsyncStorage (our current source of truth) rather than resetting to
     // SEED ensures a pull-to-refresh can never resurrect deleted items.
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const raw = await AsyncStorage.getItem(storageKeyFor(userId));
       if (raw) setNotifications(JSON.parse(raw));
     } catch {
       // Keep whatever is currently in memory.
     }
-  }, []);
+  }, [userId]);
 
   return (
     <NotificationsContext.Provider
